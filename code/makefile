@@ -1,18 +1,21 @@
 CC = g++
-CFLAGS = -c -O2
-SOURCES = server.cpp utils.cpp
+CFLAGS = -O2 -Wall -pedantic
+SOURCES = server.cpp client.cpp utils.cpp
 OBJECTS = $(SOURCES:.cpp=.o)
-EXECUTABLE = server.out
+EXECUTABLES = server client
 
-all: $(OBJECTS) $(EXECUTABLE)
+all: $(OBJECTS) server client
 
-$(EXECUTABLE) : $(OBJECTS)
-		$(CC) $(OBJECTS) -o $@  
+server : server.o utils.o
+	$(CC) $(CFLAGS) server.o utils.o -o $@
+
+client : client.o utils.o
+	$(CC) $(CFLAGS) client.o utils.o -o $@
 
 .cpp.o: *.h
-	$(CC) $(CFLAGS) $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean : 
-	-rm -f $(OBJECTS) $(EXECUTABLE)
+	-rm -f $(OBJECTS) $(EXECUTABLES)
 
 .PHONY: all clean
