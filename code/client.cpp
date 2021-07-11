@@ -53,22 +53,53 @@ int main ( int argc , char** argv )
 	cout << current_time() << "	Initiating connection with server." << endl;
 
 	connect( socket_fd , (struct sockaddr *) &server , sizeof( server ) );
-	
 	if ( rv < 0 )
 		error( "Connect failed." );
 
+	
+	/*************************************************************/
+	/* Main loop.                                                */
+	/*************************************************************/
 	while ( 1 )
 	{
-		// wait for global model
+		/*************************************************************/
+		/* wait for global model and read it. Blocking.              */
+		/*************************************************************/
 		cout << current_time() << "	Waiting for global model." << endl;
 
-		// calculate lamdas
+		char buffer[100];
 
-		//send local lamdas
-		break;
+		rv = recv( socket_fd , buffer , sizeof(buffer) , 0 );
+		
+		// something went wrong
+		if ( rv < 0 )
+		{	
+			cout << current_time() << "	Unexpected error on recv: " << errno << endl;
+			continue;
+		}
+
+		// check if connection got closed
+		if ( rv == 0 )
+		{
+			cout << current_time() << "	Connection Closed" << endl;
+
+			// There's mothing more to do if the connection with server breaks.
+			// Close socket and exit. 
+			close( socket_fd );
+			break;
+		}
+
+		/*************************************************************/
+		/* calculate deltas.                                         */
+		/*************************************************************/
+		cout << "\n			epoch    =   " << buffer << "\n" << endl;
+		/*************************************************************/
+		/* send local deltas. Non blocking.                          */
+		/*************************************************************/
+		rv = send( socket_fd , buffer , sizeof(buffer) , MSG_DONTWAIT );
+		if ( rv < 0 )
+			cout << current_time() << "	Unexpected error on send: " << errno << endl;
 	}
-
-	close( socket_fd );
 }
 
 

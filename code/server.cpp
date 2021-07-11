@@ -32,13 +32,17 @@ using namespace std;
 
 #define LISTEN_MAX_BACKLOG 5
 #define MAX_CONNECTED_CLIENTS 10
+#define EPOCH_LIMIT 5
 
 #define TRUE  1
 #define FALSE 0
 
 
-int global_model_ready();
-void announce_global_model();
+int read_socket( struct pollfd polled_fds[MAX_CONNECTED_CLIENTS] , int fd_num , int* compress_array , int* connected_clients , int* working_clients );
+
+int global_model_ready( int connected_clients , int working_clients );
+
+int announce_global_model( struct pollfd polled_fds[MAX_CONNECTED_CLIENTS] , int connected_clients , int working_clients , int epoch );
 
 
 int main( int argc , char** argv )
@@ -104,7 +108,7 @@ int main( int argc , char** argv )
 	// Initialize the pollfd structure
 	memset( polled_fds , 0 , sizeof(polled_fds) );
 
-	// Set up the initial listening socket
+	// Put in the initial listening socket
 	polled_fds[0].fd = listening_socket_fd;
 	polled_fds[0].events = POLLIN;
 	num_polled_fds++;
@@ -122,6 +126,9 @@ int main( int argc , char** argv )
 	int working_clients = 0;
 	// When results are acceptable, stop training.
 	int server_shutdown = FALSE;
+	// keep track of current epoch
+	int current_epoch = 0;
+
 
 	while ( server_shutdown == FALSE )
 	{
@@ -214,38 +221,19 @@ int main( int argc , char** argv )
 			{
 				cout << current_time() << "	Fd readable:	IP: " << peer_ip
 					<< "	Port: " << ntohs( peer_addr.sin_port ) << endl;
+			
+				rv = read_socket( polled_fds , i , &compress_array , &connected_clients , &working_clients );
 
-				char* buffer[100];
-				rv = recv( polled_fds[i].fd , buffer , sizeof(buffer) , 0 );
-
-				if ( rv < 0 )
-				{
-					// no more data
-					if ( errno == EWOULDBLOCK )
-						break;
-						
-					// something went wrong
-					cout << current_time() << "	Unexpected error on recv: " << errno << endl;
-						break;
-				}
-
-				// check if connection got closed
+				// read failed, continue to next fd, might be reduntant
 				if ( rv == 0 )
-				{
-					cout << "Connection Closed" << endl;
+					continue;
 
-					// close it and mark it for removal from the fd set
-					close( polled_fds[i].fd );
-					polled_fds[i].fd = -1;
-					compress_array = TRUE;
-
-					connected_clients--;
-				}
 			} /* End of existing connection is readable */
 		} /* End of loop through pollable descriptors */
 
 
 		/*****************************************************************/
+		/* Remove fds of closed sockets.                                 */
 		/* If the compress_array flag was turned on, squeeze the array   */
 		/* and decrement the number of file descriptors. No need to move */
 		/* back the events and revents fields because the events will    */
@@ -269,20 +257,109 @@ int main( int argc , char** argv )
 		}
 
 
-		if ( global_model_ready() )
+		/*****************************************************************/
+		/* Track current epoch, check shutdown requirements              */
+		/* and announce global model.                                    */
+		/*****************************************************************/
+		if ( global_model_ready( connected_clients , working_clients ) )
 		{
-			announce_global_model();
+			if ( current_epoch == EPOCH_LIMIT )
+			{
+				server_shutdown = TRUE;
+				current_epoch = -1; // to show to the clients that training ended and they receiving the final model
+			}
+			else
+				current_epoch++;
+
+			cout << "\n			EPOCH    =    " << current_epoch << "\n" << endl;
+
+			working_clients = announce_global_model( polled_fds , connected_clients , working_clients , current_epoch );
 		}
 	} /* End of server running */
+
+	// close all connections
+	for ( int i = 0 ; i < MAX_CONNECTED_CLIENTS ; i++ )
+	{
+		if ( polled_fds[i].fd > 0 )
+			shutdown( polled_fds[i].fd , SHUT_RDWR );
+	}
 }
 
 
-int global_model_ready()
+// TODO: struct to write data
+/*****************************************************************/
+/* Reads socket and marks it for removal in case it got closed.  */
+/*****************************************************************/
+int read_socket( struct pollfd polled_fds[MAX_CONNECTED_CLIENTS] , int fd_num , int* compress_array , int* connected_clients , int* working_clients )
 {
+	char buffer[100];
+	int rv = recv( polled_fds[fd_num].fd , buffer , sizeof(buffer) , 0 );
+
+	if ( rv < 0 )
+	{
+		// no more data
+		if ( errno == EWOULDBLOCK )
+			return 0;
+			
+		// something went wrong
+		cout << current_time() << "	Unexpected error on recv: " << errno << endl;
+		return 0;
+	}
+
+	// check if connection got closed
+	if ( rv == 0 )
+	{
+		cout << current_time() << "Connection Closed" << endl;
+
+		// close it and mark it for removal from the fd set
+		close( polled_fds[fd_num].fd );
+		polled_fds[fd_num].fd = -1;
+		*compress_array = TRUE;
+
+		(*connected_clients)--;
+	}
+	// TODO: check if client was working
+	(*working_clients)--;
+
 	return 1;
 }
 
-void announce_global_model()
+
+/*****************************************************************/
+/*****************************************************************/
+int global_model_ready( int connected_clients , int working_clients )
 {
-	return;
+	cout << "connected_clients = " << connected_clients << "	working_clients = " << working_clients << endl;
+	if ( connected_clients - working_clients == 3 )
+		return 1;
+
+	return 0;
+}
+
+
+/*****************************************************************/
+/*****************************************************************/
+int announce_global_model( struct pollfd polled_fds[MAX_CONNECTED_CLIENTS] , int connected_clients , int working_clients , int epoch )
+{
+	int rv;
+	char buffer[100];
+
+	sprintf( buffer , "%d" , epoch);
+
+	// first descriptor is the listening socket. Start from second
+	for( int i = 1 ; i < connected_clients + 1 ; i++ )
+	{
+		cout << current_time() << "	Sending Global Model to client: " << i << endl;
+
+		rv = send( polled_fds[i].fd , buffer , sizeof(buffer) , 0 );
+		
+		// send failed
+		if ( rv < 0 )
+		{
+			continue;
+		}
+		working_clients++;
+	}
+
+	return working_clients;
 }
