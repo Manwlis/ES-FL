@@ -1,11 +1,12 @@
-/*
- * utils.h
- *
- * Description
- *
- * Created: 21/6/2021
- * Author : Emmanouil Petrakos
- * Developed with VS code on WSL
+/**
+ * @file utils.h
+ * @author Emmanouil Petrakos
+ * @brief Header file for utils.cpp which contains generic helper functions
+ * @version 4.0
+ * @date 2021-07-11
+ * 
+ * @copyright None
+ * 
  */
 
 #pragma once
@@ -17,6 +18,12 @@
 
 using namespace std;
 
-void error( const char *msg );
+#define RESET   "\033[0m"
+#define RED     "\033[31m"  /* Red */
+#define GREEN   "\033[32m"  /* Green */
 
-const string current_time();
+#define CURRENT_TIME GREEN << current_time() << RESET
+
+void error( const char* msg );
+
+string current_time();

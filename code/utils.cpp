@@ -1,24 +1,35 @@
-/*
- * utils.cpp
- *
- * Description
- *
- * Created: 21/6/2021
- * Author : Emmanouil Petrakos
- * Developed with VS code on WSL
+/**
+ * @file utils.cpp
+ * @author Emmanouil Petrakos
+ * @brief File with generic helper functions
+ * @version 4.0
+ * @date 2021-07-11
+ * 
+ * @copyright None
+ * 
  */
 
 #include "utils.h"
 
 
-void error( const char *msg )
+/**
+ * @brief perror() wrapper, calls perror and closes program.
+ * 
+ * @param char* message to be printed by perror 
+ */
+void error( const char* msg )
 {
 	perror( msg );
 	exit( EXIT_FAILURE );
 }
 
-// Get current date/time, format is HH:mm:ss
-const string current_time()
+
+/**
+ * @brief Get current time, formated as HH:mm:ss
+ * 
+ * @return string containing the formated time
+ */
+string current_time()
 {
 	char buf[9];
 

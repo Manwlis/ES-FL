@@ -1,11 +1,12 @@
-/*
- * server.cpp
- *
- * Description
- *
- * Created: 21/6/2021
- * Author : Emmanouil Petrakos
- * Developed with VS code on WSL
+/**
+ * @file server.cpp
+ * @author Emmanouil Petrakos
+ * @brief Server orchestrating federated learning.
+ * @version 0.1
+ * @date 11/07/2021
+ * 
+ * @copyright None
+ * 
  */
 
 #include <iostream>		/* << */
@@ -34,15 +35,21 @@ using namespace std;
 #define MAX_CONNECTED_CLIENTS 10
 #define EPOCH_LIMIT 5
 
+#define FD_NUM MAX_CONNECTED_CLIENTS+1 // +1 for the listening socket
+
 #define TRUE  1
 #define FALSE 0
 
 
-int read_socket( struct pollfd polled_fds[MAX_CONNECTED_CLIENTS] , int fd_num , int* compress_array , int* connected_clients , int* working_clients );
+int read_socket(
+	struct pollfd polled_fds[FD_NUM] , int working_fds[FD_NUM] ,
+	int fd_pos , int* compress_array , int* connected_clients_num , int* working_clients_num );
 
-int global_model_ready( int connected_clients , int working_clients );
+int global_model_ready( int connected_clients_num , int working_clients_num );
 
-int announce_global_model( struct pollfd polled_fds[MAX_CONNECTED_CLIENTS] , int connected_clients , int working_clients , int epoch );
+int announce_global_model(
+	struct pollfd polled_fds[FD_NUM] , int working_fds[FD_NUM] ,
+	int connected_clients_num , int working_clients_num , int epoch );
 
 
 int main( int argc , char** argv )
@@ -95,14 +102,14 @@ int main( int argc , char** argv )
 		error( "Listen server socket failed" );
 	
 
-	cout << current_time() << "	Listening port " << server_port << endl;
+	cout << CURRENT_TIME << "	Listening port " << server_port << endl;
 
 
 	/**************************************************************/
 	/* Initialize polling                                         */
 	/**************************************************************/
 	// Contains the file descriptors of the sockets that are being polled
-	struct pollfd polled_fds[MAX_CONNECTED_CLIENTS];
+	struct pollfd polled_fds[FD_NUM];
 	int num_polled_fds = 0;
 
 	// Initialize the pollfd structure
@@ -122,8 +129,9 @@ int main( int argc , char** argv )
 	/* on any of the connected sockets.                          */
 	/*************************************************************/
 	// Used to check when to announce the new global model
-	int connected_clients = 0;
-	int working_clients = 0;
+	int connected_clients_num = 0;
+	int working_clients_num = 0;
+	int working_fds[FD_NUM] = {0};
 	// When results are acceptable, stop training.
 	int server_shutdown = FALSE;
 	// keep track of current epoch
@@ -133,7 +141,7 @@ int main( int argc , char** argv )
 	while ( server_shutdown == FALSE )
 	{
 		// Wait on poll
-		cout << current_time() << "	Waiting on poll" << endl;
+		cout << CURRENT_TIME << "	Waiting on poll" << endl;
 
 		rv = poll( polled_fds , num_polled_fds , timeout );
 
@@ -142,7 +150,7 @@ int main( int argc , char** argv )
 
 		if ( rv == 0 )
 		{
-			cout << current_time() << "	Poll timed out" << endl;
+			cout << CURRENT_TIME << "	Poll timed out" << endl;
 			// do time out things
 		}
 
@@ -167,7 +175,7 @@ int main( int argc , char** argv )
 
 			// Unexpected event
 			if ( polled_fds[i].revents != POLLIN )
-				cout << current_time() << "	Revent: " << polled_fds[i].revents
+				cout << CURRENT_TIME << "	Revent: " << polled_fds[i].revents
 					<< " on connention with " << peer_ip
 					<< " at port " << ntohs( peer_addr.sin_port ) << endl;
 			
@@ -178,7 +186,7 @@ int main( int argc , char** argv )
 			if ( polled_fds[i].fd == listening_socket_fd )
 			{
 				// there are incoming connection requests
-				cout << current_time() << "	New connections" << endl;
+				cout << CURRENT_TIME << "	New connections" << endl;
 
 				// accept them all
 				while ( TRUE )
@@ -196,12 +204,12 @@ int main( int argc , char** argv )
 							break;
 							
 						// something went wrong
-						cout << current_time() << "	Unexpected error on accept: " << new_fd << endl;
+						cout << CURRENT_TIME << "	Unexpected error on accept: " << new_fd << endl;
 						continue;
 					}
 
 					// new client
-					cout << current_time() << "	New client IP:	" << inet_ntoa( client_addr.sin_addr )
+					cout << CURRENT_TIME << "	New client IP:	" << inet_ntoa( client_addr.sin_addr )
 						<< "	Port: " << ntohs( client_addr.sin_port ) << endl;
 
 					// add the new socket in the polled fd set.
@@ -209,7 +217,7 @@ int main( int argc , char** argv )
 					polled_fds[num_polled_fds].events = POLLIN;
 					num_polled_fds++;
 
-					connected_clients++;
+					connected_clients_num++;
 				}
 			}
 
@@ -219,10 +227,10 @@ int main( int argc , char** argv )
 			/*************************************************************/
 			else
 			{
-				cout << current_time() << "	Fd readable:	IP: " << peer_ip
+				cout << CURRENT_TIME << "	Fd readable:	IP: " << peer_ip
 					<< "	Port: " << ntohs( peer_addr.sin_port ) << endl;
 			
-				rv = read_socket( polled_fds , i , &compress_array , &connected_clients , &working_clients );
+				rv = read_socket( polled_fds , working_fds , i , &compress_array , &connected_clients_num , &working_clients_num );
 
 				// read failed, continue to next fd, might be reduntant
 				if ( rv == 0 )
@@ -249,6 +257,7 @@ int main( int argc , char** argv )
 					for( int j = i ; j < num_polled_fds - 1 ; j++ )
 					{
 						polled_fds[j].fd = polled_fds[j+1].fd;
+						working_fds[j] = working_fds[j+1]; // do the same for the work flags
 					}
 					i--;
 					num_polled_fds--;
@@ -261,7 +270,7 @@ int main( int argc , char** argv )
 		/* Track current epoch, check shutdown requirements              */
 		/* and announce global model.                                    */
 		/*****************************************************************/
-		if ( global_model_ready( connected_clients , working_clients ) )
+		if ( global_model_ready( connected_clients_num , working_clients_num ) )
 		{
 			if ( current_epoch == EPOCH_LIMIT )
 			{
@@ -271,14 +280,18 @@ int main( int argc , char** argv )
 			else
 				current_epoch++;
 
-			cout << "\n			EPOCH    =    " << current_epoch << "\n" << endl;
+			cout << RED << "\n			EPOCH    =    " << current_epoch << RESET << "\n" << endl;
 
-			working_clients = announce_global_model( polled_fds , connected_clients , working_clients , current_epoch );
+			working_clients_num = announce_global_model( polled_fds , working_fds , connected_clients_num , working_clients_num , current_epoch );
+	// for( int k = 0 ; k < FD_NUM ; k++ )
+	// {
+	// 	cout << working_fds[k] << endl;
+	// }
 		}
 	} /* End of server running */
 
 	// close all connections
-	for ( int i = 0 ; i < MAX_CONNECTED_CLIENTS ; i++ )
+	for ( int i = 0 ; i < FD_NUM ; i++ )
 	{
 		if ( polled_fds[i].fd > 0 )
 			shutdown( polled_fds[i].fd , SHUT_RDWR );
@@ -287,13 +300,23 @@ int main( int argc , char** argv )
 
 
 // TODO: struct to write data
-/*****************************************************************/
-/* Reads socket and marks it for removal in case it got closed.  */
-/*****************************************************************/
-int read_socket( struct pollfd polled_fds[MAX_CONNECTED_CLIENTS] , int fd_num , int* compress_array , int* connected_clients , int* working_clients )
+/**
+ * @brief Reads socket and marks it for removal in case it got closed.
+ * 
+ * @param pollfd[] struct array of size FD_NUM, containing the fds of the polled sockets
+ * @param int[] array of size FD_NUM, showing which clients are working
+ * @param int the potision in the array of the fd to be read 
+ * @param int* compress array flag
+ * @param int* connected clients counter
+ * @param int* working clients counter
+ * @return int 1 on success, 0 on failure
+ */
+int read_socket(
+	struct pollfd polled_fds[FD_NUM] , int working_fds[FD_NUM] ,
+	int fd_pos , int* compress_array , int* connected_clients_num , int* working_clients_num )
 {
 	char buffer[100];
-	int rv = recv( polled_fds[fd_num].fd , buffer , sizeof(buffer) , 0 );
+	int rv = recv( polled_fds[fd_pos].fd , buffer , sizeof(buffer) , 0 );
 
 	if ( rv < 0 )
 	{
@@ -302,44 +325,64 @@ int read_socket( struct pollfd polled_fds[MAX_CONNECTED_CLIENTS] , int fd_num , 
 			return 0;
 			
 		// something went wrong
-		cout << current_time() << "	Unexpected error on recv: " << errno << endl;
+		cout << CURRENT_TIME << "	Unexpected error on recv: " << errno << endl;
 		return 0;
 	}
 
 	// check if connection got closed
 	if ( rv == 0 )
 	{
-		cout << current_time() << "Connection Closed" << endl;
+		cout << CURRENT_TIME << "	Connection Closed" << endl;
 
 		// close it and mark it for removal from the fd set
-		close( polled_fds[fd_num].fd );
-		polled_fds[fd_num].fd = -1;
+		close( polled_fds[fd_pos].fd );
+		polled_fds[fd_pos].fd = -1;
 		*compress_array = TRUE;
 
-		(*connected_clients)--;
+		(*connected_clients_num)--;
 	}
-	// TODO: check if client was working
-	(*working_clients)--;
+	// if a working client sended a message means it finished
+	// track warking clients
+	if( working_fds[fd_pos] == 1 )
+		(*working_clients_num)--;
+
+	// mark the fd as non working
+	working_fds[fd_pos] = 0;
 
 	return 1;
 }
 
 
-/*****************************************************************/
-/*****************************************************************/
-int global_model_ready( int connected_clients , int working_clients )
+/**
+ * @brief Checks new epoch conditions.
+ * 
+ * @param int connected clients counter
+ * @param int working clients counter
+ * @return int 1 if new epoch ready, 0 if not
+ */
+int global_model_ready( int connected_clients_num , int working_clients_num )
 {
-	cout << "connected_clients = " << connected_clients << "	working_clients = " << working_clients << endl;
-	if ( connected_clients - working_clients == 3 )
+	cout << "									connected clients = " << connected_clients_num << "	working clients  = " << working_clients_num << endl;
+	if ( connected_clients_num - working_clients_num == 3 )
 		return 1;
 
 	return 0;
 }
 
 
-/*****************************************************************/
-/*****************************************************************/
-int announce_global_model( struct pollfd polled_fds[MAX_CONNECTED_CLIENTS] , int connected_clients , int working_clients , int epoch )
+/**
+ * @brief Sends new global model to all connected clients.
+ * 
+ * @param pollfd[] struct array of size FD_NUM, containing the fds of the polled sockets
+ * @param int[] array of size FD_NUM, showing which clients are working
+ * @param int connected clients counter 
+ * @param int working clients counter 
+ * @param int current epoch number 
+ * @return int number of clients where the new global model was send
+ */
+int announce_global_model(
+	struct pollfd polled_fds[FD_NUM] , int working_fds[FD_NUM] ,
+	int connected_clients_num , int working_clients_num , int epoch )
 {
 	int rv;
 	char buffer[100];
@@ -347,9 +390,9 @@ int announce_global_model( struct pollfd polled_fds[MAX_CONNECTED_CLIENTS] , int
 	sprintf( buffer , "%d" , epoch);
 
 	// first descriptor is the listening socket. Start from second
-	for( int i = 1 ; i < connected_clients + 1 ; i++ )
+	for( int i = 1 ; i < connected_clients_num + 1 ; i++ )
 	{
-		cout << current_time() << "	Sending Global Model to client: " << i << endl;
+		cout << CURRENT_TIME << "	Sending Global Model to client: " << i << endl;
 
 		rv = send( polled_fds[i].fd , buffer , sizeof(buffer) , 0 );
 		
@@ -358,8 +401,10 @@ int announce_global_model( struct pollfd polled_fds[MAX_CONNECTED_CLIENTS] , int
 		{
 			continue;
 		}
-		working_clients++;
+		// track working fds
+		working_clients_num++;
+		working_fds[i] = 1;
 	}
 
-	return working_clients;
+	return working_clients_num;
 }
