@@ -2,7 +2,7 @@
  * @file utils.h
  * @author Emmanouil Petrakos
  * @brief Header file for utils.cpp which contains generic helper functions
- * @version 4.0
+ * @version 0.1
  * @date 2021-07-11
  * 
  * @copyright None
@@ -17,6 +17,9 @@
 #include <stdlib.h> /* exit, EXIT_FAILURE */
 
 using namespace std;
+
+#define TRUE  1
+#define FALSE 0
 
 #define RESET   "\033[0m"
 #define RED     "\033[31m"  /* Red */

@@ -24,6 +24,7 @@
 #include <fcntl.h>		/* fcntl */
 
 #include "utils.h"		/* error, current_time */
+#include "messages.h"	/* msg structs, serialize, deserialize */
 
 
 using namespace std;
@@ -37,19 +38,23 @@ using namespace std;
 
 #define FD_NUM MAX_CONNECTED_CLIENTS+1 // +1 for the listening socket
 
-#define TRUE  1
-#define FALSE 0
-
 
 int read_socket(
 	struct pollfd polled_fds[FD_NUM] , int working_fds[FD_NUM] ,
-	int fd_pos , int* compress_array , int* connected_clients_num , int* working_clients_num );
+	int fd_pos , int* compress_array , int* connected_clients_num , int* working_clients_num ,
+	client_to_server_msg* received_message );
+
+int dequintize_received_deltas();
+int add_deltas_to_global_diff();
 
 int global_model_ready( int connected_clients_num , int working_clients_num );
 
+int create_new_global_model();
+
 int announce_global_model(
 	struct pollfd polled_fds[FD_NUM] , int working_fds[FD_NUM] ,
-	int connected_clients_num , int working_clients_num , int epoch );
+	int connected_clients_num , int working_clients_num , int epoch ,
+	server_to_client_msg* message );
 
 
 int main( int argc , char** argv )
@@ -137,7 +142,7 @@ int main( int argc , char** argv )
 	// keep track of current epoch
 	int current_epoch = 0;
 
-
+	// main loop
 	while ( server_shutdown == FALSE )
 	{
 		// Wait on poll
@@ -181,7 +186,7 @@ int main( int argc , char** argv )
 			
 
 			/*************************************************************/
-			/* The listening socket fd raised POLLIN event.              */
+			/* The listening socket fd raised POLLIN event. New client.  */
 			/*************************************************************/
 			if ( polled_fds[i].fd == listening_socket_fd )
 			{
@@ -225,16 +230,29 @@ int main( int argc , char** argv )
 			/* Non listening socket fd raised POLLIN event.              */
 			/* New incoming data, read them                              */
 			/*************************************************************/
+			// TODO: time this block, thread it if it's 
 			else
 			{
 				cout << CURRENT_TIME << "	Fd readable:	IP: " << peer_ip
 					<< "	Port: " << ntohs( peer_addr.sin_port ) << endl;
 			
-				rv = read_socket( polled_fds , working_fds , i , &compress_array , &connected_clients_num , &working_clients_num );
+				client_to_server_msg received_message;
 
-				// read failed, continue to next fd, might be reduntant
+				rv = read_socket( polled_fds , working_fds , i , &compress_array , &connected_clients_num , &working_clients_num , &received_message );
+
+				// read failed, continue to next fd
 				if ( rv == 0 )
 					continue;
+
+				/*************************************************************/
+				/* Decompress / dequantize received deltas.                  */
+				/*************************************************************/	
+				dequintize_received_deltas();
+
+				/*************************************************************/
+				/* Increment received deltas to global diff.                 */
+				/*************************************************************/
+				add_deltas_to_global_diff();
 
 			} /* End of existing connection is readable */
 		} /* End of loop through pollable descriptors */
@@ -268,25 +286,29 @@ int main( int argc , char** argv )
 
 		/*****************************************************************/
 		/* Track current epoch, check shutdown requirements              */
-		/* and announce global model.                                    */
+		/* create and announce new global model.                         */
 		/*****************************************************************/
 		if ( global_model_ready( connected_clients_num , working_clients_num ) )
 		{
+			// track epoch and shutdown requirements
 			if ( current_epoch == EPOCH_LIMIT )
 			{
 				server_shutdown = TRUE;
-				current_epoch = -1; // to show to the clients that training ended and they receiving the final model
+				current_epoch = -1; // show to the clients that training ended and they are receiving the final model
 			}
 			else
 				current_epoch++;
 
+			// create global model
+			server_to_client_msg announcement_msg;
+			announcement_msg.epoch = current_epoch;
+
+			create_new_global_model();
+
+			// announce global model
 			cout << RED << "\n			EPOCH    =    " << current_epoch << RESET << "\n" << endl;
 
-			working_clients_num = announce_global_model( polled_fds , working_fds , connected_clients_num , working_clients_num , current_epoch );
-	// for( int k = 0 ; k < FD_NUM ; k++ )
-	// {
-	// 	cout << working_fds[k] << endl;
-	// }
+			working_clients_num = announce_global_model( polled_fds , working_fds , connected_clients_num , working_clients_num , current_epoch , &announcement_msg );
 		}
 	} /* End of server running */
 
@@ -299,7 +321,7 @@ int main( int argc , char** argv )
 }
 
 
-// TODO: struct to write data
+
 /**
  * @brief Reads socket and marks it for removal in case it got closed.
  * 
@@ -309,15 +331,19 @@ int main( int argc , char** argv )
  * @param int* compress array flag
  * @param int* connected clients counter
  * @param int* working clients counter
+ * @param client_to_server_msg* struct containing client's local training 
  * @return int 1 on success, 0 on failure
  */
 int read_socket(
 	struct pollfd polled_fds[FD_NUM] , int working_fds[FD_NUM] ,
-	int fd_pos , int* compress_array , int* connected_clients_num , int* working_clients_num )
+	int fd_pos , int* compress_array , int* connected_clients_num , int* working_clients_num ,
+	client_to_server_msg* received_message )
 {
-	char buffer[100];
-	int rv = recv( polled_fds[fd_pos].fd , buffer , sizeof(buffer) , 0 );
+	// read socket
+	unsigned char buffer[CLIENT_TO_SERVER_BUF_SIZE];
+	int rv = recv( polled_fds[fd_pos].fd , buffer , CLIENT_TO_SERVER_BUF_SIZE , 0 );
 
+	// check for errors
 	if ( rv < 0 )
 	{
 		// no more data
@@ -349,7 +375,26 @@ int read_socket(
 	// mark the fd as non working
 	working_fds[fd_pos] = 0;
 
+	// check if message is complete through rv
+	if ( rv < CLIENT_TO_SERVER_BUF_SIZE )													// TODO: test
+		return 0;
+	
+	// deserialize received data
+	deserialize_client_to_server_msg( received_message , buffer );								// TODO: test
+
 	return 1;
+}
+
+
+int dequintize_received_deltas()
+{
+	return 0;
+}
+
+
+int add_deltas_to_global_diff()
+{
+	return 0;
 }
 
 
@@ -369,32 +414,43 @@ int global_model_ready( int connected_clients_num , int working_clients_num )
 	return 0;
 }
 
+int create_new_global_model()
+{
+	return 0;
+}
 
+
+// maybe remove current epoch, already exists in message
 /**
  * @brief Sends new global model to all connected clients.
  * 
  * @param pollfd[] struct array of size FD_NUM, containing the fds of the polled sockets
  * @param int[] array of size FD_NUM, showing which clients are working
- * @param int connected clients counter 
- * @param int working clients counter 
- * @param int current epoch number 
+ * @param int connected clients counter
+ * @param int working clients counter
+ * @param int current epoch number
+ * @param server_to_client_msg* Struct containing the global model that is going to be announced
  * @return int number of clients where the new global model was send
  */
 int announce_global_model(
 	struct pollfd polled_fds[FD_NUM] , int working_fds[FD_NUM] ,
-	int connected_clients_num , int working_clients_num , int epoch )
+	int connected_clients_num , int working_clients_num , int epoch ,
+	server_to_client_msg* message )
 {
 	int rv;
-	char buffer[100];
+	unsigned char buffer[SERVER_TO_CLIENT_BUF_SIZE];
 
-	sprintf( buffer , "%d" , epoch);
+	//sprintf( buffer , "%d" , epoch);
+	// serialize data
+	serialize_server_to_client_msg( message , buffer );										// TODO: test
+
 
 	// first descriptor is the listening socket. Start from second
 	for( int i = 1 ; i < connected_clients_num + 1 ; i++ )
 	{
 		cout << CURRENT_TIME << "	Sending Global Model to client: " << i << endl;
 
-		rv = send( polled_fds[i].fd , buffer , sizeof(buffer) , 0 );
+		rv = send( polled_fds[i].fd , buffer , SERVER_TO_CLIENT_BUF_SIZE , 0 );
 		
 		// send failed
 		if ( rv < 0 )

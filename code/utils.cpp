@@ -2,7 +2,7 @@
  * @file utils.cpp
  * @author Emmanouil Petrakos
  * @brief File with generic helper functions
- * @version 4.0
+ * @version 0.1
  * @date 2021-07-11
  * 
  * @copyright None

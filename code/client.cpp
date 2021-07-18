@@ -2,7 +2,7 @@
  * @file client.cpp
  * @author Emmanouil Petrakos
  * @brief Client taking part in federated learning.
- * @version 4.0
+ * @version 0.1
  * @date 11/07/2021
  * 
  * @copyright None
@@ -21,15 +21,19 @@
 #include <netdb.h>		/* getnameinfo */
 
 #include "utils.h"		/* error, current_time */
-
+#include "messages.h"	/* msg structs, serialize, deserialize */
 
 using namespace std;
+
 
 #define SERVER_IP "127.0.0.1"
 #define SERVER_PORT "12345"
 
 
 struct sockaddr_in find_server( const string server_name , const string server_port );
+
+int quantize_deltas();
+int send_deltas( int socket_fd , client_to_server_msg* send_message );
 
 
 int main ( int argc , char** argv )
@@ -68,10 +72,10 @@ int main ( int argc , char** argv )
 		/*************************************************************/
 		cout << CURRENT_TIME << "	Waiting for global model." << endl;
 
-		char buffer[100];
+		// read socket
+		unsigned char buffer[SERVER_TO_CLIENT_BUF_SIZE];
+		rv = recv( socket_fd , buffer , SERVER_TO_CLIENT_BUF_SIZE , 0 );
 
-		rv = recv( socket_fd , buffer , sizeof(buffer) , 0 );
-		
 		// something went wrong
 		if ( rv < 0 )
 		{	
@@ -90,14 +94,33 @@ int main ( int argc , char** argv )
 			break;
 		}
 
+		// check if received message is complete
+		if ( rv < SERVER_TO_CLIENT_BUF_SIZE )										// TODO: test
+			continue;
+		
+		// deserialize it
+		server_to_client_msg received_message;
+		deserialize_server_to_client_msg( &received_message , buffer );
+
 		/*************************************************************/
 		/* calculate deltas.                                         */
 		/*************************************************************/
-		cout << RED << "\n			EPOCH    =   " << buffer << RESET << "\n" << endl;
+		cout << RED << "\n			EPOCH    =   " << received_message.epoch << RESET << "\n" << endl;
+
+		/*************************************************************/
+		/* Compress / quantize deltas.                               */
+		/*************************************************************/
+		quantize_deltas();
+
 		/*************************************************************/
 		/* send local deltas. Non blocking.                          */
 		/*************************************************************/
-		rv = send( socket_fd , buffer , sizeof(buffer) , MSG_DONTWAIT );
+		// create message
+		client_to_server_msg send_message;
+		send_message.epoch = received_message.epoch;
+
+		// send message
+		rv = send_deltas( socket_fd , &send_message );
 		if ( rv < 0 )
 			cout << CURRENT_TIME << "	Unexpected error on send: " << errno << endl;
 	}
@@ -127,4 +150,30 @@ struct sockaddr_in find_server( const string server_name , const string server_p
 		error( "getaddrinfo failed." );
 
 	return *( (struct sockaddr_in *) server_addr_info->ai_addr );
+}
+
+
+int quantize_deltas()
+{
+	return 0;
+}
+
+
+/**
+ * @brief Serialize and send local deltas to target socket.
+ * 
+ * @param int target socket's fd  
+ * @param client_to_server_msg* message to be send
+ * @return int send(2) return value
+ */
+int send_deltas( int socket_fd , client_to_server_msg* send_message )
+{
+	// serialize local deltas
+	unsigned char buffer[CLIENT_TO_SERVER_BUF_SIZE];
+	serialize_client_to_server_msg( send_message , buffer );
+
+	// send message
+	int rv = send( socket_fd , buffer , sizeof(buffer) , MSG_DONTWAIT );
+
+	return rv;
 }
