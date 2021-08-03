@@ -11,7 +11,6 @@
 
 #include <iostream>		/* << */
 
-#include <assert.h>		/* assert */
 #include <stdlib.h>		/* atoi */
 #include <unistd.h>		/* close */
 #include <string.h>		/* memset */
@@ -299,9 +298,11 @@ int main( int argc , char** argv )
 			else
 				current_epoch++;
 
-			// create global model
+			// create global model / fake for now
 			server_to_client_msg announcement_msg;
 			announcement_msg.epoch = current_epoch;
+			for( int i = 0; i < WEIGHTS_NUM ; i++ )
+				announcement_msg.weights[i] = 1;
 
 			create_new_global_model();
 
@@ -438,11 +439,10 @@ int announce_global_model(
 	server_to_client_msg* message )
 {
 	int rv;
-	unsigned char buffer[SERVER_TO_CLIENT_BUF_SIZE];
 
-	//sprintf( buffer , "%d" , epoch);
-	// serialize data
-	serialize_server_to_client_msg( message , buffer );										// TODO: test
+	// serialize data - uncomment if network byte orded need to be respected
+	//static unsigned char buffer[SERVER_TO_CLIENT_BUF_SIZE];
+	//serialize_server_to_client_msg( message , buffer );
 
 
 	// first descriptor is the listening socket. Start from second
@@ -450,7 +450,7 @@ int announce_global_model(
 	{
 		cout << CURRENT_TIME << "	Sending Global Model to client: " << i << endl;
 
-		rv = send( polled_fds[i].fd , buffer , SERVER_TO_CLIENT_BUF_SIZE , 0 );
+		rv = send( polled_fds[i].fd , message , SERVER_TO_CLIENT_BUF_SIZE , 0 ); // message -> buffer if nbo respected
 		
 		// send failed
 		if ( rv < 0 )

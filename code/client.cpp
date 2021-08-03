@@ -65,16 +65,20 @@ int main ( int argc , char** argv )
 	/*************************************************************/
 	/* Main loop.                                                */
 	/*************************************************************/
+	int counter = 0; // counts total received bytes per message
+	static server_to_client_msg received_message; // struct to hold message
+
 	while ( 1 )
 	{
 		/*************************************************************/
 		/* wait for global model and read it. Blocking.              */
 		/*************************************************************/
-		cout << CURRENT_TIME << "	Waiting for global model." << endl;
+		cout << CURRENT_TIME << "	Waiting for data." << endl;
 
 		// read socket
-		unsigned char buffer[SERVER_TO_CLIENT_BUF_SIZE];
+		static unsigned char buffer[SERVER_TO_CLIENT_BUF_SIZE];
 		rv = recv( socket_fd , buffer , SERVER_TO_CLIENT_BUF_SIZE , 0 );
+
 
 		// something went wrong
 		if ( rv < 0 )
@@ -94,13 +98,28 @@ int main ( int argc , char** argv )
 			break;
 		}
 
+		// message may come in many parts. Concate them
+		memcpy( &(((unsigned char*)&received_message)[counter]) , buffer , rv );
+		counter += rv;
+
+		cout << CURRENT_TIME << "	received bytes: " << rv << "	total: " << counter << "	needed: " << SERVER_TO_CLIENT_BUF_SIZE << endl;
+
 		// check if received message is complete
-		if ( rv < SERVER_TO_CLIENT_BUF_SIZE )										// TODO: test
+		if ( counter < SERVER_TO_CLIENT_BUF_SIZE )
+			// if not wait for the rest of the data
 			continue;
 		
-		// deserialize it
-		server_to_client_msg received_message;
-		deserialize_server_to_client_msg( &received_message , buffer );
+
+		// message is complete, continue
+
+		cout << CURRENT_TIME << "	Received global model." << endl;
+		counter = 0; // reset counter for the next message
+
+		// test if expected data received / remove when real data is send
+		for( int i = 0 ; i < WEIGHTS_NUM ; i++ )
+			if( received_message.weights[i] != 1)
+				putchar('!');
+		//cout << received_message.weights[WEIGHTS_NUM - 1] << endl;
 
 		/*************************************************************/
 		/* calculate deltas.                                         */
@@ -116,7 +135,7 @@ int main ( int argc , char** argv )
 		/* send local deltas. Non blocking.                          */
 		/*************************************************************/
 		// create message
-		client_to_server_msg send_message;
+		static client_to_server_msg send_message;
 		send_message.epoch = received_message.epoch;
 
 		// send message

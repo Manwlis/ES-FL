@@ -25,9 +25,9 @@ struct server_to_client_msg
 struct client_to_server_msg
 {
     int epoch;
-    float weights[WEIGHTS_NUM];
     float loss;
     float accuracy;
+    float weights[WEIGHTS_NUM];
 };
 
 void serialize_server_to_client_msg(server_to_client_msg* message , unsigned char* buffer );
