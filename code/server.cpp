@@ -262,7 +262,7 @@ int main( int argc , char** argv )
 		/* If the compress_array flag was turned on, squeeze the array   */
 		/* and decrement the number of file descriptors. No need to move */
 		/* back the events and revents fields because the events will    */
-		/* always be POLLIN , and revents is output.                     */
+		/* always be POLLIN, and revents is output.                      */
 		/*****************************************************************/
 		if ( compress_array )
 		{
@@ -328,7 +328,7 @@ int main( int argc , char** argv )
  * 
  * @param pollfd[] struct array of size FD_NUM, containing the fds of the polled sockets
  * @param int[] array of size FD_NUM, showing which clients are working
- * @param int the potision in the array of the fd to be read 
+ * @param int the position in the array of the fd to be read 
  * @param int* compress array flag
  * @param int* connected clients counter
  * @param int* working clients counter
@@ -340,6 +340,9 @@ int read_socket(
 	int fd_pos , int* compress_array , int* connected_clients_num , int* working_clients_num ,
 	client_to_server_msg* received_message )
 {
+	/*****************************************************************/
+	/* Read socket, do checks & collect message.                     */
+	/*****************************************************************/
 	// read socket
 	unsigned char buffer[CLIENT_TO_SERVER_BUF_SIZE];
 	int rv = recv( polled_fds[fd_pos].fd , buffer , CLIENT_TO_SERVER_BUF_SIZE , 0 );
@@ -368,20 +371,34 @@ int read_socket(
 
 		(*connected_clients_num)--;
 	}
+
+	// need a received_message & received_bytes for every client 
+	// maybe create a struct that holds them with polled_fds[], num_polled_fds, working_fds[], working_clients_num, compress_array,
+
+
+	// message may come in many parts. Concate them
+	// track total received bytes
+
+	// check if received message is complete
+		// if not wait for the rest of the data
+
+	// message is complete, continue
+	// reset received bytes counter for use on the next message
+
+
+	/*****************************************************************/
+	/* Track necessary info for client synchronization.              */
+	/*****************************************************************/
 	// if a working client sended a message means it finished
 	// track warking clients
 	if( working_fds[fd_pos] == 1 )
-		(*working_clients_num)--;
+		(*working_clients_num)--;	// if message not completed
 
 	// mark the fd as non working
-	working_fds[fd_pos] = 0;
+	working_fds[fd_pos] = 0;	// if message not completed
 
-	// check if message is complete through rv
-	if ( rv < CLIENT_TO_SERVER_BUF_SIZE )													// TODO: test
-		return 0;
-	
 	// deserialize received data
-	deserialize_client_to_server_msg( received_message , buffer );								// TODO: test
+	deserialize_client_to_server_msg( received_message , buffer );	// if message completed
 
 	return 1;
 }

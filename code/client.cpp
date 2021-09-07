@@ -65,7 +65,7 @@ int main ( int argc , char** argv )
 	/*************************************************************/
 	/* Main loop.                                                */
 	/*************************************************************/
-	int counter = 0; // counts total received bytes per message
+	int received_bytes = 0; // counts total received bytes per message
 	static server_to_client_msg received_message; // struct to hold message
 
 	while ( 1 )
@@ -99,13 +99,13 @@ int main ( int argc , char** argv )
 		}
 
 		// message may come in many parts. Concate them
-		memcpy( &(((unsigned char*)&received_message)[counter]) , buffer , rv );
-		counter += rv;
+		memcpy( &(((unsigned char*)&received_message)[received_bytes]) , buffer , rv );
+		received_bytes += rv; // track total received bytes
 
-		cout << CURRENT_TIME << "	received bytes: " << rv << "	total: " << counter << "	needed: " << SERVER_TO_CLIENT_BUF_SIZE << endl;
+		cout << CURRENT_TIME << "	received bytes: " << rv << "	total: " << received_bytes << "	needed: " << SERVER_TO_CLIENT_BUF_SIZE << endl;
 
 		// check if received message is complete
-		if ( counter < SERVER_TO_CLIENT_BUF_SIZE )
+		if ( received_bytes < SERVER_TO_CLIENT_BUF_SIZE )
 			// if not wait for the rest of the data
 			continue;
 		
@@ -113,7 +113,7 @@ int main ( int argc , char** argv )
 		// message is complete, continue
 
 		cout << CURRENT_TIME << "	Received global model." << endl;
-		counter = 0; // reset counter for the next message
+		received_bytes = 0; // reset received bytes counter for use onthe next message
 
 		// test if expected data received / remove when real data is send
 		for( int i = 0 ; i < WEIGHTS_NUM ; i++ )
