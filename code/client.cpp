@@ -117,7 +117,7 @@ int main ( int argc , char** argv )
 
 		// test if expected data received / remove when real data is send
 		for( int i = 0 ; i < WEIGHTS_NUM ; i++ )
-			if( received_message.weights[i] != 1)
+			if( received_message.weights[i] != received_message.epoch )
 				putchar('!');
 		//cout << received_message.weights[WEIGHTS_NUM - 1] << endl;
 
@@ -137,6 +137,10 @@ int main ( int argc , char** argv )
 		// create message
 		static client_to_server_msg send_message;
 		send_message.epoch = received_message.epoch;
+		
+		// create fake data for testing, remove when real data is sent
+		for( int i = 0 ; i < WEIGHTS_NUM ; i++ )
+			send_message.weights[i] = send_message.epoch;
 
 		// send message
 		rv = send_deltas( socket_fd , &send_message );
@@ -155,7 +159,6 @@ int main ( int argc , char** argv )
  */
 struct sockaddr_in find_server( const string server_name , const string server_port )
 {
-
 	struct addrinfo hints;
 	memset( &hints , 0 , sizeof(hints) );
 	hints.ai_socktype = SOCK_STREAM;
@@ -188,11 +191,10 @@ int quantize_deltas()
 int send_deltas( int socket_fd , client_to_server_msg* send_message )
 {
 	// serialize local deltas
-	unsigned char buffer[CLIENT_TO_SERVER_BUF_SIZE];
+	static unsigned char buffer[CLIENT_TO_SERVER_BUF_SIZE];
 	serialize_client_to_server_msg( send_message , buffer );
-
-	// send message
-	int rv = send( socket_fd , buffer , sizeof(buffer) , MSG_DONTWAIT );
+	
+	int rv = send( socket_fd , buffer , CLIENT_TO_SERVER_BUF_SIZE , 0 ); // na tsekarw an einai blocking h oxi
 
 	return rv;
 }

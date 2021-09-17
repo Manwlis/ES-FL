@@ -11,9 +11,10 @@
 
 #pragma once
 
-#define WEIGHTS_NUM 1000000
-#define SERVER_TO_CLIENT_BUF_SIZE (int) ( sizeof(int) + WEIGHTS_NUM * sizeof(float) )
-#define CLIENT_TO_SERVER_BUF_SIZE (int) ( sizeof(int) + WEIGHTS_NUM * sizeof(float) + sizeof(float) + sizeof(float) )
+#define WEIGHTS_NUM 2000000
+#define WEIGHT_TYPE float
+#define SERVER_TO_CLIENT_BUF_SIZE (int) ( sizeof(int) + WEIGHTS_NUM * sizeof(WEIGHT_TYPE) )
+#define CLIENT_TO_SERVER_BUF_SIZE (int) ( sizeof(int) + WEIGHTS_NUM * sizeof(WEIGHT_TYPE) + sizeof(float) + sizeof(float) )
 
 
 struct server_to_client_msg
