@@ -37,8 +37,8 @@ int test_server_message()
 		input.weights[i] = (float) rand();
 
 	/* serialize - desirialize */
-	serialize_server_to_client_msg( &input , buffer );
-	deserialize_server_to_client_msg( &output , buffer );
+	serialize_server_to_client_msg( input , *buffer );
+	deserialize_server_to_client_msg( output , *buffer );
 
 	/* test */
 	if( input.epoch != output.epoch )
@@ -74,8 +74,8 @@ int test_client_message()
 		input.weights[i] = (float) rand();
 
 	/* serialize - desirialize */
-	serialize_client_to_server_msg( &input , buffer );
-	deserialize_client_to_server_msg( &output , buffer );
+	serialize_client_to_server_msg( input , *buffer );
+	deserialize_client_to_server_msg( output , *buffer );
 
 	/* test */
 	if( input.epoch != output.epoch )

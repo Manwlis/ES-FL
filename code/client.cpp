@@ -22,6 +22,7 @@
 
 #include "utils.h"		/* error, current_time */
 #include "messages.h"	/* msg structs, serialize, deserialize */
+#include "fake_data.h"	/* check_fake_server_data, create_fake_client_data */
 
 using namespace std;
 
@@ -33,13 +34,13 @@ using namespace std;
 struct sockaddr_in find_server( const string server_name , const string server_port );
 
 int quantize_deltas();
-int send_deltas( int socket_fd , client_to_server_msg* send_message );
+
+int send_deltas( int socket_fd , client_to_server_msg& send_message );
 
 
 int main ( int argc , char** argv )
 {
 	int rv; // return value used to check if functions worked properly
-	
 
 	/**************************************************************/
 	/* Set up a socket to communicate with server and connect.    */
@@ -60,8 +61,8 @@ int main ( int argc , char** argv )
 	connect( socket_fd , (struct sockaddr *) &server , sizeof( server ) );
 	if ( rv < 0 )
 		error( "Connect failed." );
-
 	
+
 	/*************************************************************/
 	/* Main loop.                                                */
 	/*************************************************************/
@@ -70,8 +71,9 @@ int main ( int argc , char** argv )
 
 	while ( 1 )
 	{
+
 		/*************************************************************/
-		/* wait for global model and read it. Blocking.              */
+		/* wait for global model and read it.                        */
 		/*************************************************************/
 		cout << CURRENT_TIME << "	Waiting for data." << endl;
 
@@ -80,14 +82,10 @@ int main ( int argc , char** argv )
 		rv = recv( socket_fd , buffer , SERVER_TO_CLIENT_BUF_SIZE , 0 );
 
 
-		// something went wrong
-		if ( rv < 0 )
-		{	
-			cout << CURRENT_TIME << "	Unexpected error on recv: " << errno << endl;
-			continue;
-		}
-
-		// check if connection got closed
+		/*****************************************************************/
+		/* Do checks.                                                    */
+		/*****************************************************************/
+		// connection closed
 		if ( rv == 0 )
 		{
 			cout << CURRENT_TIME << "	Connection Closed" << endl;
@@ -98,9 +96,23 @@ int main ( int argc , char** argv )
 			break;
 		}
 
+		// socket errors
+		if ( rv < 0 )
+		{	
+			cout << CURRENT_TIME << "	Unexpected error on recv: " << errno << endl;
+			continue;
+		}
+
+		// erroneous data size, what do i do?
+
+
+		/*****************************************************************/
+		/* Collect message.                                              */
+		/*****************************************************************/
 		// message may come in many parts. Concate them
-		memcpy( &(((unsigned char*)&received_message)[received_bytes]) , buffer , rv );
-		received_bytes += rv; // track total received bytes
+		memcpy( (unsigned char*)&received_message + received_bytes , buffer , rv );
+		// track total received bytes
+		received_bytes += rv;
 
 		cout << CURRENT_TIME << "	received bytes: " << rv << "	total: " << received_bytes << "	needed: " << SERVER_TO_CLIENT_BUF_SIZE << endl;
 
@@ -110,40 +122,37 @@ int main ( int argc , char** argv )
 			continue;
 		
 
-		// message is complete, continue
-
+		/*****************************************************************/
+		/* Message is complete, continue.                                */
+		/*****************************************************************/
 		cout << CURRENT_TIME << "	Received global model." << endl;
-		received_bytes = 0; // reset received bytes counter for use onthe next message
+		received_bytes = 0; // reset received bytes counter for use on the next message
 
 		// test if expected data received / remove when real data is send
-		for( int i = 0 ; i < WEIGHTS_NUM ; i++ )
-			if( received_message.weights[i] != received_message.epoch )
-				putchar('!');
-		//cout << received_message.weights[WEIGHTS_NUM - 1] << endl;
+		check_fake_server_data( received_message );
+
 
 		/*************************************************************/
 		/* calculate deltas.                                         */
 		/*************************************************************/
 		cout << RED << "\n			EPOCH    =   " << received_message.epoch << RESET << "\n" << endl;
 
+
 		/*************************************************************/
 		/* Compress / quantize deltas.                               */
 		/*************************************************************/
 		quantize_deltas();
+
 
 		/*************************************************************/
 		/* send local deltas. Non blocking.                          */
 		/*************************************************************/
 		// create message
 		static client_to_server_msg send_message;
-		send_message.epoch = received_message.epoch;
-		
-		// create fake data for testing, remove when real data is sent
-		for( int i = 0 ; i < WEIGHTS_NUM ; i++ )
-			send_message.weights[i] = send_message.epoch;
+		create_fake_client_data( send_message , received_message.epoch );
 
 		// send message
-		rv = send_deltas( socket_fd , &send_message );
+		rv = send_deltas( socket_fd , send_message );
 		if ( rv < 0 )
 			cout << CURRENT_TIME << "	Unexpected error on send: " << errno << endl;
 	}
@@ -188,11 +197,11 @@ int quantize_deltas()
  * @param client_to_server_msg* message to be send
  * @return int send(2) return value
  */
-int send_deltas( int socket_fd , client_to_server_msg* send_message )
+int send_deltas( int socket_fd , client_to_server_msg& send_message )
 {
 	// serialize local deltas
 	static unsigned char buffer[CLIENT_TO_SERVER_BUF_SIZE];
-	serialize_client_to_server_msg( send_message , buffer );
+	serialize_client_to_server_msg( send_message , *buffer );
 	
 	int rv = send( socket_fd , buffer , CLIENT_TO_SERVER_BUF_SIZE , 0 ); // na tsekarw an einai blocking h oxi
 
