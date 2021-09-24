@@ -1,25 +1,35 @@
-CC = g++
+CC = g++ -std=gnu++2a
 CFLAGS = -O2 -Wall -pedantic
-SOURCES = server.cpp client.cpp utils.cpp fake_data.cpp messages.cpp unit_tests.cpp
-OBJECTS = $(SOURCES:.cpp=.o)
+
+SOURCES = server.cpp client.cpp utils.cpp fake_data.cpp messages.cpp
+TEST_SOURCES = unit_tests.cpp
+OBJECTS = $(SOURCES:.cpp=.o) $(TEST_SOURCES:.cpp=.o)
+ARCHIVES = lib.a
 EXECUTABLES = server client test
 
 all: $(OBJECTS) server client
 
-test : messages.o
-	$(CC) $(CFLAGS) -c unit_tests.cpp -o unit_tests.o
-	$(CC) $(CFLAGS) unit_tests.o messages.o -o $@
+# executables
+server : server.o lib.a
+	$(CC) $(CFLAGS) $^ -o $@
+client : client.o lib.a
+	$(CC) $(CFLAGS) $^ -o $@
 
-server : server.o utils.o messages.o fake_data.o
-	$(CC) $(CFLAGS) server.o utils.o messages.o fake_data.o -o $@
+# archive of object files / static library
+lib.a : utils.o fake_data.o messages.o
+	ar rcs $@ $^
 
-client : client.o utils.o messages.o fake_data.o
-	$(CC) $(CFLAGS) client.o utils.o messages.o fake_data.o -o $@
-
-.cpp.o: *.h
+# object files
+.cpp.o : *.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
+# clean up
 clean : 
-	-rm -f $(OBJECTS) $(EXECUTABLES)
+	-rm -f $(OBJECTS) $(ARCHIVES) $(EXECUTABLES)
+
+
+test : $(OBJECTS) lib.a
+	$(CC) $(CFLAGS) unit_tests.o lib.a -o test
+
 
 .PHONY: all clean test

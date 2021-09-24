@@ -9,27 +9,69 @@
  * 
  */
 
-#include <string.h> /* memcpy */
-
 #include "messages.h"
+#include "utils.h"
 
 
-void serialize_server_to_client_msg(server_to_client_msg& message , unsigned char& buffer )
+
+/**
+ * @brief Converts a little endian server to client message
+ * to big endian when used in a big endian system.
+ * 
+ * @param server_to_client_msg, message to be converted
+ */
+void server_to_client_msg_big_endianess( server_to_client_msg& message )
 {
-	memcpy( &buffer , &message , sizeof(server_to_client_msg) );
+	message.epoch = le32toh( message.epoch ); // little endian to host (big endian) uint32_t
+	// flip floats in weights array
+	for( int i = 0  ; i < WEIGHTS_NUM ; i++ )
+		message.weights[i] = reverse_float( message.weights[i] );
 }
 
-void deserialize_server_to_client_msg(server_to_client_msg& message , unsigned char& buffer )
+/**
+ * @brief Converts a big endian server to client message
+ * to little endian when used in a little endian system.
+ * 
+ * @param server_to_client_msg, message to be converted
+ */
+void server_to_client_msg_little_endianess( server_to_client_msg& message )
 {
-	memcpy( &message , &buffer , sizeof(server_to_client_msg) );
+	message.epoch = be32toh( message.epoch ); // big endian to host (little endian) uint32_t
+	// flip floats in weights array
+	for( int i = 0  ; i < WEIGHTS_NUM ; i++ )
+		message.weights[i] = reverse_float( message.weights[i] );
 }
 
-void serialize_client_to_server_msg(client_to_server_msg& message , unsigned char& buffer )
+/**
+ * @brief Converts a little endian client to server message
+ * to big endian when used in a big endian system.
+ * 
+ * @param server_to_client_msg, message to be converted
+ */
+void client_to_server_msg_big_endianess( client_to_server_msg& message )
 {
-	memcpy( &buffer , &message , sizeof(client_to_server_msg) );
+	message.epoch = le32toh( message.epoch ); // little endian to host (big endian) uint32_t
+	// flip floats in weights array
+	for( int i = 0  ; i < WEIGHTS_NUM ; i++ )
+		message.weights[i] = reverse_float( message.weights[i] );
+	// flip stats floats
+	message.accuracy = reverse_float( message.accuracy );
+	message.loss = reverse_float( message.loss );
 }
 
-void deserialize_client_to_server_msg(client_to_server_msg& message , unsigned char& buffer )
+/**
+ * @brief Converts a big endian client to server message
+ * to little endian when used in a little endian system.
+ * 
+ * @param server_to_client_msg, message to be converted
+ */
+void client_to_server_msg_little_endianess( client_to_server_msg& message )
 {
-	memcpy( &message , &buffer , sizeof(client_to_server_msg) );
+	message.epoch = be32toh( message.epoch ); // big endian to host (little endian) uint32_t
+	// flip floats in weights array
+	for( int i = 0  ; i < WEIGHTS_NUM ; i++ )
+		message.weights[i] = reverse_float( message.weights[i] );
+	// flip stats floats
+	message.accuracy = reverse_float( message.accuracy );
+	message.loss = reverse_float( message.loss );
 }

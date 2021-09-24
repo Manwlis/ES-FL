@@ -16,7 +16,6 @@
 #include <string.h>		/* memset */
 
 #include <sys/socket.h>	/* accept, bind, connect, listen, recv, send, getpeername */
-//#include <sys/types.h>
 #include <netinet/in.h>	/* htonl, htons, ntohl, ntohs */
 #include <arpa/inet.h>	/* inet_ntop */
 #include <poll.h>		/* poll */
@@ -26,8 +25,8 @@
 #include "messages.h"	/* msg structs, serialize, deserialize */
 #include "fake_data.h"	/* check_fake_client_data, create_fake_server_data */
 
-
 using namespace std;
+
 
 // network definitions
 #define SERVER_PORT 12345
@@ -264,14 +263,10 @@ int main( int argc , char** argv )
 					compress_array = TRUE;
 				}
 
-
 				// test if expected data received / remove when real data is send
 				if( client_info[i].received_bytes == CLIENT_TO_SERVER_BUF_SIZE ) // message is complete
 				{
 					check_fake_client_data( client_info , i , current_epoch );
-
-					// deserialize received data
-					//deserialize_client_to_server_msg( client_info.received_message , buffer );	// if message completed
 				}
 
 				/*************************************************************/
@@ -354,7 +349,6 @@ int main( int argc , char** argv )
 		}
 	}
 }
-
 
 
 /**
@@ -497,10 +491,6 @@ int announce_global_model(
 	server_to_client_msg& message )
 {
 	int rv;
-
-	// serialize data - uncomment if network byte orded need to be respected
-	//static unsigned char buffer[SERVER_TO_CLIENT_BUF_SIZE];
-	//serialize_server_to_client_msg( message , buffer );
 
 	// first descriptor is the listening socket. Start from second
 	for( int i = 1 ; i < connected_clients_num + 1 ; i++ )

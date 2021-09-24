@@ -17,151 +17,52 @@
 #include <time.h>		/* time */
 #include <string.h>
 
+#include "utils.h"
 #include "messages.h"
+#include "fake_data.h"
 
 using namespace std;
 
-int test_server_message()
-{
-	server_to_client_msg input;
-	server_to_client_msg output;
-	static unsigned char buffer[SERVER_TO_CLIENT_BUF_SIZE];
 
-	/* initialize random seed: */
-	srand (time(NULL));
-
-	/* Randomize input */
-	input.epoch = rand();
-
-	for( int i = 0 ; i < WEIGHTS_NUM ; i++ )
-		input.weights[i] = (float) rand();
-
-	/* serialize - desirialize */
-	serialize_server_to_client_msg( input , *buffer );
-	deserialize_server_to_client_msg( output , *buffer );
-
-	/* test */
-	if( input.epoch != output.epoch )
-		return 0;
-
-	for( int i = 0 ; i < WEIGHTS_NUM ; i++ )
-		if( input.weights[i] != output.weights[i] )
-			return 0;
-
-cout << input.epoch << "		" << output.epoch << endl;
-cout << input.weights[0] << "		" << output.weights[0] << endl;
-cout << input.weights[WEIGHTS_NUM-1] << "		" << output.weights[WEIGHTS_NUM-1] << endl;
-
-	return 1;
-}
-
-
-int test_client_message()
-{
-	client_to_server_msg input;
-	client_to_server_msg output;
-	static unsigned char buffer[SERVER_TO_CLIENT_BUF_SIZE];
-
-	/* initialize random seed: */
-	srand (time(NULL));
-
-	/* Randomize input */
-	input.epoch = rand();
-	input.loss = (float) rand();
-	input.accuracy = (float) rand();
-
-	for( int i = 0 ; i < WEIGHTS_NUM ; i++ )
-		input.weights[i] = (float) rand();
-
-	/* serialize - desirialize */
-	serialize_client_to_server_msg( input , *buffer );
-	deserialize_client_to_server_msg( output , *buffer );
-
-	/* test */
-	if( input.epoch != output.epoch )
-		return 0;
-
-	if( input.loss != output.loss )
-		return 0;
-
-	if( input.accuracy != output.accuracy )
-		return 0;
-
-	for( int i = 0 ; i < WEIGHTS_NUM ; i++ )
-		if( input.weights[i] != output.weights[i] )
-			return 0;
-
-cout << input.epoch << "		" << output.epoch << endl;
-cout << input.weights[0] << "		" << output.weights[0] << endl;
-cout << input.weights[WEIGHTS_NUM-1] << "		" << output.weights[WEIGHTS_NUM-1] << endl;
-
-	return 1;
-}
-
-union Y
-{
-	int a[4];
-	unsigned char x[16];
-};
-int union_test()
-{
-
-	Y y = {{1,2,3,4}};
-	
-    for (int i = 0 ; i < (int) sizeof(y.x) ; i ++) {
-        printf(" %02x", y.x[i]);
-    }
-    putchar('\n');
-
-	return 1;
-}
-
-
-union X
-{
-	server_to_client_msg msg;
-	unsigned char buffer[SERVER_TO_CLIENT_BUF_SIZE];
-};
-int union_test_b()
-{
-	X a;
-
-	/* Randomize input */
-	a.msg.epoch = rand();
-	for( int i = 0 ; i < WEIGHTS_NUM ; i++ )
-		a.msg.weights[i] = (float) rand();
-
-	/* Copy */
-	int counter = 0;
-
-	int step = SERVER_TO_CLIENT_BUF_SIZE/4;
-
-	X b;
-
-	for ( int i = 0 ; i < 4 ; i++ )
-	{
-		memcpy( &(b.buffer[counter]) , &(a.buffer[counter]) , step );
-		counter += step;
-	}
-
-	/* test */
-	if( a.msg.epoch != b.msg.epoch )
-		return 0;
-
-	for( int i = 0 ; i < WEIGHTS_NUM ; i++ )
-		if( a.msg.weights[i] != b.msg.weights[i] )
-			return 0;
-
-	return 1;
-}
-
-
+int endianess_test();
 
 
 int main ( int argc , char** argv )
 {
-	//cout << test_server_message() << endl;
-	//cout << test_client_message() << endl;
-
-	cout << union_test_b() << endl;
+    assert( endianess_test );
+    cout << "ok" << endl;
 }
+
+
+int endianess_test()
+{
+    /*************************************************************/
+    /* Test server to client message endianess change.           */
+    /*************************************************************/
+    // create dumb data
+    struct server_to_client_msg stoc_msg;
+    stoc_msg.epoch = 1;
+    for ( int i = 0 ; i < WEIGHTS_NUM ; i++ )
+    {
+        stoc_msg.weights[i] = 1;
+    }
+
+    // create clone
+    struct server_to_client_msg stoc_msg_clone;
+    memcpy( &stoc_msg_clone , &stoc_msg , sizeof(stoc_msg) );
+
+    // change endianess on clone
+    server_to_client_msg_big_endianess( stoc_msg_clone );
+    server_to_client_msg_little_endianess( stoc_msg_clone );
+
+    // check that clone remains the same
+    if ( stoc_msg_clone.epoch != stoc_msg.epoch )
+        return 0;
+    for ( int i = 0 ; i < WEIGHTS_NUM ; i++ )
+    {
+        if ( stoc_msg_clone.weights[i] != stoc_msg.weights[i] )
+            return 0;
+    }
+    return 1;
+}
+

@@ -9,9 +9,6 @@
  * 
  */
 
-#include <iostream>
-#include <stdio.h>  /*putchar */
-
 #include "fake_data.h"
 
 

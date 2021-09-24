@@ -9,7 +9,8 @@
  * 
  */
 
-#include <iostream>
+#include <iostream>		/* cout */
+#include <bit>			/* endian */
 
 #include <assert.h>		/* assert */
 #include <stdlib.h>		/* atoi */
@@ -21,7 +22,7 @@
 #include <netdb.h>		/* getnameinfo */
 
 #include "utils.h"		/* error, current_time */
-#include "messages.h"	/* msg structs, serialize, deserialize */
+#include "messages.h"	/* msg structs, change message endianess */
 #include "fake_data.h"	/* check_fake_server_data, create_fake_client_data */
 
 using namespace std;
@@ -116,9 +117,8 @@ int main ( int argc , char** argv )
 
 		cout << CURRENT_TIME << "	received bytes: " << rv << "	total: " << received_bytes << "	needed: " << SERVER_TO_CLIENT_BUF_SIZE << endl;
 
-		// check if received message is complete
+		// check if received message is complete, if not wait for the rest of the data
 		if ( received_bytes < SERVER_TO_CLIENT_BUF_SIZE )
-			// if not wait for the rest of the data
 			continue;
 		
 
@@ -127,6 +127,10 @@ int main ( int argc , char** argv )
 		/*****************************************************************/
 		cout << CURRENT_TIME << "	Received global model." << endl;
 		received_bytes = 0; // reset received bytes counter for use on the next message
+
+		// server uses little endian encoding, need to change received message to host endian
+		if constexpr ( std::endian::native == std::endian::big ) // requires c++20, dangerous !!!!
+			server_to_client_msg_big_endianess( received_message ); // maybe move this to the server side if needed
 
 		// test if expected data received / remove when real data is send
 		check_fake_server_data( received_message );
@@ -200,10 +204,10 @@ int quantize_deltas()
 int send_deltas( int socket_fd , client_to_server_msg& send_message )
 {
 	// serialize local deltas
-	static unsigned char buffer[CLIENT_TO_SERVER_BUF_SIZE];
-	serialize_client_to_server_msg( send_message , *buffer );
+	if constexpr ( std::endian::native == std::endian::big ) // requires c++20, dangerous !!!!
+		client_to_server_msg_big_endianess( send_message ); // maybe move this to the server side if needed
 	
-	int rv = send( socket_fd , buffer , CLIENT_TO_SERVER_BUF_SIZE , 0 ); // na tsekarw an einai blocking h oxi
+	int rv = send( socket_fd , &send_message , CLIENT_TO_SERVER_BUF_SIZE , 0 ); // na tsekarw an einai blocking h oxi
 
 	return rv;
 }

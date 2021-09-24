@@ -12,6 +12,9 @@
 #pragma once
 
 
+#include <iostream>	/* cout */
+#include <stdio.h>	/*putchar */
+
 #include "messages.h"	/* message types, WEIGHTS_NUM */
 
 
