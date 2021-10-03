@@ -19,15 +19,14 @@
 using namespace std;
 
 
-#define TRUE  1
-#define FALSE 0
+#define MESSAGE_LOGGING 0
 
 #define RESET	"\033[0m"
 #define RED		"\033[31m"	/* Red */
 #define GREEN	"\033[32m"	/* Green */
 #define YELLOW	"\033[33m"	/* Yellow */
 
-#define CURRENT_TIME GREEN << current_time() << RESET
+#define CURRENT_TIME GREEN << current_time() << RESET << "    "
 
 
 void error( const char* msg );

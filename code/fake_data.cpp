@@ -33,7 +33,7 @@ void create_fake_server_data(struct server_to_client_msg& announcement_msg , int
 {
 	announcement_msg.epoch = epoch;
 	for( int i = 0; i < WEIGHTS_NUM ; i++ )
-		announcement_msg.weights[i] = epoch;
+		announcement_msg.deltas[i] = epoch;
 }
 
 
@@ -49,7 +49,7 @@ void create_fake_client_data( client_to_server_msg& send_message , int epoch )
 	
 	// create fake data for testing, remove when real data is sent
 	for( int i = 0 ; i < WEIGHTS_NUM ; i++ )
-		send_message.weights[i] = send_message.epoch;
+		send_message.deltas[i] = send_message.epoch;
 	send_message.accuracy = send_message.epoch;
 	send_message.loss = send_message.epoch;
 }
@@ -72,7 +72,7 @@ void check_fake_client_data( struct client_info client_info[] , int i , int epoc
 			putchar('1');
 			flag = 1;
 		}
-		if( client_info[i].received_message->weights[k] != client_info[i].received_message->epoch )
+		if( client_info[i].received_message->deltas[k] != client_info[i].received_message->epoch )
 		{
 			putchar('2');
 			flag = 1;
@@ -102,7 +102,7 @@ void check_fake_server_data( server_to_client_msg& received_message )
 {
 	bool flag = 0;
 	for( int i = 0 ; i < WEIGHTS_NUM ; i++ )
-		if( received_message.weights[i] != received_message.epoch )
+		if( received_message.deltas[i] != received_message.epoch )
 		{
 			putchar('!');
 			flag = 1;

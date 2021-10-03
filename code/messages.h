@@ -17,15 +17,15 @@
 #include "utils.h"  /* reverse_float */
 
 #define WEIGHTS_NUM 1000000
-#define WEIGHT_TYPE float
-#define SERVER_TO_CLIENT_BUF_SIZE (int) ( sizeof(int) + WEIGHTS_NUM * sizeof(WEIGHT_TYPE) )
-#define CLIENT_TO_SERVER_BUF_SIZE (int) ( sizeof(int) + WEIGHTS_NUM * sizeof(WEIGHT_TYPE) + sizeof(float) + sizeof(float) )
+#define MESSAGE_DELTAS_TYPE float
+#define SERVER_TO_CLIENT_BUF_SIZE (int) ( sizeof(int) + WEIGHTS_NUM * sizeof(MESSAGE_DELTAS_TYPE) )
+#define CLIENT_TO_SERVER_BUF_SIZE (int) ( sizeof(int) + WEIGHTS_NUM * sizeof(MESSAGE_DELTAS_TYPE) + sizeof(float) + sizeof(float) )
 
 
 struct server_to_client_msg
 {
     int epoch;
-    float weights[WEIGHTS_NUM];
+    float deltas[WEIGHTS_NUM];
 };
 
 struct client_to_server_msg
@@ -33,7 +33,7 @@ struct client_to_server_msg
     int epoch;
     float loss;
     float accuracy;
-    float weights[WEIGHTS_NUM];
+    float deltas[WEIGHTS_NUM];
 };
 
 void server_to_client_msg_big_endianess( server_to_client_msg& message );

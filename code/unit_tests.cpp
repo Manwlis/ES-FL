@@ -34,17 +34,17 @@ int main ( int argc , char** argv )
 }
 
 
+/**************************************************************************************************/
+/* Test server to client message endianess change.                                                */
+/**************************************************************************************************/
 int endianess_test()
 {
-    /*************************************************************/
-    /* Test server to client message endianess change.           */
-    /*************************************************************/
     // create dumb data
     struct server_to_client_msg stoc_msg;
     stoc_msg.epoch = 1;
     for ( int i = 0 ; i < WEIGHTS_NUM ; i++ )
     {
-        stoc_msg.weights[i] = 1;
+        stoc_msg.deltas[i] = 1;
     }
 
     // create clone
@@ -60,9 +60,8 @@ int endianess_test()
         return 0;
     for ( int i = 0 ; i < WEIGHTS_NUM ; i++ )
     {
-        if ( stoc_msg_clone.weights[i] != stoc_msg.weights[i] )
+        if ( stoc_msg_clone.deltas[i] != stoc_msg.deltas[i] )
             return 0;
     }
     return 1;
 }
-
