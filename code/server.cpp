@@ -11,19 +11,19 @@
 
 #include <iostream>		/* << */
 
-#include <stdlib.h>		/* atoi */
-#include <unistd.h>		/* close */
-#include <string.h>		/* memset */
+#include <stdlib.h>			/* atoi */
+#include <unistd.h>			/* close */
+#include <string.h>			/* memset */
 
-#include <sys/socket.h>	/* accept, bind, connect, listen, recv, send, getpeername */
-#include <netinet/in.h>	/* htonl, htons, ntohl, ntohs */
-#include <arpa/inet.h>	/* inet_ntop */
-#include <poll.h>		/* poll */
-#include <fcntl.h>		/* fcntl */
+#include <sys/socket.h>		/* accept, bind, connect, listen, recv, send, getpeername */
+#include <netinet/in.h>		/* htonl, htons, ntohl, ntohs */
+#include <arpa/inet.h>		/* inet_ntop */
+#include <poll.h>			/* poll */
+#include <fcntl.h>			/* fcntl */
 
-#include "utils.h"		/* error, current_time, colored output */
-#include "messages.h"	/* msg structs, serialize, deserialize */
-#include "fake_data.h"	/* check_fake_client_data, create_fake_server_data */
+#include "utils.hpp"		/* error, current_time, colored output */
+#include "messages.hpp"		/* msg structs, serialize, deserialize */
+#include "fake_data.hpp"	/* check_fake_client_data, create_fake_server_data */
 
 using namespace std;
 
@@ -44,10 +44,10 @@ using namespace std;
 int read_socket( int fd , struct client_info &client_info ,
 	int& connected_clients_num , int& working_clients_num , int& completed_clients_num );
 
-void dequintize_received_deltas( MESSAGE_DELTAS_TYPE message_deltas[WEIGHTS_NUM] , float local_deltas[WEIGHTS_NUM] );
+void dequintize_received_variables( MSG_VARIABLE_DATATYPE message_variables[VARIABLES_NUM] , float local_variables[VARIABLES_NUM] );
 
-void accumulate_deltas( float local_deltas[WEIGHTS_NUM] , float accumulated_deltas[WEIGHTS_NUM] );
-void create_average_model( float accumulated_deltas[WEIGHTS_NUM] , int num_models , float global_model[WEIGHTS_NUM] );
+void accumulate_variables( float local_variables[VARIABLES_NUM] , float accumulated_variables[VARIABLES_NUM] );
+void create_average_model( float accumulated_variables[VARIABLES_NUM] , int num_models , float global_model[VARIABLES_NUM] );
 
 int next_epoch_ready( int connected_clients_num , int working_clients_num , int completed_clients_num );
 int announce_global_model(
@@ -137,7 +137,7 @@ int main( int argc , char** argv )
 	/* Loop waiting for incoming connects or for incoming data on any of the connected sockets.       */
 	/**************************************************************************************************/
 	// global model data. Static variable are by default initialized to zero. No need for explicit initialization.
-	static float accumulated_deltas[WEIGHTS_NUM];
+	static float accumulated_variables[VARIABLES_NUM];
 	static server_to_client_msg announcement_msg; // holds global model
 	// nessesary info per client
 	struct client_info client_info[FD_NUM]; // parallel with polled_fds[]
@@ -254,7 +254,7 @@ int main( int argc , char** argv )
 			/**************************************************************************************************/
 			/* Non listening socket fd raised POLLIN event. New incoming data, read them.                     */
 			/**************************************************************************************************/
-			// TODO: time this block, thread it if it's 
+			// TODO: time this block, thread it if it's a bottleneck
 			else
 			{
 				// Get peer info for logging
@@ -287,17 +287,18 @@ int main( int argc , char** argv )
 
 				#if MESSAGE_LOGGING == 0
 					cout << CURRENT_TIME << "Fd: " << polled_fds[i].fd << "    IP: " << inet_ntoa( peer_addr.sin_addr )
-						<< "    Port: " << ntohs( peer_addr.sin_port ) << "    Local deltas received." << endl;
+						<< "    Port: " << ntohs( peer_addr.sin_port ) << "    Local variables received." << endl;
 				#endif
 				/**************************************************************************************************/
-				/* Decompress / dequantize received deltas.                                                       */
+				/* Decompress / dequantize received variables.                                                       */
 				/**************************************************************************************************/
-				//dequintize_received_deltas();
+				//dequintize_received_variables();
 
 				/**************************************************************************************************/
-				/* Increment received deltas to global diff.                                                      */
+				/* Increment received variables to global diff.                                                      */
 				/**************************************************************************************************/
-				accumulate_deltas( client_info[i].received_message->deltas , accumulated_deltas );
+				
+				accumulate_variables( client_info[i].received_message->variables , accumulated_variables );
 
 			} /* End of existing connection is readable */
 		} /* End of loop through pollable descriptors */
@@ -343,7 +344,7 @@ int main( int argc , char** argv )
 
 			// create new global model
 			announcement_msg.epoch = current_epoch;
-			create_average_model( accumulated_deltas , completed_clients_num , announcement_msg.deltas );
+			create_average_model( accumulated_variables , completed_clients_num , announcement_msg.variables );
 
 			// announce global model
 			cout << RED << "\n			EPOCH    =    " << current_epoch << RESET << "\n" << endl;
@@ -351,8 +352,8 @@ int main( int argc , char** argv )
 
 			// clear previous epoch info
 			completed_clients_num = 0;
-			for( int i = 0 ; i < WEIGHTS_NUM ; i++ )
-				accumulated_deltas[i] = 0;
+			for( int i = 0 ; i < VARIABLES_NUM ; i++ )
+				accumulated_variables[i] = 0;
 		}
 	} /* End of server running */
 
@@ -460,32 +461,32 @@ int read_socket( int fd , struct client_info& client_info , int& connected_clien
 
 
 /**
- * @brief Received deltas may be in a smaller data type to reduce comunication.
+ * @brief Received variables may be in a smaller data type to reduce comunication.
  * In order to achieve better accuracy, they need to be reverted back to float.
- * Mayde remove this fuction and do the conversion in accumulate_deltas() to avoid extra memory use.
- * @param message_deltas 
- * @param local_deltas 
+ * Mayde remove this fuction and do the conversion in accumulate_variables() to avoid extra memory use.
+ * @param message_variables 
+ * @param local_variables 
  */
-void dequintize_received_deltas( MESSAGE_DELTAS_TYPE message_deltas[WEIGHTS_NUM] , float local_deltas[WEIGHTS_NUM] )
+void dequintize_received_variables( MSG_VARIABLE_DATATYPE message_variables[VARIABLES_NUM] , float local_variables[VARIABLES_NUM] )
 {
-	for( int i = 0 ; i < WEIGHTS_NUM ; i++ )
+	for( int i = 0 ; i < VARIABLES_NUM ; i++ )
 	{
-		local_deltas[i] = (float) message_deltas[i];
+		local_variables[i] = (float) message_variables[i];
 	}
 }
 
 
 /**
- * @brief Adds local deltas to cumulative deltas
+ * @brief Adds local variables to cumulative variables
  * 
- * @param float[WEIGHTS_NUM] local deltas 
- * @param float[WEIGHTS_NUM] accumulated deltas 
+ * @param float[VARIABLES_NUM] local variables 
+ * @param float[VARIABLES_NUM] accumulated variables 
  */
-void accumulate_deltas( float local_deltas[WEIGHTS_NUM] , float accumulated_deltas[WEIGHTS_NUM] )
+void accumulate_variables( float local_variables[VARIABLES_NUM] , float accumulated_variables[VARIABLES_NUM] )
 {
-	for( int i = 0 ; i < WEIGHTS_NUM ; i++ )
+	for( int i = 0 ; i < VARIABLES_NUM ; i++ )
 	{
-		accumulated_deltas[i] += local_deltas[i];
+		accumulated_variables[i] += local_variables[i];
 	}
 }
 
@@ -493,16 +494,20 @@ void accumulate_deltas( float local_deltas[WEIGHTS_NUM] , float accumulated_delt
 /**
  * @brief Create average model 
  * 
- * @param float[WEIGHTS_NUM] accumulated diference between each local model with global model
+ * @param float[VARIABLES_NUM] accumulated diference between each local model with global model
  * @param int number of models used
- * @param float[WEIGHTS_NUM] global model
+ * @param float[VARIABLES_NUM] global model
  */
-void create_average_model( float accumulated_deltas[WEIGHTS_NUM] , int num_models , float global_model[WEIGHTS_NUM] )
+void create_average_model( float accumulated_variables[VARIABLES_NUM] , int num_models , float global_model[VARIABLES_NUM] )
 {
-	for( int i = 0 ; i < WEIGHTS_NUM ; i++ )
+	for( int i = 0 ; i < VARIABLES_NUM ; i++ )
 	{
-		float temp_average_delta = accumulated_deltas[i] / num_models; 
-		global_model[i] += temp_average_delta;
+		float temp_average_variable = accumulated_variables[i] / num_models;
+		#if MSG_VARIABLE_MODE == WEIGHTS
+			global_model[i] = temp_average_variable;
+		#elif MSG_VARIABLE_MODE == DELTAS
+			global_model[i] += temp_average_variable;
+		#endif
 	}
 }
 
@@ -520,10 +525,20 @@ int next_epoch_ready( int connected_clients_num , int working_clients_num , int 
 	cout << "									connected = " << connected_clients_num 
 		<< "	working  = " << working_clients_num << "	completed = " << completed_clients_num << endl;
 
-	if ( connected_clients_num - working_clients_num == MIN_CLIENTS_PER_EPOCH )
+	// not enough connected client, no point to start a new epoch
+	if( connected_clients_num < MIN_CLIENTS_PER_EPOCH )
+		return 0;
+
+	// no working client, need for a new epoch
+	if( working_clients_num == 0 )
+		return 1;
+
+	// enough completed
+	if( completed_clients_num == MIN_CLIENTS_PER_EPOCH )
 		return 1;
 
 	return 0;
+	// an exei ginei timeout kai uparxei kapoios teleiwmenos nea epoch?
 }
 
 
@@ -565,18 +580,3 @@ int announce_global_model(
 
 	return working_clients_num;
 }
-
-
-// pinakas i fd dieu8unseis minimatwn
-// cout << "i	fd	received message" << endl;
-// for ( int i = 0 ; i < FD_NUM ; i++)
-// {
-// 	cout << i << "	" << polled_fds[i].fd << "	" << client_info[i].received_message << "\n";
-// }
-// cout << endl;
-
-// dieu8unseis minimatwn gia mem copy
-// cout << client_info.received_message << endl;
-// cout << client_info.received_bytes << endl;
-// cout << (void*)client_info.received_message + client_info.received_bytes << endl;
-

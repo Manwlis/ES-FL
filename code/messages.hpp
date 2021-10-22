@@ -14,18 +14,24 @@
 #include <string.h> /* memcpy */
 #include <endian.h> /* be32toh, le32toh */ 
 
-#include "utils.h"  /* reverse_float */
+#include "utils.hpp"  /* reverse_float */
 
-#define WEIGHTS_NUM 1000000
-#define MESSAGE_DELTAS_TYPE float
-#define SERVER_TO_CLIENT_BUF_SIZE (int) ( sizeof(int) + WEIGHTS_NUM * sizeof(MESSAGE_DELTAS_TYPE) )
-#define CLIENT_TO_SERVER_BUF_SIZE (int) ( sizeof(int) + WEIGHTS_NUM * sizeof(MESSAGE_DELTAS_TYPE) + sizeof(float) + sizeof(float) )
+#define VARIABLES_NUM 2
+#define MSG_VARIABLE_DATATYPE float
+
+//defines the type of the transfered data
+#define WEIGHTS 1
+#define DELTAS 2
+#define MSG_VARIABLE_MODE DELTAS
+
+#define SERVER_TO_CLIENT_BUF_SIZE (int) ( sizeof(int) + VARIABLES_NUM * sizeof(MSG_VARIABLE_DATATYPE) )
+#define CLIENT_TO_SERVER_BUF_SIZE (int) ( sizeof(int) + VARIABLES_NUM * sizeof(MSG_VARIABLE_DATATYPE) + sizeof(float) + sizeof(float) )
 
 
 struct server_to_client_msg
 {
     int epoch;
-    float deltas[WEIGHTS_NUM];
+    float variables[VARIABLES_NUM];
 };
 
 struct client_to_server_msg
@@ -33,7 +39,7 @@ struct client_to_server_msg
     int epoch;
     float loss;
     float accuracy;
-    float deltas[WEIGHTS_NUM];
+    float variables[VARIABLES_NUM];
 };
 
 void server_to_client_msg_big_endianess( server_to_client_msg& message );

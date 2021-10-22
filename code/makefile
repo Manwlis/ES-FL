@@ -13,15 +13,15 @@ all: $(OBJECTS) server client
 server : server.o lib.a
 	$(CC) $(CFLAGS) $^ -o $@
 client : client.o lib.a
-	$(CC) $(CFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $^ -lpython3.8 -o $@
 
 # archive of object files / static library
 lib.a : utils.o fake_data.o messages.o
 	ar rcs $@ $^
 
 # object files
-.cpp.o : *.h
-	$(CC) $(CFLAGS) -c $< -o $@
+.cpp.o : *.hpp
+	$(CC) $(CFLAGS) -I/usr/include/python3.8/ -c $< -o $@
 
 # clean up
 clean : 

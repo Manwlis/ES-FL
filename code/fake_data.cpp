@@ -9,7 +9,7 @@
  * 
  */
 
-#include "fake_data.h"
+#include "fake_data.hpp"
 
 
 // required info per client in order to organize communications
@@ -32,8 +32,8 @@ using namespace std;
 void create_fake_server_data(struct server_to_client_msg& announcement_msg , int epoch )
 {
 	announcement_msg.epoch = epoch;
-	for( int i = 0; i < WEIGHTS_NUM ; i++ )
-		announcement_msg.deltas[i] = epoch;
+	for( int i = 0; i < VARIABLES_NUM ; i++ )
+		announcement_msg.variables[i] = epoch;
 }
 
 
@@ -48,8 +48,8 @@ void create_fake_client_data( client_to_server_msg& send_message , int epoch )
 	send_message.epoch = epoch;
 	
 	// create fake data for testing, remove when real data is sent
-	for( int i = 0 ; i < WEIGHTS_NUM ; i++ )
-		send_message.deltas[i] = send_message.epoch;
+	for( int i = 0 ; i < VARIABLES_NUM ; i++ )
+		send_message.variables[i] = send_message.epoch;
 	send_message.accuracy = send_message.epoch;
 	send_message.loss = send_message.epoch;
 }
@@ -65,14 +65,14 @@ void create_fake_client_data( client_to_server_msg& send_message , int epoch )
 void check_fake_client_data( struct client_info client_info[] , int i , int epoch )
 {
 	bool flag = 0;
-	for( int k = 0 ; k < WEIGHTS_NUM ; k++ )
+	for( int k = 0 ; k < VARIABLES_NUM ; k++ )
 	{
 		if( client_info[i].received_message->epoch != epoch )
 		{
 			putchar('1');
 			flag = 1;
 		}
-		if( client_info[i].received_message->deltas[k] != client_info[i].received_message->epoch )
+		if( client_info[i].received_message->variables[k] != client_info[i].received_message->epoch )
 		{
 			putchar('2');
 			flag = 1;
@@ -101,8 +101,8 @@ void check_fake_client_data( struct client_info client_info[] , int i , int epoc
 void check_fake_server_data( server_to_client_msg& received_message )
 {
 	bool flag = 0;
-	for( int i = 0 ; i < WEIGHTS_NUM ; i++ )
-		if( received_message.deltas[i] != received_message.epoch )
+	for( int i = 0 ; i < VARIABLES_NUM ; i++ )
+		if( received_message.variables[i] != received_message.epoch )
 		{
 			putchar('!');
 			flag = 1;

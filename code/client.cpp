@@ -9,24 +9,30 @@
  * 
  */
 
-#include <iostream>		/* cout */
-#include <bit>			/* endian */
+#define PY_SSIZE_T_CLEAN
+#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
+#include <Python.h>
+#include </home/epetrakos/.local/lib/python3.8/site-packages/numpy/core/include/numpy/arrayobject.h>
 
-#include <assert.h>		/* assert */
-#include <stdlib.h>		/* atoi */
-#include <unistd.h>		/* close */
-#include <string.h>		/* memset */
+#include <iostream>			/* cout */
+#include <bit>				/* endian */
 
-#include <sys/socket.h>	/* accept, bind, connect, listen, recv, send, getpeername */
-#include <netinet/in.h>	/* htonl, htons, ntohl, ntohs */
-#include <netdb.h>		/* getnameinfo */
+#include <unistd.h>			/* close */
+#include <string.h>			/* memset */
 
-#include "utils.h"		/* error, current_time */
-#include "messages.h"	/* msg structs, change message endianess */
-#include "fake_data.h"	/* check_fake_server_data, create_fake_client_data */
+#include <sys/socket.h>		/* accept, bind, connect, listen, recv, send, getpeername */
+#include <netinet/in.h>		/* htonl, htons, ntohl, ntohs */
+#include <netdb.h>			/* getnameinfo */
+
+#include "utils.hpp"		/* error, current_time */
+#include "messages.hpp"		/* msg structs, change message endianess */
+#include "fake_data.hpp"	/* check_fake_server_data, create_fake_client_data */
+
 
 using namespace std;
 
+#define Py_script "nn_tiny"
+#define Py_function "train_nn"
 
 #define SERVER_IP "127.0.0.1"
 #define SERVER_PORT "12345"
@@ -34,14 +40,17 @@ using namespace std;
 
 struct sockaddr_in find_server( const string server_name , const string server_port );
 
-int quantize_deltas();
+int quantize_variables();
 
-int send_deltas( int socket_fd , client_to_server_msg& send_message );
+int send_variables( int socket_fd , client_to_server_msg& send_message );
 
 
 int main ( int argc , char** argv )
 {
 	int rv; // return value used to check if functions worked properly
+	// messages can be larger than stack. Static so their memory space is reserved in heap
+	static server_to_client_msg received_message;
+	static client_to_server_msg send_message;
 
 	/**************************************************************************************************/
 	/* Set up a socket to communicate with server and connect.                                        */
@@ -59,17 +68,51 @@ int main ( int argc , char** argv )
 	// Initiate Connection
 	cout << CURRENT_TIME << "Initiating connection with server." << endl;
 
-	connect( socket_fd , (struct sockaddr *) &server , sizeof( server ) );
+	connect( socket_fd , (struct sockaddr*) &server , sizeof( server ) );
 	if ( rv < 0 )
 		error( "Connect failed." );
-	
+		
+	/**************************************************************************************************/
+	/* Set up python environment, neural network and numpy wrappers.                                  */
+	/**************************************************************************************************/
+	PyObject* pName;
+	PyObject* pModule;
+	PyObject* pFunc;
+	//PyObject* pValue;
+
+	// Initialize python interpeter and numpy
+    Py_SetProgramName( (wchar_t*) argv[0] );
+	Py_Initialize();
+
+	// look in current working directory for importing modules
+	//PyRun_SimpleString ("import os , sys; sys.path.append( os.getcwd() );");
+	PyObject* sys = PyImport_ImportModule( "sys" );
+	PyObject* path = PyObject_GetAttrString( sys , "path" );
+	PyList_Append( path , PyUnicode_FromString( "." ) );
+	Py_DECREF( sys );
+	Py_DECREF( path );
+
+	// get file
+	cout << "Getting file" << endl;
+	pName = PyUnicode_FromString( Py_script );
+	pModule = PyImport_Import( pName ); // this executes code in module outside functions!
+	Py_DECREF( pName );
+
+	// get function
+	cout << "Getting function" << endl;
+	pFunc = PyObject_GetAttrString( pModule , Py_function );
+	Py_DECREF( pModule ); // be carefull with this if need more functions
+
+	// create numpy array metadata around C arrays to pass them to python code
+	_import_array();
+	npy_intp dims[1] = {VARIABLES_NUM}; // dimension/size of numpy arrays. Easier to pass an 1-D array to python and reshape data there.
+	PyObject* pArray_input = PyArray_SimpleNewFromData( 1 , dims , NPY_FLOAT , received_message.variables );
+	PyObject* pArray_output = PyArray_SimpleNewFromData( 1 , dims , NPY_FLOAT , send_message.variables );
+
 	/**************************************************************************************************/
 	/* Main loop.                                                                                     */
 	/**************************************************************************************************/
 	int received_bytes = 0; // counts total received bytes per message
-	static server_to_client_msg received_message;
-	static client_to_server_msg send_message;
-
 	while ( 1 )
 	{
 		/**************************************************************************************************/
@@ -143,32 +186,53 @@ int main ( int argc , char** argv )
 			server_to_client_msg_big_endianess( received_message ); // maybe move this to the server side if needed
 
 		/**************************************************************************************************/
-		/* Calculate deltas.                                                                              */
+		/* Calculate variables.                                                                           */
 		/**************************************************************************************************/
 		cout << RED << "\n			EPOCH    =   " << received_message.epoch << RESET << "\n" << endl;
+		cout << CURRENT_TIME << "received weights: " << received_message.variables[0] << "    " << received_message.variables[1] << endl;
 
-		memcpy( send_message.deltas , received_message.deltas , WEIGHTS_NUM * sizeof(MESSAGE_DELTAS_TYPE) );
+		// call python function
+		PyObject_CallFunctionObjArgs( pFunc , pArray_input , pArray_output , NULL );
+
+		// calculate deltas
+		#if MSG_VARIABLE_MODE == DELTAS
+			for( int i = 0 ; i < VARIABLES_NUM ; i++ )
+				send_message.variables[i] = send_message.variables[i] - received_message.variables[i];
+		#endif
+		
 		send_message.accuracy = 0;
 		send_message.loss = 0;
 
-		//sleep(10);
+		cout << CURRENT_TIME << "sended variables: " << send_message.variables[0] << "    " << send_message.variables[1] << endl;
+		
 		/**************************************************************************************************/
-		/* Compress / quantize deltas.                                                                    */
+		/* Compress / quantize variables.                                                                 */
 		/**************************************************************************************************/
-		// quantize_deltas();
+		// quantize_variables();
 
 		/**************************************************************************************************/
-		/* send local deltas. Blocking in order for tcp to fix communication errors.                      */
+		/* Send local variables. Blocking in order for tcp to fix communication errors.                   */
 		/**************************************************************************************************/
-		cout << CURRENT_TIME << "Sending local deltas." << endl;
+		cout << CURRENT_TIME << "Sending local variables." << endl;
 		// create message
 		send_message.epoch = received_message.epoch;
 
 		// send message
-		rv = send_deltas( socket_fd , send_message );
+		rv = send_variables( socket_fd , send_message );
 		if ( rv < 0 )
 			cout << CURRENT_TIME << "Unexpected error on send: " << errno << endl;
 	}
+	
+	/**************************************************************************************************/
+	/* Clean up and exit.                                                                             */
+	/**************************************************************************************************/
+	// free up remaining python variables
+	Py_DECREF( pFunc );
+	Py_DECREF( pArray_input );
+	Py_DECREF( pArray_output );
+
+	// close socket properly
+	shutdown( socket_fd , SHUT_RDWR );
 }
 
 
@@ -197,22 +261,22 @@ struct sockaddr_in find_server( const string server_name , const string server_p
 }
 
 
-int quantize_deltas()
+int quantize_variables()
 {
 	return 0;
 }
 
 
 /**
- * @brief Serialize and send local deltas to target socket.
+ * @brief Serialize and send local variables to target socket.
  * 
  * @param int target socket's fd  
  * @param client_to_server_msg* message to be send
  * @return send(2) return value
  */
-int send_deltas( int socket_fd , client_to_server_msg& send_message )
+int send_variables( int socket_fd , client_to_server_msg& send_message )
 {
-	// serialize local deltas
+	// serialize local variables
 	if constexpr ( std::endian::native == std::endian::big ) // requires c++20, dangerous !!!!
 		client_to_server_msg_big_endianess( send_message ); // maybe move this to the server side if needed
 	

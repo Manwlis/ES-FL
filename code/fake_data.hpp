@@ -15,7 +15,7 @@
 #include <iostream>	/* cout */
 #include <stdio.h>	/*putchar */
 
-#include "messages.h"	/* message types, WEIGHTS_NUM */
+#include "messages.hpp"	/* message types, VARIABLES_NUM */
 
 
 void check_fake_client_data( struct client_info client_info[] , int i , int epoch );

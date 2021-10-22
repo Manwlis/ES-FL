@@ -17,9 +17,9 @@
 #include <time.h>		/* time */
 #include <string.h>
 
-#include "utils.h"
-#include "messages.h"
-#include "fake_data.h"
+#include "utils.hpp"
+#include "messages.hpp"
+#include "fake_data.hpp"
 
 using namespace std;
 
@@ -42,9 +42,9 @@ int endianess_test()
     // create dumb data
     struct server_to_client_msg stoc_msg;
     stoc_msg.epoch = 1;
-    for ( int i = 0 ; i < WEIGHTS_NUM ; i++ )
+    for ( int i = 0 ; i < VARIABLES_NUM ; i++ )
     {
-        stoc_msg.deltas[i] = 1;
+        stoc_msg.variables[i] = 1;
     }
 
     // create clone
@@ -58,9 +58,9 @@ int endianess_test()
     // check that clone remains the same
     if ( stoc_msg_clone.epoch != stoc_msg.epoch )
         return 0;
-    for ( int i = 0 ; i < WEIGHTS_NUM ; i++ )
+    for ( int i = 0 ; i < VARIABLES_NUM ; i++ )
     {
-        if ( stoc_msg_clone.deltas[i] != stoc_msg.deltas[i] )
+        if ( stoc_msg_clone.variables[i] != stoc_msg.variables[i] )
             return 0;
     }
     return 1;
