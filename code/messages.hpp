@@ -22,7 +22,7 @@
 //defines the type of the transfered data
 #define WEIGHTS 1
 #define DELTAS 2
-#define MSG_VARIABLE_MODE DELTAS
+#define MSG_VARIABLE_MODE WEIGHTS
 
 #define SERVER_TO_CLIENT_BUF_SIZE (int) ( sizeof(int) + VARIABLES_NUM * sizeof(MSG_VARIABLE_DATATYPE) )
 #define CLIENT_TO_SERVER_BUF_SIZE (int) ( sizeof(int) + VARIABLES_NUM * sizeof(MSG_VARIABLE_DATATYPE) + sizeof(float) + sizeof(float) )

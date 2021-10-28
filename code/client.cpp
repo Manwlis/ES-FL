@@ -10,7 +10,7 @@
  */
 
 #define PY_SSIZE_T_CLEAN
-#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
+#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION // suppress numpy version warnings
 #include <Python.h>
 #include </home/epetrakos/.local/lib/python3.8/site-packages/numpy/core/include/numpy/arrayobject.h>
 
@@ -31,8 +31,8 @@
 
 using namespace std;
 
-#define Py_script "nn_tiny"
-#define Py_function "train_nn"
+#define py_script "nn_tiny"
+#define py_training_function "train_nn"
 
 #define SERVER_IP "127.0.0.1"
 #define SERVER_PORT "12345"
@@ -75,17 +75,23 @@ int main ( int argc , char** argv )
 	/**************************************************************************************************/
 	/* Set up python environment, neural network and numpy wrappers.                                  */
 	/**************************************************************************************************/
-	PyObject* pName;
-	PyObject* pModule;
-	PyObject* pFunc;
+	PyObject* py_module_name;
+	PyObject* py_module;
+	PyObject* py_func;
 	//PyObject* pValue;
 
-	// Initialize python interpeter and numpy
-    Py_SetProgramName( (wchar_t*) argv[0] );
+	// Initialize python interpeter
+    Py_SetProgramName( Py_DecodeLocale( argv[0] , NULL ) );
 	Py_Initialize();
 
+	// Pass program arguments to interpeter
+	wchar_t** wchar_argv = (wchar_t**) PyMem_Malloc( sizeof(wchar_t*)* argc );
+	for ( int i = 0 ; i < argc ; i++ )
+		wchar_argv[i] = Py_DecodeLocale( argv[i] , NULL );
+	PySys_SetArgv( argc , wchar_argv );
+	PyMem_FREE( wchar_argv );
+
 	// look in current working directory for importing modules
-	//PyRun_SimpleString ("import os , sys; sys.path.append( os.getcwd() );");
 	PyObject* sys = PyImport_ImportModule( "sys" );
 	PyObject* path = PyObject_GetAttrString( sys , "path" );
 	PyList_Append( path , PyUnicode_FromString( "." ) );
@@ -94,14 +100,14 @@ int main ( int argc , char** argv )
 
 	// get file
 	cout << "Getting file" << endl;
-	pName = PyUnicode_FromString( Py_script );
-	pModule = PyImport_Import( pName ); // this executes code in module outside functions!
-	Py_DECREF( pName );
+	py_module_name = PyUnicode_FromString( py_script );
+	py_module = PyImport_Import( py_module_name ); // this executes code in module outside functions!
+	Py_DECREF( py_module_name );
 
 	// get function
 	cout << "Getting function" << endl;
-	pFunc = PyObject_GetAttrString( pModule , Py_function );
-	Py_DECREF( pModule ); // be carefull with this if need more functions
+	py_func = PyObject_GetAttrString( py_module , py_training_function );
+	Py_DECREF( py_module ); // be carefull with this if need more functions
 
 	// create numpy array metadata around C arrays to pass them to python code
 	_import_array();
@@ -192,7 +198,7 @@ int main ( int argc , char** argv )
 		cout << CURRENT_TIME << "received weights: " << received_message.variables[0] << "    " << received_message.variables[1] << endl;
 
 		// call python function
-		PyObject_CallFunctionObjArgs( pFunc , pArray_input , pArray_output , NULL );
+		PyObject_CallFunctionObjArgs( py_func , pArray_input , pArray_output , NULL );
 
 		// calculate deltas
 		#if MSG_VARIABLE_MODE == DELTAS
@@ -227,9 +233,11 @@ int main ( int argc , char** argv )
 	/* Clean up and exit.                                                                             */
 	/**************************************************************************************************/
 	// free up remaining python variables
-	Py_DECREF( pFunc );
+	Py_DECREF( py_func );
 	Py_DECREF( pArray_input );
 	Py_DECREF( pArray_output );
+
+	Py_Finalize();
 
 	// close socket properly
 	shutdown( socket_fd , SHUT_RDWR );

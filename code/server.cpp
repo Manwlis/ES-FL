@@ -34,7 +34,7 @@ using namespace std;
 
 // federated algorithm definitions
 #define MAX_CONNECTED_CLIENTS 10
-#define EPOCH_LIMIT 5
+#define EPOCH_LIMIT 50
 #define MIN_CLIENTS_PER_EPOCH 2
 
 // systemic definitions
@@ -533,8 +533,8 @@ int next_epoch_ready( int connected_clients_num , int working_clients_num , int 
 	if( working_clients_num == 0 )
 		return 1;
 
-	// enough completed
-	if( completed_clients_num == MIN_CLIENTS_PER_EPOCH )
+	// all completed
+	if( completed_clients_num == connected_clients_num )
 		return 1;
 
 	return 0;
