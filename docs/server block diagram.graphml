@@ -290,8 +290,8 @@ incomplete<y:LabelModel><y:SmartEdgeLabelModel autoRotationEnabled="false" defau
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="-22.04999999999859" ty="-9.0">
-            <y:Point x="375.0" y="975.0"/>
-            <y:Point x="112.95000000000141" y="975.0"/>
+            <y:Point x="375.0" y="1075.0"/>
+            <y:Point x="112.95000000000141" y="1075.0"/>
             <y:Point x="112.95000000000141" y="316.0"/>
           </y:Path>
           <y:LineStyle color="#000000" type="line" width="1.0"/>

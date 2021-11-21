@@ -21,6 +21,7 @@
  */
 void server_to_client_msg_big_endianess( server_to_client_msg& message )
 {
+	message.flags = le32toh( message.flags ); // little endian to host (big endian) uint32_t
 	message.epoch = le32toh( message.epoch ); // little endian to host (big endian) uint32_t
 	// flip floats in variables array
 	for( int i = 0  ; i < VARIABLES_NUM ; i++ )
@@ -35,6 +36,7 @@ void server_to_client_msg_big_endianess( server_to_client_msg& message )
  */
 void server_to_client_msg_little_endianess( server_to_client_msg& message )
 {
+	message.flags = be32toh( message.flags ); // big endian to host (little endian) uint32_t
 	message.epoch = be32toh( message.epoch ); // big endian to host (little endian) uint32_t
 	// flip floats in variables array
 	for( int i = 0  ; i < VARIABLES_NUM ; i++ )

@@ -31,8 +31,9 @@
 
 using namespace std;
 
-#define py_script "nn_tiny"
-#define py_training_function "train_nn"
+#define py_script "fashion_mnist"//"nn_tiny"
+#define py_train_function "train_nn"
+#define py_eval_function "evaluate_nn"
 
 #define SERVER_IP "127.0.0.1"
 #define SERVER_PORT "12345"
@@ -77,7 +78,9 @@ int main ( int argc , char** argv )
 	/**************************************************************************************************/
 	PyObject* py_module_name;
 	PyObject* py_module;
-	PyObject* py_func;
+	PyObject* py_train;
+	PyObject* py_eval;
+	PyLongObject* py_flags = NULL; // NULL to supress warning 'may be used uninitialized in dealloc()'
 	//PyObject* pValue;
 
 	// Initialize python interpeter
@@ -106,14 +109,15 @@ int main ( int argc , char** argv )
 
 	// get function
 	cout << "Getting function" << endl;
-	py_func = PyObject_GetAttrString( py_module , py_training_function );
+	py_train = PyObject_GetAttrString( py_module , py_train_function );
+	py_eval = PyObject_GetAttrString( py_module , py_eval_function );
 	Py_DECREF( py_module ); // be carefull with this if need more functions
 
 	// create numpy array metadata around C arrays to pass them to python code
 	_import_array();
 	npy_intp dims[1] = {VARIABLES_NUM}; // dimension/size of numpy arrays. Easier to pass an 1-D array to python and reshape data there.
-	PyObject* pArray_input = PyArray_SimpleNewFromData( 1 , dims , NPY_FLOAT , received_message.variables );
-	PyObject* pArray_output = PyArray_SimpleNewFromData( 1 , dims , NPY_FLOAT , send_message.variables );
+	PyObject* py_array_input = PyArray_SimpleNewFromData( 1 , dims , NPY_FLOAT , received_message.variables );
+	PyObject* py_array_output = PyArray_SimpleNewFromData( 1 , dims , NPY_FLOAT , send_message.variables );
 
 	/**************************************************************************************************/
 	/* Main loop.                                                                                     */
@@ -191,14 +195,19 @@ int main ( int argc , char** argv )
 		if constexpr ( std::endian::native == std::endian::big ) // requires c++20, dangerous !!!!
 			server_to_client_msg_big_endianess( received_message ); // maybe move this to the server side if needed
 
+		cout << RED << "\n			EPOCH    =   " << received_message.epoch << RESET << "\n" << endl;
+
+		if( received_message.flags == FINAL_EPOCH )
+		{
+			PyObject_CallFunctionObjArgs( py_eval , py_array_input , py_array_output , py_flags , NULL );
+			break;
+		}
 		/**************************************************************************************************/
 		/* Calculate variables.                                                                           */
 		/**************************************************************************************************/
-		cout << RED << "\n			EPOCH    =   " << received_message.epoch << RESET << "\n" << endl;
-		cout << CURRENT_TIME << "received weights: " << received_message.variables[0] << "    " << received_message.variables[1] << endl;
-
 		// call python function
-		PyObject_CallFunctionObjArgs( py_func , pArray_input , pArray_output , NULL );
+		py_flags = (PyLongObject*) PyLong_FromLong( (long) received_message.flags );
+		PyObject_CallFunctionObjArgs( py_train , py_array_input , py_array_output , py_flags , NULL );
 
 		// calculate deltas
 		#if MSG_VARIABLE_MODE == DELTAS
@@ -208,8 +217,6 @@ int main ( int argc , char** argv )
 		
 		send_message.accuracy = 0;
 		send_message.loss = 0;
-
-		cout << CURRENT_TIME << "sended variables: " << send_message.variables[0] << "    " << send_message.variables[1] << endl;
 		
 		/**************************************************************************************************/
 		/* Compress / quantize variables.                                                                 */
@@ -232,10 +239,13 @@ int main ( int argc , char** argv )
 	/**************************************************************************************************/
 	/* Clean up and exit.                                                                             */
 	/**************************************************************************************************/
+
 	// free up remaining python variables
-	Py_DECREF( py_func );
-	Py_DECREF( pArray_input );
-	Py_DECREF( pArray_output );
+	Py_DECREF( py_train );
+	Py_DECREF( py_eval );
+	Py_DECREF( py_array_input );
+	Py_DECREF( py_array_output );
+	Py_XDECREF( py_flags ); // py_flags gets initialised in main loop. If main loop ends early, it may be NULL.
 
 	Py_Finalize();
 

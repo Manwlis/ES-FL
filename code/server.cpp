@@ -10,6 +10,7 @@
  */
 
 #include <iostream>		/* << */
+#include <fstream>
 
 #include <stdlib.h>			/* atoi */
 #include <unistd.h>			/* close */
@@ -34,7 +35,7 @@ using namespace std;
 
 // federated algorithm definitions
 #define MAX_CONNECTED_CLIENTS 10
-#define EPOCH_LIMIT 50
+#define EPOCH_LIMIT 200
 #define MIN_CLIENTS_PER_EPOCH 2
 
 // systemic definitions
@@ -66,13 +67,36 @@ struct client_info // maybe rename
 int main( int argc , char** argv )
 {
 	cout << CURRENT_TIME << "Server Start" << endl;
-
-	int server_port = SERVER_PORT;
 	int rv; // return value used to check if functions worked properly
+	
+	// global model data. Static variable are by default initialized to zero. No need for explicit initialization.
+	static float accumulated_variables[VARIABLES_NUM];
+	static server_to_client_msg announcement_msg; // holds global model
+
+	/**************************************************************************************************/
+	/* Check if pretrained model file exists and set it up.                                           */
+	/**************************************************************************************************/
+	bool pretrained_model_flag = false;
+	// pretrained model exists
+	if( argc == 2 )
+	{
+		ifstream pretrained_model_file( argv[1] , std::ifstream::in | std::ifstream::binary );
+		if( ! pretrained_model_file.is_open() )
+			error( "Failed to open pretrained model file" );
+
+		// load model
+		pretrained_model_file.read( reinterpret_cast<char*>(announcement_msg.variables) , VARIABLES_NUM * sizeof(MSG_VARIABLE_DATATYPE) );
+		cout << CURRENT_TIME << "Loaded pretrained model" << endl;
+
+		pretrained_model_file.close();
+		pretrained_model_flag = true;
+	}
 
 	/**************************************************************************************************/
 	/* Set up a socket to receive incoming connections on. TCP.                                       */
 	/**************************************************************************************************/
+	int server_port = SERVER_PORT;
+
 	int listening_socket_fd;
 	struct sockaddr_in server_addr;
 
@@ -136,9 +160,6 @@ int main( int argc , char** argv )
 	/**************************************************************************************************/
 	/* Loop waiting for incoming connects or for incoming data on any of the connected sockets.       */
 	/**************************************************************************************************/
-	// global model data. Static variable are by default initialized to zero. No need for explicit initialization.
-	static float accumulated_variables[VARIABLES_NUM];
-	static server_to_client_msg announcement_msg; // holds global model
 	// nessesary info per client
 	struct client_info client_info[FD_NUM]; // parallel with polled_fds[]
 	// Used to check when to announce the new global model
@@ -237,6 +258,11 @@ int main( int argc , char** argv )
 					// track how many clients are connected
 					connected_clients_num++;
 
+					// check if clients should consider pretrained model
+					if ( current_epoch == 0 && pretrained_model_flag == false )
+					// shows to the clients that sended variables are random and they should consider their own initial values
+						announcement_msg.flags = 1;
+			
 					// send current global model so new client starts working imidiately
 					rv = send( new_fd , &announcement_msg , SERVER_TO_CLIENT_BUF_SIZE , 0 );
 
@@ -290,12 +316,12 @@ int main( int argc , char** argv )
 						<< "    Port: " << ntohs( peer_addr.sin_port ) << "    Local variables received." << endl;
 				#endif
 				/**************************************************************************************************/
-				/* Decompress / dequantize received variables.                                                       */
+				/* Decompress / dequantize received variables.                                                    */
 				/**************************************************************************************************/
 				//dequintize_received_variables();
 
 				/**************************************************************************************************/
-				/* Increment received variables to global diff.                                                      */
+				/* Increment received variables to global diff.                                                   */
 				/**************************************************************************************************/
 				
 				accumulate_variables( client_info[i].received_message->variables , accumulated_variables );
@@ -335,13 +361,19 @@ int main( int argc , char** argv )
 			// next epoch
 			current_epoch++;
 
+			announcement_msg.flags = 0;
+			// check if clients should consider pretrained model
+			if ( current_epoch == 0 && pretrained_model_flag == false )
+			{
+				// sended variables are random and clients should consider their own initial values
+				announcement_msg.flags = 1;
+			}
 			// check shutdown requirements
-			if ( current_epoch == EPOCH_LIMIT )
+			else if ( current_epoch == EPOCH_LIMIT )
 			{
 				server_shutdown = 1;
-				current_epoch = -1; // shows to the clients that training ended and they are receiving the final model
+				announcement_msg.flags = 2; // training ended and clients are receiving the final model
 			}
-
 			// create new global model
 			announcement_msg.epoch = current_epoch;
 			create_average_model( accumulated_variables , completed_clients_num , announcement_msg.variables );
@@ -363,6 +395,18 @@ int main( int argc , char** argv )
 	for ( int i = 0 ; i < FD_NUM ; i++ )
 		if ( polled_fds[i].fd > 0 )
 			shutdown( polled_fds[i].fd , SHUT_RDWR );
+
+	/**************************************************************************************************/
+	/* Save model.                                                                                    */
+	/**************************************************************************************************/
+	ofstream trained_model_file( "out.bin" , std::ifstream::out | std::ifstream::binary | std::ifstream::trunc );
+
+	trained_model_file.write( reinterpret_cast<char*>(announcement_msg.variables) , VARIABLES_NUM * sizeof(MSG_VARIABLE_DATATYPE) );
+		cout << CURRENT_TIME << "Saved model to " << "out.bin" << endl;
+
+	trained_model_file.close();
+	
+	cout << announcement_msg.variables[0] << endl;
 }
 
 
@@ -440,6 +484,7 @@ int read_socket( int fd , struct client_info& client_info , int& connected_clien
 	#if MESSAGE_LOGGING == 1
 		cout << CURRENT_TIME << "received bytes: " << rv << "	total: " << client_info.received_bytes << "	needed: " << CLIENT_TO_SERVER_BUF_SIZE;
 	#endif
+		
 	/**************************************************************************************************/
 	/* If message completed, update counters for client synchronization.                              */
 	/**************************************************************************************************/
