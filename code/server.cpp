@@ -2,8 +2,6 @@
  * @file server.cpp
  * @author Emmanouil Petrakos
  * @brief Server orchestrating federated learning.
- * @version 0.1
- * @date 11/07/2021
  * 
  * @copyright None
  * 
@@ -35,8 +33,8 @@ using namespace std;
 
 // federated algorithm definitions
 #define MAX_CONNECTED_CLIENTS 10
-#define EPOCH_LIMIT 200
-#define MIN_CLIENTS_PER_EPOCH 2
+#define EPOCH_LIMIT 500
+#define MIN_CLIENTS_PER_EPOCH 4
 
 // systemic definitions
 #define FD_NUM MAX_CONNECTED_CLIENTS+1 // +1 for the listening socket
@@ -379,7 +377,7 @@ int main( int argc , char** argv )
 			create_average_model( accumulated_variables , completed_clients_num , announcement_msg.variables );
 
 			// announce global model
-			cout << RED << "\n			EPOCH    =    " << current_epoch << RESET << "\n" << endl;
+			cout << RED << "\n			GLOBAL EPOCH    =    " << current_epoch << RESET << "\n" << endl;
 			working_clients_num = announce_global_model( polled_fds , client_info , connected_clients_num , working_clients_num , announcement_msg );
 
 			// clear previous epoch info
@@ -399,14 +397,12 @@ int main( int argc , char** argv )
 	/**************************************************************************************************/
 	/* Save model.                                                                                    */
 	/**************************************************************************************************/
-	ofstream trained_model_file( "out.bin" , std::ifstream::out | std::ifstream::binary | std::ifstream::trunc );
+	ofstream trained_model_file( "IO_files/out.bin" , std::ifstream::out | std::ifstream::binary | std::ifstream::trunc );
 
 	trained_model_file.write( reinterpret_cast<char*>(announcement_msg.variables) , VARIABLES_NUM * sizeof(MSG_VARIABLE_DATATYPE) );
-		cout << CURRENT_TIME << "Saved model to " << "out.bin" << endl;
+		cout << CURRENT_TIME << "Saved model to " << "./IO_files/out.bin" << endl;
 
 	trained_model_file.close();
-	
-	cout << announcement_msg.variables[0] << endl;
 }
 
 

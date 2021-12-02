@@ -16,7 +16,7 @@
 
 #include "utils.hpp"  /* reverse_float */
 
-#define VARIABLES_NUM 496138
+#define VARIABLES_NUM 421642
 #define MSG_VARIABLE_DATATYPE float
 
 //defines the type of the transfered data

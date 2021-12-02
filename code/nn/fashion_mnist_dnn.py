@@ -1,3 +1,12 @@
+# @file fashion_mnist.py
+# @author Emmanouil Petrakos
+# @brief 
+# @version 0.1
+# @date 20/11/2021
+# 
+# @copyright None
+
+
 # trains the nn using the input variables as the initial trainable variables.
 # final trainable variables are saved in and returned through the output_variables.
 # If flags == 1 input variables are disregarded and the values in the model are used instead.
@@ -16,7 +25,7 @@ def train_nn( input_variables , output_variables , flags ):
 	#print( "input			" , input_variables[0] )
 	#print( "variable prin fit	" , model.trainable_variables[0].numpy()[0][0] )
 	# train
-	model.fit( train_dataset , epochs=1 , steps_per_epoch=5 )
+	model.fit( train_dataset , epochs=1 , steps_per_epoch=10 )
 
 	#print( "variable meta fit	" , model.trainable_variables[0].numpy()[0][0] )
 	# save variables
@@ -55,11 +64,14 @@ import numpy as np
 dataset , metadata = tfds.load( 'fashion_mnist' , as_supervised=True , with_info=True )
 test_dataset = dataset['test']
 
-split = tfds.even_splits( 'train' , int( sys.argv[1] ) )
+if( len(sys.argv) == 1 ):
+	train_dataset = dataset['train']
+	print("Standalone mode.")
+else:
+	split = tfds.even_splits( 'train' , int( sys.argv[1] ) )
+	train_dataset = tfds.load( 'fashion_mnist' , as_supervised=True , split=split[ int( sys.argv[2] ) ] )
 
-train_dataset = tfds.load( 'fashion_mnist' , as_supervised=True , split=split[ int( sys.argv[2] ) ] )
-
-
+# print(len(train_dataset))
 class_names = metadata.features['label'].names
 
 num_train_examples = tf.data.experimental.cardinality( train_dataset ).numpy()
@@ -77,7 +89,7 @@ test_dataset  =  test_dataset.map( normalize )
 train_dataset =  train_dataset.cache()
 test_dataset  =  test_dataset.cache()
 
-BATCH_SIZE = 30
+BATCH_SIZE = 10
 train_dataset = train_dataset.cache().repeat().shuffle( num_train_examples ).batch( BATCH_SIZE )
 test_dataset = test_dataset.cache().batch( BATCH_SIZE )
 
@@ -96,12 +108,11 @@ model = tf.keras.Sequential([
 
 model.compile( optimizer='adam' , loss=tf.keras.losses.SparseCategoricalCrossentropy() , metrics=['accuracy'] )
 
+if ( len(sys.argv) == 1 ):
+	model.fit( train_dataset , epochs=1 , steps_per_epoch=num_batches )
+	a, b = model.evaluate( test_dataset , steps=math.ceil( num_test_examples / BATCH_SIZE ) )
+	print('Accuracy on test dataset:', b )
 
-# train directly with fit
-# for i in range(200):
-# 	model.fit( train_dataset , epochs=1 , steps_per_epoch=5 )
-
-# evaluate_nn( 0 , 0 , 0 )
 
 
 # train through the train_nn function

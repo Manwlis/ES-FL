@@ -2,8 +2,6 @@
  * @file client.cpp
  * @author Emmanouil Petrakos
  * @brief Client taking part in federated learning.
- * @version 0.1
- * @date 11/07/2021
  * 
  * @copyright None
  * 
@@ -31,7 +29,7 @@
 
 using namespace std;
 
-#define py_script "fashion_mnist"//"nn_tiny"
+#define py_script "fashion_mnist_cnn"//"nn_tiny"
 #define py_train_function "train_nn"
 #define py_eval_function "evaluate_nn"
 
@@ -195,7 +193,7 @@ int main ( int argc , char** argv )
 		if constexpr ( std::endian::native == std::endian::big ) // requires c++20, dangerous !!!!
 			server_to_client_msg_big_endianess( received_message ); // maybe move this to the server side if needed
 
-		cout << RED << "\n			EPOCH    =   " << received_message.epoch << RESET << "\n" << endl;
+		cout << RED << "\n			GLOBAL EPOCH    =   " << received_message.epoch << RESET << "\n" << endl;
 
 		if( received_message.flags == FINAL_EPOCH )
 		{
