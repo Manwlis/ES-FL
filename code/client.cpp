@@ -22,19 +22,14 @@
 #include <netinet/in.h>		/* htonl, htons, ntohl, ntohs */
 #include <netdb.h>			/* getnameinfo */
 
+#include "definitions.hpp"
+
 #include "utils.hpp"		/* error, current_time */
 #include "messages.hpp"		/* msg structs, change message endianess */
 #include "fake_data.hpp"	/* check_fake_server_data, create_fake_client_data */
 
 
 using namespace std;
-
-#define py_script "fashion_mnist_cnn"//"nn_tiny"
-#define py_train_function "train_nn"
-#define py_eval_function "evaluate_nn"
-
-#define SERVER_IP "127.0.0.1"
-#define SERVER_PORT "12345"
 
 
 struct sockaddr_in find_server( const string server_name , const string server_port );
@@ -62,12 +57,12 @@ int main ( int argc , char** argv )
 		error( "Client socket creation failed." );
 
 	// find server
-	struct sockaddr_in server = find_server( SERVER_IP , SERVER_PORT );
+	struct sockaddr_in server = find_server( SERVER_IP , to_string(SERVER_PORT) );
 
 	// Initiate Connection
 	cout << CURRENT_TIME << "Initiating connection with server." << endl;
 
-	connect( socket_fd , (struct sockaddr*) &server , sizeof( server ) );
+	rv = connect( socket_fd , (struct sockaddr*) &server , sizeof( server ) );
 	if ( rv < 0 )
 		error( "Connect failed." );
 		
@@ -76,13 +71,14 @@ int main ( int argc , char** argv )
 	/**************************************************************************************************/
 	PyObject* py_module_name;
 	PyObject* py_module;
+	PyObject* py_compile;
 	PyObject* py_train;
 	PyObject* py_eval;
 	PyLongObject* py_flags = NULL; // NULL to supress warning 'may be used uninitialized in dealloc()'
 	//PyObject* pValue;
 
 	// Initialize python interpeter
-    Py_SetProgramName( Py_DecodeLocale( argv[0] , NULL ) );
+	Py_SetProgramName( Py_DecodeLocale( argv[0] , NULL ) );
 	Py_Initialize();
 
 	// Pass program arguments to interpeter
@@ -92,24 +88,34 @@ int main ( int argc , char** argv )
 	PySys_SetArgv( argc , wchar_argv );
 	PyMem_FREE( wchar_argv );
 
-	// look in current working directory for importing modules
+	// look in nn directory for importing modules
 	PyObject* sys = PyImport_ImportModule( "sys" );
 	PyObject* path = PyObject_GetAttrString( sys , "path" );
-	PyList_Append( path , PyUnicode_FromString( "." ) );
+	PyList_Append( path , PyUnicode_FromString( "./nn" ) );
 	Py_DECREF( sys );
 	Py_DECREF( path );
 
-	// get file
+	// get module
 	cout << "Getting file" << endl;
 	py_module_name = PyUnicode_FromString( py_script );
 	py_module = PyImport_Import( py_module_name ); // this executes code in module outside functions!
 	Py_DECREF( py_module_name );
 
-	// get function
+	// pass C macros to module 
+	PyModule_AddIntMacro( py_module , LOCAL_EPOCHS );
+	PyModule_AddIntMacro( py_module , STEPS_PER_EPOCH );
+	PyModule_AddIntMacro( py_module , BATCH_SIZE );
+
+	// get functions
 	cout << "Getting function" << endl;
+	py_compile = PyObject_GetAttrString( py_module , py_compile_function );
 	py_train = PyObject_GetAttrString( py_module , py_train_function );
 	py_eval = PyObject_GetAttrString( py_module , py_eval_function );
 	Py_DECREF( py_module ); // be carefull with this if need more functions
+
+	// compile model
+	PyObject_CallFunctionObjArgs( py_compile , NULL );
+	Py_DECREF( py_compile );
 
 	// create numpy array metadata around C arrays to pass them to python code
 	_import_array();
@@ -142,19 +148,18 @@ int main ( int argc , char** argv )
 		{
 			cout << CURRENT_TIME << "Connection Closed" << endl;
 
-			// There's mothing more to do if the connection with server breaks.
-			// Close socket and exit. 
+			// There's mothing more to do if the connection with server broke. Close socket and exit. 
 			close( socket_fd );
 			break;
 		}
-
 		// socket errors
-		if ( rv < 0 )
+		else if ( rv < 0 )
 		{	
+			error("recv");
+			
 			cout << CURRENT_TIME << "Unexpected error on recv: " << errno << endl;
 			continue;
 		}
-
 		// erroneous data size, what do i do?
 
 		/**************************************************************************************************/
@@ -166,7 +171,10 @@ int main ( int argc , char** argv )
 		received_bytes += rv;
 
 		#if MESSAGE_LOGGING == 1
-			cout << CURRENT_TIME << "received bytes: " << rv << "	total: " << received_bytes << "	needed: " << SERVER_TO_CLIENT_BUF_SIZE;
+			cout << CURRENT_TIME
+				<< "received bytes: " << rv
+				<< "	total: " << received_bytes
+				<< "	needed: " << SERVER_TO_CLIENT_BUF_SIZE;
 		#endif
 
 		// check if received message is complete, if not wait for the rest of the data
@@ -222,7 +230,7 @@ int main ( int argc , char** argv )
 		// quantize_variables();
 
 		/**************************************************************************************************/
-		/* Send local variables. Blocking in order for tcp to fix communication errors.                   */
+		/* Send local variables. Blocking.                                                                */
 		/**************************************************************************************************/
 		cout << CURRENT_TIME << "Sending local variables." << endl;
 		// create message
@@ -230,10 +238,10 @@ int main ( int argc , char** argv )
 
 		// send message
 		rv = send_variables( socket_fd , send_message );
+
 		if ( rv < 0 )
 			cout << CURRENT_TIME << "Unexpected error on send: " << errno << endl;
 	}
-	
 	/**************************************************************************************************/
 	/* Clean up and exit.                                                                             */
 	/**************************************************************************************************/
@@ -277,6 +285,7 @@ struct sockaddr_in find_server( const string server_name , const string server_p
 }
 
 
+// white box for now
 int quantize_variables()
 {
 	return 0;
@@ -284,7 +293,7 @@ int quantize_variables()
 
 
 /**
- * @brief Serialize and send local variables to target socket.
+ * @brief Serialize and send local variables to target socket. Blocking
  * 
  * @param int target socket's fd  
  * @param client_to_server_msg* message to be send
@@ -296,7 +305,12 @@ int send_variables( int socket_fd , client_to_server_msg& send_message )
 	if constexpr ( std::endian::native == std::endian::big ) // requires c++20, dangerous !!!!
 		client_to_server_msg_big_endianess( send_message ); // maybe move this to the server side if needed
 	
-	int rv = send( socket_fd , &send_message , CLIENT_TO_SERVER_BUF_SIZE , 0 ); // na tsekarw an einai blocking h oxi
+	int rv = send( socket_fd , &send_message , CLIENT_TO_SERVER_BUF_SIZE , 0 );
+
+	cout << CURRENT_TIME
+		<< "sended bytes: " << rv
+		<< "	total: " << CLIENT_TO_SERVER_BUF_SIZE
+		<< "\n" << endl;
 
 	return rv;
 }

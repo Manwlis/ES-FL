@@ -14,15 +14,10 @@
 #include <string.h> /* memcpy */
 #include <endian.h> /* be32toh, le32toh */ 
 
+#include "definitions.hpp"
+
 #include "utils.hpp"  /* reverse_float */
 
-#define VARIABLES_NUM 421642
-#define MSG_VARIABLE_DATATYPE float
-
-//defines the type of the transfered data
-#define WEIGHTS 1
-#define DELTAS 2
-#define MSG_VARIABLE_MODE WEIGHTS
 
 // propably useless
 #define SERVER_TO_CLIENT_BUF_SIZE (int) ( sizeof(int) + sizeof(int) + VARIABLES_NUM * sizeof(MSG_VARIABLE_DATATYPE) )

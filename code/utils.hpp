@@ -8,8 +8,9 @@
  * @copyright None
  * 
  */
-
 #pragma once
+
+#include "definitions.hpp"
 
 #include <string>	/* string */
 #include <time.h>	/* time, localtime, strftime */
@@ -18,8 +19,6 @@
 
 using namespace std;
 
-
-#define MESSAGE_LOGGING 0
 
 #define RESET	"\033[0m"
 #define RED		"\033[31m"	/* Red */
