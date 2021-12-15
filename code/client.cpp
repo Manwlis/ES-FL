@@ -29,10 +29,7 @@
 #include "fake_data.hpp"	/* check_fake_server_data, create_fake_client_data */
 
 
-using namespace std;
-
-
-struct sockaddr_in find_server( const string server_name , const string server_port );
+struct sockaddr_in find_server( const char* server_name , const char* server_port );
 
 int quantize_variables();
 
@@ -57,10 +54,10 @@ int main ( int argc , char** argv )
 		error( "Client socket creation failed." );
 
 	// find server
-	struct sockaddr_in server = find_server( SERVER_IP , to_string(SERVER_PORT) );
+	struct sockaddr_in server = find_server( SERVER_IP , std::to_string(SERVER_PORT).c_str() );
 
 	// Initiate Connection
-	cout << CURRENT_TIME << "Initiating connection with server." << endl;
+	std::cout << CURRENT_TIME << "Initiating connection with server." << std::endl;
 
 	rv = connect( socket_fd , (struct sockaddr*) &server , sizeof( server ) );
 	if ( rv < 0 )
@@ -74,17 +71,17 @@ int main ( int argc , char** argv )
 	PyObject* py_compile;
 	PyObject* py_train;
 	PyObject* py_eval;
-	PyLongObject* py_flags = NULL; // NULL to supress warning 'may be used uninitialized in dealloc()'
+	PyLongObject* py_flags = nullptr; // nullptr to supress warning 'may be used uninitialized in dealloc()'
 	//PyObject* pValue;
 
 	// Initialize python interpeter
-	Py_SetProgramName( Py_DecodeLocale( argv[0] , NULL ) );
+	Py_SetProgramName( Py_DecodeLocale( argv[0] , nullptr ) );
 	Py_Initialize();
 
 	// Pass program arguments to interpeter
 	wchar_t** wchar_argv = (wchar_t**) PyMem_Malloc( sizeof(wchar_t*)* argc );
 	for ( int i = 0 ; i < argc ; i++ )
-		wchar_argv[i] = Py_DecodeLocale( argv[i] , NULL );
+		wchar_argv[i] = Py_DecodeLocale( argv[i] , nullptr );
 	PySys_SetArgv( argc , wchar_argv );
 	PyMem_FREE( wchar_argv );
 
@@ -96,7 +93,7 @@ int main ( int argc , char** argv )
 	Py_DECREF( path );
 
 	// get module
-	cout << "Getting file" << endl;
+	std::cout << "Getting file" << std::endl;
 	py_module_name = PyUnicode_FromString( py_script );
 	py_module = PyImport_Import( py_module_name ); // this executes code in module outside functions!
 	Py_DECREF( py_module_name );
@@ -107,7 +104,7 @@ int main ( int argc , char** argv )
 	PyModule_AddIntMacro( py_module , BATCH_SIZE );
 
 	// get functions
-	cout << "Getting function" << endl;
+	std::cout << "Getting function" << std::endl;
 	py_compile = PyObject_GetAttrString( py_module , py_compile_function );
 	py_train = PyObject_GetAttrString( py_module , py_train_function );
 	py_eval = PyObject_GetAttrString( py_module , py_eval_function );
@@ -133,7 +130,7 @@ int main ( int argc , char** argv )
 		/* Wait for global model and read it.                                                             */
 		/**************************************************************************************************/
 		#if MESSAGE_LOGGING == 1
-			cout << CURRENT_TIME << "Waiting for data." << endl;
+			std::cout << CURRENT_TIME << "Waiting for data." << std::endl;
 		#endif
 		
 		// read socket
@@ -146,7 +143,7 @@ int main ( int argc , char** argv )
 		// connection closed
 		if ( rv == 0 )
 		{
-			cout << CURRENT_TIME << "Connection Closed" << endl;
+			std::cout << CURRENT_TIME << "Connection Closed" << std::endl;
 
 			// There's mothing more to do if the connection with server broke. Close socket and exit. 
 			close( socket_fd );
@@ -157,7 +154,7 @@ int main ( int argc , char** argv )
 		{	
 			error("recv");
 			
-			cout << CURRENT_TIME << "Unexpected error on recv: " << errno << endl;
+			std::cout << CURRENT_TIME << "Unexpected error on recv: " << errno << std::endl;
 			continue;
 		}
 		// erroneous data size, what do i do?
@@ -171,7 +168,7 @@ int main ( int argc , char** argv )
 		received_bytes += rv;
 
 		#if MESSAGE_LOGGING == 1
-			cout << CURRENT_TIME
+			std::cout << CURRENT_TIME
 				<< "received bytes: " << rv
 				<< "	total: " << received_bytes
 				<< "	needed: " << SERVER_TO_CLIENT_BUF_SIZE;
@@ -181,19 +178,19 @@ int main ( int argc , char** argv )
 		if ( received_bytes < SERVER_TO_CLIENT_BUF_SIZE )
 		{
 			#if MESSAGE_LOGGING == 1
-				cout << endl;
+				std::cout << std::endl;
 			#endif
 
 			continue;
 		}
 		#if MESSAGE_LOGGING == 1
-			cout << YELLOW << "	completed" << RESET << endl;
+			std::cout << YELLOW << "	completed" << RESET << std::endl;
 		#endif
 
 		/**************************************************************************************************/
 		/* Message is complete, continue with processing it.                                              */
 		/**************************************************************************************************/
-		cout << CURRENT_TIME << "Received new global model." << endl;
+		std::cout << CURRENT_TIME << "Received new global model." << std::endl;
 
 		received_bytes = 0; // reset received bytes counter for use on the next message
 
@@ -201,7 +198,7 @@ int main ( int argc , char** argv )
 		if constexpr ( std::endian::native == std::endian::big ) // requires c++20, dangerous !!!!
 			server_to_client_msg_big_endianess( received_message ); // maybe move this to the server side if needed
 
-		cout << RED << "\n			GLOBAL EPOCH    =   " << received_message.epoch << RESET << "\n" << endl;
+		std::cout << RED << "\n			GLOBAL EPOCH    =   " << received_message.epoch << RESET << "\n" << std::endl;
 
 		if( received_message.flags == FINAL_EPOCH )
 		{
@@ -232,7 +229,7 @@ int main ( int argc , char** argv )
 		/**************************************************************************************************/
 		/* Send local variables. Blocking.                                                                */
 		/**************************************************************************************************/
-		cout << CURRENT_TIME << "Sending local variables." << endl;
+		std::cout << CURRENT_TIME << "Sending local variables." << std::endl;
 		// create message
 		send_message.epoch = received_message.epoch;
 
@@ -240,7 +237,7 @@ int main ( int argc , char** argv )
 		rv = send_variables( socket_fd , send_message );
 
 		if ( rv < 0 )
-			cout << CURRENT_TIME << "Unexpected error on send: " << errno << endl;
+			std::cout << CURRENT_TIME << "Unexpected error on send: " << errno << std::endl;
 	}
 	/**************************************************************************************************/
 	/* Clean up and exit.                                                                             */
@@ -263,11 +260,11 @@ int main ( int argc , char** argv )
 /**
  * @brief Create an Internet address that can be specified in a call to connect, based on server IP and port.
  * 
- * @param string server's name 
- * @param string server's port 
+ * @param char* server's name 
+ * @param char* server's port 
  * @return sockaddr_in struct containing the server's info
  */
-struct sockaddr_in find_server( const string server_name , const string server_port )
+struct sockaddr_in find_server( const char* server_name , const char* server_port )
 {
 	struct addrinfo hints;
 	memset( &hints , 0 , sizeof(hints) );
@@ -277,7 +274,7 @@ struct sockaddr_in find_server( const string server_name , const string server_p
 	
 	struct addrinfo* server_addr_info;
 
-	int rv = getaddrinfo( &server_name[0] , &server_port[0] , NULL , &server_addr_info );
+	int rv = getaddrinfo( server_name , server_port , nullptr , &server_addr_info );
 	if ( rv != 0 )
 		error( "getaddrinfo failed." );
 
@@ -307,10 +304,10 @@ int send_variables( int socket_fd , client_to_server_msg& send_message )
 	
 	int rv = send( socket_fd , &send_message , CLIENT_TO_SERVER_BUF_SIZE , 0 );
 
-	cout << CURRENT_TIME
+	std::cout << CURRENT_TIME
 		<< "sended bytes: " << rv
 		<< "	total: " << CLIENT_TO_SERVER_BUF_SIZE
-		<< "\n" << endl;
+		<< "\n" << std::endl;
 
 	return rv;
 }

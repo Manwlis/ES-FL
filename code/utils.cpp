@@ -29,7 +29,7 @@ void error( const char* msg )
  * 
  * @return string containing the formated time
  */
-string current_time()
+std::string current_time()
 {
 	char buf[9];
 

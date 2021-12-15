@@ -17,8 +17,6 @@
 #include <stdio.h>	/* perror */
 #include <stdlib.h>	/* exit, EXIT_FAILURE */
 
-using namespace std;
-
 
 #define RESET	"\033[0m"
 #define RED		"\033[31m"	/* Red */
@@ -29,7 +27,7 @@ using namespace std;
 
 
 void error( const char* msg );
-string current_time();
+std::string current_time();
 
 
 /**

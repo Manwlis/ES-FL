@@ -7,8 +7,8 @@
  * 
  */
 
-#include <iostream>		/* << */
-#include <fstream>
+#include <iostream>			/* << */
+#include <fstream>			/* ifstream, ofstream */
 
 #include <stdlib.h>			/* atoi */
 #include <unistd.h>			/* close */
@@ -28,15 +28,12 @@
 
 #include <netinet/tcp.h>
 
-using namespace std;
-
 
 // systemic definitions
 #define FD_NUM MAX_CONNECTED_CLIENTS+1 // +1 for the listening socket
 
 
-int read_socket( int fd , struct polled_fds_info &polled_fds_info ,
-	int& connected_clients_num , int& working_clients_num , int& completed_clients_num );
+int read_socket( int fd , struct polled_fds_info &polled_fds_info , int bytes_to_read );
 
 void dequintize_received_variables( MSG_VARIABLE_DATATYPE message_variables[VARIABLES_NUM] , float local_variables[VARIABLES_NUM] );
 
@@ -60,7 +57,7 @@ struct polled_fds_info // maybe rename
 
 int main( int argc , char** argv )
 {
-	cout << CURRENT_TIME << "Server Start" << endl;
+	std::cout << CURRENT_TIME << "Server Start" << std::endl;
 	int rv; // return value used to check if functions worked properly
 	
 	// global model data. Static variable are by default initialized to zero. No need for explicit initialization.
@@ -72,10 +69,10 @@ int main( int argc , char** argv )
 	/**************************************************************************************************/
 	bool pretrained_model_flag = false;
 	// pretrained model exists
-	if( argc == 2 )
+	if ( argc == 2 )
 	{
-		ifstream pretrained_model_file( argv[1] , std::ifstream::in | std::ifstream::binary );
-		if( ! pretrained_model_file.is_open() )
+		std::ifstream pretrained_model_file( argv[1] , std::ifstream::in | std::ifstream::binary );
+		if ( !pretrained_model_file.is_open() )
 			error( "Failed to open pretrained model file" );
 
 		// load model
@@ -83,7 +80,7 @@ int main( int argc , char** argv )
 		if ( !pretrained_model_file )
 			error( "Failed to read requested number of data" );
 
-		cout << CURRENT_TIME << "Loaded pretrained model" << endl;
+		std::cout << CURRENT_TIME << "Loaded pretrained model" << std::endl;
 
 		pretrained_model_file.close();
 		pretrained_model_flag = true;
@@ -128,7 +125,7 @@ int main( int argc , char** argv )
 	if ( rv < 0 )
 		error( "Listen server socket failed" );
 	
-	cout << CURRENT_TIME << "Listening port " << server_port << endl;
+	std::cout << CURRENT_TIME << "Listening port " << server_port << std::endl;
 
 	/**************************************************************************************************/
 	/* Initialize polling structure.                                                                  */
@@ -162,7 +159,7 @@ int main( int argc , char** argv )
 	// keep track of current epoch
 	int current_epoch = 0;
 
-	cout << CURRENT_TIME << "Starting polling" << endl;
+	std::cout << CURRENT_TIME << "Starting polling" << std::endl;
 	// main loop
 	while ( server_shutdown == false )
 	{
@@ -200,11 +197,13 @@ int main( int argc , char** argv )
 			if ( polled_fds[i].fd == listening_socket_fd )
 			{
 				// there are incoming connection requests
-				cout << CURRENT_TIME << "New connections" << endl;
+				std::cout << CURRENT_TIME << "New connections" << std::endl;
 
 				// accept them all
 				while ( true )
-				{
+				{ // TODO: Move the following code to a function accept_connection()
+				  // input: listening_socket_fd, polled_fds_info, 
+				  // return: -1 on failure, 0 if there's no connection to accept, 1 on success
 					struct sockaddr_in client_addr; // just for logging
 					socklen_t client_addr_len = sizeof(client_addr);
 					memset( &client_addr , 0 , client_addr_len );
@@ -218,22 +217,22 @@ int main( int argc , char** argv )
 							break;
 							
 						// something went wrong
-						cout << CURRENT_TIME << "Unexpected error on accept: " << new_fd << endl;
+						std::cout << CURRENT_TIME << "Unexpected error on accept: " << new_fd << std::endl;
 						continue;
 					}
 					// set new socket as non blocking
-					if(fcntl(new_fd, F_SETFL, fcntl(new_fd, F_GETFL) | O_NONBLOCK) < 0)
+					if ( fcntl( new_fd , F_SETFL , fcntl( new_fd , F_GETFL ) | O_NONBLOCK ) < 0 )
 					{
-						cout << CURRENT_TIME << "Failed setting new socket as non blocking. Closing it." << endl;
+						std::cout << CURRENT_TIME << "Failed setting new socket as non blocking. Closing it." << std::endl;
 						close( new_fd );
 						continue;
 					}
 
 					// new client
-					cout << CURRENT_TIME
+					std::cout << CURRENT_TIME
 						<< "New client IP:	" << inet_ntoa( client_addr.sin_addr )
 						<< "	Port: " << ntohs( client_addr.sin_port )
-						<< endl;
+						<< std::endl;
 
 					// add the new socket in the polled fd set.
 					polled_fds[num_polled_fds].fd = new_fd;
@@ -244,7 +243,7 @@ int main( int argc , char** argv )
 					polled_fds_info[num_polled_fds].received_message = (struct client_to_server_msg *) malloc( sizeof(client_to_server_msg) );
 					polled_fds_info[num_polled_fds].received_bytes = 0;
 					polled_fds_info[num_polled_fds].sended_bytes = 0;
-
+// till here and put ifs on the trackings
 					// track polled fds num
 					num_polled_fds++;
 					// track how many clients are connected
@@ -254,16 +253,16 @@ int main( int argc , char** argv )
 			/**************************************************************************************************/
 			/* Non listening socket fd raised Unexpected event.                                               */
 			/**************************************************************************************************/
-			if ( polled_fds[i].revents & ( POLLNVAL|POLLERR|POLLHUP ) )
+			else if ( polled_fds[i].revents & ( POLLNVAL|POLLERR|POLLHUP ) )
 			{
-				cout << CURRENT_TIME
+				std::cout << CURRENT_TIME
 					<< "Revent: " << polled_fds[i].revents
 					<< " on connention with " << inet_ntoa( peer_addr.sin_addr )
 					<< " at port " << ntohs( peer_addr.sin_port )
-					<< endl;
+					<< std::endl;
 
 				// error on socket, kill connection
-				cout << CURRENT_TIME << "Connection Closed unexpectedly." << endl;
+				std::cout << CURRENT_TIME << "Connection Closed unexpectedly." << std::endl;
 
 				// // close it and mark it for removal from the fd set
 				close( polled_fds[i].fd );
@@ -275,7 +274,7 @@ int main( int argc , char** argv )
 
 				// update counters
 				connected_clients_num--;
-				// works ok if client not working, TODO: test in other circumstances
+				
 				if ( polled_fds_info[i].received_bytes != CLIENT_TO_SERVER_BUF_SIZE &&  polled_fds_info[i].sended_bytes == SERVER_TO_CLIENT_BUF_SIZE )
 					working_clients_num--;
 				
@@ -286,17 +285,18 @@ int main( int argc , char** argv )
 			/**************************************************************************************************/
 			/* Non listening socket fd raised POLLIN event. New incoming data, read them.                     */
 			/**************************************************************************************************/
-			else if( polled_fds[i].revents & POLLIN )
+			else if ( polled_fds[i].revents & POLLIN )
 			{
 				#if MESSAGE_LOGGING == 1
-					cout << CURRENT_TIME  
+					std::cout << CURRENT_TIME  
 						<< "Read event on Fd: " << polled_fds[i].fd 
 						<< "	IP: " << inet_ntoa( peer_addr.sin_addr )
 						<< "	Port: " << ntohs( peer_addr.sin_port ) 
-						<< endl;
+						<< std::endl;
 				#endif
 
-				rv = read_socket( polled_fds[i].fd , polled_fds_info[i] , connected_clients_num , working_clients_num , completed_clients_num );
+				int bytes_to_read = CLIENT_TO_SERVER_BUF_SIZE - polled_fds_info[i].received_bytes;
+				rv = read_socket( polled_fds[i].fd , polled_fds_info[i] , bytes_to_read );
 
 				// read failed, continue to next fd
 				if ( rv == -1 )
@@ -304,6 +304,12 @@ int main( int argc , char** argv )
 				// connection closed, mark fd for removal from polling struct
 				else if ( rv == 0 )
 				{
+					// update counters
+					connected_clients_num--;
+					if ( bytes_to_read != 0 ) // if server wasn't expecting any data, client was not working
+						working_clients_num--; // decrement only if client was working
+					
+					// mark fd for removal
 					polled_fds[i].fd = -1;
 					compress_array = true;
 					continue;
@@ -313,12 +319,17 @@ int main( int argc , char** argv )
 					// if not, wait for the rest of the data
 					continue;
 
+				// finished working
+				working_clients_num--;
+				completed_clients_num++;
+
+
 				#if MESSAGE_LOGGING == 0
-					cout << CURRENT_TIME
+					std::cout << CURRENT_TIME
 					<< "Fd: " << polled_fds[i].fd
 					<< "    IP: " << inet_ntoa( peer_addr.sin_addr )
 					<< "    Port: " << ntohs( peer_addr.sin_port )
-					<< "    Local variables received." << endl;
+					<< "    Local variables received." << std::endl;
 				#endif
 
 				/**************************************************************************************************/
@@ -338,13 +349,13 @@ int main( int argc , char** argv )
 			{
 				int remaining_bytes = SERVER_TO_CLIENT_BUF_SIZE - polled_fds_info[i].sended_bytes;
 				#if MESSAGE_LOGGING == 1
-					cout << CURRENT_TIME  
+					std::cout << CURRENT_TIME  
 						<< "Send event on Fd: " << polled_fds[i].fd 
 						<< "	IP: " << inet_ntoa( peer_addr.sin_addr )
 						<< "	Port: " << ntohs( peer_addr.sin_port ) 
 						<< "	Remaining bytes: " << remaining_bytes
 						<< "	Sended bytes: " << polled_fds_info[i].sended_bytes
-						<< endl;
+						<< std::endl;
 				#endif
 
 				// send remaining bytes
@@ -357,14 +368,14 @@ int main( int argc , char** argv )
 				polled_fds_info[i].sended_bytes += rv;
 
 				#if MESSAGE_LOGGING == 1
-					cout << CURRENT_TIME
+					std::cout << CURRENT_TIME
 						<< "sended bytes: " << rv
 						<< "	total: " << polled_fds_info[i].sended_bytes
 						<< "	needed: " << SERVER_TO_CLIENT_BUF_SIZE;
 				#endif
 
 				// completed the message
-				if( polled_fds_info[i].sended_bytes == SERVER_TO_CLIENT_BUF_SIZE )
+				if ( polled_fds_info[i].sended_bytes == SERVER_TO_CLIENT_BUF_SIZE )
 				{
 					// no need to write to the socket fd anymore
 					polled_fds[i].events = POLLIN | POLLRDHUP | POLLERR | POLLNVAL;
@@ -374,20 +385,20 @@ int main( int argc , char** argv )
 					working_clients_num++;
 
 					#if MESSAGE_LOGGING == 1
-						cout << YELLOW << "	completed\n" << RESET << endl;
+						std::cout << YELLOW << "	completed\n" << RESET << std::endl;
 					#elif MESSAGE_LOGGING == 0 // if message stats logging is disabled, show info only when a message is completed
-						cout << CURRENT_TIME
+						std::cout << CURRENT_TIME
 							<< "Fd: " << polled_fds[i].fd
 							<< "    IP: " << inet_ntoa( peer_addr.sin_addr )
 							<< "    Port: " << ntohs( peer_addr.sin_port )
 							<< "    Global model sended."
-							<< endl;
+							<< std::endl;
 					#endif
 
 					// in the final epoch when the final global model is sent, clients are disconnected
 					if ( current_epoch == EPOCH_LIMIT )
 					{
-						cout << CURRENT_TIME << "Closing connection" << endl;
+						std::cout << CURRENT_TIME << "Closing connection" << std::endl;
 
 						// close the connection and mark its fd for removal from the set
 						shutdown( polled_fds[i].fd  , SHUT_RDWR );
@@ -407,7 +418,7 @@ int main( int argc , char** argv )
 				else // not completed the message
 				{
 					#if MESSAGE_LOGGING == 1
-						cout << endl; // ends above message before if
+						std::cout << std::endl; // ends above message before if
 					#endif
 
 					continue;
@@ -426,7 +437,7 @@ int main( int argc , char** argv )
 			{
 				if ( polled_fds[i].fd == -1 )
 				{
-					for( int j = i ; j < num_polled_fds - 1 ; j++ )
+					for ( int j = i ; j < num_polled_fds - 1 ; j++ )
 					{
 						// squeeze the fd array
 						polled_fds[j].fd = polled_fds[j+1].fd;
@@ -470,7 +481,7 @@ int main( int argc , char** argv )
 			/**************************************************************************************************/
 			/* Announce global model.                                                                         */
 			/**************************************************************************************************/
-			cout << RED << "\n			GLOBAL EPOCH    =    " << current_epoch << RESET << "\n" << endl;
+			std::cout << RED << "\n			GLOBAL EPOCH    =    " << current_epoch << RESET << "\n" << std::endl;
 			
 			// set all connected sockets as ready to get data
 			for ( int i = 1 ; i < connected_clients_num + 1 ; i++ )
@@ -504,11 +515,11 @@ int main( int argc , char** argv )
 	/**************************************************************************************************/
 	/* Save model.                                                                                    */
 	/**************************************************************************************************/
-	ofstream trained_model_file( OUTPUT_FILE , std::ifstream::out | std::ifstream::binary | std::ifstream::trunc );
+	std::ofstream trained_model_file( OUTPUT_FILE , std::ofstream::out | std::ofstream::binary | std::ofstream::trunc );
 
 	trained_model_file.write( reinterpret_cast<char*>(announcement_msg.variables) , VARIABLES_NUM * sizeof(MSG_VARIABLE_DATATYPE) );
 
-	cout << CURRENT_TIME << "Saved model to " << OUTPUT_FILE << endl;
+	std::cout << CURRENT_TIME << "Saved model to " << OUTPUT_FILE << std::endl;
 
 	trained_model_file.close();
 }
@@ -519,20 +530,16 @@ int main( int argc , char** argv )
  * 
  * @param int fd to be read
  * @param polled_fds_info& struct containing client's info
- * @param int& connected clients counter
- * @param int& working clients counter
- * @param int& completed clients counter
+ * @param int how many bytes to read
  * @return 1 on succesfull read, 0 on socket closure, -1 on error
  */
-int read_socket( int fd , struct polled_fds_info& fd_info , int& connected_clients_num , int& working_clients_num , int& completed_clients_num )
+int read_socket( int fd , struct polled_fds_info& fd_info , int bytes_to_read )
 {
 	/**************************************************************************************************/
 	/* Read socket. Message may be incomplete, track size of received data.                           */
 	/**************************************************************************************************/
-	int bytes_left = CLIENT_TO_SERVER_BUF_SIZE - fd_info.received_bytes;
-
 	static unsigned char buffer[CLIENT_TO_SERVER_BUF_SIZE];
-	int rv = recv( fd , buffer , bytes_left , 0 );
+	int rv = recv( fd , buffer , bytes_to_read , 0 );
 
 	/**************************************************************************************************/
 	/* Do necesary checks. Connection closed / socket errors / erroneous data size.                   */
@@ -540,7 +547,7 @@ int read_socket( int fd , struct polled_fds_info& fd_info , int& connected_clien
 	// connection closed properly
 	if ( rv == 0 )
 	{
-		cout << CURRENT_TIME << "Connection Closed." << endl;
+		std::cout << CURRENT_TIME << "Connection Closed." << std::endl;
 
 		// // close it and mark it for removal from the fd set
 		close( fd );
@@ -550,28 +557,13 @@ int read_socket( int fd , struct polled_fds_info& fd_info , int& connected_clien
 		fd_info.received_bytes = 0;
 		fd_info.sended_bytes = 0;
 
-		// update counters
-		connected_clients_num--;
-		if( bytes_left != 0 ) // if server wasn't expecting any data, client was not working
-			working_clients_num--; // decrement only if client was working
 		return 0;
 	}
 	// socket recv errors
 	if ( rv < 0 )
 	{
 		// something went wrong
-		cout << CURRENT_TIME << "Unexpected error on recv: " << errno << endl;
-		return -1;
-	}
-	// erroneous data size
-	if ( fd_info.received_bytes + rv > CLIENT_TO_SERVER_BUF_SIZE )
-	{
-		cout << CURRENT_TIME << "Client sended more data than supposed." << endl;
-
-		// it's improbable that any more useful data will be sended after that. Mark client as non working
-		working_clients_num--;
-		fd_info.received_bytes = CLIENT_TO_SERVER_BUF_SIZE+1;
-
+		std::cout << CURRENT_TIME << "Unexpected error on recv: " << errno << std::endl;
 		return -1;
 	}
 
@@ -585,7 +577,7 @@ int read_socket( int fd , struct polled_fds_info& fd_info , int& connected_clien
 	fd_info.received_bytes += rv;
 
 	#if MESSAGE_LOGGING == 1
-		cout << CURRENT_TIME
+		std::cout << CURRENT_TIME
 			<< "received bytes: " << rv
 			<< "	total: " << fd_info.received_bytes
 			<< "	needed: " << CLIENT_TO_SERVER_BUF_SIZE;
@@ -594,20 +586,17 @@ int read_socket( int fd , struct polled_fds_info& fd_info , int& connected_clien
 	/**************************************************************************************************/
 	/* If message completed, update counters for client synchronization.                              */
 	/**************************************************************************************************/
-	if( fd_info.received_bytes == CLIENT_TO_SERVER_BUF_SIZE )
+	if ( fd_info.received_bytes == CLIENT_TO_SERVER_BUF_SIZE )
 	{
-		working_clients_num--;
-		completed_clients_num++;
-		
 		#if MESSAGE_LOGGING == 1
-			cout << YELLOW << "	completed\n" << RESET;
+			std::cout << YELLOW << "	completed\n" << RESET;
 		#endif
 
 		// reset sended bytes counter to be ready for next epoch.
 		fd_info.sended_bytes = 0;
 	}
 	#if MESSAGE_LOGGING == 1
-		cout << endl;
+		std::cout << std::endl;
 	#endif
 
 	return 1;
@@ -676,11 +665,11 @@ void create_average_model( float accumulated_variables[VARIABLES_NUM] , int num_
  */
 int next_epoch_ready( int connected_clients_num , int working_clients_num , int completed_clients_num )
 {
-	cout << "								"
+	std::cout << "								"
 		<< "	connected = " << connected_clients_num 
 		<< "	working  = " << working_clients_num
 		<< "	completed = " << completed_clients_num
-		<< endl;
+		<< std::endl;
 
 	// not enough connected client, no point to start a new epoch
 	if( connected_clients_num < MIN_CLIENTS_PER_EPOCH )

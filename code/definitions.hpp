@@ -7,12 +7,12 @@
 
 // federated algorithm definitions
 #define MAX_CONNECTED_CLIENTS 10
-#define MIN_CLIENTS_PER_EPOCH 4
-#define EPOCH_LIMIT 150
+#define MIN_CLIENTS_PER_EPOCH 5
+#define EPOCH_LIMIT 6000
 
 #define LOCAL_EPOCHS 1
-#define STEPS_PER_EPOCH 3
-#define BATCH_SIZE 10
+#define STEPS_PER_EPOCH 1
+#define BATCH_SIZE 2
 
 // message variables and their types
 #define VARIABLES_NUM 421642

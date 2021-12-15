@@ -21,8 +21,6 @@
 #include "messages.hpp"
 #include "fake_data.hpp"
 
-using namespace std;
-
 
 int endianess_test();
 
@@ -30,7 +28,7 @@ int endianess_test();
 int main ( int argc , char** argv )
 {
     assert( endianess_test );
-    cout << "ok" << endl;
+    std::cout << "ok" << std::endl;
 }
 
 

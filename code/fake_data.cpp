@@ -20,11 +20,8 @@ struct client_info // maybe rename
 };
 
 
-using namespace std;
-
-
 /**
- * @brief Create a fake server data object
+ * @brief Create a fake server message, where every variable has value equal with the epoch
  * 
  * @param announcement_msg 
  * @param epoch 
@@ -38,7 +35,7 @@ void create_fake_server_data(struct server_to_client_msg& announcement_msg , int
 
 
 /**
- * @brief Create a fake client data object
+ * @brief Create a fake client message, where every variable, accuracy and loss have value equal with the epoch
  * 
  * @param send_message 
  * @param epoch 
@@ -56,57 +53,53 @@ void create_fake_client_data( client_to_server_msg& send_message , int epoch )
 
 
 /**
- * @brief 
+ * @brief Check that the message follows the above format
  * 
- * @param client_info 
- * @param i 
- * @param epoch 
+ * @param client_to_server_msg& the input message
+ * @param epoch the current epoch
  */
-void check_fake_client_data( struct client_info client_info[] , int i , int epoch )
+void check_fake_client_data( struct client_to_server_msg& received_message, int epoch )
 {
-	bool flag = 0;
-	for( int k = 0 ; k < VARIABLES_NUM ; k++ )
+	if ( received_message.epoch != epoch )
 	{
-		if( client_info[i].received_message->epoch != epoch )
+		std::cout << "epoch wrong" << std::endl;
+		return;
+	}
+	else if ( received_message.accuracy != received_message.epoch )
+	{
+		std::cout << "accuracy wrong" << std::endl;
+		return;
+	}
+	else if ( received_message.loss != received_message.loss )
+	{
+		std::cout << "loss wrong" << std::endl;
+		return;
+	}
+	
+	for( int i = 0 ; i < VARIABLES_NUM ; i++ )
+	{
+		if( received_message.variables[i] != received_message.epoch )
 		{
-			putchar('1');
-			flag = 1;
-		}
-		if( client_info[i].received_message->variables[k] != client_info[i].received_message->epoch )
-		{
-			putchar('2');
-			flag = 1;
-		}
-		if( client_info[i].received_message->accuracy != client_info[i].received_message->epoch )
-		{
-			putchar('3');
-			flag = 1;
-		}
-		if( client_info[i].received_message->loss != client_info[i].received_message->epoch )
-		{
-			putchar('4');
-			flag = 1;
+			std::cout << "variable " << i << " wrong" << std::endl;
+			return;
 		}
 	}
-	if( flag == 0 )
-		cout << "message received ok" << endl;
+	std::cout << "message received ok" << std::endl;
 }
 
 
 /**
- * @brief 
+ * @brief Check that the message follows the above format
  * 
- * @param received_message 
+ * @param client_to_server_msg& the input message
  */
 void check_fake_server_data( server_to_client_msg& received_message )
 {
-	bool flag = 0;
 	for( int i = 0 ; i < VARIABLES_NUM ; i++ )
 		if( received_message.variables[i] != received_message.epoch )
 		{
-			putchar('!');
-			flag = 1;
+			std::cout << "variable " << i << " wrong" << std::endl;
+			return;
 		}
-	if ( flag == 0 )
-		cout << "message received ok" << endl;
+	std::cout << "message received ok" << std::endl;
 }
