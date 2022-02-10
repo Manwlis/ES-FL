@@ -18,29 +18,31 @@
 
 #include "utils.hpp"  /* reverse_float */
 
+#define SERVER_TO_CLIENT_BUF_SIZE sizeof(server_to_client_msg)
+#define CLIENT_TO_SERVER_BUF_SIZE sizeof(client_to_server_msg)
 
-// propably useless
-#define SERVER_TO_CLIENT_BUF_SIZE (int) ( sizeof(int) + sizeof(int) + VARIABLES_NUM * sizeof(MSG_VARIABLE_DATATYPE) )
-#define CLIENT_TO_SERVER_BUF_SIZE (int) ( sizeof(int) + VARIABLES_NUM * sizeof(MSG_VARIABLE_DATATYPE) + sizeof(float) + sizeof(float) )
-
-// server_to_client_msg.flag values
-#define NORMAL_OP 0             // Normal operation.
-#define NO_PRETRAINED_MODEL 1   // Disregard server's variables. Useful for first epoch without pretrained model.
-#define FINAL_EPOCH 2           // Shows to the clients that they should stop operating.
 
 struct server_to_client_msg
 {
-    int flags;
-    int epoch;
-    float variables[VARIABLES_NUM];
+	// server_to_client_msg.flag values
+	enum flag
+	{
+		normal_op,
+		no_pretrained_model,
+		final_epoch
+	};
+
+	int flags;
+	int epoch;
+	float variables[VARIABLES_NUM];
 };
 
 struct client_to_server_msg
 {
-    int epoch;
-    float loss;
-    float accuracy;
-    float variables[VARIABLES_NUM];
+	int epoch;
+	float loss;
+	float accuracy;
+	float variables[VARIABLES_NUM];
 };
 
 void server_to_client_msg_big_endianess( server_to_client_msg& message );

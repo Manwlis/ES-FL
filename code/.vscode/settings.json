@@ -59,6 +59,7 @@
         "typeinfo": "cpp",
         "socket.h": "c",
         "stddef.h": "c",
-        "string.h": "c"
+        "string.h": "c",
+        "iomanip": "cpp"
     }
 }

@@ -12,7 +12,11 @@
 
 #include "definitions.hpp"
 
+#include <iostream>	/* cout */
+#include <iomanip>	/* setw */
+
 #include <string>	/* string */
+#include <chrono>	/* time_point, durration */
 #include <time.h>	/* time, localtime, strftime */
 #include <stdio.h>	/* perror */
 #include <stdlib.h>	/* exit, EXIT_FAILURE */
@@ -22,14 +26,13 @@
 #define RED		"\033[31m"	/* Red */
 #define GREEN	"\033[32m"	/* Green */
 #define YELLOW	"\033[33m"	/* Yellow */
-
-#define CURRENT_TIME GREEN << current_time() << RESET << "    "
+#define COMPLETED_MSG "	\033[33mcompleted\033[0m"
 
 
 void error( const char* msg );
-std::string current_time();
 
 
+// wrong and useless, leave them alone till moving code in device. Then check about endianess and float ieee structure
 /**
  * @brief Reverses the byte order of the input float. Used when comunicating with machines of different endianess.
  * In the .h file so it can be inline
@@ -51,3 +54,74 @@ inline float reverse_float( const float input_float )
 
 	return reversed_float;
 }
+
+/**************************************************************************************************/
+/* Timer                                                                                          */
+/**************************************************************************************************/
+/**
+ * @brief Ever
+ * 
+ */
+class Timer
+{
+private:
+	std::chrono::steady_clock::time_point start_time;
+
+	void set_start_time();
+
+public:
+	Timer();
+	int64_t since();
+};
+
+// Global timer that starts ticking at program start. Needs to be used in multiple files, so define it here with extern.
+extern Timer g_timer;
+
+/**************************************************************************************************/
+/* Logger                                                                                         */
+/**************************************************************************************************/
+/**
+ * @brief Simple loger class to log the FL training.Can be manipulated with the ENABLE_LOGGING, VERDOSE_LOGGING & DISABLE_MESSAGE_INFO flags.
+ * Logs event level, +time (ms) from the start of the program and text descibing the event.
+ * If VERDOSE_LOGGING is enabled, function, file and code line of the event are also logged.
+ */
+class Logger {
+public:
+	/**
+	 * @brief Level of logging events. Can be used to block certain events from being logged.
+	 */
+	enum Level
+	{
+		initialization,
+		fl_info,
+		message_info,
+		warning,
+		error
+	};
+
+	Logger(  std::ostream* target = &(std::cout) );
+
+
+	void operator()( Level level , const std::string& description, const char* function , const char* file , int line );
+
+private:
+	// Output stream, can be anything with a write() function.
+	std::ostream* out;
+};
+
+#define LOG( logger_ , level_ , Message_ ) \
+	if( DISABLE_MESSAGE_INFO && level_ == Logger::message_info )\
+		do {} while(0);\
+	else\
+		logger_( level_ , static_cast<std::ostringstream&>( std::ostringstream().flush() << Message_ ).str() , __func__ , __FILE__ , __LINE__ );\
+
+
+// used to enable/disable all logging
+#if ENABLE_LOGGING
+	#define LOGGER( level_ , message_ ) LOG( g_logger , level_ , message_ )
+#else 
+	#define LOGGER(_1,_2) do {} while(0)
+#endif
+
+// Global Logger that logs the FL training. Need to be used in multiple files may arise, so define it here with extern.
+extern Logger g_logger;

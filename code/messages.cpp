@@ -12,6 +12,7 @@
 #include "messages.hpp"
 #include "utils.hpp"
 
+// wrong and useless, leave them alone till moving code in device. Then check about endianess and float ieee structure
 
 /**
  * @brief Converts a little endian server to client message
@@ -21,11 +22,15 @@
  */
 void server_to_client_msg_big_endianess( server_to_client_msg& message )
 {
-	message.flags = le32toh( message.flags ); // little endian to host (big endian) uint32_t
-	message.epoch = le32toh( message.epoch ); // little endian to host (big endian) uint32_t
+	//message.flags = le32toh( message.flags ); // little endian to host (big endian) uint32_t
+	//message.epoch = le32toh( message.epoch ); // little endian to host (big endian) uint32_t
+	message.flags = __builtin_bswap32( message.flags );
+	message.epoch = __builtin_bswap32( message.epoch );
+
 	// flip floats in variables array
 	for( int i = 0  ; i < VARIABLES_NUM ; i++ )
-		message.variables[i] = reverse_float( message.variables[i] );
+		message.variables[i] = __builtin_bswap64( message.variables[i] ); //wrong 
+		//message.variables[i] = reverse_float( message.variables[i] );
 }
 
 /**

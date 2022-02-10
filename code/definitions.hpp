@@ -7,12 +7,12 @@
 
 // federated algorithm definitions
 #define MAX_CONNECTED_CLIENTS 10
-#define MIN_CLIENTS_PER_EPOCH 5
-#define EPOCH_LIMIT 6000
+#define MIN_CLIENTS_PER_EPOCH 3
+#define NUM_EPOCHS 100
 
 #define LOCAL_EPOCHS 1
-#define STEPS_PER_EPOCH 1
-#define BATCH_SIZE 2
+#define STEPS_PER_EPOCH 2
+#define BATCH_SIZE 20
 
 // message variables and their types
 #define VARIABLES_NUM 421642
@@ -33,4 +33,6 @@
 #define py_eval_function "evaluate_nn"
 
 // logging
-#define MESSAGE_LOGGING 0
+#define ENABLE_LOGGING 1
+#define VERDOSE_LOGGING 0
+#define DISABLE_MESSAGE_INFO 1

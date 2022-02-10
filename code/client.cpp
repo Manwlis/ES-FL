@@ -32,9 +32,11 @@
 struct sockaddr_in find_server( const char* server_name , const char* server_port );
 
 int quantize_variables();
-
 int send_variables( int socket_fd , client_to_server_msg& send_message );
 
+// Global timer that starts ticking at program start.
+Timer g_timer;
+Logger g_logger( &(std::cout) );
 
 int main ( int argc , char** argv )
 {
@@ -57,7 +59,7 @@ int main ( int argc , char** argv )
 	struct sockaddr_in server = find_server( SERVER_IP , std::to_string(SERVER_PORT).c_str() );
 
 	// Initiate Connection
-	std::cout << CURRENT_TIME << "Initiating connection with server." << std::endl;
+	LOGGER( Logger::initialization , "Initiating connection with server." );
 
 	rv = connect( socket_fd , (struct sockaddr*) &server , sizeof( server ) );
 	if ( rv < 0 )
@@ -93,18 +95,21 @@ int main ( int argc , char** argv )
 	Py_DECREF( path );
 
 	// get module
-	std::cout << "Getting file" << std::endl;
+	LOGGER( Logger::initialization , "Getting file." );
+
 	py_module_name = PyUnicode_FromString( py_script );
 	py_module = PyImport_Import( py_module_name ); // this executes code in module outside functions!
 	Py_DECREF( py_module_name );
 
-	// pass C macros to module 
+	// pass C macros, constants to module 
 	PyModule_AddIntMacro( py_module , LOCAL_EPOCHS );
 	PyModule_AddIntMacro( py_module , STEPS_PER_EPOCH );
 	PyModule_AddIntMacro( py_module , BATCH_SIZE );
+	PyModule_AddIntConstant(py_module, "no_pretrained_model_flag", server_to_client_msg::flag::no_pretrained_model );
 
 	// get functions
-	std::cout << "Getting function" << std::endl;
+	LOGGER( Logger::initialization , "Getting function." );
+
 	py_compile = PyObject_GetAttrString( py_module , py_compile_function );
 	py_train = PyObject_GetAttrString( py_module , py_train_function );
 	py_eval = PyObject_GetAttrString( py_module , py_eval_function );
@@ -127,11 +132,8 @@ int main ( int argc , char** argv )
 	while ( 1 )
 	{
 		/**************************************************************************************************/
-		/* Wait for global model and read it.                                                             */
-		/**************************************************************************************************/
-		#if MESSAGE_LOGGING == 1
-			std::cout << CURRENT_TIME << "Waiting for data." << std::endl;
-		#endif
+		/* Wait for global model and read it.                                                             */		
+		LOGGER( Logger::message_info , "Waiting for data." );
 		
 		// read socket
 		static unsigned char buffer[SERVER_TO_CLIENT_BUF_SIZE];
@@ -142,19 +144,19 @@ int main ( int argc , char** argv )
 		/**************************************************************************************************/
 		// connection closed
 		if ( rv == 0 )
-		{
-			std::cout << CURRENT_TIME << "Connection Closed" << std::endl;
+		{	
+			LOGGER( Logger::warning , "Connection Closed." );
 
 			// There's mothing more to do if the connection with server broke. Close socket and exit. 
 			close( socket_fd );
 			break;
 		}
-		// socket errors
+		// socket errors. Needs expansion
 		else if ( rv < 0 )
 		{	
 			error("recv");
 			
-			std::cout << CURRENT_TIME << "Unexpected error on recv: " << errno << std::endl;
+			LOGGER( Logger::warning , "Unexpected error on recv: " << errno );
 			continue;
 		}
 		// erroneous data size, what do i do?
@@ -167,30 +169,20 @@ int main ( int argc , char** argv )
 		// track total received bytes
 		received_bytes += rv;
 
-		#if MESSAGE_LOGGING == 1
-			std::cout << CURRENT_TIME
-				<< "received bytes: " << rv
-				<< "	total: " << received_bytes
-				<< "	needed: " << SERVER_TO_CLIENT_BUF_SIZE;
-		#endif
-
+		LOGGER( Logger::message_info , 
+			"received bytes: " << rv << "	total: " << received_bytes << "	needed: " << SERVER_TO_CLIENT_BUF_SIZE
+			<< ( received_bytes == SERVER_TO_CLIENT_BUF_SIZE ? COMPLETED_MSG : "" ) );
+		
 		// check if received message is complete, if not wait for the rest of the data
-		if ( received_bytes < SERVER_TO_CLIENT_BUF_SIZE )
+		if ( received_bytes < (int)SERVER_TO_CLIENT_BUF_SIZE )
 		{
-			#if MESSAGE_LOGGING == 1
-				std::cout << std::endl;
-			#endif
-
 			continue;
 		}
-		#if MESSAGE_LOGGING == 1
-			std::cout << YELLOW << "	completed" << RESET << std::endl;
-		#endif
 
 		/**************************************************************************************************/
 		/* Message is complete, continue with processing it.                                              */
 		/**************************************************************************************************/
-		std::cout << CURRENT_TIME << "Received new global model." << std::endl;
+		LOGGER( Logger::fl_info , "Received new global model." );
 
 		received_bytes = 0; // reset received bytes counter for use on the next message
 
@@ -198,9 +190,9 @@ int main ( int argc , char** argv )
 		if constexpr ( std::endian::native == std::endian::big ) // requires c++20, dangerous !!!!
 			server_to_client_msg_big_endianess( received_message ); // maybe move this to the server side if needed
 
-		std::cout << RED << "\n			GLOBAL EPOCH    =   " << received_message.epoch << RESET << "\n" << std::endl;
+		LOGGER( Logger::fl_info , RED << "		GLOBAL EPOCH    =   " << received_message.epoch << RESET );
 
-		if( received_message.flags == FINAL_EPOCH )
+		if( received_message.flags == server_to_client_msg::flag::final_epoch )
 		{
 			PyObject_CallFunctionObjArgs( py_eval , py_array_input , py_array_output , py_flags , NULL );
 			break;
@@ -229,7 +221,7 @@ int main ( int argc , char** argv )
 		/**************************************************************************************************/
 		/* Send local variables. Blocking.                                                                */
 		/**************************************************************************************************/
-		std::cout << CURRENT_TIME << "Sending local variables." << std::endl;
+		LOGGER( Logger::fl_info , "Sending local variables.\n" );
 		// create message
 		send_message.epoch = received_message.epoch;
 
@@ -237,7 +229,9 @@ int main ( int argc , char** argv )
 		rv = send_variables( socket_fd , send_message );
 
 		if ( rv < 0 )
-			std::cout << CURRENT_TIME << "Unexpected error on send: " << errno << std::endl;
+		{
+			LOGGER( Logger::error , "Unexpected error on send: " << errno );
+		}
 	}
 	/**************************************************************************************************/
 	/* Clean up and exit.                                                                             */
@@ -304,10 +298,7 @@ int send_variables( int socket_fd , client_to_server_msg& send_message )
 	
 	int rv = send( socket_fd , &send_message , CLIENT_TO_SERVER_BUF_SIZE , 0 );
 
-	std::cout << CURRENT_TIME
-		<< "sended bytes: " << rv
-		<< "	total: " << CLIENT_TO_SERVER_BUF_SIZE
-		<< "\n" << std::endl;
+	LOGGER( Logger::message_info , "sended bytes: " << rv << "	total: " << CLIENT_TO_SERVER_BUF_SIZE << "\n" );
 
 	return rv;
 }

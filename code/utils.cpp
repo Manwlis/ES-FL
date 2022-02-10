@@ -23,20 +23,70 @@ void error( const char* msg )
 	exit( EXIT_FAILURE );
 }
 
+/**************************************************************************************************/
+/* Timer                                                                                          */
+/**************************************************************************************************/
+/**
+ * @brief Construct a new timer::timer object. Sets current time as starting time.
+ * 
+ */
+Timer::Timer()
+{
+	set_start_time();
+}
 
 /**
- * @brief Get current time, formated as HH:mm:ss
+ * @brief Sets the starting point of the timer.
  * 
- * @return string containing the formated time
  */
-std::string current_time()
+void Timer::set_start_time()
 {
-	char buf[9];
+	start_time = std::chrono::steady_clock::now();
+}
 
-	time_t now = time(0);
-	struct tm tstruct = *localtime( &now );
+/**
+ * @brief Calculates and returns elapsed time.
+ * 
+ * @return int64_t elapsed time in milliseconds
+ */
+int64_t Timer::since()
+{
+	return std::chrono::duration_cast<std::chrono::milliseconds> ( std::chrono::steady_clock::now() - start_time ).count();
+}
 
-	strftime( buf , sizeof(buf) , "%X" , &tstruct );
+/**************************************************************************************************/
+/* Loger                                                                                          */
+/**************************************************************************************************/
+/**
+ * @brief Construct a new Logger object
+ * 
+ * @param std::ostream* target output stream, defaults at std::cout
+ */
+Logger::Logger( std::ostream* target )
+{
+	out = target;
+}
 
-	return buf;
+/**
+ * @brief Overide of the () operator. Used to log events
+ * 
+ * @param Level level of the event 
+ * @param std::string& info about the event 
+ * @param char* function where the event occured 
+ * @param char* file where the event occured
+ * @param int the line where the event occured
+ */
+void Logger::operator()( Level level , const std::string& description, const char* function , const char* file , int line )
+{
+	*(this->out)
+		<< '[' << level <<  ']'
+		<< GREEN << std::setw(10) << g_timer.since() << RESET << "	"
+		//<< description.length() << " "
+		<< std::setw(70) << std::left << description << std::right 
+		#if VERDOSE_LOGGING
+			<< std::setw(4) << function
+			<< std::setw(11) << file
+			<< std::setw(5) << line
+		#endif
+		<< std::endl;
 }
