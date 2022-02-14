@@ -1,0 +1,45 @@
+WHEN: new connection
+WHERE: accept_connection()
+AFFECTED: new fd
+	create new fd
+	polled_fds[new fd].events = POLLIN | ERRORS
+	polled_fds_info[new fd].
+		received_message = new
+		received_bytes = 0
+		sended_bytes = 0
+		working = false
+
+WHEN: new epoch
+WHERE: client_selection()
+AFFECTED: selected fd(s)
+	polled_fds[selected fd].events = POLLIN | POLLOUT | ERRORS
+	polled_fds_info[selected fd].
+		received_bytes = 0
+		sended_bytes = 0
+		working = true
+
+WHEN: POLLOUT event
+WHERE: write_socket()
+AFFECTED: writed fd
+	polled_fds_info[writed fd].
+		sended_bytes += send() return value
+	if .sended_bytes == server to client message size
+		polled_fds[writed fd].events &= ~POLLOUT
+
+WHEN: POLLIN event
+WHERE: read_socket()
+AFFECTED: readed fd
+	polled_fds_info[readed fd].
+		received_message += received data
+		received_bytes += read() return value
+	if polled_fds_info[readed fd] == client to server message size
+		working = false
+
+WHEN: ERROR events, disconnected properly on read, sended final message
+WHERE: remove_fd()
+AFFECTED: removed fd
+	shutdown( removed fd )
+	close( removed fd )
+	polled_fds[removed fd].fd = -1
+	compress_array = true // removes the fds from the polled fds structure
+	delete polled_fds_info[removed fd].received_message = new

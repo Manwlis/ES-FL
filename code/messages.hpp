@@ -11,20 +11,19 @@
 
 #pragma once
 
-#include <string.h> /* memcpy */
 #include <endian.h> /* be32toh, le32toh */ 
 
 #include "definitions.hpp"
 
 #include "utils.hpp"  /* reverse_float */
 
-#define SERVER_TO_CLIENT_BUF_SIZE sizeof(server_to_client_msg)
-#define CLIENT_TO_SERVER_BUF_SIZE sizeof(client_to_server_msg)
+#define SERVER_TO_CLIENT_BUF_SIZE sizeof(Server_to_client_msg)
+#define CLIENT_TO_SERVER_BUF_SIZE sizeof(Client_to_server_msg)
 
 
-struct server_to_client_msg
+struct Server_to_client_msg
 {
-	// server_to_client_msg.flag values
+	// Server_to_client_msg.flag values
 	enum flag
 	{
 		normal_op,
@@ -37,7 +36,7 @@ struct server_to_client_msg
 	float variables[VARIABLES_NUM];
 };
 
-struct client_to_server_msg
+struct Client_to_server_msg
 {
 	int epoch;
 	float loss;
@@ -45,8 +44,8 @@ struct client_to_server_msg
 	float variables[VARIABLES_NUM];
 };
 
-void server_to_client_msg_big_endianess( server_to_client_msg& message );
-void server_to_client_msg_little_endianess( server_to_client_msg& message );
+void server_to_client_msg_big_endianess( Server_to_client_msg& message );
+void server_to_client_msg_little_endianess( Server_to_client_msg& message );
 
-void client_to_server_msg_big_endianess( client_to_server_msg& message );
-void client_to_server_msg_little_endianess( client_to_server_msg& message );
+void client_to_server_msg_big_endianess( Client_to_server_msg& message );
+void client_to_server_msg_little_endianess( Client_to_server_msg& message );

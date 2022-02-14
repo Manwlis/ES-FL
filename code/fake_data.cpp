@@ -15,7 +15,7 @@
 // required info per client in order to organize communications
 struct client_info // maybe rename
 {
-    struct client_to_server_msg* received_message; // holds received data
+    struct Client_to_server_msg* received_message; // holds received data
 	int received_bytes; // counts how many data has been received
 };
 
@@ -26,7 +26,7 @@ struct client_info // maybe rename
  * @param announcement_msg 
  * @param epoch 
  */
-void create_fake_server_data(struct server_to_client_msg& announcement_msg , int epoch )
+void create_fake_server_data(struct Server_to_client_msg& announcement_msg , int epoch )
 {
 	announcement_msg.epoch = epoch;
 	for( int i = 0; i < VARIABLES_NUM ; i++ )
@@ -40,7 +40,7 @@ void create_fake_server_data(struct server_to_client_msg& announcement_msg , int
  * @param send_message 
  * @param epoch 
  */
-void create_fake_client_data( client_to_server_msg& send_message , int epoch )
+void create_fake_client_data( Client_to_server_msg& send_message , int epoch )
 {
 	send_message.epoch = epoch;
 	
@@ -55,10 +55,10 @@ void create_fake_client_data( client_to_server_msg& send_message , int epoch )
 /**
  * @brief Check that the message follows the above format
  * 
- * @param client_to_server_msg& the input message
+ * @param Client_to_server_msg& the input message
  * @param epoch the current epoch
  */
-void check_fake_client_data( struct client_to_server_msg& received_message, int epoch )
+void check_fake_client_data( struct Client_to_server_msg& received_message, int epoch )
 {
 	if ( received_message.epoch != epoch )
 	{
@@ -91,9 +91,9 @@ void check_fake_client_data( struct client_to_server_msg& received_message, int 
 /**
  * @brief Check that the message follows the above format
  * 
- * @param client_to_server_msg& the input message
+ * @param Client_to_server_msg& the input message
  */
-void check_fake_server_data( server_to_client_msg& received_message )
+void check_fake_server_data( Server_to_client_msg& received_message )
 {
 	for( int i = 0 ; i < VARIABLES_NUM ; i++ )
 		if( received_message.variables[i] != received_message.epoch )

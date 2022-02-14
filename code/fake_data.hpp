@@ -17,8 +17,8 @@
 #include "messages.hpp"	/* message types, VARIABLES_NUM */
 
 
-void create_fake_server_data( struct server_to_client_msg& announcement_msg , int epoch );
-void create_fake_client_data( struct client_to_server_msg& send_message , int epoch );
+void create_fake_server_data( struct Server_to_client_msg& announcement_msg , int epoch );
+void create_fake_client_data( struct Client_to_server_msg& send_message , int epoch );
 
-void check_fake_client_data( struct client_to_server_msg& received_message, int epoch );
-void check_fake_server_data( struct server_to_client_msg& received_message );
+void check_fake_client_data( struct Client_to_server_msg& received_message, int epoch );
+void check_fake_server_data( struct Server_to_client_msg& received_message );

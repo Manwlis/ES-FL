@@ -7,7 +7,7 @@
 
 // federated algorithm definitions
 #define MAX_CONNECTED_CLIENTS 10
-#define MIN_CLIENTS_PER_EPOCH 3
+#define MIN_CLIENTS_PER_EPOCH 2
 #define NUM_EPOCHS 100
 
 #define LOCAL_EPOCHS 1

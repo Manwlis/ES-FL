@@ -12,17 +12,18 @@
 #include "utils.hpp"
 
 
-/**
- * @brief perror() wrapper, calls perror and closes program.
- * 
- * @param char* message to be printed by perror 
- */
-void error( const char* msg )
-{
-	perror( msg );
-	exit( EXIT_FAILURE );
+namespace Utils{
+	/**
+	 * @brief perror() wrapper, calls perror and closes program.
+	 * 
+	 * @param char* message to be printed by perror 
+	 */
+	void error( const char* msg )
+	{
+		perror( msg );
+		exit( EXIT_FAILURE );
+	}
 }
-
 /**************************************************************************************************/
 /* Timer                                                                                          */
 /**************************************************************************************************/
@@ -79,7 +80,7 @@ Logger::Logger( std::ostream* target )
 void Logger::operator()( Level level , const std::string& description, const char* function , const char* file , int line )
 {
 	*(this->out)
-		<< '[' << level <<  ']'
+		<< '[' << static_cast<int>(level) <<  ']'
 		<< GREEN << std::setw(10) << g_timer.since() << RESET << "	"
 		//<< description.length() << " "
 		<< std::setw(70) << std::left << description << std::right 

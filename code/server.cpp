@@ -16,7 +16,6 @@
 #include <random>			/* default_random_engine */
 #include <chrono>			/* system_clock */
 
-#include <stdlib.h>			/* atoi */
 #include <unistd.h>			/* close */
 #include <string.h>			/* memset */
 
@@ -28,36 +27,74 @@
 
 #include "definitions.hpp"
 
-#include "utils.hpp"		/* error, current_time, colored output */
-#include "messages.hpp"		/* msg structs, serialize, deserialize */
+#include "utils.hpp"		/* error, Timer, Logging */
+#include "messages.hpp"		/* msg structs */
 #include "fake_data.hpp"	/* check_fake_client_data, create_fake_server_data */
-
-//#include <netinet/tcp.h> //TODO: check if can be removed
 
 
 // systemic definitions
-#define _FD_NUM MAX_CONNECTED_CLIENTS+1 // +1 for the listening socket
+#define FD_NUM_MAX MAX_CONNECTED_CLIENTS+1 // +1 for the listening socket
 #define FINAL_EPOCH NUM_EPOCHS+1
 
-int read_socket( int fd , struct polled_fds_info &polled_fds_info , int bytes_to_read );
+
+/**
+ * @brief Required info per client in order to orchistrate communications.
+ */
+struct Polled_fds_info
+{
+	struct Client_to_server_msg* received_message; // holds received data
+	unsigned int received_bytes; // counts how many data has been received this epoch
+	unsigned int sended_bytes; // counts how many data has been send this epoch
+	bool working;	// shows that the client is working
+};
+
+
+/**
+ * @brief Return values for the accept_connection function. Error, no more connections, success.
+ */
+enum class Accept_connection_rv
+{
+	error = -1,
+	no_more_connections = 0,
+	success = 1
+};
+Accept_connection_rv accept_connection( int listening_socket_fd , int num_polled_fds , pollfd polled_fds[] , Polled_fds_info polled_fds_info[] );
+
+/**
+ * @brief Return values for the Write_socket_rv function. Error, finished writing, success.
+ * 
+ */
+enum class Write_socket_rv
+{
+	error = -1,
+	finished_writing = 0,
+	success = 1
+};
+Write_socket_rv write_socket( pollfd& polled_fd , Polled_fds_info& fd_info , Server_to_client_msg announcement_msg , int bytes_to_write );
+
+/**
+ * @brief Return values for the read_socket function. Error, socket closed, success.
+ */
+enum class Read_socket_rv
+{
+	error = -1,
+	socket_closed = 0,
+	success = 1
+};
+Read_socket_rv read_socket( int fd , Polled_fds_info& fd_info , int bytes_to_read );
 
 void dequintize_received_variables( MSG_VARIABLE_DATATYPE message_variables[VARIABLES_NUM] , float local_variables[VARIABLES_NUM] );
 
 void accumulate_variables( float local_variables[VARIABLES_NUM] , float accumulated_variables[VARIABLES_NUM] );
 void create_average_model( float accumulated_variables[VARIABLES_NUM] , int num_models , float global_model[VARIABLES_NUM] );
 
-int next_epoch_ready( int connected_clients_num , int working_clients_num , int completed_clients_num );
-void client_selection( int connected_clients_num , struct pollfd fds[] , int epoch );
+bool next_epoch_ready( int connected_clients_num , int working_clients_num , int completed_clients_num );
+
+int client_selection( int connected_clients_num , pollfd fds[] , Polled_fds_info fds_info[] , int epoch );
 
 bool shutdown_ready( int epoch , unsigned int connected_clients_num );
 
-// required info per client in order to organize communications
-struct polled_fds_info // maybe rename
-{
-	struct client_to_server_msg* received_message; // holds received data
-	int received_bytes; // counts how many data has been received this epoch
-	int sended_bytes; // counts how many data has been send this epoch
-};
+void remove_fd( pollfd& polled_fd , Polled_fds_info& polled_fd_info , bool& compress_array );
 
 // Global timer that starts ticking at program start.
 Timer g_timer;
@@ -65,13 +102,13 @@ Logger g_logger( &(std::cout) );
 
 int main( int argc , char** argv )
 {	
-	LOGGER( Logger::initialization , "Server Start" );
+	LOGGING( Logger::Level::initialization , "Server Start" );
 	
 	int rv; // return value used to check if functions worked properly
 	
 	// global model data. Static variable are by default initialized to zero. No need for explicit initialization.
 	static float accumulated_variables[VARIABLES_NUM];
-	static server_to_client_msg announcement_msg; // holds global model
+	static Server_to_client_msg announcement_msg; // holds global model
 
 	/**************************************************************************************************/
 	/* Check if pretrained model file exists and set it up.                                           */
@@ -82,14 +119,14 @@ int main( int argc , char** argv )
 	{
 		std::ifstream pretrained_model_file( argv[1] , std::ifstream::in | std::ifstream::binary );
 		if ( !pretrained_model_file.is_open() )
-			error( "Failed to open pretrained model file" );
+			Utils::error( "Failed to open pretrained model file" );
 
 		// load model
 		pretrained_model_file.read( reinterpret_cast<char*>(announcement_msg.variables) , VARIABLES_NUM * sizeof(MSG_VARIABLE_DATATYPE) );
 		if ( !pretrained_model_file )
-			error( "Failed to read requested number of data" );
+			Utils::error( "Failed to read requested number of data" );
 
-		LOGGER( Logger::initialization , "Loaded pretrained model" );
+		LOGGING( Logger::Level::initialization , "Loaded pretrained model" );
 
 		pretrained_model_file.close();
 		pretrained_model_flag = true;
@@ -97,7 +134,7 @@ int main( int argc , char** argv )
 	// check if clients should consider pretrained model
 	if ( pretrained_model_flag == false )
 		// shows to the clients that sended variables are random and they should consider their own initial values
-		announcement_msg.flags = server_to_client_msg::flag::no_pretrained_model;
+		announcement_msg.flags = Server_to_client_msg::flag::no_pretrained_model;
 
 	/**************************************************************************************************/
 	/* Set up a socket to receive incoming connections on. TCP.                                       */
@@ -110,13 +147,13 @@ int main( int argc , char** argv )
 	// Create socket as TCP & non blocking
 	rv = listening_socket_fd = socket( AF_INET , SOCK_STREAM | SOCK_NONBLOCK , 0 );
 	if ( rv < 0 )
-		error( "Server socket creation failed." );
+		Utils::error( "Server socket creation failed." );
 
 	// Set socket as reusable. New sockets will inherit this state.
 	int reuse = 1;
 	rv = setsockopt( listening_socket_fd , SOL_SOCKET , SO_REUSEADDR , (const char*) &reuse , sizeof(reuse) );
 	if ( rv < 0 )
-		error( "Setting server socket fd as reusable failed" );
+		Utils::error( "Setting server socket fd as reusable failed" );
 
 	// Setup socket structure
 	memset( &server_addr , 0 , sizeof(server_addr) );
@@ -125,22 +162,22 @@ int main( int argc , char** argv )
 	server_addr.sin_port = htons( server_port );		// convert port to network byte order
 	
 	// Bind socket
-	rv = bind( listening_socket_fd , (const struct sockaddr*) &server_addr , sizeof(server_addr) );
+	rv = bind( listening_socket_fd , (const sockaddr*) &server_addr , sizeof(server_addr) );
 	if ( rv < 0 )
-		error( "Binding server's socket failed" );
+		Utils::error( "Binding server's socket failed" );
 
 	// Set the listen backlog
 	rv = listen( listening_socket_fd , LISTEN_MAX_BACKLOG );
 	if ( rv < 0 )
-		error( "Listen server socket failed" );
+		Utils::error( "Listen server socket failed" );
 	
-	LOGGER( Logger::initialization , "Listening port " << server_port  );
+	LOGGING( Logger::Level::initialization , "Listening port " << server_port  );
 
 	/**************************************************************************************************/
 	/* Initialize polling structure.                                                                  */
 	/**************************************************************************************************/
 	// Contains the file descriptors of the sockets that are being polled
-	struct pollfd polled_fds[_FD_NUM];
+	pollfd polled_fds[FD_NUM_MAX];
 	int num_polled_fds = 0;
 
 	// Initialize the pollfd structure
@@ -154,28 +191,32 @@ int main( int argc , char** argv )
 	//Initialize the timeout to 1 minute. Timeout value is based on milliseconds. */
 	int timeout = 1 * 60 * 1000;
 
+	// necessary info per client
+	Polled_fds_info polled_fds_info[FD_NUM_MAX]; // parallel with polled_fds[]
+
 	/**************************************************************************************************/
-	/* Loop waiting for incoming connects or for incoming data on any of the connected sockets.       */
+	/* FL algorithm initialization.                                                                   */
 	/**************************************************************************************************/
-	// nessesary info per client
-	struct polled_fds_info polled_fds_info[_FD_NUM]; // parallel with polled_fds[]
 	// Used to check when to announce the new global model
-	int connected_clients_num = 0;
-	int working_clients_num = 0;
-	int completed_clients_num = 0;
+	unsigned int connected_clients_num = 0;
+	unsigned int working_clients_num = 0;
+	unsigned int completed_clients_num = 0;
 	// When results are acceptable, stop training and shutdown server.
 	bool server_shutdown = false;
 	// keep track of current epoch
-	int current_epoch = 0;
+	unsigned int current_epoch = 0;
 
-	LOGGER( Logger::initialization , "Starting polling" );
-	// main loop
+	/**************************************************************************************************/
+	/* End of initializations, start of main loop.                                                    */
+	/* Loop waiting for incoming connects or for incoming data on any of the connected sockets.       */
+	/**************************************************************************************************/
+	LOGGING( Logger::Level::initialization , "Starting polling." );
 	while ( server_shutdown == false )
 	{
 		rv = poll( polled_fds , num_polled_fds , timeout );
 
 		if ( rv < 0 )
-			error( "Poll failed" );
+			Utils::error( "Poll failed" );
 
 		if ( rv == 0 )
 		{
@@ -185,7 +226,8 @@ int main( int argc , char** argv )
 		/**************************************************************************************************/
 		/* One or more descriptors are readable. Check them all and read those who received data.         */
 		/**************************************************************************************************/
-		int size = num_polled_fds; // num_polled_fds can change inside the loop, see array compression
+		// num_polled_fds can change inside the loop, see array compression
+		int size = num_polled_fds;
 		// shows if there are fds marked for removal in the fd set
 		bool compress_array = false;
 
@@ -196,123 +238,128 @@ int main( int argc , char** argv )
 				continue;
 			
 			// Get peer info for logging
-			struct sockaddr_in peer_addr;
-			socklen_t peer_addr_len = sizeof(peer_addr);
-			getpeername( polled_fds[i].fd , (struct sockaddr*) &peer_addr , &peer_addr_len );
-
+			#if ENABLE_LOGGING
+				sockaddr_in peer_addr;
+				socklen_t peer_addr_len = sizeof(peer_addr);
+				getpeername( polled_fds[i].fd , (struct sockaddr*) &peer_addr , &peer_addr_len );
+			#endif
 			/**************************************************************************************************/
 			/* The listening socket fd raised POLLIN event. New client.                                       */
 			/**************************************************************************************************/
 			if ( polled_fds[i].fd == listening_socket_fd )
 			{
 				// there are incoming connection requests
-				LOGGER( Logger::initialization , "New connections" );
+				LOGGING( Logger::Level::initialization , "New connections" );
 
 				// accept them all
 				while ( true )
-				{ // TODO: Move the following code to a function accept_connection()
-				  // input: listening_socket_fd, polled_fds_info, 
-				  // return: -1 on failure, 0 if there's no connection to accept, 1 on success
-					struct sockaddr_in client_addr; // just for logging
-					socklen_t client_addr_len = sizeof(client_addr);
-					memset( &client_addr , 0 , client_addr_len );
-
-					int new_fd = accept( listening_socket_fd , (struct sockaddr*) &client_addr , &client_addr_len );
+				{
+					Accept_connection_rv accept_connection_rv = accept_connection( listening_socket_fd , num_polled_fds , polled_fds , polled_fds_info );
 					
-					if ( new_fd < 0 )
+					// no more connections
+					if( accept_connection_rv == Accept_connection_rv::no_more_connections )
+						break;
+					// new connection
+					else if( accept_connection_rv == Accept_connection_rv::success )
 					{
-						// no more connections
-						if ( errno == EWOULDBLOCK )
-							break;
-							
-						// something went wrong
-						LOGGER( Logger::error , "Unexpected error on accept: " << new_fd );
-						continue;
+						// track polled fds num
+						num_polled_fds++;
+						// track how many clients are connected
+						connected_clients_num++;
 					}
-					// set new socket as non blocking
-					if ( fcntl( new_fd , F_SETFL , fcntl( new_fd , F_GETFL ) | O_NONBLOCK ) < 0 )
-					{
-						LOGGER( Logger::error , "Failed setting new socket as non blocking. Closing it." );
-						close( new_fd );
-						continue;
-					}
-
-					// new client
-					LOGGER( Logger::initialization , "New client IP: " << inet_ntoa( client_addr.sin_addr ) << "	Port: " << ntohs( client_addr.sin_port ) );
-
-					// add the new socket in the polled fd set.
-					polled_fds[num_polled_fds].fd = new_fd;
-					// Set up socket flags.
-					polled_fds[num_polled_fds].events = POLLRDHUP | POLLERR | POLLNVAL;
-
-					// init client info
-					polled_fds_info[num_polled_fds].received_message = (struct client_to_server_msg *) malloc( sizeof(client_to_server_msg) );
-					polled_fds_info[num_polled_fds].received_bytes = 0;
-					polled_fds_info[num_polled_fds].sended_bytes = 0;
-// till here and put ifs on the trackings
-					// track polled fds num
-					num_polled_fds++;
-					// track how many clients are connected
-					connected_clients_num++;
 				}
 			}
 			/**************************************************************************************************/
 			/* Non listening socket fd raised Unexpected event.                                               */
 			/**************************************************************************************************/
-			else if ( polled_fds[i].revents & ( POLLNVAL|POLLERR|POLLHUP ) )
+			else if ( polled_fds[i].revents & ( POLLNVAL|POLLERR|POLLHUP ) ) // TODO: think about checking errors and divert to proper reaction instead of always closing socket
 			{
-				LOGGER( Logger::error , 
-					"Revent: " << polled_fds[i].revents << " on connention with " << inet_ntoa( peer_addr.sin_addr ) 
-					<< " at port " << ntohs( peer_addr.sin_port ) );
+				LOGGING( Logger::Level::error , 
+					"Revent: " << polled_fds[i].revents << " on connention with " << inet_ntoa( peer_addr.sin_addr ) << " at port " << ntohs( peer_addr.sin_port ) );
 
-				// TODO: think about checking errors and divert to proper reaction instead of always closing socket
 				// error on socket, kill connection
-				LOGGER( Logger::error , "Connection Closed unexpectedly." );
-
-				// // close it and mark it for removal from the fd set
-				close( polled_fds[i].fd );
-
-				// clear client info
-				free( polled_fds_info[i].received_message );
-				polled_fds_info[i].received_bytes = 0;
-				polled_fds_info[i].sended_bytes = 0;
+				LOGGING( Logger::Level::error , "Connection Closed unexpectedly." );
 
 				// update counters
 				connected_clients_num--;
-				
-				if ( polled_fds_info[i].received_bytes != CLIENT_TO_SERVER_BUF_SIZE &&  polled_fds_info[i].sended_bytes == SERVER_TO_CLIENT_BUF_SIZE )
+				if ( polled_fds_info[i].working )
 					working_clients_num--;
+
+				// clean up the fd and the acompanied info
+				remove_fd( polled_fds[i] , polled_fds_info[i] , compress_array );
 				
-				polled_fds[i].fd = -1;
-				compress_array = true;
 				continue;
+			}
+			/**************************************************************************************************/
+			/* Non listening socket fd raised POLLOUT event. Can write data.                                  */
+			/**************************************************************************************************/
+			else if ( polled_fds[i].revents & POLLOUT ) // TODO: Move this to a function
+			{
+				// remaining bytes to complete the announcement
+				int remaining_bytes = SERVER_TO_CLIENT_BUF_SIZE - polled_fds_info[i].sended_bytes;
+
+				LOGGING( Logger::Level::message_info , 
+					"Send event on Fd: " << polled_fds[i].fd << "	IP: " << inet_ntoa( peer_addr.sin_addr )
+					<< "	Port: " << ntohs( peer_addr.sin_port ) << "	Remaining bytes: " << remaining_bytes
+					<< "	Sended bytes: " << polled_fds_info[i].sended_bytes );
+
+				// send the announcement
+				Write_socket_rv write_socket_rv = write_socket( polled_fds[i] , polled_fds_info[i] , announcement_msg , remaining_bytes );
+
+				// error on write
+				if( write_socket_rv == Write_socket_rv::error )
+					continue;
+				// finished writing on socket
+				else if( write_socket_rv == Write_socket_rv::finished_writing )
+				{
+					LOGGING( Logger::Level::fl_info ,
+						"Fd: " << polled_fds[i].fd << "    IP: " << inet_ntoa( peer_addr.sin_addr )
+						<< "    Port: " << ntohs( peer_addr.sin_port ) << "    Global model sended." );
+
+					// in the final epoch when the final global model is sent, clients are disconnected
+					if ( current_epoch == FINAL_EPOCH )
+					{
+						LOGGING( Logger::Level::warning , "Closing connection" );
+
+						// clean up the fd and the acompanied info
+						remove_fd( polled_fds[i] , polled_fds_info[i] , compress_array );
+
+						// update counters
+						connected_clients_num--;
+						// the clients who receive a message are selected but no more communication will happen. Count them down
+						working_clients_num--; 
+					}
+				}
+				// not completed the message
+				else
+					continue;
 			}
 			/**************************************************************************************************/
 			/* Non listening socket fd raised POLLIN event. New incoming data, read them.                     */
 			/**************************************************************************************************/
 			else if ( polled_fds[i].revents & POLLIN )
 			{
-				LOGGER( Logger::message_info , 
-					"Read event on Fd: " << polled_fds[i].fd << "	IP: " << inet_ntoa( peer_addr.sin_addr ) 
-					<< "	Port: " << ntohs( peer_addr.sin_port ) );
+				LOGGING( Logger::Level::message_info , 
+					"Read event on Fd: " << polled_fds[i].fd << "	IP: " << inet_ntoa( peer_addr.sin_addr ) << "	Port: " << ntohs( peer_addr.sin_port ) );
 
 				int bytes_to_read = CLIENT_TO_SERVER_BUF_SIZE - polled_fds_info[i].received_bytes;
-				rv = read_socket( polled_fds[i].fd , polled_fds_info[i] , bytes_to_read );
+
+				Read_socket_rv read_socket_rv = read_socket( polled_fds[i].fd , polled_fds_info[i] , bytes_to_read );
 
 				// read failed, continue to next fd
-				if ( rv == -1 )
+				if ( read_socket_rv == Read_socket_rv::error )
 					continue;
 				// connection closed, mark fd for removal from polling struct
-				else if ( rv == 0 )
+				else if ( read_socket_rv == Read_socket_rv::socket_closed )
 				{
 					// update counters
 					connected_clients_num--;
-					if ( bytes_to_read != 0 ) // if server wasn't expecting any data, client was not working
+					if ( polled_fds_info[i].working == true ) // client disconnected while working
 						working_clients_num--; // decrement only if client was working
 					
-					// mark fd for removal
-					polled_fds[i].fd = -1;
-					compress_array = true;
+					// clean up the fd and the acompanied info
+					remove_fd( polled_fds[i] , polled_fds_info[i] , compress_array );
+
 					continue;
 				}
 				// check if message is completely received
@@ -320,17 +367,12 @@ int main( int argc , char** argv )
 					// if not, wait for the rest of the data
 					continue;
 
-				// finished working
+				// finished working, update counters
 				working_clients_num--;
 				completed_clients_num++;
 
-				// no more data needed, close POLLIN.
-				polled_fds[i].events &= ~POLLIN;
-
-				LOGGER( Logger::fl_info , 
-					"Fd: " << polled_fds[i].fd << "    IP: " << inet_ntoa( peer_addr.sin_addr ) << 
-					"    Port: " << ntohs( peer_addr.sin_port ) << "    Local variables received." );
-
+				LOGGING( Logger::Level::fl_info , 
+					"Fd: " << polled_fds[i].fd << "    IP: " << inet_ntoa( peer_addr.sin_addr ) << "    Port: " << ntohs( peer_addr.sin_port ) << "    Local variables received." );
 
 				/**************************************************************************************************/
 				/* Decompress / dequantize received variables.                                                    */
@@ -341,70 +383,6 @@ int main( int argc , char** argv )
 				/* Increment received variables to global diff.                                                   */
 				/**************************************************************************************************/
 				accumulate_variables( polled_fds_info[i].received_message->variables , accumulated_variables );
-			} 
-			/**************************************************************************************************/
-			/* Non listening socket fd raised POLLOUT event. Can write data.                                  */
-			/**************************************************************************************************/ // TODO: Move this to a function
-			else if ( polled_fds[i].revents & POLLOUT )
-			{
-				int remaining_bytes = SERVER_TO_CLIENT_BUF_SIZE - polled_fds_info[i].sended_bytes;
-
-				LOGGER( Logger::message_info , 
-					"Send event on Fd: " << polled_fds[i].fd << "	IP: " << inet_ntoa( peer_addr.sin_addr )
-					<< "	Port: " << ntohs( peer_addr.sin_port ) << "	Remaining bytes: " << remaining_bytes
-					<< "	Sended bytes: " << polled_fds_info[i].sended_bytes );
-
-				// send remaining bytes
-				rv = send( polled_fds[i].fd , (unsigned char*)&announcement_msg + polled_fds_info[i].sended_bytes , remaining_bytes , MSG_DONTWAIT );
-
-				if( rv < 0 )
-					error( "send failed" );
-
-				// track total sended bytes
-				polled_fds_info[i].sended_bytes += rv;
-
-				LOGGER( Logger::message_info ,
-					"sended bytes: " << rv << "	total: " << polled_fds_info[i].sended_bytes << "	needed: " << SERVER_TO_CLIENT_BUF_SIZE 
-					<< ( polled_fds_info[i].sended_bytes == SERVER_TO_CLIENT_BUF_SIZE ? COMPLETED_MSG : "" ) );
-
-				// completed the message
-				if ( polled_fds_info[i].sended_bytes == SERVER_TO_CLIENT_BUF_SIZE )
-				{
-					// no need to write to the socket fd anymore, close pollout
-					polled_fds[i].events &= ~POLLOUT;
-					// reset received bytes to be able to send the next global model.
-					polled_fds_info[i].received_bytes = 0;
-					// the client has enough data to start working, track this.
-					working_clients_num++;
-
-					LOGGER( Logger::fl_info ,
-						"Fd: " << polled_fds[i].fd << "    IP: " << inet_ntoa( peer_addr.sin_addr )
-						<< "    Port: " << ntohs( peer_addr.sin_port ) << "    Global model sended." );
-
-					// in the final epoch when the final global model is sent, clients are disconnected
-					if ( current_epoch == FINAL_EPOCH )
-					{
-						LOGGER( Logger::warning , "Closing connection" );
-
-						// close the connection and mark its fd for removal from the set
-						shutdown( polled_fds[i].fd  , SHUT_RDWR );
-						close( polled_fds[i].fd );
-						// clear client info
-						free( polled_fds_info[i].received_message );
-
-						// update counters
-						connected_clients_num--;
-						working_clients_num--;
-						
-						// remove fd from the fd set
-						polled_fds[i].fd = -1;
-						compress_array = true;
-					}
-				}
-				else // not completed the message
-				{
-					continue;
-				}
 			} /* End of pollable fd */
 		} /* End of loop through pollable fds */
 
@@ -436,7 +414,6 @@ int main( int argc , char** argv )
 				}
 			}
 		}
-
 		/**************************************************************************************************/
 		/* Check next epoch requirements.                                                                 */
 		/**************************************************************************************************/
@@ -448,14 +425,14 @@ int main( int argc , char** argv )
 			// next epoch
 			current_epoch++;
 
-			announcement_msg.flags = server_to_client_msg::flag::normal_op;
+			announcement_msg.flags = Server_to_client_msg::flag::normal_op;
 			// check if clients should consider pretrained model
 			if ( current_epoch == 1 && pretrained_model_flag == false )
-				announcement_msg.flags = server_to_client_msg::flag::no_pretrained_model; // sended variables are random and clients should consider their own initial values
+				announcement_msg.flags = Server_to_client_msg::flag::no_pretrained_model; // sended variables are random and clients should consider their own initial values
 			// check shutdown requirements
 			else if ( current_epoch == FINAL_EPOCH ){
-				announcement_msg.flags = server_to_client_msg::flag::final_epoch; // training ended and clients are receiving the final model
-				LOGGER(Logger::warning , "Reached final epoch." );
+				announcement_msg.flags = Server_to_client_msg::flag::final_epoch; // training ended and clients are receiving the final model
+				LOGGING(Logger::Level::warning , "Reached final epoch." );
 			}
 			// create new global model
 			announcement_msg.epoch = current_epoch;
@@ -464,13 +441,13 @@ int main( int argc , char** argv )
 			/**************************************************************************************************/
 			/* Announce global model to selected clients.                                                     */
 			/**************************************************************************************************/
-			LOGGER( Logger::fl_info , RED << "		GLOBAL EPOCH    =    " << current_epoch << RESET );
+			LOGGING( Logger::Level::fl_info , RED << "		GLOBAL EPOCH    =    " << current_epoch << RESET );
 			
-			client_selection( connected_clients_num , polled_fds , current_epoch );
+			working_clients_num = client_selection( connected_clients_num , polled_fds , polled_fds_info , current_epoch );
 			
 			// clear previous epoch info
 			completed_clients_num = 0;
-			working_clients_num = 0;
+
 			for ( int i = 0 ; i < VARIABLES_NUM ; i++ )
 				accumulated_variables[i] = 0;
 		}
@@ -482,30 +459,130 @@ int main( int argc , char** argv )
 	} /* End of server running */
 
 	/**************************************************************************************************/
-	/* Shutdown server. Inform the clients that server is shutting down by clossing their connections.*/
-	/**************************************************************************************************/
-	// this might be useless now, as connections are closed when the final epoch is sent to them
-	for ( int i = 0 ; i < _FD_NUM ; i++ )
-		if ( polled_fds[i].fd > 0 )
-		{
-			shutdown( polled_fds[i].fd , SHUT_RDWR );
-			close( polled_fds[i].fd );
-		}
-
-	/**************************************************************************************************/
 	/* Save model.                                                                                    */
 	/**************************************************************************************************/
 	std::ofstream trained_model_file( OUTPUT_FILE , std::ofstream::out | std::ofstream::binary | std::ofstream::trunc );
 
 	trained_model_file.write( reinterpret_cast<char*>(announcement_msg.variables) , VARIABLES_NUM * sizeof(MSG_VARIABLE_DATATYPE) );
-
-	LOGGER( Logger::initialization , "Saved model to " << OUTPUT_FILE );
-
 	trained_model_file.close();
 
-	std::cout << g_timer.since() << std::endl;
+	LOGGING( Logger::Level::warning , "Saved model to " << OUTPUT_FILE );
 }
 
+/**************************************************************************************************/
+/* Communication functions. Accept/remove connection, write/read data.                            */
+/**************************************************************************************************/
+/**
+ * @brief Accepts an incoming connection, set the new socket as non-blocking, add it in the polling structure and initialize its info.
+ * 
+ * @param int fd of the listening socket
+ * @param int number of the polled fds 
+ * @param pollfd[] array of the polled fds
+ * @param polled_fds_info[] array with the info of the polled fds
+ * @return Accept_connection_rv - appropiate value
+ */
+Accept_connection_rv accept_connection( int listening_socket_fd , int num_polled_fds , pollfd polled_fds[] , Polled_fds_info polled_fds_info[] )
+{
+	struct sockaddr_in client_addr; // just for logging
+	socklen_t client_addr_len = sizeof(client_addr);
+	memset( &client_addr , 0 , client_addr_len );
+
+	int new_fd = accept( listening_socket_fd , (sockaddr*) &client_addr , &client_addr_len );
+	
+	// check if a connection was accepted
+	if ( new_fd < 0 )
+	{
+		// no more connections
+		if ( errno == EWOULDBLOCK )
+			return Accept_connection_rv::no_more_connections;
+			
+		// something went wrong
+		LOGGING( Logger::Level::error , "Unexpected error on accept: " << new_fd << "	errno: " << errno );
+		return Accept_connection_rv::error;
+	}
+	// set new socket as non blocking
+	if ( fcntl( new_fd , F_SETFL , fcntl( new_fd , F_GETFL ) | O_NONBLOCK ) < 0 )
+	{
+		LOGGING( Logger::Level::error , "Failed setting new socket as non blocking. Closing it." );
+		close( new_fd );
+		return Accept_connection_rv::error;
+	}
+	// new client
+	LOGGING( Logger::Level::initialization , "New client IP: " << inet_ntoa( client_addr.sin_addr ) << "	Port: " << ntohs( client_addr.sin_port ) );
+
+	// add the new socket in the polled fd set.
+	polled_fds[num_polled_fds].fd = new_fd;
+	// Set up socket flags.
+	polled_fds[num_polled_fds].events = POLLIN | POLLRDHUP | POLLERR | POLLNVAL; // POLLIN always open to catch disconections
+
+	// init client info
+	polled_fds_info[num_polled_fds].received_message = new Client_to_server_msg;
+	polled_fds_info[num_polled_fds].received_bytes = 0;
+	polled_fds_info[num_polled_fds].sended_bytes = 0;
+	polled_fds_info[num_polled_fds].working = false;
+
+	return Accept_connection_rv::success;
+}
+
+/**
+ * @brief Shutdown the connection of the fd, clean up its info and mark it for removal
+ * 
+ * @param pollfd& of the fd to be removed
+ * @param Polled_fds_info& of the fd to be removed
+ * @param bool& compress array flag 
+ */
+void remove_fd( pollfd& polled_fd , Polled_fds_info& polled_fd_info , bool& compress_array )
+{
+	// close the connection
+	shutdown( polled_fd.fd  , SHUT_RDWR );
+	close( polled_fd.fd );
+
+	// mark the fd for removal from the set
+	polled_fd.fd = -1;
+	compress_array = true;
+
+	// clear client info
+	delete polled_fd_info.received_message;
+}// TODO: test this properly
+
+/**
+ * @brief 
+ * 
+ * @param pollfd& of the fd to be read
+ * @param Polled_fds_info& of the fd to be removed
+ * @param Server_to_client_msg message holding global model
+ * @param int how many bytes to read 
+ * @return Write_socket_rv - appropiate value
+ */
+Write_socket_rv write_socket( pollfd& polled_fd , Polled_fds_info& fd_info , Server_to_client_msg announcement_msg , int bytes_to_write )
+{
+	// send remaining bytes
+	int rv = send( polled_fd.fd , (unsigned char*)&announcement_msg + fd_info.sended_bytes , bytes_to_write , MSG_DONTWAIT );
+
+	// send failed
+	if( rv < 0 )
+	{
+		LOGGING( Logger::Level::error , "Write failed on fd: " << polled_fd.fd );
+		return Write_socket_rv::error;
+	}
+	// send succesful
+
+	// track total sended bytes
+	fd_info.sended_bytes += rv;
+
+	LOGGING( Logger::Level::message_info ,
+		"sended bytes: " << rv << "	total: " << fd_info.sended_bytes << "	needed: " << SERVER_TO_CLIENT_BUF_SIZE 
+		<< ( fd_info.sended_bytes == SERVER_TO_CLIENT_BUF_SIZE ? COMPLETED_MSG : "" ) );
+
+	// completed the message
+	if ( fd_info.sended_bytes == SERVER_TO_CLIENT_BUF_SIZE )
+	{
+		// no need to write to the socket anymore, close pollout
+		polled_fd.events &= ~POLLOUT;
+		return Write_socket_rv::finished_writing;
+	}
+	return Write_socket_rv::success;
+}
 
 /**
  * @brief Reads socket and concats received data to client's message. Updates client synchronization counters.
@@ -513,9 +590,9 @@ int main( int argc , char** argv )
  * @param int fd to be read
  * @param polled_fds_info& struct containing client's info
  * @param int how many bytes to read
- * @return 1 on succesfull read, 0 on socket closure, -1 on error
+ * @return Read_socket_rv - appropiate value
  */
-int read_socket( int fd , struct polled_fds_info& fd_info , int bytes_to_read )
+Read_socket_rv read_socket( int fd , Polled_fds_info& fd_info , int bytes_to_read )
 {
 	/**************************************************************************************************/
 	/* Read socket. Message may be incomplete, track size of received data.                           */
@@ -529,24 +606,15 @@ int read_socket( int fd , struct polled_fds_info& fd_info , int bytes_to_read )
 	// connection closed properly
 	if ( rv == 0 )
 	{
-		LOGGER( Logger::initialization , "Connection Closed." );
-
-		// // close it and mark it for removal from the fd set
-		close( fd );
-
-		// clear client info
-		free( fd_info.received_message );
-		fd_info.received_bytes = 0;
-		fd_info.sended_bytes = 0;
-
-		return 0;
+		LOGGING( Logger::Level::initialization , "Connection Closed." );
+		return Read_socket_rv::socket_closed;
 	}
 	// socket recv errors
 	if ( rv < 0 )
 	{
 		// something went wrong
-		LOGGER( Logger::error , "Unexpected error on recv: " << errno );
-		return -1;
+		LOGGING( Logger::Level::error , "Unexpected error on recv: " << errno );
+		return Read_socket_rv::error;
 	}
 
 	/**************************************************************************************************/
@@ -558,7 +626,7 @@ int read_socket( int fd , struct polled_fds_info& fd_info , int bytes_to_read )
 	// track total received bytes
 	fd_info.received_bytes += rv;
 
-	LOGGER( Logger::message_info ,
+	LOGGING( Logger::Level::message_info ,
 		"received bytes: " << rv << "	total: " << fd_info.received_bytes << "	needed: " << CLIENT_TO_SERVER_BUF_SIZE
 		<< ( fd_info.received_bytes == CLIENT_TO_SERVER_BUF_SIZE ? COMPLETED_MSG : "" ) );
 		
@@ -567,14 +635,16 @@ int read_socket( int fd , struct polled_fds_info& fd_info , int bytes_to_read )
 	/**************************************************************************************************/
 	if ( fd_info.received_bytes == CLIENT_TO_SERVER_BUF_SIZE )
 	{
-		// reset sended bytes counter to be ready for next epoch.
-		fd_info.sended_bytes = 0;
+		// if message is completed, the client is not working for the rest of the global epoch
+		fd_info.working = false;
 	}
 
-	return 1;
+	return Read_socket_rv::success;
 }
 
-
+/**************************************************************************************************/
+/* Calculations functions. Dequintize, accumulate,etc variables, create average model.            */
+/**************************************************************************************************/
 /**
  * @brief Received variables may be in a smaller data type to reduce comunication.
  * In order to achieve better accuracy, they need to be reverted back to float.
@@ -590,7 +660,6 @@ void dequintize_received_variables( MSG_VARIABLE_DATATYPE message_variables[VARI
 	}
 }
 
-
 /**
  * @brief Adds local variables to cumulative variables
  * 
@@ -604,7 +673,6 @@ void accumulate_variables( float local_variables[VARIABLES_NUM] , float accumula
 		accumulated_variables[i] += local_variables[i];
 	}
 }
-
 
 /**
  * @brief Create average model 
@@ -629,37 +697,38 @@ void create_average_model( float accumulated_variables[VARIABLES_NUM] , int num_
 	}
 }
 
-
+/**************************************************************************************************/
+/* FL algorithm flow control functions. Selecting clients, changing epoch and finishing.          */
+/**************************************************************************************************/
 /**
  * @brief Checks new epoch conditions.
  * 
  * @param int connected clients counter
  * @param int working clients counter
  * @param int completed clients counter
- * @return 1 if ready for new epoch, 0 if not
+ * @return true if ready for new epoch, false if not
  */
-int next_epoch_ready( int connected_clients_num , int working_clients_num , int completed_clients_num )
+bool next_epoch_ready( int connected_clients_num , int working_clients_num , int completed_clients_num )
 {
-	LOGGER( Logger::message_info ,//TODO: something
+	LOGGING( Logger::Level::error ,//TODO: something
 		"						" << "	connected = " << connected_clients_num 
 		<< "	working  = " << working_clients_num << "	completed = " << completed_clients_num );
 
 	// not enough connected client, no point to start a new epoch
 	if( connected_clients_num < MIN_CLIENTS_PER_EPOCH )
-		return 0;
+		return false;
 
 	// // no working client, need for a new epoch TODO: maybe create a counter for those who are waiting the global model and call them waiting for work
 	if( working_clients_num == 0 )
-		return 1;
+		return true;
 
 	// all completed
 	if( completed_clients_num == connected_clients_num )
-		return 1;
+		return true;
 
-	return 0;
+	return false;
 	// an exei ginei timeout kai uparxei kapoios teleiwmenos nea epoch?
 }
-
 
 /**
  * @brief Selects the clients that are going to partake in the next epoch.
@@ -669,12 +738,15 @@ int next_epoch_ready( int connected_clients_num , int working_clients_num , int 
  * @param int number of connected clients 
  * @param pollfd[] fds of the connected clients
  * @param int current epoch
+ * @return int - number of working clients for the new epoch
  */
-
-void client_selection( int connected_clients_num , struct pollfd fds[] , int epoch )
+int client_selection( int connected_clients_num , pollfd polled_fds[] , Polled_fds_info fds_info[] , int epoch )
 {
+	int working_clients_num;
+
 	// used for logging
 	std::string selected_clients;
+
 	// if existing clients <= required clients, select them all
 	// < in future maybe start new epoch if inefficient clients with no prospect of gaining more
 	// if epoch == final epoch clients are going to evaluate the network, use them all
@@ -684,9 +756,17 @@ void client_selection( int connected_clients_num , struct pollfd fds[] , int epo
 		for ( int i = 1 ; i < connected_clients_num + 1 ; i++ )
 		{
 			// set the sockets as active
-			fds[i].events = POLLIN | POLLOUT | POLLRDHUP | POLLERR | POLLNVAL;
+			polled_fds[i].events = POLLIN | POLLOUT | POLLRDHUP | POLLERR | POLLNVAL;
+
+			// prepare their info
+			fds_info[i].received_bytes = 0;
+			fds_info[i].sended_bytes = 0;
+			fds_info[i].working = true;
+
+			// for logging
 			selected_clients += std::to_string( i ) + ' ';
 		}
+		working_clients_num = connected_clients_num;
 	}
 	else
 	{
@@ -706,14 +786,23 @@ void client_selection( int connected_clients_num , struct pollfd fds[] , int epo
 			// get a value from the vector
 			int client = v.back();
 			v.pop_back();
+			
 			// set the sockets as active
-			fds[ client ].events = POLLIN | POLLOUT | POLLRDHUP | POLLERR | POLLNVAL;
+			polled_fds[client].events = POLLIN | POLLOUT | POLLRDHUP | POLLERR | POLLNVAL;
+
+			// prepare their info
+			fds_info[client].received_bytes = 0;
+			fds_info[client].sended_bytes = 0;
+			fds_info[client].working = true;
+
+			// for logging
 			selected_clients += std::to_string( client ) + ' ';
 		}
+		working_clients_num = MIN_CLIENTS_PER_EPOCH;
 	}
-	LOGGER( Logger::fl_info , "Selected clients: " << selected_clients );
+	LOGGING( Logger::Level::fl_info , "Selected clients: " << selected_clients );
+	return working_clients_num;
 }
-
 
 /**
  * @brief Checks if training has finished and server should shut down.

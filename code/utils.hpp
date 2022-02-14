@@ -14,10 +14,8 @@
 
 #include <iostream>	/* cout */
 #include <iomanip>	/* setw */
-
-#include <string>	/* string */
 #include <chrono>	/* time_point, durration */
-#include <time.h>	/* time, localtime, strftime */
+
 #include <stdio.h>	/* perror */
 #include <stdlib.h>	/* exit, EXIT_FAILURE */
 
@@ -29,30 +27,31 @@
 #define COMPLETED_MSG "	\033[33mcompleted\033[0m"
 
 
-void error( const char* msg );
+namespace Utils{
+	void error( const char* msg );
 
+	// wrong and useless, leave them alone till moving code in device. Then check about endianess and float ieee structure
+	/**
+	 * @brief Reverses the byte order of the input float. Used when comunicating with machines of different endianess.
+	 * In the .h file so it can be inline
+	 * 
+	 * @param float 
+	 * @return float 
+	 */
+	inline float reverse_float( const float input_float )
+	{
+		float reversed_float;
+		unsigned char* input_bytes = (unsigned char*) &input_float;
+		unsigned char* output_bytes = (unsigned char*) &reversed_float;
 
-// wrong and useless, leave them alone till moving code in device. Then check about endianess and float ieee structure
-/**
- * @brief Reverses the byte order of the input float. Used when comunicating with machines of different endianess.
- * In the .h file so it can be inline
- * 
- * @param float 
- * @return float 
- */
-inline float reverse_float( const float input_float )
-{
-	float reversed_float;
-	unsigned char* input_bytes = (unsigned char*) &input_float;
-	unsigned char* output_bytes = (unsigned char*) &reversed_float;
+		// swap the bytes into a temporary buffer
+		output_bytes[0] = input_bytes[3];
+		output_bytes[1] = input_bytes[2];
+		output_bytes[2] = input_bytes[1];
+		output_bytes[3] = input_bytes[0];
 
-	// swap the bytes into a temporary buffer
-	output_bytes[0] = input_bytes[3];
-	output_bytes[1] = input_bytes[2];
-	output_bytes[2] = input_bytes[1];
-	output_bytes[3] = input_bytes[0];
-
-	return reversed_float;
+		return reversed_float;
+	}
 }
 
 /**************************************************************************************************/
@@ -90,7 +89,7 @@ public:
 	/**
 	 * @brief Level of logging events. Can be used to block certain events from being logged.
 	 */
-	enum Level
+	enum class Level
 	{
 		initialization,
 		fl_info,
@@ -110,7 +109,7 @@ private:
 };
 
 #define LOG( logger_ , level_ , Message_ ) \
-	if( DISABLE_MESSAGE_INFO && level_ == Logger::message_info )\
+	if( DISABLE_MESSAGE_INFO && level_ == Logger::Level::message_info )\
 		do {} while(0);\
 	else\
 		logger_( level_ , static_cast<std::ostringstream&>( std::ostringstream().flush() << Message_ ).str() , __func__ , __FILE__ , __LINE__ );\
@@ -118,9 +117,9 @@ private:
 
 // used to enable/disable all logging
 #if ENABLE_LOGGING
-	#define LOGGER( level_ , message_ ) LOG( g_logger , level_ , message_ )
+	#define LOGGING( level_ , message_ ) LOG( g_logger , level_ , message_ )//use the global logger
 #else 
-	#define LOGGER(_1,_2) do {} while(0)
+	#define LOGGING( _1 , _2 ) do {} while(0)
 #endif
 
 // Global Logger that logs the FL training. Need to be used in multiple files may arise, so define it here with extern.

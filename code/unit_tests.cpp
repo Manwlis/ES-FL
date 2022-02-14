@@ -9,7 +9,7 @@
  * 
  */
 
-#include <iostream>
+#include <iostream>		// <<
 
 #include <algorithm>    // std::random_shuffle
 #include <vector>       // std::vector
@@ -18,9 +18,7 @@
 #include <chrono>       // std::chrono::system_clock
 
 #include <assert.h>		/* assert */
-#include <stdlib.h>		/* srand, rand */
-#include <time.h>		/* time */
-#include <string.h>
+#include <string.h>		/* memcpy */
 
 #include "utils.hpp"
 #include "messages.hpp"
@@ -44,14 +42,14 @@ int main ( int argc , char** argv )
 int endianess_test()
 {
 	// create dumb data
-	struct server_to_client_msg stoc_msg;
+	struct Server_to_client_msg stoc_msg;
 	stoc_msg.epoch = 1;
 	for ( int i = 0 ; i < VARIABLES_NUM ; i++ )
 	{
 		stoc_msg.variables[i] = 1;
 	}
 	// create clone
-	struct server_to_client_msg stoc_msg_clone;
+	struct Server_to_client_msg stoc_msg_clone;
 	memcpy( &stoc_msg_clone , &stoc_msg , sizeof(stoc_msg) );
 
 	// change endianess on clone

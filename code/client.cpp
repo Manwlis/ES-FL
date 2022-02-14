@@ -17,14 +17,12 @@
 
 #include <unistd.h>			/* close */
 #include <string.h>			/* memset */
-
 #include <sys/socket.h>		/* accept, bind, connect, listen, recv, send, getpeername */
-#include <netinet/in.h>		/* htonl, htons, ntohl, ntohs */
-#include <netdb.h>			/* getnameinfo */
+#include <netdb.h>			/* addrinfo, getaddrinfo */
 
 #include "definitions.hpp"
 
-#include "utils.hpp"		/* error, current_time */
+#include "utils.hpp"		/* error, Timer, Logging */
 #include "messages.hpp"		/* msg structs, change message endianess */
 #include "fake_data.hpp"	/* check_fake_server_data, create_fake_client_data */
 
@@ -32,7 +30,7 @@
 struct sockaddr_in find_server( const char* server_name , const char* server_port );
 
 int quantize_variables();
-int send_variables( int socket_fd , client_to_server_msg& send_message );
+int send_variables( int socket_fd , Client_to_server_msg& send_message );
 
 // Global timer that starts ticking at program start.
 Timer g_timer;
@@ -42,8 +40,8 @@ int main ( int argc , char** argv )
 {
 	int rv; // return value used to check if functions worked properly
 	// messages can be larger than stack. Static so their memory space is reserved in heap
-	static server_to_client_msg received_message;
-	static client_to_server_msg send_message;
+	static Server_to_client_msg received_message;
+	static Client_to_server_msg send_message;
 
 	/**************************************************************************************************/
 	/* Set up a socket to communicate with server and connect.                                        */
@@ -53,17 +51,17 @@ int main ( int argc , char** argv )
 	// Create socket
 	rv = socket_fd = socket( AF_INET , SOCK_STREAM , 0 );
 	if ( rv < 0 )
-		error( "Client socket creation failed." );
+		Utils::error( "Client socket creation failed." );
 
 	// find server
 	struct sockaddr_in server = find_server( SERVER_IP , std::to_string(SERVER_PORT).c_str() );
 
 	// Initiate Connection
-	LOGGER( Logger::initialization , "Initiating connection with server." );
+	LOGGING( Logger::Level::initialization , "Initiating connection with server." );
 
 	rv = connect( socket_fd , (struct sockaddr*) &server , sizeof( server ) );
 	if ( rv < 0 )
-		error( "Connect failed." );
+		Utils::error( "Connect failed." );
 		
 	/**************************************************************************************************/
 	/* Set up python environment, neural network and numpy wrappers.                                  */
@@ -95,7 +93,7 @@ int main ( int argc , char** argv )
 	Py_DECREF( path );
 
 	// get module
-	LOGGER( Logger::initialization , "Getting file." );
+	LOGGING( Logger::Level::initialization , "Getting file." );
 
 	py_module_name = PyUnicode_FromString( py_script );
 	py_module = PyImport_Import( py_module_name ); // this executes code in module outside functions!
@@ -105,10 +103,10 @@ int main ( int argc , char** argv )
 	PyModule_AddIntMacro( py_module , LOCAL_EPOCHS );
 	PyModule_AddIntMacro( py_module , STEPS_PER_EPOCH );
 	PyModule_AddIntMacro( py_module , BATCH_SIZE );
-	PyModule_AddIntConstant(py_module, "no_pretrained_model_flag", server_to_client_msg::flag::no_pretrained_model );
+	PyModule_AddIntConstant(py_module, "no_pretrained_model_flag", Server_to_client_msg::flag::no_pretrained_model );
 
 	// get functions
-	LOGGER( Logger::initialization , "Getting function." );
+	LOGGING( Logger::Level::initialization , "Getting function." );
 
 	py_compile = PyObject_GetAttrString( py_module , py_compile_function );
 	py_train = PyObject_GetAttrString( py_module , py_train_function );
@@ -133,7 +131,7 @@ int main ( int argc , char** argv )
 	{
 		/**************************************************************************************************/
 		/* Wait for global model and read it.                                                             */		
-		LOGGER( Logger::message_info , "Waiting for data." );
+		LOGGING( Logger::Level::message_info , "Waiting for data." );
 		
 		// read socket
 		static unsigned char buffer[SERVER_TO_CLIENT_BUF_SIZE];
@@ -145,7 +143,7 @@ int main ( int argc , char** argv )
 		// connection closed
 		if ( rv == 0 )
 		{	
-			LOGGER( Logger::warning , "Connection Closed." );
+			LOGGING( Logger::Level::warning , "Connection Closed." );
 
 			// There's mothing more to do if the connection with server broke. Close socket and exit. 
 			close( socket_fd );
@@ -154,9 +152,9 @@ int main ( int argc , char** argv )
 		// socket errors. Needs expansion
 		else if ( rv < 0 )
 		{	
-			error("recv");
+			Utils::error("recv");
 			
-			LOGGER( Logger::warning , "Unexpected error on recv: " << errno );
+			LOGGING( Logger::Level::warning , "Unexpected error on recv: " << errno );
 			continue;
 		}
 		// erroneous data size, what do i do?
@@ -169,7 +167,7 @@ int main ( int argc , char** argv )
 		// track total received bytes
 		received_bytes += rv;
 
-		LOGGER( Logger::message_info , 
+		LOGGING( Logger::Level::message_info , 
 			"received bytes: " << rv << "	total: " << received_bytes << "	needed: " << SERVER_TO_CLIENT_BUF_SIZE
 			<< ( received_bytes == SERVER_TO_CLIENT_BUF_SIZE ? COMPLETED_MSG : "" ) );
 		
@@ -182,7 +180,7 @@ int main ( int argc , char** argv )
 		/**************************************************************************************************/
 		/* Message is complete, continue with processing it.                                              */
 		/**************************************************************************************************/
-		LOGGER( Logger::fl_info , "Received new global model." );
+		LOGGING( Logger::Level::fl_info , "Received new global model." );
 
 		received_bytes = 0; // reset received bytes counter for use on the next message
 
@@ -190,9 +188,9 @@ int main ( int argc , char** argv )
 		if constexpr ( std::endian::native == std::endian::big ) // requires c++20, dangerous !!!!
 			server_to_client_msg_big_endianess( received_message ); // maybe move this to the server side if needed
 
-		LOGGER( Logger::fl_info , RED << "		GLOBAL EPOCH    =   " << received_message.epoch << RESET );
+		LOGGING( Logger::Level::fl_info , RED << "		GLOBAL EPOCH    =   " << received_message.epoch << RESET );
 
-		if( received_message.flags == server_to_client_msg::flag::final_epoch )
+		if( received_message.flags == Server_to_client_msg::flag::final_epoch )
 		{
 			PyObject_CallFunctionObjArgs( py_eval , py_array_input , py_array_output , py_flags , NULL );
 			break;
@@ -221,7 +219,7 @@ int main ( int argc , char** argv )
 		/**************************************************************************************************/
 		/* Send local variables. Blocking.                                                                */
 		/**************************************************************************************************/
-		LOGGER( Logger::fl_info , "Sending local variables.\n" );
+		LOGGING( Logger::Level::fl_info , "Sending local variables.\n" );
 		// create message
 		send_message.epoch = received_message.epoch;
 
@@ -230,7 +228,7 @@ int main ( int argc , char** argv )
 
 		if ( rv < 0 )
 		{
-			LOGGER( Logger::error , "Unexpected error on send: " << errno );
+			LOGGING( Logger::Level::error , "Unexpected error on send: " << errno );
 		}
 	}
 	/**************************************************************************************************/
@@ -258,21 +256,21 @@ int main ( int argc , char** argv )
  * @param char* server's port 
  * @return sockaddr_in struct containing the server's info
  */
-struct sockaddr_in find_server( const char* server_name , const char* server_port )
+sockaddr_in find_server( const char* server_name , const char* server_port )
 {
-	struct addrinfo hints;
+	addrinfo hints;
 	memset( &hints , 0 , sizeof(hints) );
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_family = AF_INET;
 	hints.ai_protocol = IPPROTO_TCP;
 	
-	struct addrinfo* server_addr_info;
+	addrinfo* server_addr_info;
 
 	int rv = getaddrinfo( server_name , server_port , nullptr , &server_addr_info );
 	if ( rv != 0 )
-		error( "getaddrinfo failed." );
+		Utils::error( "getaddrinfo failed." );
 
-	return *( (struct sockaddr_in *) server_addr_info->ai_addr );
+	return *( (sockaddr_in *) server_addr_info->ai_addr );
 }
 
 
@@ -287,10 +285,10 @@ int quantize_variables()
  * @brief Serialize and send local variables to target socket. Blocking
  * 
  * @param int target socket's fd  
- * @param client_to_server_msg* message to be send
+ * @param Client_to_server_msg* message to be send
  * @return send(2) return value
  */
-int send_variables( int socket_fd , client_to_server_msg& send_message )
+int send_variables( int socket_fd , Client_to_server_msg& send_message )
 {
 	// serialize local variables
 	if constexpr ( std::endian::native == std::endian::big ) // requires c++20, dangerous !!!!
@@ -298,7 +296,7 @@ int send_variables( int socket_fd , client_to_server_msg& send_message )
 	
 	int rv = send( socket_fd , &send_message , CLIENT_TO_SERVER_BUF_SIZE , 0 );
 
-	LOGGER( Logger::message_info , "sended bytes: " << rv << "	total: " << CLIENT_TO_SERVER_BUF_SIZE << "\n" );
+	LOGGING( Logger::Level::message_info , "sended bytes: " << rv << "	total: " << CLIENT_TO_SERVER_BUF_SIZE << "\n" );
 
 	return rv;
 }
