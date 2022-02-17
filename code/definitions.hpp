@@ -7,15 +7,17 @@
 
 // federated algorithm definitions
 #define MAX_CONNECTED_CLIENTS 10
-#define MIN_CLIENTS_PER_EPOCH 2
-#define NUM_EPOCHS 100
+#define MIN_CLIENTS_PER_EPOCH 3
+#define NUM_EPOCHS 500
 
 #define LOCAL_EPOCHS 1
 #define STEPS_PER_EPOCH 2
 #define BATCH_SIZE 20
 
+#define MODEL "cnn_model" // cnn_model, dnn_model, large_cnn_model, alexnet
+
 // message variables and their types
-#define VARIABLES_NUM 421642
+#define VARIABLES_NUM 421642 // 421642 , 803240 , 21598922
 #define MSG_VARIABLE_DATATYPE float
 
 //defines the type of the transfered data
@@ -27,7 +29,8 @@
 #define OUTPUT_FILE "./IO_files/out.bin"
 
 // python modules & functions
-#define py_script "fashion_mnist_cnn"
+#define py_script "fashion_mnist"
+#define py_data_function "setup_data"
 #define py_compile_function "compile_nn"
 #define py_train_function "train_nn"
 #define py_eval_function "evaluate_nn"

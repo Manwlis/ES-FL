@@ -13,6 +13,8 @@
 #include "definitions.hpp"
 
 #include <iostream>	/* cout */
+#include <ostream>	/* cout */
+#include <string>	/*  */
 #include <iomanip>	/* setw */
 #include <chrono>	/* time_point, durration */
 
@@ -27,8 +29,12 @@
 #define COMPLETED_MSG "	\033[33mcompleted\033[0m"
 
 
-namespace Utils{
+namespace Utils
+{
 	void error( const char* msg );
+
+	int get_virtual_mem_used();
+	int get_physical_mem_used();
 
 	// wrong and useless, leave them alone till moving code in device. Then check about endianess and float ieee structure
 	/**
@@ -64,13 +70,10 @@ namespace Utils{
 class Timer
 {
 private:
-	std::chrono::steady_clock::time_point start_time;
-
-	void set_start_time();
-
+	const std::chrono::steady_clock::time_point start_time;
 public:
 	Timer();
-	int64_t since();
+	int64_t since() const;
 };
 
 // Global timer that starts ticking at program start. Needs to be used in multiple files, so define it here with extern.
@@ -98,14 +101,14 @@ public:
 		error
 	};
 
-	Logger(  std::ostream* target = &(std::cout) );
+	Logger( std::ostream& target );
 
 
-	void operator()( Level level , const std::string& description, const char* function , const char* file , int line );
+	void operator()( Level level , const std::string& description, const char* function , const char* file , int line ) const;
 
 private:
 	// Output stream, can be anything with a write() function.
-	std::ostream* out;
+	std::ostream& output_sink;
 };
 
 #define LOG( logger_ , level_ , Message_ ) \

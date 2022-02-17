@@ -43,8 +43,8 @@
 struct Polled_fds_info
 {
 	struct Client_to_server_msg* received_message; // holds received data
-	unsigned int received_bytes; // counts how many data has been received this epoch
-	unsigned int sended_bytes; // counts how many data has been send this epoch
+	size_t received_bytes; // counts how many data has been received this epoch
+	size_t sended_bytes; // counts how many data has been send this epoch
 	bool working;	// shows that the client is working
 };
 
@@ -70,7 +70,7 @@ enum class Write_socket_rv
 	finished_writing = 0,
 	success = 1
 };
-Write_socket_rv write_socket( pollfd& polled_fd , Polled_fds_info& fd_info , Server_to_client_msg announcement_msg , int bytes_to_write );
+Write_socket_rv write_socket( pollfd& polled_fd , Polled_fds_info& fd_info , Server_to_client_msg& announcement_msg , size_t bytes_to_write );
 
 /**
  * @brief Return values for the read_socket function. Error, socket closed, success.
@@ -81,7 +81,7 @@ enum class Read_socket_rv
 	socket_closed = 0,
 	success = 1
 };
-Read_socket_rv read_socket( int fd , Polled_fds_info& fd_info , int bytes_to_read );
+Read_socket_rv read_socket( int fd , Polled_fds_info& fd_info , size_t bytes_to_read );
 
 void dequintize_received_variables( MSG_VARIABLE_DATATYPE message_variables[VARIABLES_NUM] , float local_variables[VARIABLES_NUM] );
 
@@ -98,10 +98,10 @@ void remove_fd( pollfd& polled_fd , Polled_fds_info& polled_fd_info , bool& comp
 
 // Global timer that starts ticking at program start.
 Timer g_timer;
-Logger g_logger( &(std::cout) );
+Logger g_logger( std::cout );
 
 int main( int argc , char** argv )
-{	
+{
 	LOGGING( Logger::Level::initialization , "Server Start" );
 	
 	int rv; // return value used to check if functions worked properly
@@ -293,7 +293,7 @@ int main( int argc , char** argv )
 			/**************************************************************************************************/
 			/* Non listening socket fd raised POLLOUT event. Can write data.                                  */
 			/**************************************************************************************************/
-			else if ( polled_fds[i].revents & POLLOUT ) // TODO: Move this to a function
+			else if ( polled_fds[i].revents & POLLOUT )
 			{
 				// remaining bytes to complete the announcement
 				int remaining_bytes = SERVER_TO_CLIENT_BUF_SIZE - polled_fds_info[i].sended_bytes;
@@ -342,7 +342,7 @@ int main( int argc , char** argv )
 				LOGGING( Logger::Level::message_info , 
 					"Read event on Fd: " << polled_fds[i].fd << "	IP: " << inet_ntoa( peer_addr.sin_addr ) << "	Port: " << ntohs( peer_addr.sin_port ) );
 
-				int bytes_to_read = CLIENT_TO_SERVER_BUF_SIZE - polled_fds_info[i].received_bytes;
+				size_t bytes_to_read = CLIENT_TO_SERVER_BUF_SIZE - polled_fds_info[i].received_bytes;
 
 				Read_socket_rv read_socket_rv = read_socket( polled_fds[i].fd , polled_fds_info[i] , bytes_to_read );
 
@@ -441,7 +441,7 @@ int main( int argc , char** argv )
 			/**************************************************************************************************/
 			/* Announce global model to selected clients.                                                     */
 			/**************************************************************************************************/
-			LOGGING( Logger::Level::fl_info , RED << "		GLOBAL EPOCH    =    " << current_epoch << RESET );
+			LOGGING( Logger::Level::warning , RED << "		GLOBAL EPOCH    =    " << current_epoch << RESET );
 			
 			working_clients_num = client_selection( connected_clients_num , polled_fds , polled_fds_info , current_epoch );
 			
@@ -554,10 +554,10 @@ void remove_fd( pollfd& polled_fd , Polled_fds_info& polled_fd_info , bool& comp
  * @param int how many bytes to read 
  * @return Write_socket_rv - appropiate value
  */
-Write_socket_rv write_socket( pollfd& polled_fd , Polled_fds_info& fd_info , Server_to_client_msg announcement_msg , int bytes_to_write )
+Write_socket_rv write_socket( pollfd& polled_fd , Polled_fds_info& fd_info , Server_to_client_msg& announcement_msg , size_t bytes_to_write )
 {
 	// send remaining bytes
-	int rv = send( polled_fd.fd , (unsigned char*)&announcement_msg + fd_info.sended_bytes , bytes_to_write , MSG_DONTWAIT );
+	ssize_t rv = send( polled_fd.fd , (unsigned char*)&announcement_msg + fd_info.sended_bytes , bytes_to_write , MSG_DONTWAIT );
 
 	// send failed
 	if( rv < 0 )
@@ -568,7 +568,7 @@ Write_socket_rv write_socket( pollfd& polled_fd , Polled_fds_info& fd_info , Ser
 	// send succesful
 
 	// track total sended bytes
-	fd_info.sended_bytes += rv;
+	fd_info.sended_bytes += reinterpret_cast<size_t&>(rv);
 
 	LOGGING( Logger::Level::message_info ,
 		"sended bytes: " << rv << "	total: " << fd_info.sended_bytes << "	needed: " << SERVER_TO_CLIENT_BUF_SIZE 
@@ -592,13 +592,13 @@ Write_socket_rv write_socket( pollfd& polled_fd , Polled_fds_info& fd_info , Ser
  * @param int how many bytes to read
  * @return Read_socket_rv - appropiate value
  */
-Read_socket_rv read_socket( int fd , Polled_fds_info& fd_info , int bytes_to_read )
+Read_socket_rv read_socket( int fd , Polled_fds_info& fd_info , size_t bytes_to_read )
 {
 	/**************************************************************************************************/
 	/* Read socket. Message may be incomplete, track size of received data.                           */
 	/**************************************************************************************************/
 	static unsigned char buffer[CLIENT_TO_SERVER_BUF_SIZE];
-	int rv = recv( fd , buffer , bytes_to_read , 0 );
+	ssize_t rv = recv( fd , buffer , bytes_to_read , 0 );
 
 	/**************************************************************************************************/
 	/* Do necesary checks. Connection closed / socket errors / erroneous data size.                   */
@@ -624,7 +624,7 @@ Read_socket_rv read_socket( int fd , Polled_fds_info& fd_info , int bytes_to_rea
 	memcpy( (unsigned char*)fd_info.received_message + fd_info.received_bytes , buffer , rv );
 
 	// track total received bytes
-	fd_info.received_bytes += rv;
+	fd_info.received_bytes += reinterpret_cast<size_t&>(rv);
 
 	LOGGING( Logger::Level::message_info ,
 		"received bytes: " << rv << "	total: " << fd_info.received_bytes << "	needed: " << CLIENT_TO_SERVER_BUF_SIZE
@@ -710,7 +710,7 @@ void create_average_model( float accumulated_variables[VARIABLES_NUM] , int num_
  */
 bool next_epoch_ready( int connected_clients_num , int working_clients_num , int completed_clients_num )
 {
-	LOGGING( Logger::Level::error ,//TODO: something
+	LOGGING( Logger::Level::fl_info ,//TODO: something
 		"						" << "	connected = " << connected_clients_num 
 		<< "	working  = " << working_clients_num << "	completed = " << completed_clients_num );
 

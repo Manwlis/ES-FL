@@ -34,14 +34,15 @@ int send_variables( int socket_fd , Client_to_server_msg& send_message );
 
 // Global timer that starts ticking at program start.
 Timer g_timer;
-Logger g_logger( &(std::cout) );
+Logger g_logger( std::cout );
 
 int main ( int argc , char** argv )
 {
-	int rv; // return value used to check if functions worked properly
+	ssize_t rv; // return value used to check if functions worked properly
 	// messages can be larger than stack. Static so their memory space is reserved in heap
 	static Server_to_client_msg received_message;
 	static Client_to_server_msg send_message;
+	static unsigned char buffer[SERVER_TO_CLIENT_BUF_SIZE];
 
 	/**************************************************************************************************/
 	/* Set up a socket to communicate with server and connect.                                        */
@@ -62,17 +63,17 @@ int main ( int argc , char** argv )
 	rv = connect( socket_fd , (struct sockaddr*) &server , sizeof( server ) );
 	if ( rv < 0 )
 		Utils::error( "Connect failed." );
-		
+
 	/**************************************************************************************************/
 	/* Set up python environment, neural network and numpy wrappers.                                  */
 	/**************************************************************************************************/
 	PyObject* py_module_name;
 	PyObject* py_module;
+	PyObject* py_data;
 	PyObject* py_compile;
 	PyObject* py_train;
 	PyObject* py_eval;
 	PyLongObject* py_flags = nullptr; // nullptr to supress warning 'may be used uninitialized in dealloc()'
-	//PyObject* pValue;
 
 	// Initialize python interpeter
 	Py_SetProgramName( Py_DecodeLocale( argv[0] , nullptr ) );
@@ -99,21 +100,28 @@ int main ( int argc , char** argv )
 	py_module = PyImport_Import( py_module_name ); // this executes code in module outside functions!
 	Py_DECREF( py_module_name );
 
+	LOGGING( Logger::Level::initialization , "Passing constants." );
 	// pass C macros, constants to module 
 	PyModule_AddIntMacro( py_module , LOCAL_EPOCHS );
 	PyModule_AddIntMacro( py_module , STEPS_PER_EPOCH );
 	PyModule_AddIntMacro( py_module , BATCH_SIZE );
+	PyModule_AddStringMacro( py_module , MODEL );
 	PyModule_AddIntConstant(py_module, "no_pretrained_model_flag", Server_to_client_msg::flag::no_pretrained_model );
 
 	// get functions
-	LOGGING( Logger::Level::initialization , "Getting function." );
+	LOGGING( Logger::Level::initialization , "Getting functions." );
 
+	py_data = PyObject_GetAttrString( py_module , py_data_function );
 	py_compile = PyObject_GetAttrString( py_module , py_compile_function );
 	py_train = PyObject_GetAttrString( py_module , py_train_function );
 	py_eval = PyObject_GetAttrString( py_module , py_eval_function );
 	Py_DECREF( py_module ); // be carefull with this if need more functions
 
-	// compile model
+	// set up data and compile model
+	LOGGING( Logger::Level::initialization , "Setting up data and neural network" );
+
+	PyObject_CallFunctionObjArgs( py_data , NULL );
+	Py_DECREF( py_data );
 	PyObject_CallFunctionObjArgs( py_compile , NULL );
 	Py_DECREF( py_compile );
 
@@ -127,14 +135,14 @@ int main ( int argc , char** argv )
 	/* Main loop.                                                                                     */
 	/**************************************************************************************************/
 	int received_bytes = 0; // counts total received bytes per message
-	while ( 1 )
+	while ( true )
 	{
 		/**************************************************************************************************/
 		/* Wait for global model and read it.                                                             */		
+		/**************************************************************************************************/
 		LOGGING( Logger::Level::message_info , "Waiting for data." );
 		
 		// read socket
-		static unsigned char buffer[SERVER_TO_CLIENT_BUF_SIZE];
 		rv = recv( socket_fd , buffer , SERVER_TO_CLIENT_BUF_SIZE , 0 );
 
 		/**************************************************************************************************/
@@ -188,11 +196,11 @@ int main ( int argc , char** argv )
 		if constexpr ( std::endian::native == std::endian::big ) // requires c++20, dangerous !!!!
 			server_to_client_msg_big_endianess( received_message ); // maybe move this to the server side if needed
 
-		LOGGING( Logger::Level::fl_info , RED << "		GLOBAL EPOCH    =   " << received_message.epoch << RESET );
+		LOGGING( Logger::Level::warning , RED << "		GLOBAL EPOCH    =   " << received_message.epoch << RESET );
 
 		if( received_message.flags == Server_to_client_msg::flag::final_epoch )
 		{
-			PyObject_CallFunctionObjArgs( py_eval , py_array_input , py_array_output , py_flags , NULL );
+			PyObject_CallFunctionObjArgs( py_eval , py_array_input , NULL , NULL , NULL );
 			break;
 		}
 		/**************************************************************************************************/
