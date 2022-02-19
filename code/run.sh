@@ -4,7 +4,7 @@
 
 make clean
 make all
-
+echo ""
 # need it to supress the "UNC over CMD not supported" error
 cd /mnt/c/Users/MSI
 

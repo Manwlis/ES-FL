@@ -46,6 +46,8 @@ struct Polled_fds_info
 	size_t received_bytes; // counts how many data has been received this epoch
 	size_t sended_bytes; // counts how many data has been send this epoch
 	bool working;	// shows that the client is working
+
+	// TODO: constructor, destructor that create clean received_message
 };
 
 
@@ -59,6 +61,8 @@ enum class Accept_connection_rv
 	success = 1
 };
 Accept_connection_rv accept_connection( int listening_socket_fd , int num_polled_fds , pollfd polled_fds[] , Polled_fds_info polled_fds_info[] );
+
+void remove_fd( pollfd& polled_fd , Polled_fds_info& polled_fd_info , bool& compress_array );
 
 /**
  * @brief Return values for the Write_socket_rv function. Error, finished writing, success.
@@ -89,12 +93,9 @@ void accumulate_variables( float local_variables[VARIABLES_NUM] , float accumula
 void create_average_model( float accumulated_variables[VARIABLES_NUM] , int num_models , float global_model[VARIABLES_NUM] );
 
 bool next_epoch_ready( int connected_clients_num , int working_clients_num , int completed_clients_num );
-
 int client_selection( int connected_clients_num , pollfd fds[] , Polled_fds_info fds_info[] , int epoch );
-
 bool shutdown_ready( int epoch , unsigned int connected_clients_num );
 
-void remove_fd( pollfd& polled_fd , Polled_fds_info& polled_fd_info , bool& compress_array );
 
 // Global timer that starts ticking at program start.
 Timer g_timer;
@@ -424,18 +425,26 @@ int main( int argc , char** argv )
 			/**************************************************************************************************/
 			// next epoch
 			current_epoch++;
+			announcement_msg.epoch = current_epoch;
 
-			announcement_msg.flags = Server_to_client_msg::flag::normal_op;
 			// check if clients should consider pretrained model
 			if ( current_epoch == 1 && pretrained_model_flag == false )
 				announcement_msg.flags = Server_to_client_msg::flag::no_pretrained_model; // sended variables are random and clients should consider their own initial values
 			// check shutdown requirements
-			else if ( current_epoch == FINAL_EPOCH ){
+			else if ( current_epoch == FINAL_EPOCH )
+			{
 				announcement_msg.flags = Server_to_client_msg::flag::final_epoch; // training ended and clients are receiving the final model
-				LOGGING(Logger::Level::warning , "Reached final epoch." );
+				LOGGING( Logger::Level::warning , "Reached final epoch." );
 			}
+			else if ( current_epoch % (NUM_EPOCHS/10) == 0 )
+			{
+				announcement_msg.flags = Server_to_client_msg::flag::evaluate;
+				LOGGING( Logger::Level::warning , "Evaluate order." );
+			}
+			else
+				announcement_msg.flags = Server_to_client_msg::flag::normal_op;
+
 			// create new global model
-			announcement_msg.epoch = current_epoch;
 			create_average_model( accumulated_variables , completed_clients_num , announcement_msg.variables );
 			
 			/**************************************************************************************************/
@@ -527,7 +536,7 @@ Accept_connection_rv accept_connection( int listening_socket_fd , int num_polled
 /**
  * @brief Shutdown the connection of the fd, clean up its info and mark it for removal
  * 
- * @param pollfd& of the fd to be removed
+ * @param pollfd& poll() wrapper of the fd to be removed
  * @param Polled_fds_info& of the fd to be removed
  * @param bool& compress array flag 
  */
@@ -548,7 +557,7 @@ void remove_fd( pollfd& polled_fd , Polled_fds_info& polled_fd_info , bool& comp
 /**
  * @brief 
  * 
- * @param pollfd& of the fd to be read
+ * @param pollfd& poll() wrapper of the fd to be read
  * @param Polled_fds_info& of the fd to be removed
  * @param Server_to_client_msg message holding global model
  * @param int how many bytes to read 
@@ -597,7 +606,7 @@ Read_socket_rv read_socket( int fd , Polled_fds_info& fd_info , size_t bytes_to_
 	/**************************************************************************************************/
 	/* Read socket. Message may be incomplete, track size of received data.                           */
 	/**************************************************************************************************/
-	static unsigned char buffer[CLIENT_TO_SERVER_BUF_SIZE];
+	static unsigned char buffer[CLIENT_TO_SERVER_BUF_SIZE]; // TODO: maybe if max recv window < CLIENT_TO_SERVER_BUF_SIZE, choose max recv window 
 	ssize_t rv = recv( fd , buffer , bytes_to_read , 0 );
 
 	/**************************************************************************************************/

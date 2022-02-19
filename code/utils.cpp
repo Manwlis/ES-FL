@@ -121,8 +121,8 @@ Logger::Logger( std::ostream& target ) : output_sink( target ) {}
  */
 void Logger::operator()( Level level , const std::string& description, const char* function , const char* file , int line ) const
 {
-	// if ( static_cast<int>(level) < static_cast<int>(Level::warning) ) TODO: 
-	// 	return;
+	if ( static_cast<int>(level) < static_cast<int>(Level::warning) ) // TODO: 
+		return;
 
 	output_sink
 		<< "[" << static_cast<int>(level) <<  "]"

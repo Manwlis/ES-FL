@@ -28,7 +28,8 @@ struct Server_to_client_msg
 	{
 		normal_op,
 		no_pretrained_model,
-		final_epoch
+		final_epoch,
+		evaluate
 	};
 
 	int flags;

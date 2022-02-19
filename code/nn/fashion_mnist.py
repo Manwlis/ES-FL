@@ -7,7 +7,9 @@
 #######################################################################################################################
 # Define dependecies and set up environment.                                                                          #
 #######################################################################################################################
+from cgi import test
 import os
+from tabnanny import verbose
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' # suppress tensorflow warnings
 
 import sys
@@ -25,8 +27,12 @@ from models import get_model
 model = None
 train_dataset = None
 test_dataset = None
+train_shard = None
+train_shard_unshafled = None
 num_train_examples = None
 num_test_examples = None
+
+accuracy_list = []
 
 #######################################################################################################################
 # Import and pre-process training data .                                                                              #
@@ -38,6 +44,8 @@ def setup_data():
 	global test_dataset
 	global num_train_examples
 	global num_test_examples
+	global train_shard
+	global train_shard_unshafled
 
 	#data import
 	dataset , metadata = tfds.load( 'fashion_mnist' , as_supervised=True , with_info=True )
@@ -46,11 +54,11 @@ def setup_data():
 
 	# standalone mode, used to test nn with all the data locally.
 	if( sys.argv[1] == "standalone" ):
-		pass
+		train_shard_unshafled = train_dataset
 	#federated learning
 	# splits data evenly between clients
 	elif( sys.argv[1] == "IID" ):
-		train_dataset = train_dataset.shard( num_shards=int(sys.argv[2]) , index=int(sys.argv[3]) ) # shard is deterministic
+		train_shard_unshafled = train_dataset.shard( num_shards=int(sys.argv[2]) , index=int(sys.argv[3]) ) # shard is deterministic
 	# split data by label, extreme case of non IID data. Need Num_clients MOD 5 = 0 to use all data
 	elif( sys.argv[1] == "nonIID" ):
 		@tf.function
@@ -70,31 +78,49 @@ def setup_data():
 		#shard the filtered dataset TODO: this
 	else:
 		sys.exit( "Specify mode. standalone/IID/nonIID" )
-	
 	print( sys.argv[1] , " mode." )
 
-	num_train_examples = train_dataset.reduce( 0 , lambda x , _ : x + 1 ).numpy() #slow
+	num_train_examples = train_shard_unshafled.reduce( 0 , lambda x , _ : x + 1 ).numpy() #slow
 	num_test_examples = tf.data.experimental.cardinality( test_dataset ).numpy() # doesn't work on filtered datasets
 
 	print( "Number of train examples: " , num_train_examples , "	Number of test examples: " , num_test_examples )
 
 	# pre-process data
+	# The map function applies the normalize function to each element in the train and test datasets
 	def normalize( images , labels ):
 		images = tf.cast( images , tf.float32 )
 		images /= 255
 		return images, labels
 
-	# The map function applies the normalize function to each element in the train and test datasets
-	train_dataset =  train_dataset.map( normalize )
-	test_dataset  =  test_dataset.map( normalize )
+	train_shard_unshafled = train_shard_unshafled.map( normalize , num_parallel_calls=tf.data.AUTOTUNE , deterministic=True )
+	test_dataset  =  test_dataset.map( normalize , num_parallel_calls=tf.data.AUTOTUNE )
 
 	# batch, prefetch
-	train_dataset = train_dataset.cache().repeat().shuffle( num_train_examples ).batch( current_module.BATCH_SIZE )
-	train_dataset = train_dataset.prefetch(1)
+	train_shard_unshafled = train_shard_unshafled.cache()
+	train_shard = train_shard_unshafled.shuffle( num_train_examples )
+	train_shard = train_shard.batch( current_module.BATCH_SIZE )
+	train_shard = train_shard.prefetch( tf.data.AUTOTUNE )
+	train_shard = train_shard.repeat()
 	
-	test_dataset = train_dataset.cache().repeat().shuffle( num_test_examples ).batch( current_module.BATCH_SIZE )
-	test_dataset = train_dataset.prefetch(1)
+	test_dataset = test_dataset.cache().shuffle( num_test_examples ).batch( current_module.BATCH_SIZE )
+	test_dataset = test_dataset.prefetch( tf.data.AUTOTUNE ).repeat()
 	#test_dataset = test_dataset.cache().batch( current_module.BATCH_SIZE )
+
+	return num_train_examples
+
+
+#######################################################################################################################
+#                                                                                  #
+#######################################################################################################################
+def shuffle_data():
+	global num_train_examples
+	global train_shard
+	global train_shard_unshafled
+
+	train_shard = train_shard_unshafled.shuffle( num_train_examples )
+	train_shard = train_shard.batch( current_module.BATCH_SIZE )
+	train_shard = train_shard.prefetch( tf.data.AUTOTUNE )
+	train_shard = train_shard.repeat()
 
 
 #######################################################################################################################
@@ -127,6 +153,7 @@ def compile_nn():
 def train_nn( input_variables , output_variables , flags ):
 	global current_module
 	global model
+	global train_shard
 
 	# get variables
 	if flags != current_module.no_pretrained_model_flag:
@@ -142,7 +169,7 @@ def train_nn( input_variables , output_variables , flags ):
 	# print( "input			" , input_variables[803239] )
 	# print( "variable prin fit	" , model.trainable_variables[29].numpy()[9] )
 	# train
-	model.fit( train_dataset , batch_size=current_module.BATCH_SIZE , epochs=current_module.LOCAL_EPOCHS , steps_per_epoch=current_module.STEPS_PER_EPOCH )
+	history = model.fit( train_shard , verbose=0 , batch_size=current_module.BATCH_SIZE , epochs=current_module.LOCAL_EPOCHS , steps_per_epoch=current_module.STEPS_PER_EPOCH )
 
 	# print( "variable meta fit	" , model.trainable_variables[29].numpy()[9] )
 	# save variables
@@ -152,7 +179,9 @@ def train_nn( input_variables , output_variables , flags ):
 		pos += tr_var.numpy().size
 
 	# print( "output			" , output_variables[803239] )
-	
+
+	print( "loss:" , history.history.get("loss")[0] , "	accuracy:" , history.history.get("accuracy")[0]  )
+
 
 #######################################################################################################################
 # Evaluates nn from input variables.                                                                                  #
@@ -162,6 +191,7 @@ def evaluate_nn( input_variables , test_loss, test_accuracy ):
 	global model
 	global test_dataset
 	global num_test_examples
+	global accuracy_list
 
 	pos = 0
 	for tr_var in model.trainable_variables:
@@ -173,22 +203,37 @@ def evaluate_nn( input_variables , test_loss, test_accuracy ):
 	# print( "input			" , input_variables[803239] )
 	# print( "variable prin evaluate	" , model.trainable_variables[29].numpy()[9] )
 
-	loss , accuracy = model.evaluate( test_dataset , batch_size=current_module.BATCH_SIZE , steps=current_module.STEPS_PER_EPOCH )
+	loss , accuracy = model.evaluate( test_dataset , verbose = 0 , batch_size=current_module.BATCH_SIZE , steps=num_test_examples/current_module.BATCH_SIZE )
 	print( 'Accuracy on test dataset:' , accuracy )
+	accuracy_list.append( accuracy )
+	print( accuracy_list )
 
 
 #######################################################################################################################
 # Standalone mode. Used to test model locally with all data.                                                          #
 #######################################################################################################################
 if ( sys.argv[1] == "standalone" ):
-	current_module.BATCH_SIZE = 30
-	current_module.LOCAL_EPOCHS = 1
-	current_module.PY_MODEL = "cnn_model"
+	current_module.BATCH_SIZE = 10
+	current_module.LOCAL_EPOCHS = 2
+	current_module.MODEL = "inception"
 
 	setup_data()
 	compile_nn()
 
-	model.fit( train_dataset , batch_size=current_module.BATCH_SIZE , steps_per_epoch=num_train_examples/current_module.BATCH_SIZE , epochs=current_module.LOCAL_EPOCHS )
+	num_train_examples = 60000
+	num_test_examples = 10000
+
+	model.fit( train_shard , batch_size=current_module.BATCH_SIZE , steps_per_epoch=num_train_examples/current_module.BATCH_SIZE , epochs=current_module.LOCAL_EPOCHS )
+
+	dataset , metadata = tfds.load( 'fashion_mnist' , as_supervised=True , with_info=True )
+	test_dataset = dataset['test']
+
+	def normalize2( images , labels ):
+		images = tf.cast( images , tf.float32 )
+		images /= 255
+		return images, labels
+	test_dataset  =  test_dataset.map( normalize2 )
+	test_dataset = test_dataset.cache().batch( current_module.BATCH_SIZE )
 
 	loss , accuracy = model.evaluate( test_dataset , batch_size=current_module.BATCH_SIZE )
 	print( 'Accuracy on test dataset:' , accuracy )

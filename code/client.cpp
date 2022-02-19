@@ -7,11 +7,6 @@
  * 
  */
 
-#define PY_SSIZE_T_CLEAN
-#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION // suppress numpy version warnings
-#include <Python.h>
-#include </home/epetrakos/.local/lib/python3.8/site-packages/numpy/core/include/numpy/arrayobject.h>
-
 #include <iostream>			/* cout */
 #include <bit>				/* endian */
 
@@ -25,6 +20,7 @@
 #include "utils.hpp"		/* error, Timer, Logging */
 #include "messages.hpp"		/* msg structs, change message endianess */
 #include "fake_data.hpp"	/* check_fake_server_data, create_fake_client_data */
+#include "computation_unit.hpp"
 
 
 struct sockaddr_in find_server( const char* server_name , const char* server_port );
@@ -44,6 +40,9 @@ int main ( int argc , char** argv )
 	static Client_to_server_msg send_message;
 	static unsigned char buffer[SERVER_TO_CLIENT_BUF_SIZE];
 
+
+	const unsigned long examples_per_global_epoch = BATCH_SIZE * LOCAL_EPOCHS * STEPS_PER_EPOCH;
+	unsigned long examples_used = 0;
 	/**************************************************************************************************/
 	/* Set up a socket to communicate with server and connect.                                        */
 	/**************************************************************************************************/
@@ -67,69 +66,7 @@ int main ( int argc , char** argv )
 	/**************************************************************************************************/
 	/* Set up python environment, neural network and numpy wrappers.                                  */
 	/**************************************************************************************************/
-	PyObject* py_module_name;
-	PyObject* py_module;
-	PyObject* py_data;
-	PyObject* py_compile;
-	PyObject* py_train;
-	PyObject* py_eval;
-	PyLongObject* py_flags = nullptr; // nullptr to supress warning 'may be used uninitialized in dealloc()'
-
-	// Initialize python interpeter
-	Py_SetProgramName( Py_DecodeLocale( argv[0] , nullptr ) );
-	Py_Initialize();
-
-	// Pass program arguments to interpeter
-	wchar_t** wchar_argv = (wchar_t**) PyMem_Malloc( sizeof(wchar_t*)* argc );
-	for ( int i = 0 ; i < argc ; i++ )
-		wchar_argv[i] = Py_DecodeLocale( argv[i] , nullptr );
-	PySys_SetArgv( argc , wchar_argv );
-	PyMem_FREE( wchar_argv );
-
-	// look in nn directory for importing modules
-	PyObject* sys = PyImport_ImportModule( "sys" );
-	PyObject* path = PyObject_GetAttrString( sys , "path" );
-	PyList_Append( path , PyUnicode_FromString( "./nn" ) );
-	Py_DECREF( sys );
-	Py_DECREF( path );
-
-	// get module
-	LOGGING( Logger::Level::initialization , "Getting file." );
-
-	py_module_name = PyUnicode_FromString( py_script );
-	py_module = PyImport_Import( py_module_name ); // this executes code in module outside functions!
-	Py_DECREF( py_module_name );
-
-	LOGGING( Logger::Level::initialization , "Passing constants." );
-	// pass C macros, constants to module 
-	PyModule_AddIntMacro( py_module , LOCAL_EPOCHS );
-	PyModule_AddIntMacro( py_module , STEPS_PER_EPOCH );
-	PyModule_AddIntMacro( py_module , BATCH_SIZE );
-	PyModule_AddStringMacro( py_module , MODEL );
-	PyModule_AddIntConstant(py_module, "no_pretrained_model_flag", Server_to_client_msg::flag::no_pretrained_model );
-
-	// get functions
-	LOGGING( Logger::Level::initialization , "Getting functions." );
-
-	py_data = PyObject_GetAttrString( py_module , py_data_function );
-	py_compile = PyObject_GetAttrString( py_module , py_compile_function );
-	py_train = PyObject_GetAttrString( py_module , py_train_function );
-	py_eval = PyObject_GetAttrString( py_module , py_eval_function );
-	Py_DECREF( py_module ); // be carefull with this if need more functions
-
-	// set up data and compile model
-	LOGGING( Logger::Level::initialization , "Setting up data and neural network" );
-
-	PyObject_CallFunctionObjArgs( py_data , NULL );
-	Py_DECREF( py_data );
-	PyObject_CallFunctionObjArgs( py_compile , NULL );
-	Py_DECREF( py_compile );
-
-	// create numpy array metadata around C arrays to pass them to python code
-	_import_array();
-	npy_intp dims[1] = {VARIABLES_NUM}; // dimension/size of numpy arrays. Easier to pass an 1-D array to python and reshape data there.
-	PyObject* py_array_input = PyArray_SimpleNewFromData( 1 , dims , NPY_FLOAT , received_message.variables );
-	PyObject* py_array_output = PyArray_SimpleNewFromData( 1 , dims , NPY_FLOAT , send_message.variables );
+	Python_with_TF python_with_TF( received_message , send_message , argc , argv );
 
 	/**************************************************************************************************/
 	/* Main loop.                                                                                     */
@@ -198,17 +135,31 @@ int main ( int argc , char** argv )
 
 		LOGGING( Logger::Level::warning , RED << "		GLOBAL EPOCH    =   " << received_message.epoch << RESET );
 
-		if( received_message.flags == Server_to_client_msg::flag::final_epoch )
+		/**************************************************************************************************/
+		/* Evaluate model if server demands it.                                                           */
+		/**************************************************************************************************/
+		if ( received_message.flags == Server_to_client_msg::flag::final_epoch )
 		{
-			PyObject_CallFunctionObjArgs( py_eval , py_array_input , NULL , NULL , NULL );
+			python_with_TF.evaluate();
 			break;
 		}
+		else if ( received_message.flags == Server_to_client_msg::flag::evaluate )
+			python_with_TF.evaluate();
+
 		/**************************************************************************************************/
 		/* Calculate variables.                                                                           */
 		/**************************************************************************************************/
 		// call python function
-		py_flags = (PyLongObject*) PyLong_FromLong( (long) received_message.flags );
-		PyObject_CallFunctionObjArgs( py_train , py_array_input , py_array_output , py_flags , NULL );
+		python_with_TF.train();
+
+		examples_used += examples_per_global_epoch;
+
+		if( examples_used == python_with_TF.m_num_examples )
+		{
+			LOGGING( Logger::Level::warning , "Reshufling. " << examples_used << "	" << python_with_TF.m_num_examples );
+			python_with_TF.shuffle_data();
+			examples_used = 0;
+		}
 
 		// calculate deltas
 		#if MSG_VARIABLE_MODE == DELTAS
@@ -242,15 +193,8 @@ int main ( int argc , char** argv )
 	/**************************************************************************************************/
 	/* Clean up and exit.                                                                             */
 	/**************************************************************************************************/
-
 	// free up remaining python variables
-	Py_DECREF( py_train );
-	Py_DECREF( py_eval );
-	Py_DECREF( py_array_input );
-	Py_DECREF( py_array_output );
-	Py_XDECREF( py_flags ); // py_flags gets initialised in main loop. If main loop ends early, it may be NULL.
-
-	Py_Finalize();
+	python_with_TF.~Python_with_TF();
 
 	// close socket properly
 	shutdown( socket_fd , SHUT_RDWR );
