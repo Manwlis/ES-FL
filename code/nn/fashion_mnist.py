@@ -169,7 +169,7 @@ def train_nn( input_variables , output_variables , flags ):
 	# print( "input			" , input_variables[803239] )
 	# print( "variable prin fit	" , model.trainable_variables[29].numpy()[9] )
 	# train
-	history = model.fit( train_shard , verbose=0 , batch_size=current_module.BATCH_SIZE , epochs=current_module.LOCAL_EPOCHS , steps_per_epoch=current_module.STEPS_PER_EPOCH )
+	history = model.fit( train_shard , verbose=1 , batch_size=current_module.BATCH_SIZE , epochs=current_module.LOCAL_EPOCHS , steps_per_epoch=current_module.STEPS_PER_EPOCH )
 
 	# print( "variable meta fit	" , model.trainable_variables[29].numpy()[9] )
 	# save variables
@@ -180,13 +180,13 @@ def train_nn( input_variables , output_variables , flags ):
 
 	# print( "output			" , output_variables[803239] )
 
-	print( "loss:" , history.history.get("loss")[0] , "	accuracy:" , history.history.get("accuracy")[0]  )
+	# print( "loss:" , history.history.get("loss")[0] , "	accuracy:" , history.history.get("accuracy")[0]  )
 
 
 #######################################################################################################################
 # Evaluates nn from input variables.                                                                                  #
 #######################################################################################################################
-def evaluate_nn( input_variables , test_loss, test_accuracy ):
+def evaluate_nn( input_variables , epoch , test_loss, test_accuracy ):
 	global current_module
 	global model
 	global test_dataset
@@ -203,9 +203,9 @@ def evaluate_nn( input_variables , test_loss, test_accuracy ):
 	# print( "input			" , input_variables[803239] )
 	# print( "variable prin evaluate	" , model.trainable_variables[29].numpy()[9] )
 
-	loss , accuracy = model.evaluate( test_dataset , verbose = 0 , batch_size=current_module.BATCH_SIZE , steps=num_test_examples/current_module.BATCH_SIZE )
+	loss , accuracy = model.evaluate( test_dataset , verbose = 1 , batch_size=current_module.BATCH_SIZE , steps=num_test_examples/current_module.BATCH_SIZE )
 	print( 'Accuracy on test dataset:' , accuracy )
-	accuracy_list.append( accuracy )
+	accuracy_list.append( ( epoch , accuracy ) )
 	print( accuracy_list )
 
 
@@ -213,17 +213,12 @@ def evaluate_nn( input_variables , test_loss, test_accuracy ):
 # Standalone mode. Used to test model locally with all data.                                                          #
 #######################################################################################################################
 if ( sys.argv[1] == "standalone" ):
-	current_module.BATCH_SIZE = 10
-	current_module.LOCAL_EPOCHS = 2
-	current_module.MODEL = "inception"
+	current_module.BATCH_SIZE = 20
+	current_module.LOCAL_EPOCHS = 1
+	current_module.MODEL = "LeNet_5"
 
 	setup_data()
 	compile_nn()
-
-	num_train_examples = 60000
-	num_test_examples = 10000
-
-	model.fit( train_shard , batch_size=current_module.BATCH_SIZE , steps_per_epoch=num_train_examples/current_module.BATCH_SIZE , epochs=current_module.LOCAL_EPOCHS )
 
 	dataset , metadata = tfds.load( 'fashion_mnist' , as_supervised=True , with_info=True )
 	test_dataset = dataset['test']
@@ -235,5 +230,13 @@ if ( sys.argv[1] == "standalone" ):
 	test_dataset  =  test_dataset.map( normalize2 )
 	test_dataset = test_dataset.cache().batch( current_module.BATCH_SIZE )
 
-	loss , accuracy = model.evaluate( test_dataset , batch_size=current_module.BATCH_SIZE )
-	print( 'Accuracy on test dataset:' , accuracy )
+	num_train_examples = 60000
+	num_test_examples = 10000
+
+	for x in range(20):
+		model.fit( train_shard , batch_size=current_module.BATCH_SIZE , steps_per_epoch=num_train_examples/current_module.BATCH_SIZE , epochs=current_module.LOCAL_EPOCHS )
+
+		shuffle_data()
+
+		loss , accuracy = model.evaluate( test_dataset , batch_size=current_module.BATCH_SIZE )
+		print( 'Accuracy on test dataset:' , accuracy )

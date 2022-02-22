@@ -93,10 +93,18 @@ void Python_with_TF::evaluate()
 {
 	LOGGING( Logger::Level::fl_info , "Evaluating model" );
 
-	PyLongObject* loss = (PyLongObject*) PyLong_FromLong( (long) m_output_message.loss );
-	PyLongObject* accuracy = (PyLongObject*) PyLong_FromLong( (long) m_output_message.loss );
+	// pass epoch for logging
+	PyLongObject* py_epoch = (PyLongObject*) PyLong_FromLong( (long) m_input_message.epoch );
 
-	PyObject_CallFunctionObjArgs( m_py_eval , m_py_array_input , loss , accuracy , NULL );
+	// get loss and accuracy
+	PyLongObject* py_loss = (PyLongObject*) PyLong_FromLong( (long) m_output_message.loss );
+	PyLongObject* py_accuracy = (PyLongObject*) PyLong_FromLong( (long) m_output_message.loss );
+
+	PyObject_CallFunctionObjArgs( m_py_eval , m_py_array_input , py_epoch , py_loss , py_accuracy , NULL );
+
+	Py_DECREF( py_epoch );
+	Py_DECREF( py_loss );
+	Py_DECREF( py_accuracy );
 }
 
 void Python_with_TF::shuffle_data() const

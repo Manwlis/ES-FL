@@ -436,7 +436,7 @@ int main( int argc , char** argv )
 				announcement_msg.flags = Server_to_client_msg::flag::final_epoch; // training ended and clients are receiving the final model
 				LOGGING( Logger::Level::warning , "Reached final epoch." );
 			}
-			else if ( current_epoch % (NUM_EPOCHS/10) == 0 )
+			else if ( (current_epoch-1) % (NUM_EPOCHS/20) == 0 ) // TODO: Make this cleaner
 			{
 				announcement_msg.flags = Server_to_client_msg::flag::evaluate;
 				LOGGING( Logger::Level::warning , "Evaluate order." );
