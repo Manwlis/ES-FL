@@ -141,6 +141,7 @@ int main ( int argc , char** argv )
 		if ( received_message.flags == Server_to_client_msg::flag::final_epoch )
 		{
 			python_with_TF.evaluate();
+			python_with_TF.print_accuracy_history();
 			break;
 		}
 		else if ( received_message.flags == Server_to_client_msg::flag::evaluate )

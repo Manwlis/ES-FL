@@ -1,6 +1,6 @@
 #include "computation_unit.hpp"
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION // suppress numpy version warnings
-#include </home/epetrakos/.local/lib/python3.8/site-packages/numpy/core/include/numpy/arrayobject.h>
+#include </home/epetrakos/.local/lib/python3.10/site-packages/numpy/core/include/numpy/arrayobject.h>
 
 Computation_unit::Computation_unit( Server_to_client_msg& input_message , Client_to_server_msg& output_message )
 	: m_input_message( input_message ) , m_output_message( output_message )
@@ -34,6 +34,11 @@ Python_with_TF::Python_with_TF( Server_to_client_msg& input_message , Client_to_
 	LOGGING( Logger::Level::initialization , "Getting file." );
 	PyObject* py_module_name = PyUnicode_FromString( py_script );
 	PyObject* py_module = PyImport_Import( py_module_name ); // this executes code in module outside functions!
+	if ( py_module == nullptr )
+	{
+		LOGGING( Logger::Level::error , "Importing python file failed." );
+		exit( EXIT_FAILURE );
+	}
 	Py_DECREF( py_module_name );
 
 	// pass C macros and constants to module 
@@ -41,6 +46,10 @@ Python_with_TF::Python_with_TF( Server_to_client_msg& input_message , Client_to_
 	PyModule_AddIntMacro( py_module , LOCAL_EPOCHS );
 	PyModule_AddIntMacro( py_module , STEPS_PER_EPOCH );
 	PyModule_AddIntMacro( py_module , BATCH_SIZE );
+
+	PyModule_AddIntMacro( py_module , LEARNING_RATE_DECAY_FLAG );
+	PyModule_AddStringMacro( py_module , LEARNING_RATE_DECAY );
+
 	PyModule_AddStringMacro( py_module , MODEL );
 	PyModule_AddIntConstant( py_module , "no_pretrained_model_flag" , Server_to_client_msg::flag::no_pretrained_model );
 
@@ -53,6 +62,7 @@ Python_with_TF::Python_with_TF( Server_to_client_msg& input_message , Client_to_
 	m_py_train = PyObject_GetAttrString( py_module , py_train_function );
 	m_py_eval = PyObject_GetAttrString( py_module , py_eval_function );
 	m_py_shuffle_data = PyObject_GetAttrString( py_module , py_shuffle_data_function );
+	m_py_print_accuracy_history = PyObject_GetAttrString( py_module , "print_accuracy_history" );
 
 	Py_DECREF( py_module );
 
@@ -75,6 +85,7 @@ Python_with_TF::~Python_with_TF( )
 	Py_DECREF( m_py_train );
 	Py_DECREF( m_py_eval );
 	Py_DECREF( m_py_shuffle_data );
+	Py_DECREF( m_py_print_accuracy_history );
 	Py_DECREF( m_py_array_input );
 	Py_DECREF( m_py_array_output );
 	Py_XDECREF( m_py_flags ); // py_flags gets initialised in train(). If train() never gets called, it may be NULL.
@@ -87,6 +98,8 @@ void Python_with_TF::train()
 	// call python function
 	m_py_flags = (PyLongObject*) PyLong_FromLong( (long) m_input_message.flags );
 	PyObject_CallFunctionObjArgs( m_py_train , m_py_array_input , m_py_array_output , m_py_flags , NULL );
+
+	PyErr_Print();
 }
 
 void Python_with_TF::evaluate()
@@ -110,4 +123,9 @@ void Python_with_TF::evaluate()
 void Python_with_TF::shuffle_data() const
 {
 	PyObject_CallFunctionObjArgs( m_py_shuffle_data , NULL );
+}
+
+void Python_with_TF::print_accuracy_history() const
+{
+	PyObject_CallFunctionObjArgs( m_py_print_accuracy_history , NULL );
 }

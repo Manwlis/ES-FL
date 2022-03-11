@@ -46,8 +46,6 @@ struct Polled_fds_info
 	size_t received_bytes; // counts how many data has been received this epoch
 	size_t sended_bytes; // counts how many data has been send this epoch
 	bool working;	// shows that the client is working
-
-	// TODO: constructor, destructor that create clean received_message
 };
 
 
@@ -97,9 +95,19 @@ int client_selection( int connected_clients_num , pollfd fds[] , Polled_fds_info
 bool shutdown_ready( int epoch , unsigned int connected_clients_num );
 
 
+std::ofstream myfile;
+std::ofstream& pick_sink()
+{
+  	myfile.open ("IO_files/server_out.txt");
+	//return myfile;
+	return myfile;
+}
+
 // Global timer that starts ticking at program start.
 Timer g_timer;
+//Logger g_logger( pick_sink() );
 Logger g_logger( std::cout );
+
 
 int main( int argc , char** argv )
 {
@@ -161,7 +169,7 @@ int main( int argc , char** argv )
 	server_addr.sin_family = AF_INET;					// IPv4 address family
 	server_addr.sin_addr.s_addr = htonl( INADDR_ANY );	// fill with current host IP address
 	server_addr.sin_port = htons( server_port );		// convert port to network byte order
-	
+
 	// Bind socket
 	rv = bind( listening_socket_fd , (const sockaddr*) &server_addr , sizeof(server_addr) );
 	if ( rv < 0 )
@@ -273,7 +281,7 @@ int main( int argc , char** argv )
 			/**************************************************************************************************/
 			/* Non listening socket fd raised Unexpected event.                                               */
 			/**************************************************************************************************/
-			else if ( polled_fds[i].revents & ( POLLNVAL|POLLERR|POLLHUP ) ) // TODO: think about checking errors and divert to proper reaction instead of always closing socket
+			else if ( polled_fds[i].revents & ( POLLNVAL|POLLERR|POLLHUP ) )
 			{
 				LOGGING( Logger::Level::error , 
 					"Revent: " << polled_fds[i].revents << " on connention with " << inet_ntoa( peer_addr.sin_addr ) << " at port " << ntohs( peer_addr.sin_port ) );
@@ -399,7 +407,7 @@ int main( int argc , char** argv )
 				if ( polled_fds[i].fd == -1 )
 				{
 					for ( int j = i ; j < num_polled_fds - 1 ; j++ )
-					{
+					{	// j is pos of removed fd, j+1 is pos of next fd
 						// squeeze the fd array
 						polled_fds[j].fd = polled_fds[j+1].fd;
 						polled_fds[j].events = polled_fds[j+1].events;
@@ -409,19 +417,25 @@ int main( int argc , char** argv )
 						polled_fds_info[j].received_bytes = polled_fds_info[j+1].received_bytes;
 						polled_fds_info[j].sended_bytes = polled_fds_info[j+1].sended_bytes;
 						polled_fds_info[j].received_message = polled_fds_info[j+1].received_message;
+						polled_fds_info[j].working = polled_fds_info[j+1].working;
 					}
 					i--;
 					num_polled_fds--;
 				}
 			}
 		}
+		// for ( int i = 0 ; i < FD_NUM_MAX ; i++ ) // shows what the structures hold
+		// 	std::cout << polled_fds[i].fd << " " << polled_fds[i].events << " " << polled_fds[i].revents << " " 
+		// 		<< polled_fds_info[i].received_bytes << " " <<  polled_fds_info[i].sended_bytes <<  " " <<  polled_fds_info[i].received_message <<  " " <<  polled_fds_info[i].working 
+		// 		<< std::endl;
+
 		/**************************************************************************************************/
 		/* Check next epoch requirements.                                                                 */
 		/**************************************************************************************************/
 		if ( next_epoch_ready( connected_clients_num , working_clients_num , completed_clients_num ) )
 		{
 			/**************************************************************************************************/
-			/* Create new global model.                                                                       */
+			/* Create new global model and its metadata.                                                      */
 			/**************************************************************************************************/
 			// next epoch
 			current_epoch++;
@@ -436,7 +450,7 @@ int main( int argc , char** argv )
 				announcement_msg.flags = Server_to_client_msg::flag::final_epoch; // training ended and clients are receiving the final model
 				LOGGING( Logger::Level::warning , "Reached final epoch." );
 			}
-			else if ( (current_epoch-1) % (NUM_EPOCHS/20) == 0 ) // TODO: Make this cleaner
+			else if ( (current_epoch-1) % EVALUATION_INTERVAL == 0 ) // send evaluation order by changing to the appropriate flag
 			{
 				announcement_msg.flags = Server_to_client_msg::flag::evaluate;
 				LOGGING( Logger::Level::warning , "Evaluate order." );
@@ -552,7 +566,7 @@ void remove_fd( pollfd& polled_fd , Polled_fds_info& polled_fd_info , bool& comp
 
 	// clear client info
 	delete polled_fd_info.received_message;
-}// TODO: test this properly
+}
 
 /**
  * @brief 
@@ -606,7 +620,7 @@ Read_socket_rv read_socket( int fd , Polled_fds_info& fd_info , size_t bytes_to_
 	/**************************************************************************************************/
 	/* Read socket. Message may be incomplete, track size of received data.                           */
 	/**************************************************************************************************/
-	static unsigned char buffer[CLIENT_TO_SERVER_BUF_SIZE]; // TODO: maybe if max recv window < CLIENT_TO_SERVER_BUF_SIZE, choose max recv window 
+	static unsigned char buffer[CLIENT_TO_SERVER_BUF_SIZE];
 	ssize_t rv = recv( fd , buffer , bytes_to_read , 0 );
 
 	/**************************************************************************************************/
@@ -719,20 +733,21 @@ void create_average_model( float accumulated_variables[VARIABLES_NUM] , int num_
  */
 bool next_epoch_ready( int connected_clients_num , int working_clients_num , int completed_clients_num )
 {
-	LOGGING( Logger::Level::fl_info ,//TODO: something
-		"						" << "	connected = " << connected_clients_num 
-		<< "	working  = " << working_clients_num << "	completed = " << completed_clients_num );
+	LOGGING( Logger::Level::message_info , "						"
+		<< "	connected = " << connected_clients_num
+		<< "	working  = " << working_clients_num
+		<< "	completed = " << completed_clients_num );
 
 	// not enough connected client, no point to start a new epoch
 	if( connected_clients_num < MIN_CLIENTS_PER_EPOCH )
 		return false;
 
-	// // no working client, need for a new epoch TODO: maybe create a counter for those who are waiting the global model and call them waiting for work
+	// no working client, need for a new epoch
 	if( working_clients_num == 0 )
 		return true;
 
-	// all completed
-	if( completed_clients_num == connected_clients_num )
+	// enough completed
+	if( completed_clients_num == MIN_CLIENTS_PER_EPOCH )
 		return true;
 
 	return false;

@@ -43,3 +43,20 @@ AFFECTED: removed fd
 	polled_fds[removed fd].fd = -1
 	compress_array = true // removes the fds from the polled fds structure
 	delete polled_fds_info[removed fd].received_message = new
+
+WHEN: squeeze arrays after removing fd
+WHERE: "if ( compress_array )" block
+AFFECTED: all fds placed after removed fd in arrays
+	
+	// squeeze the fd array
+	polled_fds[j].fd = polled_fds[j+1].fd;
+	polled_fds[j].events = polled_fds[j+1].events;
+	polled_fds[j].revents = polled_fds[j+1].revents;
+
+	// squeeze the fd info
+	polled_fds_info[j].received_bytes = polled_fds_info[j+1].received_bytes;
+	polled_fds_info[j].sended_bytes = polled_fds_info[j+1].sended_bytes;
+	polled_fds_info[j].received_message = polled_fds_info[j+1].received_message;
+	polled_fds_info[j].working = polled_fds_info[j+1].working;
+
+	where j is pos of removed fd and j+1 is pos of the next fd

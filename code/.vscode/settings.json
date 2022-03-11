@@ -60,6 +60,9 @@
         "socket.h": "c",
         "stddef.h": "c",
         "string.h": "c",
-        "iomanip": "cpp"
+        "iomanip": "cpp",
+        "ranges": "cpp",
+        "compare": "cpp",
+        "concepts": "cpp"
     }
 }

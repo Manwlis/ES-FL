@@ -33,6 +33,7 @@ private:
 	PyObject* m_py_train;
 	PyObject* m_py_eval;
 	PyObject* m_py_shuffle_data;
+	PyObject* m_py_print_accuracy_history;
 
 public:
 	unsigned long m_num_examples;
@@ -43,4 +44,6 @@ public:
 	void train();
 	void evaluate();
 	void shuffle_data() const;
+
+	void print_accuracy_history() const;
 };

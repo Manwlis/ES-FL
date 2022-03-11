@@ -15,7 +15,7 @@ from keras.layers import Activation
 from keras.layers.merge import concatenate
 
 cnn_model = tf.keras.Sequential([
-				Conv2D( 32, ( 3 , 3 ) , padding='same', activation=tf.nn.relu , input_shape=( 28 , 28 , 1 ) ),
+				Conv2D( 32, ( 3 , 3 ) , padding='same' , activation=tf.nn.relu , input_shape=( 28 , 28 , 1 ) ),
 				MaxPool2D( ( 2 , 2 ) , strides=2 ),
 
 				Conv2D( 64 , ( 3 , 3 ) , padding='same' , activation=tf.nn.relu ),
@@ -64,6 +64,19 @@ large_cnn_model = tf.keras.Sequential([
 
 				Dense( 10 , activation=tf.nn.softmax )
 			])
+
+# https://arxiv.org/pdf/1602.05629.pdf
+cnn_fedAvg = tf.keras.Sequential([
+				Conv2D( 32, ( 5 , 5 ) , padding='same' , activation=tf.nn.relu , input_shape=( 28 , 28 , 1 ) ),
+				MaxPool2D( ( 2 , 2 ) ),
+
+				Conv2D( 64 , ( 5 , 5 ) , padding='same' , activation=tf.nn.relu ),
+				MaxPool2D( ( 2 , 2 ) ),
+
+				Flatten(),
+				Dense( 512 , activation=tf.nn.relu ),
+				Dense( 10 , activation=tf.nn.softmax )
+	])
 
 
 # https://medium.com/swlh/alexnet-with-tensorflow-46f366559ce8 sketchy?!
@@ -231,6 +244,7 @@ model_dict = {
 	"cnn_model"			: cnn_model,			#    421,642
 	"dnn_model"			: dnn_model,			#    365,066
 	"large_cnn_model"	: large_cnn_model,		#    803,240
+	"cnn_fedAvg"		: cnn_fedAvg,			#  1,663,370
 
 	"AlexNet"			: AlexNet,				# 46,764,746
 	"OverFeat_AlexNet"	: OverFeat_AlexNet,		# 56,906,954

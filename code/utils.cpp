@@ -29,6 +29,12 @@ namespace Utils{
 	#include "stdio.h"
 	#include "string.h"
 
+	/**
+	 * @brief Gets a number from a line of the /proc/self/status file
+	 * 
+	 * @param char* the line
+	 * @return int the number
+	 */
 	int parseLine( char* line )
 	{
 		// This assumes that a digit will be found and the line ends in " Kb".
@@ -43,8 +49,13 @@ namespace Utils{
 		return atoi(p);
 	}
 
+	/**
+	 * @brief Get the virtual memory currently used by the program
+	 * 
+	 * @return int virtual memory in kb
+	 */
 	int get_virtual_mem_used()
-	{ //Note: this value is in KB!
+	{
 		FILE* file = fopen( "/proc/self/status" , "r" );
 
 		int result = -1;
@@ -62,8 +73,13 @@ namespace Utils{
 		return result;
 	}
 
+	/**
+	 * @brief Get the physical memory currently used by the program
+	 * 
+	 * @return int physical memory in kb
+	 */
 	int get_physical_mem_used()
-	{ //Note: this value is in KB!
+	{
 		FILE* file = fopen( "/proc/self/status" , "r" );
 
 		int result = -1;
@@ -80,7 +96,6 @@ namespace Utils{
 		fclose(file);
 		return result;
 	}
-
 }
 /**************************************************************************************************/
 /* Timer                                                                                          */
@@ -121,9 +136,6 @@ Logger::Logger( std::ostream& target ) : output_sink( target ) {}
  */
 void Logger::operator()( Level level , const std::string& description, const char* function , const char* file , int line ) const
 {
-	if ( static_cast<int>(level) < static_cast<int>(Level::warning) ) // TODO: 
-		return;
-
 	output_sink
 		<< "[" << static_cast<int>(level) <<  "]"
 		<< GREEN << std::setw(10) << g_timer.since() << RESET << "	"

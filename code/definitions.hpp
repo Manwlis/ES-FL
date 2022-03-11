@@ -8,18 +8,25 @@
 // federated algorithm definitions
 #define MAX_CONNECTED_CLIENTS 10
 #define MIN_CLIENTS_PER_EPOCH 3
-#define NUM_EPOCHS 10000
+#define NUM_EPOCHS 1000
 
 #define LOCAL_EPOCHS 1
-#define STEPS_PER_EPOCH 2
+#define STEPS_PER_EPOCH 4
 #define BATCH_SIZE 20
 
-#define MODEL "inception" 
-// model:     cnn_model , dnn_model , large_cnn_model ,  alexnet , OverFeat_AlexNet , LeNet_5 , double_inception , inception , residual
-// variables:    421642 ,    365066 ,          803240 , 46764746 ,         56906954 ,   61706 ,          4275914 ,    277082 ,   539466
+#define LEARNING_RATE_DECAY_FLAG 0
+#define LEARNING_RATE_DECAY "0.9995" // Can't pass rationals to python directy. Use string and convert it there
+
+#define MODEL "cnn_model" 
+// model:     cnn_model , dnn_model , large_cnn_model , cnn_fedAvg , alexnet , OverFeat_AlexNet , LeNet_5 , double_inception , inception , residual
+// variables:    421642 ,    365066 ,          803240 ,    1663370 , 46764746 ,        56906954 ,   61706 ,          4275914 ,    277082 ,   539466
+
+// evaluation definitions
+#define NUM_EVALUATIONS 20
+#define EVALUATION_INTERVAL (NUM_EPOCHS/NUM_EVALUATIONS)
 
 // message variables and their types
-#define VARIABLES_NUM 277082 
+#define VARIABLES_NUM 421642 
 #define MSG_VARIABLE_DATATYPE float
 
 //defines the type of the transfered data
@@ -39,6 +46,7 @@
 #define py_eval_function "evaluate_nn"
 
 // logging
-#define ENABLE_LOGGING 1
-#define VERDOSE_LOGGING 0
-#define DISABLE_MESSAGE_INFO 1
+#define ENABLE_LOGGING 1		// enable/disable all messages
+#define VERDOSE_LOGGING 0		// shows code line, function and file
+#define DISABLE_MESSAGE_INFO 1	// disables messages about communication
+#define DISABLE_NON_CRITICAL 1	// disables all messages except warnings/errors
