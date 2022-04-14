@@ -13,17 +13,20 @@ from keras.layers import ZeroPadding2D
 from keras.layers import add
 from keras.layers import Activation
 from keras.layers.merge import concatenate
+from keras.initializers import GlorotUniform
+
+initializer=GlorotUniform( seed=0 )
 
 cnn_model = tf.keras.Sequential([
-				Conv2D( 32, ( 3 , 3 ) , padding='same' , activation=tf.nn.relu , input_shape=( 28 , 28 , 1 ) ),
+				Conv2D( 32, ( 3 , 3 ) , padding='same' , activation=tf.nn.relu , input_shape=( 28 , 28 , 1 ) , kernel_initializer=initializer ),
 				MaxPool2D( ( 2 , 2 ) , strides=2 ),
 
-				Conv2D( 64 , ( 3 , 3 ) , padding='same' , activation=tf.nn.relu ),
+				Conv2D( 64 , ( 3 , 3 ) , padding='same' , activation=tf.nn.relu , kernel_initializer=initializer ),
 				MaxPool2D( ( 2 , 2 ) , strides=2 ),
 
 				Flatten(),
-				Dense( 128 , activation=tf.nn.relu ),
-				Dense( 10 , activation=tf.nn.softmax )
+				Dense( 128 , activation=tf.nn.relu , kernel_initializer=initializer ),
+				Dense( 10 , activation=tf.nn.softmax , kernel_initializer=initializer )
 			])
 
 dnn_model = tf.keras.Sequential([

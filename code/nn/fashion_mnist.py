@@ -110,7 +110,7 @@ def setup_data():
 	num_train_examples = train_shard_unshafled.reduce( 0 , lambda x , _ : x + 1 ).numpy() #slow
 	num_test_examples = tf.data.experimental.cardinality( test_dataset ).numpy() # doesn't work on filtered datasets
 
-	print( "Number of train examples: " , num_train_examples , "	Number of test examples: " , num_test_examples )
+	print( "Number of train examples: " , num_train_examples , "	Number of test examples: " , num_test_examples , "\n" )
 
 	# batch, prefetch
 	train_shard_unshafled = train_shard_unshafled.cache()
@@ -148,33 +148,57 @@ def compile_nn():
 	# model definition.Pick from models.py file
 	model = get_model( current_module.MODEL )
 	# compile model
-	# optimizer = tf.keras.optimizers.Adam( learning_rate=1e-3 )
-	# TODO: try different learning rate, momentum and decay combinations
-	optimizer = tf.keras.optimizers.SGD( learning_rate=5*(1e-3) , momentum=0.9 )
+	if ( current_module.OPTIMIZER == "Adam" ) :
+		optimizer = tf.keras.optimizers.Adam( learning_rate=float(current_module.LEARNING_RATE_INITIAL) )
+		print( "Optimizer: Adam\nLearning rate: " + current_module.LEARNING_RATE_INITIAL)
+	elif ( current_module.OPTIMIZER == "SGD" ) :
+		optimizer = tf.keras.optimizers.SGD( learning_rate=float(current_module.LEARNING_RATE_INITIAL) , momentum=float(current_module.MOMENTUM) )
+		print( "Optimizer: SGD\nLearning rate: " + current_module.LEARNING_RATE_INITIAL + "\nMomentum:" , float(current_module.MOMENTUM) )
+		if current_module.LEARNING_RATE_DECAY_FLAG :
+			print( "Learning rate decay:" , current_module.LEARNING_RATE_DECAY )
+			print( "Learning rate decay period:" , current_module.LEARNING_RATE_DECAY_PERIOD )
+	print()
 
 	model.compile( optimizer , loss=tf.keras.losses.SparseCategoricalCrossentropy() , metrics=['accuracy'] )
 
-	model.summary()
-	print("")
-	print("_________________________________________________________________")
-	print( '%-28s' % "Trainable variables" , '%-25s' % "Shape" , "Param #" )
-	print("=================================================================")
-	for tr_var in model.trainable_variables: 
-		print( '%-28s' % tr_var.name , '%-25s' %tr_var.shape , tr_var.numpy().size )
-	print("")
+	# model.summary()
+	# print("")
+	# print("_________________________________________________________________")
+	# print( '%-28s' % "Trainable variables" , '%-25s' % "Shape" , "Param #" )
+	# print("=================================================================")
+	# for tr_var in model.trainable_variables: 
+	# 	print( '%-28s' % tr_var.name , '%-25s' %tr_var.shape , tr_var.numpy().size )
+	# print("")
 
 #######################################################################################################################
-# Learning Rate Scheduler used to decay learning rate every round.                                                    #
+# Learning Rate Schedulers used to decay learning rate per global epoch / participated epoch.                         #
 #######################################################################################################################
-class CustomLearningRateScheduler( tf.keras.callbacks.Callback ):
+# Decayes learning rate based on current global epoch
+class lr_scheduler_on_global_epoch( tf.keras.callbacks.Callback ):
+	def __init__( self , global_epoch ):
+		super( lr_scheduler_on_global_epoch , self ).__init__()
+		self.global_epoch_completed = global_epoch - 1 # -1 because start at epoch 0, but callback on train begin
+		
+	def on_train_begin( self , batch , logs=None ) :
+		global current_module
+
+		# decay applies every PERIOD epochs
+		decay_steps = self.global_epoch_completed // current_module.LEARNING_RATE_DECAY_PERIOD
+		# calculate new learning rate
+		decayed_lr = float(current_module.LEARNING_RATE_INITIAL) * ( float(current_module.LEARNING_RATE_DECAY) ** decay_steps )
+		# Set the value back to the optimizer
+		tf.keras.backend.set_value( self.model.optimizer.lr , decayed_lr )
+
+# Decayes learning rate based on number of participated epochs
+class lr_scheduler_on_participated_epoch( tf.keras.callbacks.Callback ):
 	def __init__( self ):
-		super(CustomLearningRateScheduler, self).__init__()
+		super( lr_scheduler_on_participated_epoch , self ).__init__()
 		
-	def on_train_end( self , batch , logs=None ):
-		global model
-		
-		if not hasattr( self.model.optimizer, "lr" ):
-			raise ValueError('Optimizer must have a "lr" attribute.')
+	def on_train_end( self , batch , logs=None ): # on_train_end to prepare lr for the next epoch
+		global current_module
+
+		if int(self.model.optimizer.iterations) % current_module.LEARNING_RATE_DECAY_PERIOD != 0 :
+			return
 
 		# Get the current learning rate from model's optimizer.
 		lr = float( tf.keras.backend.get_value( self.model.optimizer.lr ) )
@@ -183,20 +207,33 @@ class CustomLearningRateScheduler( tf.keras.callbacks.Callback ):
 		# Set the value back to the optimizer
 		tf.keras.backend.set_value( self.model.optimizer.lr , decayed_lr )
 
-		# if not hasattr( self.model.optimizer, "momentum" ):
-		# 	raise ValueError('Optimizer must have a "momentum" attribute.')
-		# # do the same for momentum
-		# mm = float( tf.keras.backend.get_value( self.model.optimizer.momentum ) )
-		# decayed_mm = mm * float(current_module.LEARNING_RATE_DECAY)
-		# tf.keras.backend.set_value( self.model.optimizer.momentum , decayed_mm )
-# TODO: decay lr by global epoch and by batch
+# Decayes learning rate based on consuming all data
+class lr_scheduler_on_exhausted_data( tf.keras.callbacks.Callback ):
+	def __init__( self ):
+		super( lr_scheduler_on_exhausted_data , self ).__init__()
+		
+	def on_train_end( self , batch , logs=None ):
+		global current_module
+
+		data_used = current_module.BATCH_SIZE * int(self.model.optimizer.iterations)
+		data_per_period = current_module.LEARNING_RATE_DECAY_PERIOD * num_train_examples
+
+		if data_used % data_per_period != 0 : # every 1 Session
+			return
+
+		# calculate new learning rate
+		communication_rounds = self.model.optimizer.iterations / ( current_module.LOCAL_EPOCHS * current_module.STEPS_PER_EPOCH )
+
+		decayed_lr = float(current_module.LEARNING_RATE_INITIAL) * ( float(current_module.LEARNING_RATE_DECAY) ** communication_rounds ) # TODO: remove hardcoding
+		# Set the value back to the optimizer
+		tf.keras.backend.set_value( self.model.optimizer.lr , decayed_lr )
 
 #######################################################################################################################
 # Trains the nn using the input variables as the initial trainable variables.                                         #
 # Final trainable variables are saved in and returned through the output_variables.                                   #
 # If flags == NO_PRETRAINED_MODEL input variables are disregarded and the values in the model are used instead.       #
 #######################################################################################################################
-def train_nn( input_variables , output_variables , flags ):
+def train_nn( input_variables , output_variables , flags , global_epoch ):
 	global current_module
 	global model
 	global train_shard
@@ -217,8 +254,12 @@ def train_nn( input_variables , output_variables , flags ):
 	# train
 	callback_list=[]
 	if ( current_module.LEARNING_RATE_DECAY_FLAG ):
-		callback_list.append( CustomLearningRateScheduler() )
+		# callback_list.append( lr_scheduler_on_global_epoch( global_epoch ) )
+		callback_list.append( lr_scheduler_on_participated_epoch() )
+		# callback_list.append( lr_scheduler_on_exhausted_data() )
 
+	print( "Learning Rate:" , float( tf.keras.backend.get_value( model.optimizer.lr ) ) )
+	
 	model.fit( train_shard , verbose=1 ,
 		batch_size=current_module.BATCH_SIZE ,
 		epochs=current_module.LOCAL_EPOCHS ,
@@ -239,7 +280,7 @@ def train_nn( input_variables , output_variables , flags ):
 #######################################################################################################################
 # Evaluates nn from input variables.                                                                                  #
 #######################################################################################################################
-def evaluate_nn( input_variables , epoch , test_loss, test_accuracy ):
+def evaluate_nn( input_variables , global_epoch , test_loss, test_accuracy ):
 	global current_module
 	global model
 	global test_dataset
@@ -258,23 +299,51 @@ def evaluate_nn( input_variables , epoch , test_loss, test_accuracy ):
 
 	loss , accuracy = model.evaluate( test_dataset , verbose = 1 , batch_size=current_module.BATCH_SIZE , steps=num_test_examples/current_module.BATCH_SIZE )
 	print( 'Accuracy on test dataset:' , accuracy )
-	accuracy_list.append( ( epoch , accuracy ) )
+	accuracy_list.append( ( global_epoch , accuracy ) )
 
 
+#######################################################################################################################
+# Prints accuracy history.                                                                                            #
+#######################################################################################################################
 def print_accuracy_history():
 	global accuracy_list
 
 	for keys,values in accuracy_list :
-		print( keys , values )
+		print( keys//1 , values )
 
 
 #######################################################################################################################
 # Standalone mode. Used to test model locally with all data.                                                          #
 #######################################################################################################################
+# decayes lr every X number of batches
+class lr_scheduler_on_batch( tf.keras.callbacks.Callback ):
+	def __init__( self ):
+		super(lr_scheduler_on_batch, self).__init__()
+		
+	def on_batch_begin( self , batch , logs=None ):
+		global model
+		global current_module
+		if int(self.model.optimizer.iterations) % current_module.LEARNING_RATE_DECAY_PERIOD != 0 : # every XXX batches
+			return
+		if int(self.model.optimizer.iterations) == 0 :
+			return
+			
+		lr = float( tf.keras.backend.get_value( self.model.optimizer.lr ) )
+		decayed_lr = lr * float(current_module.LEARNING_RATE_DECAY)
+		tf.keras.backend.set_value( self.model.optimizer.lr , decayed_lr )
+
 if ( sys.argv[1] == "standalone" ):
 	current_module.BATCH_SIZE = 20
 	current_module.LOCAL_EPOCHS = 1
 	current_module.MODEL = "cnn_fedAvg"
+
+	current_module.OPTIMIZER = "SGD"
+	current_module.LEARNING_RATE_INITIAL = "1e-2"
+	current_module.MOMENTUM = 0.9
+	current_module.LEARNING_RATE_DECAY_FLAG = 1
+	current_module.LEARNING_RATE_DECAY = "0.999"
+	current_module.LEARNING_RATE_DECAY_PERIOD = 15
+
 
 	setup_data()
 	compile_nn()
@@ -292,8 +361,19 @@ if ( sys.argv[1] == "standalone" ):
 	num_train_examples = 60000
 	num_test_examples = 10000
 
+	callback_list=[]
+	if current_module.LEARNING_RATE_DECAY_FLAG:
+		callback_list.append( lr_scheduler_on_batch() )
+
 	for x in range(20):
-		model.fit( train_shard , batch_size=current_module.BATCH_SIZE , steps_per_epoch=num_train_examples/current_module.BATCH_SIZE , epochs=current_module.LOCAL_EPOCHS , callbacks=[CustomLearningRateScheduler()] )
+		print( "Epoch:" , x+1 )
+
+		model.fit( train_shard , 
+			batch_size=current_module.BATCH_SIZE , 
+			steps_per_epoch=num_train_examples/current_module.BATCH_SIZE , 
+			epochs=current_module.LOCAL_EPOCHS , 
+			callbacks=callback_list
+		)
 
 		shuffle_data()
 

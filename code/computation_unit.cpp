@@ -47,8 +47,12 @@ Python_with_TF::Python_with_TF( Server_to_client_msg& input_message , Client_to_
 	PyModule_AddIntMacro( py_module , STEPS_PER_EPOCH );
 	PyModule_AddIntMacro( py_module , BATCH_SIZE );
 
+	PyModule_AddStringMacro( py_module , OPTIMIZER );
+	PyModule_AddStringMacro( py_module , LEARNING_RATE_INITIAL );
+	PyModule_AddStringMacro( py_module , MOMENTUM );
 	PyModule_AddIntMacro( py_module , LEARNING_RATE_DECAY_FLAG );
 	PyModule_AddStringMacro( py_module , LEARNING_RATE_DECAY );
+	PyModule_AddIntMacro( py_module , LEARNING_RATE_DECAY_PERIOD );
 
 	PyModule_AddStringMacro( py_module , MODEL );
 	PyModule_AddIntConstant( py_module , "no_pretrained_model_flag" , Server_to_client_msg::flag::no_pretrained_model );
@@ -95,11 +99,16 @@ Python_with_TF::~Python_with_TF( )
 
 void Python_with_TF::train()
 {
+	// pass epoch for logging
+	PyLongObject* py_epoch = (PyLongObject*) PyLong_FromLong( (long) m_input_message.epoch );
+
 	// call python function
 	m_py_flags = (PyLongObject*) PyLong_FromLong( (long) m_input_message.flags );
-	PyObject_CallFunctionObjArgs( m_py_train , m_py_array_input , m_py_array_output , m_py_flags , NULL );
+	PyObject_CallFunctionObjArgs( m_py_train , m_py_array_input , m_py_array_output , m_py_flags , py_epoch , NULL );
 
 	PyErr_Print();
+
+	Py_DECREF( py_epoch );
 }
 
 void Python_with_TF::evaluate()
