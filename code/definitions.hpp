@@ -19,8 +19,8 @@
 
 /********** Federated training parameters **********/
 // server loop
-#define MIN_CLIENTS_PER_EPOCH 1
-#define NUM_EPOCHS 200
+#define MIN_CLIENTS_PER_EPOCH 3
+#define NUM_EPOCHS 40
 
 // model
 #define MODEL "cnn_model" 
@@ -37,11 +37,11 @@
 
 // local training
 #define LOCAL_EPOCHS 1
-#define STEPS_PER_EPOCH 300
+#define STEPS_PER_EPOCH 600
 #define BATCH_SIZE 20
 
 // evaluation
-#define NUM_EVALUATIONS 200 // must be =< NUM_EPOCHS
+#define NUM_EVALUATIONS 40 // must be =< NUM_EPOCHS // TODO: somehow automate this
 #define EVALUATION_INTERVAL (NUM_EPOCHS/NUM_EVALUATIONS)
 
 // python module & function names

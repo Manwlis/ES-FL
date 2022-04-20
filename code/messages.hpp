@@ -14,7 +14,6 @@
 #include <endian.h> /* be32toh, le32toh */ 
 
 #include "definitions.hpp"
-
 #include "utils.hpp"  /* reverse_float */
 
 #define SERVER_TO_CLIENT_BUF_SIZE sizeof(Server_to_client_msg)
@@ -23,13 +22,12 @@
 
 struct Server_to_client_msg
 {
-	// Server_to_client_msg.flag values
+	// Server_to_client_msg.flag values TODO: maybe make them an exclusive bit each
 	enum flag
 	{
 		normal_op,
 		no_pretrained_model,
-		final_epoch,
-		evaluate
+		final_epoch
 	};
 
 	int flags;

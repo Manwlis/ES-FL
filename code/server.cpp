@@ -7,7 +7,7 @@
  * 
  */
 
-// std
+// C++ standard libraries
 #include <iostream>			/* << */
 #include <fstream>			/* ifstream, ofstream */
 #include <vector>			/* vector */
@@ -16,6 +16,7 @@
 #include <random>			/* default_random_engine */
 #include <chrono>			/* system_clock */
 
+// C/C++ standard libraries
 #include <unistd.h>			/* close */
 #include <string.h>			/* memset */
 
@@ -31,6 +32,7 @@
 #include "messages.hpp"		/* msg structs */
 #include "fake_data.hpp"	/* check_fake_client_data, create_fake_server_data */
 
+#include "computation_unit.hpp"
 
 // systemic definitions
 #define FD_NUM_MAX MAX_CONNECTED_CLIENTS+1 // +1 for the listening socket
@@ -216,6 +218,12 @@ int main( int argc , char** argv )
 	unsigned int current_epoch = 0;
 
 	/**************************************************************************************************/
+	/* Set up python environment, neural network and numpy wrappers.                                  */
+	/* Used for evaluating the global neural network, only need that.                                 */
+	/**************************************************************************************************/
+	Python_with_TF python_with_TF( &announcement_msg , (Client_to_server_msg*) nullptr , argc , argv );
+
+	/**************************************************************************************************/
 	/* End of initializations, start of main loop.                                                    */
 	/* Loop waiting for incoming connects or for incoming data on any of the connected sockets.       */
 	/**************************************************************************************************/
@@ -231,7 +239,6 @@ int main( int argc , char** argv )
 		{
 			// do time out things
 		}
-
 		/**************************************************************************************************/
 		/* One or more descriptors are readable. Check them all and read those who received data.         */
 		/**************************************************************************************************/
@@ -435,7 +442,20 @@ int main( int argc , char** argv )
 		if ( next_epoch_ready( connected_clients_num , working_clients_num , completed_clients_num ) )
 		{
 			/**************************************************************************************************/
-			/* Create new global model and its metadata.                                                      */
+			/* Create new global model and evaluate it.                                                       */
+			/**************************************************************************************************/
+			// create new global model
+			create_average_model( accumulated_variables , completed_clients_num , announcement_msg.variables );
+
+			// evaluate it
+			if ( (current_epoch > 0) && (((current_epoch-1) % EVALUATION_INTERVAL) == 0) )
+			{
+				LOGGING( Logger::Level::fl_info , "Evaluating global model." );
+				python_with_TF.evaluate();
+			}
+
+			/**************************************************************************************************/
+			/* Create metadata of the message.                                                                */
 			/**************************************************************************************************/
 			// next epoch
 			current_epoch++;
@@ -446,31 +466,23 @@ int main( int argc , char** argv )
 				announcement_msg.flags = Server_to_client_msg::flag::no_pretrained_model; // sended variables are random and clients should consider their own initial values
 			// check shutdown requirements
 			else if ( current_epoch == FINAL_EPOCH )
-			{
 				announcement_msg.flags = Server_to_client_msg::flag::final_epoch; // training ended and clients are receiving the final model
-				LOGGING( Logger::Level::warning , "Reached final epoch." );
-			}
-			else if ( (current_epoch-1) % EVALUATION_INTERVAL == 0 ) // send evaluation order by changing to the appropriate flag
-			{
-				announcement_msg.flags = Server_to_client_msg::flag::evaluate;
-				LOGGING( Logger::Level::warning , "Evaluate order." );
-			}
 			else
 				announcement_msg.flags = Server_to_client_msg::flag::normal_op;
 
-			// create new global model
-			create_average_model( accumulated_variables , completed_clients_num , announcement_msg.variables );
-			
 			/**************************************************************************************************/
 			/* Announce global model to selected clients.                                                     */
 			/**************************************************************************************************/
-			LOGGING( Logger::Level::warning , RED << "		GLOBAL EPOCH    =    " << current_epoch << RESET );
-			
+			if ( current_epoch != FINAL_EPOCH )
+				LOGGING( Logger::Level::warning , RED << "		GLOBAL EPOCH    =    " << current_epoch << RESET );
+			else
+				LOGGING( Logger::Level::warning , RED << "		TRAINING FINISHED" << RESET );
+
+			// Select clients
 			working_clients_num = client_selection( connected_clients_num , polled_fds , polled_fds_info , current_epoch );
 			
 			// clear previous epoch info
 			completed_clients_num = 0;
-
 			for ( int i = 0 ; i < VARIABLES_NUM ; i++ )
 				accumulated_variables[i] = 0;
 		}
@@ -480,6 +492,15 @@ int main( int argc , char** argv )
 		if ( shutdown_ready( current_epoch , connected_clients_num ) )
 			server_shutdown = 1;	
 	} /* End of server running */
+
+	/**************************************************************************************************/
+	/* Print accuracy history and clean-up python stuff.                                              */
+	/**************************************************************************************************/
+	LOGGING( Logger::Level::warning , RED << "Accuracy history:" << RESET );
+	python_with_TF.print_accuracy_history();
+
+	// destroy python environment
+	python_with_TF.~Python_with_TF();
 
 	/**************************************************************************************************/
 	/* Save model.                                                                                    */

@@ -111,14 +111,14 @@ private:
 	std::ostream& output_sink;
 };
 
+// Hacky macro to add logger functionality with minimum code. Blocks unwanted messages.
 #define LOG( logger_ , level_ , Message_ ) \
 	if( DISABLE_NON_CRITICAL && level_ < Logger::Level::warning )\
 		do {} while(0);\
 	else if( DISABLE_MESSAGE_INFO && level_ == Logger::Level::message_info )\
 		do {} while(0);\
 	else\
-		logger_( level_ , static_cast<std::ostringstream&>( std::ostringstream().flush() << Message_ ).str() , __func__ , __FILE__ , __LINE__ );\
-
+		logger_( level_ , static_cast<std::ostringstream&>( std::ostringstream().flush() << Message_ ).str() , __func__ , __FILE__ , __LINE__ )\
 
 // used to enable/disable all logging
 #if ENABLE_LOGGING

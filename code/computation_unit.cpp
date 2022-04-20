@@ -2,14 +2,14 @@
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION // suppress numpy version warnings
 #include </home/epetrakos/.local/lib/python3.10/site-packages/numpy/core/include/numpy/arrayobject.h>
 
-Computation_unit::Computation_unit( Server_to_client_msg& input_message , Client_to_server_msg& output_message )
+Computation_unit::Computation_unit( Server_to_client_msg* input_message , Client_to_server_msg* output_message )
 	: m_input_message( input_message ) , m_output_message( output_message )
 { }
 
 Computation_unit::~Computation_unit(){}
 
-Python_with_TF::Python_with_TF( Server_to_client_msg& input_message , Client_to_server_msg& output_message , int argc , char** argv )
-	: Computation_unit( input_message , output_message ) , m_py_flags( nullptr ) // nullptr to supress warning 'may be used uninitialized in dealloc()'
+Python_with_TF::Python_with_TF( Server_to_client_msg* input_message , Client_to_server_msg* output_message , int argc , char** argv )
+	: Computation_unit( input_message , output_message ) , m_py_flags( nullptr ) , m_py_epoch( nullptr ) // nullptr to supress warning 'may be used uninitialized in dealloc()'
 {
 	// Initialize python interpeter
 	LOGGING( Logger::Level::initialization , "Initializing python interpeter." );
@@ -36,6 +36,7 @@ Python_with_TF::Python_with_TF( Server_to_client_msg& input_message , Client_to_
 	PyObject* py_module = PyImport_Import( py_module_name ); // this executes code in module outside functions!
 	if ( py_module == nullptr )
 	{
+		PyErr_Print();
 		LOGGING( Logger::Level::error , "Importing python file failed." );
 		exit( EXIT_FAILURE );
 	}
@@ -80,8 +81,8 @@ Python_with_TF::Python_with_TF( Server_to_client_msg& input_message , Client_to_
 	// create numpy array metadata around C arrays to pass them to python code
 	_import_array();
 	npy_intp dims[1] = {VARIABLES_NUM}; // dimension/size of numpy arrays. Easier to pass an 1-D array to python and reshape data there.
-	m_py_array_input = PyArray_SimpleNewFromData( 1 , dims , NPY_FLOAT , m_input_message.variables );
-	m_py_array_output = PyArray_SimpleNewFromData( 1 , dims , NPY_FLOAT , m_output_message.variables );
+	m_py_array_input = PyArray_SimpleNewFromData( 1 , dims , NPY_FLOAT , m_input_message->variables );
+	m_py_array_output = PyArray_SimpleNewFromData( 1 , dims , NPY_FLOAT , m_output_message->variables );
 }
 
 Python_with_TF::~Python_with_TF( )
@@ -92,41 +93,34 @@ Python_with_TF::~Python_with_TF( )
 	Py_DECREF( m_py_print_accuracy_history );
 	Py_DECREF( m_py_array_input );
 	Py_DECREF( m_py_array_output );
-	Py_XDECREF( m_py_flags ); // py_flags gets initialised in train(). If train() never gets called, it may be NULL.
+	Py_XDECREF( m_py_flags ); // m_py_flags gets initialised in train(). If train() never gets called, it may be NULL.
+	Py_XDECREF( m_py_epoch ); // m_py_epoch gets initialised in train(). If train() never gets called, it may be NULL.
 
 	Py_Finalize();
 }
 
 void Python_with_TF::train()
 {
-	// pass epoch for logging
-	PyLongObject* py_epoch = (PyLongObject*) PyLong_FromLong( (long) m_input_message.epoch );
+	// pass metadata of the message to python
+	m_py_flags = (PyLongObject*) PyLong_FromLong( (long) m_input_message->flags );
+	m_py_epoch = (PyLongObject*) PyLong_FromLong( (long) m_input_message->epoch );
 
 	// call python function
-	m_py_flags = (PyLongObject*) PyLong_FromLong( (long) m_input_message.flags );
-	PyObject_CallFunctionObjArgs( m_py_train , m_py_array_input , m_py_array_output , m_py_flags , py_epoch , NULL );
+	PyObject_CallFunctionObjArgs( m_py_train , m_py_array_input , m_py_array_output , m_py_flags , m_py_epoch , NULL );
 
 	PyErr_Print();
-
-	Py_DECREF( py_epoch );
 }
 
 void Python_with_TF::evaluate()
 {
 	LOGGING( Logger::Level::fl_info , "Evaluating model" );
 
-	// pass epoch for logging
-	PyLongObject* py_epoch = (PyLongObject*) PyLong_FromLong( (long) m_input_message.epoch );
+	// pass metadata of the message to python
+	m_py_epoch = (PyLongObject*) PyLong_FromLong( (long) m_input_message->epoch ); // for logging
 
-	// get loss and accuracy
-	PyLongObject* py_loss = (PyLongObject*) PyLong_FromLong( (long) m_output_message.loss );
-	PyLongObject* py_accuracy = (PyLongObject*) PyLong_FromLong( (long) m_output_message.loss );
+	PyObject_CallFunctionObjArgs( m_py_eval , m_py_array_input , m_py_epoch , NULL );
 
-	PyObject_CallFunctionObjArgs( m_py_eval , m_py_array_input , py_epoch , py_loss , py_accuracy , NULL );
-
-	Py_DECREF( py_epoch );
-	Py_DECREF( py_loss );
-	Py_DECREF( py_accuracy );
+	PyErr_Print();
 }
 
 void Python_with_TF::shuffle_data() const

@@ -13,10 +13,10 @@ public:
 
 protected:
 	// big chunks of data
-	Server_to_client_msg& m_input_message;
-	Client_to_server_msg& m_output_message;
+	Server_to_client_msg* m_input_message;
+	Client_to_server_msg* m_output_message;
 
-	Computation_unit( Server_to_client_msg& input_message , Client_to_server_msg& output_message );
+	Computation_unit( Server_to_client_msg* input_message , Client_to_server_msg* output_message );
 	virtual ~Computation_unit();
 };
 
@@ -28,6 +28,7 @@ private:
 	PyObject* m_py_array_input;
 	PyObject* m_py_array_output;
 	PyLongObject* m_py_flags;
+	PyLongObject* m_py_epoch;
 
 	// python module and functions
 	PyObject* m_py_train;
@@ -38,7 +39,7 @@ private:
 public:
 	unsigned long m_num_examples;
 
-	Python_with_TF( Server_to_client_msg& input_message , Client_to_server_msg& output_message , int argc ,  char** argv );
+	Python_with_TF( Server_to_client_msg* input_message , Client_to_server_msg* output_message , int argc ,  char** argv );
 	~Python_with_TF();
 
 	void train();

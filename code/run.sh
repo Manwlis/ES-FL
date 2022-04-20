@@ -5,7 +5,7 @@
 make clean
 make all
 echo ""
-# need it to supress the "UNC over CMD not supported" error
+# The bash.exe terminals will open there. Need it to supress the "UNC over CMD not supported" error.
 cd /mnt/c/Users/MSI
 
 # IO_file=/home/epetrakos/ES-FL/code/IO_files/out.bin
@@ -16,7 +16,7 @@ cmd.exe /c start bash.exe -c "cd /home/epetrakos/ES-FL/code; /usr/bin/time -v ./
 mode=IID
 # run clients
 for (( i = 0 ; i < $1 ; i++ )); do
+	sleep 5 # do not open all clients imidiately to not clog the system
 	echo "cd /home/epetrakos/ES-FL/code; /usr/bin/time -v ./client ${mode} $1 ${i}; exec bash"
 	cmd.exe /c start bash.exe -c "cd /home/epetrakos/ES-FL/code; /usr/bin/time -v ./client ${mode} $1 ${i}; exec bash"
-	sleep 5 # do not open all clients imidiately to not clog the CPU
 done

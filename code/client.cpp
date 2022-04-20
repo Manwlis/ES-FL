@@ -66,7 +66,7 @@ int main ( int argc , char** argv )
 	/**************************************************************************************************/
 	/* Set up python environment, neural network and numpy wrappers.                                  */
 	/**************************************************************************************************/
-	Python_with_TF python_with_TF( received_message , send_message , argc , argv );
+	Python_with_TF python_with_TF( &received_message , &send_message , argc , argv );
 
 	/**************************************************************************************************/
 	/* Main loop.                                                                                     */
@@ -133,19 +133,13 @@ int main ( int argc , char** argv )
 		if constexpr ( std::endian::native == std::endian::big ) // requires c++20, dangerous !!!!
 			server_to_client_msg_big_endianess( received_message ); // maybe move this to the server side if needed
 
-		LOGGING( Logger::Level::warning , RED << "		GLOBAL EPOCH    =   " << received_message.epoch << RESET );
-
-		/**************************************************************************************************/
-		/* Evaluate model if server demands it.                                                           */
-		/**************************************************************************************************/
-		if ( received_message.flags == Server_to_client_msg::flag::final_epoch )
+		if ( received_message.flags == Server_to_client_msg::flag::final_epoch ) // finished training
 		{
-			python_with_TF.evaluate();
-			python_with_TF.print_accuracy_history();
+			LOGGING( Logger::Level::warning , RED << "Received final message." << RESET );
 			break;
 		}
-		else if ( received_message.flags == Server_to_client_msg::flag::evaluate )
-			python_with_TF.evaluate();
+		else
+			LOGGING( Logger::Level::warning , RED << "		GLOBAL EPOCH    =   " << received_message.epoch << RESET );
 
 		/**************************************************************************************************/
 		/* Calculate variables.                                                                           */
@@ -194,7 +188,7 @@ int main ( int argc , char** argv )
 	/**************************************************************************************************/
 	/* Clean up and exit.                                                                             */
 	/**************************************************************************************************/
-	// free up remaining python variables
+	// destroy python environment
 	python_with_TF.~Python_with_TF();
 
 	// close socket properly

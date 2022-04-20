@@ -10,7 +10,7 @@ all: $(OBJECTS) $(EXECUTABLES)
 
 # executables
 server : server.o lib.a
-	$(CC) $(CFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $^ -lpython3.10 -o $@
 client : client.o lib.a
 	$(CC) $(CFLAGS) $^ -lpython3.10 -o $@
 tests : unit_tests.o lib.a
@@ -23,7 +23,7 @@ lib.a : utils.o fake_data.o messages.o computation_unit.o
 # object files
 .cpp.o :  *.hpp
 	$(CC) $(CFLAGS) -I /usr/include/python3.10/ -c client.cpp -o client.o
-	$(CC) $(CFLAGS) -c server.cpp -o server.o
+	$(CC) $(CFLAGS) -I /usr/include/python3.10/ -c server.cpp -o server.o
 	$(CC) $(CFLAGS) -c unit_tests.cpp -o unit_tests.o
 
 	$(CC) $(CFLAGS) -c utils.cpp -o utils.o
