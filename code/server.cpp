@@ -25,6 +25,7 @@
 #include <arpa/inet.h>		/* inet_ntoa */
 #include <poll.h>			/* poll */
 #include <fcntl.h>			/* fcntl */
+#include <signal.h>			/* signal */
 
 #include "definitions.hpp"
 
@@ -32,7 +33,7 @@
 #include "messages.hpp"		/* msg structs */
 #include "fake_data.hpp"	/* check_fake_client_data, create_fake_server_data */
 
-#include "computation_unit.hpp"
+#include "computation_unit.hpp"	/* Python_with_TF */
 
 // systemic definitions
 #define FD_NUM_MAX MAX_CONNECTED_CLIENTS+1 // +1 for the listening socket
@@ -96,6 +97,10 @@ bool next_epoch_ready( int connected_clients_num , int working_clients_num , int
 int client_selection( int connected_clients_num , pollfd fds[] , Polled_fds_info fds_info[] , int epoch );
 bool shutdown_ready( int epoch , unsigned int connected_clients_num );
 
+// Lambda that catches ctrl+C interrupts and shows accuracy history. Used to show history when manually ending training.
+std::function<void(int)> interrupt_trap;
+// interrupt_trap is a lambda capturing local variables, must be wrapped to a simple function in order to be used as an interrupt handling function.
+void interrupt_trap_function_wrapper(int signal) { interrupt_trap(signal); }
 
 std::ofstream myfile;
 std::ofstream& pick_sink()
@@ -220,8 +225,21 @@ int main( int argc , char** argv )
 	/**************************************************************************************************/
 	/* Set up python environment, neural network and numpy wrappers.                                  */
 	/* Used for evaluating the global neural network, only need that.                                 */
+	/* Set up an interrupt trap in order to print NN accuracy history when manually shutting down.    */
 	/**************************************************************************************************/
 	Python_with_TF python_with_TF( &announcement_msg , (Client_to_server_msg*) nullptr , argc , argv );
+
+	interrupt_trap = [&python_with_TF]( int signum )
+	{
+		// the state of the terminal can't be predicted when the interrupt rises
+		std::cout << std::endl;
+		// print accuracy history
+		python_with_TF.print_accuracy_history();
+		// Terminate program
+		exit( signum );
+	};
+	// set the signal handling function
+	signal( SIGINT , interrupt_trap_function_wrapper );
 
 	/**************************************************************************************************/
 	/* End of initializations, start of main loop.                                                    */

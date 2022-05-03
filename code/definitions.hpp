@@ -20,7 +20,7 @@
 /********** Federated training parameters **********/
 // server loop
 #define MIN_CLIENTS_PER_EPOCH 3
-#define NUM_EPOCHS 40
+#define NUM_EPOCHS 300
 
 // model
 #define MODEL "cnn_model" 
@@ -32,16 +32,19 @@
 #define LEARNING_RATE_INITIAL "1e-2"
 #define MOMENTUM "0.9"
 #define LEARNING_RATE_DECAY_FLAG 1
-#define LEARNING_RATE_DECAY "0.977331125"//"0.977331125" // Can't pass rationals to python directy. Use string and convert it there
+#define LEARNING_RATE_DECAY "0.999235967" // Can't pass rationals to python directy. Use string and convert it there
+// base 0.977331125
+// root_2 = 0.988600589 , root_4 = 0.994283958 , root_5 = 0.995424547 , root_15 = 0.998472517 , root_30 = 0.999235967 , root_60 = 0.99961791
+// pow_2 = 0.955176128
 #define LEARNING_RATE_DECAY_PERIOD 1
 
 // local training
-#define LOCAL_EPOCHS 1
-#define STEPS_PER_EPOCH 600
-#define BATCH_SIZE 20
+#define LOCAL_EPOCHS 3
+#define STEPS_PER_EPOCH 20
+#define BATCH_SIZE 600
 
 // evaluation
-#define NUM_EVALUATIONS 40 // must be =< NUM_EPOCHS // TODO: somehow automate this
+#define NUM_EVALUATIONS 300 // must be =< NUM_EPOCHS // TODO: somehow automate this
 #define EVALUATION_INTERVAL (NUM_EPOCHS/NUM_EVALUATIONS)
 
 // python module & function names
