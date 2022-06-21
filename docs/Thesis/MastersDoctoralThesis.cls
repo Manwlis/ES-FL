@@ -551,6 +551,15 @@ breaklinks=true,
 }
 
 %----------------------------------------------------------------------------------------
-
+\newenvironment{conditions}{
+    \par\noindent
+    \begin{tabular}{>{$}l<{$} @{${}={}$} l}
+}
+{
+    \end{tabular}
+    \par\vspace{\belowdisplayskip}
+}
+  
+%----------------------------------------------------------------------------------------
 \endinput
 % lazyLizardTracer
