@@ -152,7 +152,7 @@ Convolutional layers carry out the convolution process with the help of small ma
 
 \begin{figure}[H]
     \centering
-        \includegraphics[width=1\textwidth]{Images/2d_convolution.png}
+        \includegraphics[width=1\textwidth]{Images/ANNArchitectures/2d_convolution.png}
         \decoRule
         \caption[2D convolution]{2D convolution: \href{https://peltarion.com/knowledge-center/documentation/modeling-view/build-an-ai-model/blocks/2d-convolution}{URL}.}
         \label{fig:2D convolution}
@@ -162,13 +162,13 @@ The subsampling layers is the second distinguishing innovation of CNNs. Their pr
 
 \begin{figure}[H]
     \centering
-        \includegraphics[width=0.76\textwidth]{Images/2d_max_pooling.png}
+        \includegraphics[width=0.76\textwidth]{Images/ANNArchitectures/2d_max_pooling.png}
         \decoRule
         \caption[2D max pooling]{2D max pooling: \href{https://peltarion.com/knowledge-center/documentation/modeling-view/build-an-ai-model/blocks/max-pooling-2d}{URL}.}
         \label{fig:2D max pooling}
 \end{figure}
 
-\subsubsection{rnn?}
+% \subsubsection{rnn?}
 
 \section{Training Artificial Neural Networks}
 As previously stated, ANNs are made up of neurons, which contain multiple parameters known as weights and biases, which are generally referred simply as weights. Training\footnote{Also called fitting.} is an iterative process that aims to improve the ANN's performance by optimizing these parameters. To accomplish this, three key elements are required: a loss function, an optimization algorithm such as gradient descent and a training algorithm like backpropagation.
@@ -445,8 +445,8 @@ Multiple methods attempt to enhance the model's performance by simplifying it an
 
 The preceding methods necessitate some level of domain knowledge, which is not always available. In this scenario, regularization methods are particularly helpful, as they aim to reduce complexity by altering the model. In general they try to penalize input parameters with large coefficients, typical in examples with significant noise, in order to minimize the variance in the model. Such methods include L1 regularization, dropout and others.
 
-\subsection{Adaptive Learning Rate?}
-\subsection{Adaptive algoritms?}
+% \subsection{Adaptive Learning Rate?}
+% \subsection{Adaptive algoritms?}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Federated learning %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Federated Learning}
 %definition and central aim
@@ -493,7 +493,7 @@ The server collects and aggregates the local models to generate a new global mod
 This process is repeated until the global loss function converges, target accuracy has been achieved etc.
 
 \subsection{Federated Learning Settings} % B
-FL can be used in a broad array of applications with significantly diverse contexts and constraints. An example of FL across data centers could be hospitals that cooperatively train a cancer recognition model utilizing data from their patient diagnoses. Moreover, a real-world application of IoT FL is the training of a next-word prediction model for Google's Gboard \cite{GBoard_FL} utilizing users' personal text messages. Table \ref{table:FL scenarios} seeks to describe two generalized FL scenarios and compare them with data center Distributed Learning (DL).
+FL can be used in a broad array of applications with significantly diverse contexts and constraints \cite{survey_B, survey_D}. An example of FL across data centers could be hospitals that cooperatively train a cancer recognition model utilizing data from their patient diagnoses. Moreover, a real-world application of IoT FL is the training of a next-word prediction model for Google's Gboard \cite{GBoard_FL} utilizing users' personal text messages. Table \ref{table:FL scenarios} seeks to describe two generalized FL scenarios and compare them with data center Distributed Learning (DL).
 
 \renewcommand{\arraystretch}{1.3}
 \begin{table}[H]
@@ -537,74 +537,165 @@ FL can be used in a broad array of applications with significantly diverse conte
     \label{table:FL scenarios}
 \end{table}
 \renewcommand{\arraystretch}{1}
-%types
-\subsection{Categorization?} % C12:5 +B88
-    horizontal - vertical - transfer learning?
-    \subsubsection{Architectures for a federated learning system}
+
 % problems outlook
-\subsection{Core challenges or Unique characteristics and issues of FL}
-    Aside from the standard challenges associated with ML development, there are a number of obstacles specific to FL. These issues distinguish the federated setting from more traditional problems such as private data analysis and data center DL.
+\subsection{Unique characteristics \& challenges of FL}
+Aside from the standard challenges associated with ML development, there are a number of obstacles specific to FL. These issues distinguish the federated setting from more traditional problems such as private data analysis and data center DL. \cite{FL_comprehensive_survey, survey_B, survey_C, survey_D, survey_E}
 
-    \subsubsection{Expensive communication} % E
-    Communication is a critical bottleneck in many FL applications. In traditional data center DL, the communication environment is assumed to be perfect, with low latency, high bandwidth and negligible to no packet loss. This assumption is not appropriate to FL training, as clients are expected to be in different locations and with varying amounts of resources. This is especially true in edge FL, where the on-device datasets are small and connections are slow and unreliable, resulting to a high communication to computation ratio.
+\subsubsection{Expensive communication} % E
+Communication is a critical bottleneck in many FL applications. In traditional data center DL, the communication environment is assumed to be perfect, with low latency, high bandwidth and negligible to no packet loss. This assumption is not appropriate to FL training, as clients are expected to be in different locations and with varying amounts of resources. This is especially true in edge FL, where the on-device datasets are small and connections are slow and unreliable, resulting to a high communication to computation ratio.
+
+\subsubsection{Heterogeneous devices} % E
+Client computational and communication capabilities can vary greatly in FL. They may differ in architecture (CPU, GPU, FPGA) and resources such as clock speed and RAM availability. Furthermore, they may be networked using different technologies (e.g., 4G, 5G, wifi) with varying reliability and bandwidth. Finally, some of them may be less eager to participate. All this leads to random and unpredictable client disconnections, as well as the appearance of "stragglers" \cite{stragglers}, clients who take substantially longer to provide their updates than the rest and impede the entire process.
+
+\subsubsection{Statistical heterogeneity} % E
+It is frequently assumed in distribution optimization problems that the data are independent and identically distributed (IID). This is commonly violated in the federated setting, adding complexity to problem modeling, analysis, and solution evaluation. Data generation and collection are frequently uneven between clients, and the server is unable to collect or check the quality and distribution of their data due to privacy issues.
+
+\subsubsection{Privacy and Security concerns} % E
+The primary concern of FL apps is to protect the privacy of participating customers. However, malicious participants or third parties may be able to infer sensitive information from shared parameters, defeating one of FL's key goals. Furthermore, its mostly assumed that all participants are well-intentioned, yet this is not always the case. Malicious clients may try to undermine the model's accuracy or install backdoors into it by utilizing poisonous datasets.
     
-    \subsubsection{Systems heterogeneity} % E
-    In FL, the computational and communication capabilities of the clients may greatly vary. The client devices may differ in architecture (CPU, GPU, FPGA) with different resources and capabilities. Furthermore, they may use different networks (4G, 5G, wifi, etc.) with varying reliability and bandwidth. The devices can also have different levels of willingness to participate
-    
-    Heterogeneous devices
-    \subsubsection{Statistical heterogeneity} % E 
-    due to data privacy concerns, the FL servers are unable to check for training data quality
-    \subsubsection{Privacy concerns} % E
+\begin{figure}[H]
+    \centering
+        \includegraphics[width=1\textwidth]{Images/fl_protocol.png}
+        \decoRule
+        \caption[FL protocol]{FL protocol with stragglers, client disconnections and client selection: \href{https://ieeexplore.ieee.org/document/9060868}{URL}.}
+        \label{fig:FL protocol}
+\end{figure}
 
+\subsection{Communication cost reduction}
+To achieve a satisfactory model in FL, multiple rounds of training and communication between the server and the clients are required. Communication can be a big bottleneck if the ANN being trained is massive and has millions of parameters, or if the clients are under slow connections. As a result, a series of techniques for improving communication efficiency have been developed, which can be classified into three groups: increasing computation, decreasing communication size, and decreasing communication frequency.
 
-\subsection{Communication cost}
-    \subsubsection{Edge and End Computation}
-    decrease the number of communication rounds, adding computation:
-    increase parallelism by increasing participants per global epoch
-    increase computation per global epoch, more local epochs smaller minibatch
-    FedAvg increases the accuracy eventually since model averaging produces regularization effects similar to dropout, which prevents overfitting
-    the heterogeneity among edge devices, e.g., in computing capabilities, is often not considered
-    inroduce straggler effect
-    when too many local updates are implemented between communication rounds, the communication cost is indeed reduced but the convergence can be significantly delayed
-    \subsubsection{Model Compression}
-    Commonly used in DL
-    purpose is to reduse size of updates
-    Structured updates restrict participant updates to have a prespecified structure
-    sketched updates refer to the approach of encoding the update in a compressed form before communication with the server like
-    model or gradient compression using sparsification,quantization, subsambling etc
-    lossy compression on server updates no acceptable level of performance 
-    on client updates work, update errors can be averaged out for participant to server uploads
-    federated dropout?
-    \subsubsection{Importance-based Updating}
-    only the important or relevant updates are transmitted in each communication round.
-    besides saving on communication omitting can even improve the global model performance.
-    such strategies include
-    if loss greater than previous update, do not send
-    uploads only relevant local model, local update is first compared with the global update
-    lower accuracy and convergence guarantees
+\subsubsection{Edge and End Computation}
+Increasing parallelism by selecting more clients each global epoch is an obvious technique to increase computation in edge devices. In general, client-wise parallelism is desirable, but it provides diminishing returns as the number of participating clients increases. Furthermore, if all of the connected clients are participating, this strategy is no longer applicable. Finally, there is the risk of rapidly exhausting the available datasets.
+
+The most typical technique to increase computation is to have clients perform more local model updates per global epoch. This can be achieved in two ways, more local epochs, i.e. more passes through the local dataset, or smaller batch size, i.e. more updates per pass through the local dataset. In traditional DL, such techniques tends to produce negative effects like overfitting. On the other hand, FL algorithms, due to their model averaging, produce regularization effects equivalent to dropout, ultimately increasing the accuracy of the model under training.
+
+While these techniques are effective, having too many local updates between communication rounds can have a negative impact. To begin with, local models may diverge too much from each other, especially when under non-IID data distribution, significantly decreasing the convergent rate of the global model. As a result, additional training is required, defeating the aim of these techniques.
+
+Another concern is that the likelihood of stragglers occurring is considerably increased due to client heterogeneity. Clients with fewer resources will take disproportionately longer to complete the additional computations, widening the gap between them and the faster ones. Since simulations are most often used when developing FL algorithms, researchers frequently overlook this issue.
+
+\subsubsection{Model Compression}
+These techniques, which are extensively employed in DL, attempt to decrease the amount of the communicated updates. The weights of the model under training make up the majority of the updates; applying transformations like sparification, quantization, and subsambling to them can reduce the size of the updates. In general, they are classified into two types: structured updates, which attempt to select what information is sent, and sketched updates, which attempt to compress the communicated information.
+
+Structured updates require that updates adhere to a set, reduced format. This is possible in multiple ways, like putting a predermined per-client mask on the model after training to sparsify it. Another method is to instruct a client to train and communicate only specific layers or pieces of them. A more complex alternative is for the server to apply dropout to the global model in order to create a submodel, which the clients train, and the server maps back to the global model during aggregation. In general, these methods try to shift the responsibility of compression to the server, with the aim to make it more predictable and correct its error.
+
+Sketched updates refer to techniques that encode the update in one side and decode in the other. One such method is probabilistic quantization \cite{probabilistic_quantization}, in which the update matrices are vectorized and quantized for each scalar. Another option is to use a random mask like in a structure update, with the difference that it is randomly generated by the client and communicated to the server together with the encoded local model.
+
+All these methods can be lossy and introduce error as a result of information loss. This error can be characterized as noise, which in most cases has a mean value of zero due to the nature of the compression algorithms commonly used. As such, the averaging of the FL algorithms can reduce it or even eliminate it from the accumulation of the local updates. For this to be true in practice, a large number of clients must be participating, which that is not always achievable. Moreover, as there is only one global model at any given time, any error in server-to-client communication cannot be reduced.
+
+\subsubsection{Importance-based Updating}
+By sending only what seems important, importance-based updating aims to reduce the volume of communication. Based on the observation that most parameters in an ANN are close to zero or hardly vary \cite{observation_parameters}, this can be done in a fine-grained manner by sending to the server only a small percentage of the model parameters. It can also be applied in a coarse-grained way by asking clients to review their updates and send them only if they think they would help the overall model. These techniques have demonstrated that, when applied properly, they can occasionally reduce communication while also increasing accuracy and convergence rate. In contrast, they may produce the opposite effects if used excessively.
+
+\subsection{Systems heterogeneity}
+The previously discussed systemic characteristics of FL aggravate issues like straggler mitigation and fault tolerance. The slowest participating client has a significant impact on the duration of a global epoch. They can substantially impede training speed, thus removing them from the process is generally considered. Furthermore, if the server waits indefinitely for the client updates and a client disconnects without notifying, the entire system would hang. These issues are especially prevalent in on-edge setting where there is little information or control over the clients' resources.
+
+FL algorithms must be able to handle heterogeneous hardware and resist against random and unpredictable client drops. A frequent option is to disconnect clients who have not responded within a predetermined amount of time. Additionally, using more clients per epoch than necessary and accepting updates from those who respond first can help to eliminate stragglers. While effective, such strategies can induce biases in favour of the datasets of the fastest clients, reducing the overall accuracy of the model.
+
+More sophisticated proposed solutions include intelligent client selection by only accepting clients that report their resources prior participating or tracking statistics on their overall performance. Such methods are not always feasible since they may jeopardize the privacy of the clients. A major portion of FL research employs simulations and avoid these problems, letting these challenges the least explored.
 
 \subsection{Data distribution}
-    iid - non iid
-    \subsubsection{Non-identical client distributions}
-    Feature distribution skew (covariate shift) B
-    Label distribution skew (prior probability shift) B
-    Same label, different features (concept drift) B
-    Quantity skew or unbalancedness B
-    Violations of independence B
-    Dataset shift? B
-    
-    statistical challenges?
+A dataset is independent and identically distributed (iid) if each example in it has the same probability distribution as the others and all are mutually independent. Models' accuracy, convergence rate, and fairness can all be degraded by training on non-iid datasets. Traditional ML avoids these issues by using a single, massive dataset that the designer is allowed to manipulate. On the other hand, FL encompasses a set of smaller datasets that could differ statistically from one another, and the designer may not be in control of or even aware of these differences. Ideally, a global dataset could be established by aggregating all of these small local datasets, however in reality this is impossible because the data cannot be centralized.
+
+\begin{figure}[H]
+    \centering
+        \includegraphics[width=0.6\textwidth]{Images/block_diagrams/data_distribution.png}
+        \decoRule
+        \caption[Data distribution]{Centralized Dataset vs. Local Datasets. When distributed unevenly among the clients, the same data can behave as non-iid.}
+        \label{fig:Data distribution}
+\end{figure}
+
+\subsubsection{Non-identical client distributions}
+A global dataset used during FL may not be iid for a variety of reasons. First of all, a client's private dataset may locally violate independence, but this can usually be fixed via local shuffling. The statistical variations between the local datasets are more significant.
+
+The distribution of a local dataset \(P_i(x,y)\) can be rewritten as \(P_i(y|x)P(x)\) and \(P_i(x|y)P(y)\), where \(x\) and \(y\) are the input-output pairs. The distributions of at least two clients, I and j, must differ for the data to be non-iid, that is \(P_i \neq P_j\). There are several causes for this, including:
+
+\begin{itemize}
+  \item \emph{Feature distribution skew} (covariate shift), \(P_i(x) \neq P_j(x)\):\\
+  Even if \(P_i(y|x) = P_j(y|x)\), the marginal distributions \(P(x)\) may differ. This is frequent in the domain of handwriting recognition, where two clients may write the same text in a different writing style.
+  
+  \item \emph{Label distribution skew} (prior probability shift), \(P_i(y) \neq P_j(y)\):\\
+  Even if \(P_i(x|y) = P_j(x|y)\), the marginal distributions \(P(y)\) may differ. This is common when clients are bound to specific locations. Clients from different areas may use different terms and phrases depending on their local accent and lingo.
+  
+  \item \emph{Same label, different features (concept drift)}, \(P_i(x|y) \neq P_j(x|y)\):\\
+  Even if \(P_i(y) = P_j(y)\), the marginal distributions \(P(x|y)\) may differ. The same label \(y\) can have different meaning for different users based on their culture and standard of leaving. Images of clothes, for example, can vary greatly according on location.
+  
+  \item \emph{Same features, different label (concept shift):}, \(P_i(y|x) \neq P_j(y|x)\):\\
+  Even if \(P_i(x) = P_j(x)\), the marginal distributions \(P(y|x)\) may differ. This is very common with labels that reflect sentiment. As an example, clients living in cold climates may describe the same weather phenomena differently than clients lining in warm or temperate climates.
+  
+  \item \emph{Quantity skew}:\\
+  Clients can generate and save different amounts of data. This is dependent on a variety of factors, including available data storage, local data retention laws, and the habits of their users.
+  
+  \item \emph{Violations of independence}:\\
+  Throughout training, the distribution may change at any time. Clients may connect or disconnect, or their local datasets may be exhausted. Furthermore, if clients are available at specific times of day due to solstice, a strong regional bias is imposed. Finally, because the clients own their own datasets, they can modify them at any time during training.
+  
+  \item \emph{Dataset shift}:\\
+  The FL participants might not be indicative of the end users. For instance, clients with inferior devices may be underrepresented as a result of any eligibility criteria used during client selection.
+\end{itemize}
+
+A real-world FL dataset may have any combination of these effects. Due to the difficulties of generating such datasets and examining algorithms built on them, most research tends to concentrate on one or two of them. Depending on the Fl scenario under training, different distribution skew effects may aplly and different mitigation strategies may be required.
+
+\subsubsection{Dealing with non-iid distributions}
+Existing algorithms can be modified, either by altering their parameters and hyperparameters or by sophisticating features like client selection. While adjusting other parameters, reducing batch size and increasing local epochs can be increase model accuracy, but excessive use may hurt convergence rate and lengthen training time. Metalearning approaches could be used to discover an ideal equilibrium.
+
+It has been demonstrated that system heterogeneity and data heterogeneity interplay. By discarding straggles, unique and useful data could be wasted, degrading the model's fairness and accuracy. Stragglers can partially work, by personalizing parameters or reparameterizing on the fly, according to their resources. In this way, their local datasets can be exploited without slowing down the overall process.
+
+Another approach is for the server to request data distribution statistics from the clients. With this information, the server can select those that will result in a balanced distribution. In addition, the server may be able to share some relevant publicly available data with the clients in order to rebalance their datasets. If no such data are available, willing clients may, if practical, provide their datasets to aid in the overall training process. These techniques can alleviate non-iid distribution problems, but they require additional communication and bandwidth. Additionally, they have the potential to compromise privacy, which would undermine one of FL's main goals.
+
+Similarly, frameworks for multitask learning may be employed. Clients can train their local personalized models concurrently with the global model and share knowledge between them. Such techniques may not always be available as they demand greater processing and memory resources from the clients.
+
+\subsection{Privacy and Security}
+One of FL's key goals is to protect participants' privacy by simply requesting them to share model parameters and not any of their personal information. Additionally, FL wants to improve the model's fairness and accuracy by incorporating personal data. However, if any FL participant is malicious, these goals could be defeated. Model updates obtained from them can be used to reconstruct data, and poisoning attacks can corrupt the model.
+
+\subsection{Types of Attacks} % D
+
+\begin{itemize}
+  \item Data poisoning attacks\\
+  In order to lower the accuracy of the model and add biases, these attacks introduce tainted data that violate the dataset's integrity. Model skew attacks \cite{Model_skewing_attacks} and feedback weaponization\cite{feedback_weaponization} fall within this group. The goal of model skew attacks is to decrease the model's accuracy by obfuscating or distorting the boundaries between the classifiers. Feedback weaponization, on the other hand, tricks the model into misclassifying certain labels to introduce biases against them.
+  
+  \item Adversarial attacks \footnote{Also called model poisoning.}\\
+  Adversarial attacks \cite{adversarial_attack} involve specially crafted data that have designed to be consistently misclassified by the model. They can be subdivided to non-targeted and targeted. Non-targeted attacks try to evade being correctly classification during inference, any incorrect result is acceptable. Targeted attacks aim to incorporate backdoors into the model, that means manipulate the network to give specific erroneous inference for certain inputs.
+  
+  \item Inferring Attacks\\
+  Attacks of this kind aim to gain information about the participants and their data, and can be classified into two categories. The first one is tracing attacks, which aim to detect whether a client is actively participating into training. The second one reconstruction attacks, which aim to recreate examples used in training, or features of them.
+  
+  Such attack can perpetrated using model extraction algortihms and Generative Adversarial Networks \cite{GAN_attack} (GANs). GANs is a ML technique where two competing ANNs are trained, a generator network and a discriminator network. The generator tries to create fake data while the discriminator tries to discern real data from the fake by analyzing the output of the discriminator. After some training, the generator can create data that closely resembles the real ones using the statistics learned by the classifier.
+  
+  A GAN attack seeks to infer as much useful information as possible about elements in a target class that are not under its possession. The GAN tries to mimic samples of that class, mislabels them and feeds them to the ANN under federated training. The rest of the participants must then work harder to discriminate between the target class and the mislabeled class, resulting in additional knowledge about the target class in the global model. This process is repeated until convergence, and the GAN has enough information to reliably reconstruct samples from the target class that approximate the original examples. 
+  
+  This attack can be generalized to any number of classes and users, as well as any type of collaborative learning. If the server or another entity with access to the victim's communications is the malicious actor,it can be made more efficient by using the victim's local updates rather than the global model.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+        \includegraphics[width=1\textwidth]{Images/topologies/gan_fl.png}
+        \decoRule
+        \caption[GAN attack]{GAN attack. The adversary mimics images of class \emph{a}, labels them as class \emph{c} and uses them to train the collaborative model. To distinguish between these two classes, the model will require more information from the victim. The adversary does not need to have any true samples.: \href{https://arxiv.org/abs/1702.07464}{URL}.}
+        \label{fig:GAN attack}
+\end{figure}
+
+\subsubsection{Countermeasures}
+FL algorithms are somewhat resistant to the aforementioned attacks due to the regularization effect of averaging local models. Data poisoning and adversarial attacks require a sizable portion of the dataset to be tainted in order to succeed. Additionally, inferring attacks demand that the malicious actor go through numerous training epochs. In an IoT environment since most clients, if they are even chosen, will only participate once. Even when several malicious clients collude, the is a very small probability of achieving their goals.
+
+Such scale is quite challenging to achieve in an environment closer to the datacenter, making it much more vulnerable. Furthermore, clients might seek stronger privacy guarantees as the server might not always trustworthy. For these reasons, further measures for protecting privacy and security are necessary.
+
+An additional level of security can be provided with minimal adjustments to the FL protocol, by scanning the clients' updates for unusual patterns. Repeated updates with outlandish values could be a sign that a client is attempting to corrupt the model. Furthermore, the updates of clients that try to inject backdoors frequently resemble one another, which is rare, especially in a non-iid dataset. Such methods can improve the security of the model, but require plain-text access to the local updates, which is not always available due to privacy enhancements based on cryptography.
+
+Clients might request further privacy protections, particularly if they don't trust the server or the connection between them. Secure Multi-Party Computation (MPC) \cite{MPC}, a subfield of cryptography, can be utilized to accomplish that. MPC simulate a trustworthy third party between two or more collaborating parties. Its homomorphic encryption techniques, which allow mathematical operations to be performed directly on cyphertexts and enable the server to aggregate the local models without having access to their plain-text contents, are particularly helpful. As a result, privacy can be ensured, albeit at a high computational cost that comes with cryptographic operations.
+
+The state of the art method to enhance model security and restrict information exposure is differential privacy (DP) \cite{GAN_attack}. The fundamental tenet of DP is that by blurring a model's weights, they can not be associated with the data they were produced with. In FL, clients add random noise\footnote{Usually Gaussian.},with a mean value zero, to their local updates prior sharing them with the server. In addition of concealing the clients, this technique hinders dackdoor injections to the model, as the malicious clients need to send a precise set of parameters to achieve their goals.
 
 
-\subsection{communication security}
-Secure aggregation - untrusted server
-Differential privacy - gan attacks
-data poisoning attacks
-model poisoning attacks
+\begin{figure}[H]
+    \centering
+        \includegraphics[width=1\textwidth]{Images/topologies/dp_on_gan_attack.png}
+        \decoRule
+        \caption[GAN attack under Differential Privacy]{Effect of Differential Privacy on a GAN attack.: \href{https://arxiv.org/abs/1702.07464}{URL}.}
+        \label{fig:GAN attack under Differential Privacy}
+\end{figure}
 
+Theoretically, under DP transformation, the accuracy of the model and its convergence rate won't be impacted as the noise should vanish during aggregation. In practice, several samples are necessary to generate a distribution with a mean value close to zero, thus FL must be scaled appropriately. Finally, as attacks get more sophisticated, these countermeasures might not be effective and combinations of them or new ones are required.
 
-
-
-
-
-somewhere talk about stragglers and participant selection
+%types
+% \subsection{Categorization?} % C12:5 +B88
+%     horizontal - vertical - transfer learning?
+%     \subsubsection{Architectures for a federated learning system}

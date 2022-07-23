@@ -66,7 +66,7 @@ int main ( int argc , char** argv )
 	/**************************************************************************************************/
 	/* Set up python environment, neural network and numpy wrappers.                                  */
 	/**************************************************************************************************/
-	Python_with_TF python_with_TF( &received_message , &send_message , argc , argv );
+	Python_with_TF python_with_TF( &received_message , &send_message , argc , argv );//TODO: rename object to computational unit
 
 	/**************************************************************************************************/
 	/* Main loop.                                                                                     */
@@ -146,7 +146,7 @@ int main ( int argc , char** argv )
 		/**************************************************************************************************/
 		// call python function
 		python_with_TF.train();
-
+//TODO:remove this propably, it does not do anything
 		examples_used += examples_per_global_epoch;
 
 		if( examples_used == python_with_TF.m_num_examples )
@@ -155,6 +155,7 @@ int main ( int argc , char** argv )
 			python_with_TF.shuffle_data();
 			examples_used = 0;
 		}
+//TODO:till here
 
 		// calculate deltas
 		#if MSG_VARIABLE_MODE == DELTAS

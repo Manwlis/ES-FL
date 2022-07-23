@@ -11,12 +11,12 @@ Computation_unit::~Computation_unit(){}
 Python_with_TF::Python_with_TF( Server_to_client_msg* input_message , Client_to_server_msg* output_message , int argc , char** argv )
 	: Computation_unit( input_message , output_message ) , m_py_flags( nullptr ) , m_py_epoch( nullptr ) // nullptr to supress warning 'may be used uninitialized in dealloc()'
 {
-	// Initialize python interpeter
+	// Initialize python interpreter
 	LOGGING( Logger::Level::initialization , "Initializing python interpeter." );
 	Py_SetProgramName( Py_DecodeLocale( argv[0] , nullptr ) );
 	Py_Initialize();
 
-	// Pass program arguments to interpeter
+	// Pass program arguments to interpreter
 	wchar_t** wchar_argv = (wchar_t**) PyMem_Malloc( sizeof(wchar_t*)* argc );
 	for ( int i = 0 ; i < argc ; i++ )
 		wchar_argv[i] = Py_DecodeLocale( argv[i] , nullptr );

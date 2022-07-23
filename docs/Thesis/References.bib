@@ -282,14 +282,14 @@
     number =        {3},
     series = 	    {Proceedings of Machine Learning Research},
     address = 	    {Atlanta, Georgia, USA},
-    month = 	    {17--19 Jun},
+    month = 	    {01},
     publisher =     {PMLR},
     pdf = 	        {http://proceedings.mlr.press/v28/sutskever13.pdf},
     url = 	        {https://proceedings.mlr.press/v28/sutskever13.html},
     abstract = 	    {Deep and recurrent neural networks (DNNs and RNNs respectively) are powerful models that were considered to be almost impossible to train using stochastic gradient descent with momentum. In this paper, we show that when stochastic gradient descent with momentum uses a well-designed random initialization and a particular type of slowly increasing schedule for the momentum parameter, it can train both DNNs and RNNs (on datasets with long-term dependencies) to levels of performance that were previously achievable only with Hessian-Free optimization. We find that both the initialization and the momentum are crucial since poorly initialized networks cannot be trained with momentum and well-initialized networks perform markedly worse when the momentum is absent or poorly tuned.     Our success training these models suggests that previous attempts to train deep and recurrent neural networks from random initializations have likely failed due to poor initialization schemes. Furthermore, carefully tuned momentum methods suffice for dealing with the curvature issues in deep and recurrent network training objectives without the need for sophisticated second-order methods.}
 }
 
-@ARTICLE{FL_comprehensive_survey,
+@ARTICLE{FL_comprehensive_survey, %survey A
     author =        {Lim, Wei Yang Bryan and Luong, Nguyen Cong and Hoang, Dinh Thai and Jiao, Yutao and Liang, Ying-Chang and Yang, Qiang and Niyato, Dusit and Miao, Chunyan},
     journal =       {IEEE Communications Surveys \& Tutorials}, 
     title =         {Federated Learning in Mobile Edge Networks: A Comprehensive Survey}, 
@@ -299,7 +299,56 @@
     pages =         {2031-2063},
     doi =           {10.1109/COMST.2020.2986024}
  }
- 
+ @misc{survey_B,
+    doi =           {10.48550/ARXIV.1912.04977},
+    url =           {https://arxiv.org/abs/1912.04977},
+    author =        {Kairouz,  Peter and McMahan,  H. Brendan and Avent,  Brendan and Bellet,  Aurélien and Bennis,  Mehdi and Bhagoji,  Arjun Nitin and Bonawitz,  Kallista and Charles,  Zachary and Cormode,  Graham and Cummings,  Rachel and D'Oliveira,  Rafael G. L. and Eichner,  Hubert and Rouayheb,  Salim El and Evans,  David and Gardner,  Josh and Garrett,  Zachary and Gascón,  Adrià and Ghazi,  Badih and Gibbons,  Phillip B. and Gruteser,  Marco and Harchaoui,  Zaid and He,  Chaoyang and He,  Lie and Huo,  Zhouyuan and Hutchinson,  Ben and Hsu,  Justin and Jaggi,  Martin and Javidi,  Tara and Joshi,  Gauri and Khodak,  Mikhail and Konečný,  Jakub and Korolova,  Aleksandra and Koushanfar,  Farinaz and Koyejo,  Sanmi and Lepoint,  Tancrède and Liu,  Yang and Mittal,  Prateek and Mohri,  Mehryar and Nock,  Richard and \"{O}zg\"{u}r,  Ayfer and Pagh,  Rasmus and Raykova,  Mariana and Qi,  Hang and Ramage,  Daniel and Raskar,  Ramesh and Song,  Dawn and Song,  Weikang and Stich,  Sebastian U. and Sun,  Ziteng and Suresh,  Ananda Theertha and Tramèr,  Florian and Vepakomma,  Praneeth and Wang,  Jianyu and Xiong,  Li and Xu,  Zheng and Yang,  Qiang and Yu,  Felix X. and Yu,  Han and Zhao,  Sen},
+    keywords =      {Machine Learning (cs.LG),  Cryptography and Security (cs.CR),  Machine Learning (stat.ML),  FOS: Computer and information sciences,  FOS: Computer and information sciences},
+    title =         {Advances and Open Problems in Federated Learning},
+    publisher =     {arXiv},
+    year =          {2019},
+    copyright =     {arXiv.org perpetual,  non-exclusive license}
+}
+
+@article{survey_C,
+    doi =           {10.48550/ARXIV.1902.04885},
+    url =           {https://arxiv.org/abs/1902.04885},
+    author =        {Yang,  Qiang and Liu,  Yang and Chen,  Tianjian and Tong,  Yongxin},
+    keywords =      {Artificial Intelligence (cs.AI),  Cryptography and Security (cs.CR),  Machine Learning (cs.LG),  FOS: Computer and information sciences,  FOS: Computer and information sciences},
+    title =         {Federated Machine Learning: Concept and Applications},
+    publisher =     {arXiv},
+    year =          {2019},
+    copyright =     {arXiv.org perpetual,  non-exclusive license}
+}
+
+@article{survey_D,
+    title =         {A review of applications in federated learning},
+    journal =       {Computers \& Industrial Engineering},
+    volume =        {149},
+    pages =         {106854},
+    year =          {2020},
+    issn =          {0360-8352},
+    doi =           {https://doi.org/10.1016/j.cie.2020.106854},
+    url =           {https://www.sciencedirect.com/science/article/pii/S0360835220305532},
+    author =        {Li Li and Yuxi Fan and Mike Tse and Kuo-Yi Lin},
+    keywords =      {Federated learning, Literature review, Citation analysis, Research front},
+    abstract =      {Federated Learning (FL) is a collaboratively decentralized privacy-preserving technology to overcome challenges of data silos and data sensibility. Exactly what research is carrying the research momentum forward is a question of interest to research communities as well as industrial engineering. This study reviews FL and explores the main evolution path for issues exist in FL development process to advance the understanding of FL. This study aims to review prevailing application in industrial engineering to guide for the future landing application. This study also identifies six research fronts to address FL literature and help advance our understanding of FL for future optimization. This study contributes to conclude application in industrial engineering and computer science and summarize a review of applications in FL.}
+}
+
+@article{survey_E,
+    doi =           {10.1109/msp.2020.2975749},
+    url =           {https://doi.org/10.1109/msp.2020.2975749},
+    year =          {2020},
+    month =         {05},
+    publisher =     {Institute of Electrical and Electronics Engineers ({IEEE})},
+    volume =        {37},
+    number =        {3},
+    pages =         {50--60},
+    author =        {Tian Li and Anit Kumar Sahu and Ameet Talwalkar and Virginia Smith},
+    title =         {Federated Learning: Challenges,  Methods,  and Future Directions},
+    journal =       {{IEEE} Signal Processing Magazine}
+}
+
 @misc{GBoard_FL,
     doi =           {10.48550/ARXIV.1811.03604},
     url =           {https://arxiv.org/abs/1811.03604},
@@ -309,6 +358,181 @@
     publisher =     {arXiv},
     year =          {2018},
     copyright =     {Creative Commons Attribution Non Commercial Share Alike 4.0 International}
+}
+
+@inproceedings{stragglers,
+    author =        {Sprague, Michael and Jalalirad, Amir and Scavuzzo, Marco and Capota, Catalin and Neun, Moritz and Do, Lyman and Kopp, Michael},
+    year =          {2019},
+    month =         {03},
+    pages =         {21-28},
+    title =         {Asynchronous Federated Learning for Geospatial Applications},
+    isbn =          {978-981-10-0665-4},
+    doi =           {10.1007/978-3-030-14880-5_2}
+}
+
+@misc{probabilistic_quantization,
+    doi =           {10.48550/ARXIV.1510.00149},
+    url =           {https://arxiv.org/abs/1510.00149},
+    author =        {Han,  Song and Mao,  Huizi and Dally,  William J.},
+    keywords =      {Computer Vision and Pattern Recognition (cs.CV),  Neural and Evolutionary Computing (cs.NE),  FOS: Computer and information sciences,  FOS: Computer and information sciences},
+    title =         {Deep Compression: Compressing Deep Neural Networks with Pruning,  Trained Quantization and Huffman Coding},
+    publisher =     {arXiv},
+    year =          {2015},
+    copyright =     {arXiv.org perpetual,  non-exclusive license}
+}
+
+@inproceedings{observation_parameters,
+    title=          {Scalable distributed DNN training using commodity GPU cloud computing},
+    author=         {Nikko Strom},
+    booktitle=      {INTERSPEECH},
+    year=           {2015}
+}
+
+@misc{interplay_heterogeneities,
+    doi =           {10.48550/ARXIV.1812.06127},
+    url =           {https://arxiv.org/abs/1812.06127},
+    author =        {Li,  Tian and Sahu,  Anit Kumar and Zaheer,  Manzil and Sanjabi,  Maziar and Talwalkar,  Ameet and Smith,  Virginia},
+    keywords =      {Machine Learning (cs.LG),  Machine Learning (stat.ML),  FOS: Computer and information sciences,  FOS: Computer and information sciences},
+    title =         {Federated Optimization in Heterogeneous Networks},
+    publisher =     {arXiv},
+    year =          {2018},
+    copyright =     {arXiv.org perpetual,  non-exclusive license}
+}
+
+@inproceedings{model_inversion,
+    author =        {Fredrikson, Matt and Jha, Somesh and Ristenpart, Thomas},
+    title =         {Model Inversion Attacks That Exploit Confidence Information and Basic Countermeasures},
+    year =          {2015},
+    isbn =          {9781450338325},
+    publisher =     {Association for Computing Machinery},
+    address =       {New York, NY, USA},
+    url =           {https://doi.org/10.1145/2810103.2813677},
+    doi =           {10.1145/2810103.2813677},
+    abstract =      {Machine-learning (ML) algorithms are increasingly utilized in privacy-sensitive applications such as predicting lifestyle choices, making medical diagnoses, and facial recognition. In a model inversion attack, recently introduced in a case study of linear classifiers in personalized medicine by Fredrikson et al., adversarial access to an ML model is abused to learn sensitive genomic information about individuals. Whether model inversion attacks apply to settings outside theirs, however, is unknown. We develop a new class of model inversion attack that exploits confidence values revealed along with predictions. Our new attacks are applicable in a variety of settings, and we explore two in depth: decision trees for lifestyle surveys as used on machine-learning-as-a-service systems and neural networks for facial recognition. In both cases confidence values are revealed to those with the ability to make prediction queries to models. We experimentally show attacks that are able to estimate whether a respondent in a lifestyle survey admitted to cheating on their significant other and, in the other context, show how to recover recognizable images of people's faces given only their name and access to the ML model. We also initiate experimental exploration of natural countermeasures, investigating a privacy-aware decision tree training algorithm that is a simple variant of CART learning, as well as revealing only rounded confidence values. The lesson that emerges is that one can avoid these kinds of MI attacks with negligible degradation to utility.},
+    booktitle =     {Proceedings of the 22nd ACM SIGSAC Conference on Computer and Communications Security},
+    pages =         {1322–1333},
+    numpages =      {12},
+    keywords =      {privacy, machine learning, attacks},
+    location =      {Denver, Colorado, USA},
+    series =        {CCS '15}
+}
+
+@misc{adversarial_attack,
+    doi =           {10.48550/ARXIV.1312.6199},
+    url =           {https://arxiv.org/abs/1312.6199},
+    author =        {Szegedy,  Christian and Zaremba,  Wojciech and Sutskever,  Ilya and Bruna,  Joan and Erhan,  Dumitru and Goodfellow,  Ian and Fergus,  Rob},
+    keywords =      {Computer Vision and Pattern Recognition (cs.CV),  Machine Learning (cs.LG),  Neural and Evolutionary Computing (cs.NE),  FOS: Computer and information sciences,  FOS: Computer and information sciences},
+    title =         {Intriguing properties of neural networks},
+    publisher =     {arXiv},
+    year =          {2013},
+    copyright =     {Creative Commons Attribution 3.0 Unported}
+}
+
+@misc{GAN_attack,
+    doi =           {10.48550/ARXIV.1702.07464},
+    url =           {https://arxiv.org/abs/1702.07464},
+    author =        {Hitaj,  Briland and Ateniese,  Giuseppe and Perez-Cruz,  Fernando},
+    keywords =      {Cryptography and Security (cs.CR),  Machine Learning (cs.LG),  Machine Learning (stat.ML),  FOS: Computer and information sciences,  FOS: Computer and information sciences},
+    title =         {Deep Models Under the GAN: Information Leakage from Collaborative Deep Learning},
+    publisher =     {arXiv},
+    year =          {2017},
+    copyright =     {arXiv.org perpetual,  non-exclusive license}
+}
+
+@misc{fashion_mnist,
+    doi =           {10.48550/ARXIV.1708.07747},
+    author =        {Han Xiao and Kashif Rasul and Roland Vollgraf},
+    title =         {Fashion-MNIST: a Novel Image Dataset for Benchmarking Machine Learning Algorithms},
+    journal =       {CoRR},
+    volume =        {abs/1708.07747},
+    year =          {2017},
+    url =           {http://arxiv.org/abs/1708.07747},
+    archivePrefix = {arXiv},
+    eprint =        {1708.07747},
+    timestamp =     {Mon, 13 Aug 2018 16:47:27 +0200},
+    biburl =        {https://dblp.org/rec/bib/journals/corr/abs-1708-07747},
+    bibsource =     {dblp computer science bibliography, https://dblp.org}
+}
+
+@ARTICLE{LeNet,
+    author=         {Lecun, Y. and Bottou, L. and Bengio, Y. and Haffner, P.},
+    journal=        {Proceedings of the IEEE}, 
+    title=          {Gradient-based learning applied to document recognition}, 
+    year=           {1998},
+    volume=         {86},
+    number=         {11},
+    pages=          {2278-2324},
+    doi=            {10.1109/5.726791}
+}
+
+@misc{inception_module,
+    doi =           {10.48550/ARXIV.1409.4842},
+    url =           {https://arxiv.org/abs/1409.4842},
+    author =        {Szegedy,  Christian and Liu,  Wei and Jia,  Yangqing and Sermanet,  Pierre and Reed,  Scott and Anguelov,  Dragomir and Erhan,  Dumitru and Vanhoucke,  Vincent and Rabinovich,  Andrew},
+    keywords =      {Computer Vision and Pattern Recognition (cs.CV),  FOS: Computer and information sciences,  FOS: Computer and information sciences},
+    title =         {Going Deeper with Convolutions},
+    publisher =     {arXiv},
+    year =          {2014},
+    copyright =     {arXiv.org perpetual,  non-exclusive license}
+}
+
+@misc{parallel_SGD,
+    doi =           {10.48550/ARXIV.1410.7455},
+    url =           {https://arxiv.org/abs/1410.7455},
+    author =        {Povey,  Daniel and Zhang,  Xiaohui and Khudanpur,  Sanjeev},
+    keywords =      {Neural and Evolutionary Computing (cs.NE),  Machine Learning (cs.LG),  Machine Learning (stat.ML),  FOS: Computer and information sciences,  FOS: Computer and information sciences},
+    title =         {Parallel training of DNNs with Natural Gradient and Parameter Averaging},
+    publisher =     {arXiv},
+    year =          {2014},
+    copyright =     {Creative Commons Attribution 3.0 Unported}
+}
+
+@misc{tensorflow2015-whitepaper,
+    title =         { {TensorFlow}: Large-Scale Machine Learning on Heterogeneous Systems},
+    url =           {https://www.tensorflow.org/},
+    note =          {Software available from tensorflow.org},
+    author =        {
+        Mart\'{i}n~Abadi and
+        Ashish~Agarwal and
+        Paul~Barham and
+        Eugene~Brevdo and
+        Zhifeng~Chen and
+        Craig~Citro and
+        Greg~S.~Corrado and
+        Andy~Davis and
+        Jeffrey~Dean and
+        Matthieu~Devin and
+        Sanjay~Ghemawat and
+        Ian~Goodfellow and
+        Andrew~Harp and
+        Geoffrey~Irving and
+        Michael~Isard and
+        Yangqing Jia and
+        Rafal~Jozefowicz and
+        Lukasz~Kaiser and
+        Manjunath~Kudlur and
+        Josh~Levenberg and
+        Dandelion~Man\'{e} and
+        Rajat~Monga and
+        Sherry~Moore and
+        Derek~Murray and
+        Chris~Olah and
+        Mike~Schuster and
+        Jonathon~Shlens and
+        Benoit~Steiner and
+        Ilya~Sutskever and
+        Kunal~Talwar and
+        Paul~Tucker and
+        Vincent~Vanhoucke and
+        Vijay~Vasudevan and
+        Fernanda~Vi\'{e}gas and
+        Oriol~Vinyals and
+        Pete~Warden and
+        Martin~Wattenberg and
+        Martin~Wicke and
+        Yuan~Yu and
+        Xiaoqiang~Zheng},
+    year =          {2015},
 }
 
 
@@ -492,6 +716,125 @@
     urldate =       {2022-06-17}
 }
 
+@online{Model_skewing_attacks,
+    author =        {Nikhil Joshi},
+    title =         {Model Skewing Attacks on Machine Learning Models},
+    organization =  {Payatu},
+    year =          {2021},
+    month =         {02},
+    day =           {18},
+    
+    url =           {https://payatu.com/blog/nikhilj/sec4ml-machine-learning-model-skewing-data-poisoning},
+    urldate =       {2022-06-27}
+}
+
+@online{feedback_weaponization,
+    author =        {Elie Bursztein},
+    title =         {Attacks against machine learning — an overview},
+    year =          {2018},
+    month =         {05},
+    
+    url =           {https://elie.net/blog/ai/attacks-against-machine-learning-an-overview/#:~:text=impacted\%20your\%20users.-,Feedback\%20weaponization,this\%20fact\%20to\%20their\%20advantage.},
+    urldate =       {2022-06-27}
+}
+
+
+@online{MPC,
+    title =         {What is Secure Multiparty Computation?},
+    organization =  {Inpher},
+    
+    url =           {https://inpher.io/technology/what-is-secure-multiparty-computation/},
+    urldate =       {2022-07-01}
+}
+
+@online{digits_mnist,
+    author =        {LeCun, Yann and Cortes, Corinna},
+    keywords =      {MSc _checked character_recognition mnist network neural},
+    title =         {{MNIST} handwritten digit database},
+    url =           {http://yann.lecun.com/exdb/mnist/},
+    year =          {2010}
+}
+
+@online{tff,
+    title =         {TensorFlow Federated: Machine Learning on Decentralized Data},
+    
+    url =           {https://www.tensorflow.org/federated},
+    urldate =       {2022-07-08}
+}
+
+@online{POSIX_socket,
+    title =         {socket(2) — Linux manual page},
+    organization =  {man7.org},
+    year =          {2021},
+    month =         {03},
+    day =           {22},
+    
+    url =           {https://man7.org/linux/man-pages/man2/socket.2.html},
+    urldate =       {2022-07-08}
+}
+
+@online{bsd,
+    title =         {Berkeley Software Distribution},
+    organization =  {Wikipedia},
+    year =          {2022},
+    month =         {05},
+    day =           {27},
+    
+    url =           {https://en.wikipedia.org/wiki/Berkeley_Software_Distribution},
+    urldate =       {2022-07-08}
+}
+
+@online{TFDS,
+    title =         { {TensorFlow Datasets}, A collection of ready-to-use datasets},
+    organization =  {TensorFlow},
+    howpublished =  {\url{https://www.tensorflow.org/datasets} },
+    urldate =       {2022-07-09}
+}
+
+@online{dataset_norm,
+    title =         {Normalize Data component},
+    author =        {Blanca, Li and Peter, Lu},
+    organization =  {Microsoft},
+    year =          {2021},
+    month =         {04},
+    day =           {11},
+    
+    url =           {https://docs.microsoft.com/en-us/azure/machine-learning/component-reference/normalize-data},
+    urldate =       {2022-07-09}
+}
+
+@online{Python/C_API,
+    title =         {Python/C API Reference Manual},
+    organization =  {Python Software Foundation},
+    year =          {2022},
+    month =         {07},
+    day =           {11},
+    
+    url =           {https://docs.python.org/3/c-api/index.html},
+    urldate =       {2022-07-11}
+}
+
+@online{embedding_python,
+    title =         {Embedding Python in Another Application},
+    organization =  {Python Software Foundation},
+    year =          {2022},
+    month =         {07},
+    day =           {11},
+    
+    url =           {https://docs.python.org/3/extending/embedding.html},
+    urldate =       {2022-07-11}
+}
+
+@online{TF_C_API,
+    title =         {TensorFlow in other languages},
+    organization =  {Google Inc.},
+    year =          {2019},
+    month =         {08},
+    day =           {21},
+    
+    url =           {https://github.com/tensorflow/docs/blob/master/site/en/r1/guide/extend/bindings.md},
+    urldate =       {2022-07-11}
+}
 %-----------------------------------
 %	Unused references
 %-----------------------------------

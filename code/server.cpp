@@ -225,10 +225,12 @@ int main( int argc , char** argv )
 	/**************************************************************************************************/
 	/* Set up python environment, neural network and numpy wrappers.                                  */
 	/* Used for evaluating the global neural network, only need that.                                 */
-	/* Set up an interrupt trap in order to print NN accuracy history when manually shutting down.    */
 	/**************************************************************************************************/
 	Python_with_TF python_with_TF( &announcement_msg , (Client_to_server_msg*) nullptr , argc , argv );
 
+	/**************************************************************************************************/
+	/* Set up an interrupt trap in order to print NN accuracy history when manually shutting down.    */
+	/**************************************************************************************************/
 	interrupt_trap = [&python_with_TF]( int signum )
 	{
 		// the state of the terminal can't be predicted when the interrupt rises
