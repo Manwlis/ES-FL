@@ -1,0 +1,27 @@
+\begin{tikzpicture}
+    \begin{axis}
+        [
+            xmin = 0,
+            xmax = 50,
+            ymin = 0.8,
+            xlabel = GE,
+            xtick = { 1 , 5 ,..., 50 },
+            ylabel = Test Accuracy,
+            legend pos = south east,
+            scale = 1.25,
+            no markers,
+        ]
+        \addplot [blue] table [ x=GE , y={lr_decay=0.818649} ]{data/experiment8.dat};
+        \addplot [red] table [ x=GE , y={lr_decay=0.9093245} ]{data/experiment8.dat};
+        \addplot [green] table [ x=GE , y={lr_decay=0.95466225} ]{data/experiment8.dat};
+        \addplot [yellow] table [ x=GE , y={lr_decay=0.977331125} ]{data/experiment8.dat};
+        \addplot [black] table [ x=GE , y={no_decay} ]{data/experiment8.dat};
+        \addplot[ domain=0:50 , mark=none , black , thin , dotted , samples=2 ] {0.92};
+        
+        \addlegendentry{LR decay $\approx$ 0.819}
+        \addlegendentry{LR decay $\approx$ 0.909}
+        \addlegendentry{LR decay $\approx$ 0.955}
+        \addlegendentry{LR decay $\approx$ 0.977}
+        \addlegendentry{No decay}
+    \end{axis}
+\end{tikzpicture}

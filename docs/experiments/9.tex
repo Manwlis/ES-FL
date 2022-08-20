@@ -1,0 +1,27 @@
+\begin{tikzpicture}[baseline=(current axis.outer east)]
+    \begin{axis}
+        [
+            xmin = 0,
+            xmax = 200,
+            ymin = 0.8,
+            xlabel = GE,
+            xtick = { 1 , 20 ,..., 200 },
+            ylabel = Test Accuracy,
+            legend pos = south east,
+            scale = 1.25,
+            no markers,
+            thin
+        ]
+        \addplot [black] table [ x=GE , y={client1} ]{data/experiment9.dat};
+        \addplot +[restrict x to domain=1:100] [red] table [ x=GE , y={client3} ]{data/experiment9.dat};
+        \addplot +[restrict x to domain=1:100] [green] table [ x=GE , y={client5} ]{data/experiment9.dat};
+        \addplot +[restrict x to domain=1:100] [blue] table [ x=GE , y={client10} ]{data/experiment9.dat};
+        \addplot [ domain=0:200 , mark=none , black , thin , dotted , samples=2 ] {0.92};
+        
+        \addlegendentry{1 client per GE}
+        \addlegendentry{3 clients per GE}
+        \addlegendentry{5 clients per GE}
+        \addlegendentry{10 clients per GE}
+        
+    \end{axis}
+\end{tikzpicture}

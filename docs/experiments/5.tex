@@ -1,0 +1,23 @@
+\begin{tikzpicture}
+    \begin{axis}
+        [
+            xmin = 0,
+            xmax = 21,
+            xlabel = Dataset Repetitions,
+            xtick = { 1 , 2 ,..., 20 },
+            ylabel = Test Accuracy,
+            legend pos = south east,
+            thick,
+               scale = 1.25,
+            every node/.style = {transform shape},
+            scaled x ticks = false
+        ]
+        \addplot table [ x=session , y=normal_operation ]{data/experiment5.dat};
+        \addplot table [ x=session , y=faulty_client ]{data/experiment5.dat};
+        \addplot[mark=*] coordinates {(2,0.823400020599365)} node[pin=0:{client disconnects}]{} ;
+        
+        \addlegendentry{Normal operation}
+        \addlegendentry{Faulty operation}
+        
+    \end{axis}
+\end{tikzpicture}

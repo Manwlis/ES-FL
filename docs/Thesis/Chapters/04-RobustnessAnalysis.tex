@@ -66,7 +66,7 @@ After exposing the parameters to the Python code, one more step is necessary to 
 \end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% implementation %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
-\section{FL Architecture}
+\section{FL Architecture}\label{sec:FL_architecture}
 The architecture aims to offer a generalized FL loop that enables the implementation of various FL algorithms. To achieve this, it is designed to be flexible and modular, with each FL operation, such as client selection and aggregation, having its own specialized function. Additionally, all relevant training parameters and hyper-parameters, such as local epochs or participating clients per epoch, are compiled in the \texttt{definitions.hpp} file. Since the entire codebase accesses them from there, testing and experimentation are streamlined and less prone to mistakes.
 
 In FL, multiple entities are present, the orchestrating server and the clients training the global model. As the aim of this work is to implement FL with clients operating on separate devices, it is essential that each entity is a distinct process with its own private data-space. That data-space contains its private training or testing dataset, as well as its local or global models. All required communication is facilitated through POSIX sockets.
@@ -100,9 +100,9 @@ After the initializations, the server enters a waiting state. To achieve this th
 
 Following any event, the server determines whether a new epoch should begin. It takes in consideration how many local models were successfully received this epoch, how many clients are connected, and how many clients are still working. If the current epoch requires further work, the process returns to the waiting state and sleeps until a new event occurs.
 
-If the contrary is true, the new global model is created by dividing the aggregated local models by the number of received local models during the current epoch. Then, this new model is evaluated, and shared with randomly selected clients. The only action needed to share the model with a client is enabling the \texttt{POLLOUT} flag of the corresponding socket; the event loop will handle sending the message.
+If the contrary is true, the new global model is created by dividing the aggregated local models by the number of received local models during the current epoch. This new model is evaluated, and then shared with clients that where randomly selected using the Durstenfeld-Fisher-Yates shuffle algorithm \cite{Durstenfeld_Fisher_Yates_paper, Fisher_Yates_shuffle_wiki}. The only action needed to share the model with a client is enabling the \texttt{POLLOUT} flag of the corresponding socket; the event loop will handle sending the message.
 
-The event loop's final step is to determine whether any further training is required. If the target accuracy is achieved or a predetermined number of global epochs have been completed, the server shows any relevant statistics, stores the final global model to disk, and shuts down.
+The event loop's final step is to determine whether any further training is required. If the target accuracy is achieved or a predetermined number of GEs have been completed, the server shows any relevant statistics, stores the final global model to disk, and shuts down.
 
 % \subsubsection{Memory layout}
 
@@ -118,77 +118,101 @@ At startup, the client creates a socket and connects to the server. Additionally
 The main loop contains three major operation. First, it receives the global model shared by the server. Then, it is trained with the local private data, creating a new local model. Finally, any required transformations, such as quantization and compression, are applied to the new model, which is then send to the server. This process is repeated until the server informs that there will be no more training with that client.
 
 % \subsubsection{Memory layout}
-\begin{figure}
+\begin{figure}[H]
     \centering
         \includegraphics[ width=\textwidth, height=\textheight, keepaspectratio]{Images/block_diagrams/top.png}
         \decoRule
         \caption[Server - Client Activity Diagram]{Server - Client Activity Diagram: Yellow states are modelled with TensorFlow, while grey states are not essential for FL. Blue arrows represent data movements. Error conditions and states are not displayed.}
         \label{fig:server_client_activity_diagram}
 \end{figure}
-\subsection{Life cycle of a model?} figure 4.1
+% \subsection{Life cycle of a model?} figure 4.1
 
 \subsection{Communication Scheme}
-The FL training is set up to be cross-device compatible. The server holds minimum information about the clients, just enough to maintain connection and communicate. As a result, the server can not address clients directly and no confirmations are conveyed on any direction.
+As stated in section \ref{sec:FL_architecture}, the server and the clients are separate processes that communicate over sockets. A concrete, predefined communication system is needed to accomplish this in a reliable manner. The server holds the barest amount of information on the clients, just what is necessary to stay in connection and communicate, to adhere to the cross-device FL setting.
+As such, the server can not address clients directly and messages must be generic. Furthermore, each message must be independent from the rest and self sufficient. As a result, messages sent by the server to clients must be general and self-sufficient.
+
+Algorithmic solutions can reduce communication, but communication must be kept to a minimum in systemic level too. The messages, to be as compact as possible, only include their model and a few bytes of metadata required by the FL algorithm. Furthermore, they are C-aligned arrays, which means there are no delimiters between their values, or hidden metadata from predefined protocols of higher abstraction, such as Protobuf.
+
+Minimizing communication frequency is another strategy used for cutting down on communication time. Any message send by the server that contains the global model, can be interpreted as an request to train it. Furthermore, if a client sends its local model, it can be presumed that it completed its task. As a result, each epoch only these two messages are required, and any synchronization or confirmation messages are unnecessary. With this approach, it is necessary for every party to interpret the messages in a same predefined way.
+
+\begin{table}[H]
+    \center
+    \begin{tabular}{ | c | }
+        \hline
+        Server to client message\\
+        \hline\hline
+        flags\\
+        \hline
+        GE\\
+        \hline
+        global model variables\\
+        ...\\
+        \hline
+        \multicolumn{1}{ c }{ } \\
+    \end{tabular}
+    \quad
+    \begin{tabular}{ | c | }
+        \hline
+        Client to server message\\
+        \hline\hline
+        GE\\
+        \hline
+        local loss\\
+        \hline
+        local accuracy\\
+        \hline
+        model variables / deltas\\
+        ...\\
+        \hline
+    \end{tabular}
+    \caption[Communication Scheme]{The format of the communication between the server and clients.}
+    \label{table:FL messages structure}
+\end{table}
+
+The format of the messages is shown in Table \ref{table:FL messages structure}. The flags field is intended to communicate particular instructions to clients, such as the message is the final one and no more communication will be accepted or that the client should initialize the model. The GE field is used to discard stragglers, as the server can quickly reject any messages from an earlier GE. The local loss and accuracy fields are used to facilitate complex algorithms, such as ignoring local models with poor accuracy or higher loss than the prior GE. The global and local model parameters are the last part of the format and make up the bulk of the messages.
 
 \subsection{Model Library}
+Most ML models, if not all of them, are meant to be trainable in a federated environment. To demonstrate the accuracy of the developed FL environment, a library of ten typical models has been created. As the training problem is image recognition, the majority of the models are CNNs. However, models of different architectures, such as deep and residual ANNs, are also included.
 
-% \section{Communication Scheme}
-% The server and each client are separate processes with their own memory regions. Data must be shared efficiently and reliably, hence a fitting communication mechanism is required. This is accomplished by using messages with predetermined size and structure in order to reduce the frequency and complexity of the communication. The messages are C-aligned arrays and their structure is as follows.
+\begin{enumerate}
 
-% \begin{center}
-%     \begin{tabular}{|c|}
-%         \hline
-%         Server to client message\\
-%         \hline\hline
-%         flags\\
-%         \hline
-%         global epoch\\
-%         \hline
-%         global model variables\\
-%         ...\\
-%         \hline
-%         \multicolumn{1}{c}{ } \\
-%     \end{tabular}
-%     \quad
-%     \begin{tabular}{|c|}
-%         \hline
-%         Client to server message\\
-%         \hline\hline
-%         global epoch\\
-%         \hline
-%         loss\\
-%         \hline
-%         accuracy\\
-%         \hline
-%         model variables / deltas\\
-%         ...\\
-%         \hline
-%     \end{tabular}
-% \end{center}
+    \item The simplest model in the library is a DNN architecture. It consists of three fully connected ReLU activated layers with 128, 1024 and 128 neurons respectively, followed by a Softmax layer. In total, it contains 365,066 weights for an approximate size of 1.46 MBytes.
+    
+    \item The first CNN model follows the original LeNet-5 architecture. It has two convolutional layers of 6 and 16 \(5\times5\) kernels, each one accompanied by an average pooling layer with \(2\times2\) pool size. They are followed by two fully connected layers of 120 and 84 neurons, and a Softmax layer. All layers, except the final one, are activated with the hyperbolic tangent function. In total, it contains 61,706 weights for an approximate size of 0.25 MBytes.
+    
+    \item For the following experiments, the model most used is a CNN architecture consisting of two convolutional ReLU activated layers of 32 and 64 \(3\times3\) kernels, each accompanied by a max pooling layer with \(2\times2\) pool size. They are followed a 128-neuron fully connected ReLU activated layer, and a Softmax layer. It contains 421,642 weights for an approximate size of 1.69 MBytes. This architecture is compact enough to enable rapid experimentation and testing while being sufficiently sophisticated to provide an acceptable level of accuracy and necessitate several training epochs.
+    
+    \item The CNN used in the original FL work \cite{FL-original-paper} is also included in the model library. Its architecture is fairly similar with the previous one, but with larger \(5\times5\) kernels, and a fully connected layer of 512 neurons. In total, it contains 1,663,370 weights for an approximate size of 6.65 MBytes.
+    
+    \item The next model included in the library aims to evaluate the FL environment with more sophisticated layers and combinations between them. It employs six convolutional layers, applies batch normalization on their outputs, and uses max pooling every two convolutions. There are 803,240 weights in it, giving it an approximate size of 3.2 MBytes.
+    
+    \item To test the FL environment with extremely large models, the AlexNet architecture have been implemented. The model consists of 46,764,746 weights for a message size of 187 MBytes. As a result, it is unfeasible to train it repeatedly, as the FL operation needs, with the current available resources. Instead, it was trained for a single epoch with a few training data and conservative hyperparameters, just to demonstrate that the FL environment has no model size constraints.
 
-% The flags field is used to give orders or supplementary information to the clients. These are:
-% \begin{itemize}
-%     \item The received model is random and can be ignored.
-%     \item The received model is the final one and no further communication will be accepted by the server.
-% \end{itemize}
-% The GE field is required for the server to determine whether a received model is addressed for the current GE and to accept or ignore it. The loss and accuracy fields can be used for more complex algorithms like disregarding local model with inadequate accuracy or greater loss than the previous GE.
-
-% \medskip
-% At the start of each GE, the server sends a message to each client chosen to take part, which is essentially an order to begin working. When a client finish its task, they answer with a single message containing the produced local network, indicating that they have completed their work. There is no need for any additional communication, such as confirmation or synchronization messages. In total 2 * N messages are sent every epoch, where N is the number of the clients. As far as the server is concerned, the clients are stateless and every interaction with them is unique. Each message is independent from the rest and must be self sufficient.
-
-
+    \item For similar reasons the OverFeat-AlexNet architecture is included. This model is the largest one in the library, with 56,906,954 weights and a total size of 227 MBytes. The same constrains apllies.
+    
+    \item The inception module detailed in section \ref{Inception Module} is the foundation for two of the included models. The first one comprises of two such modules of different sizes and a Softmax layer. It has a total of 4,275,914 parameters and is about 17.1 MBytes in size.
+    
+    \item The second inception architecture includes a module sandwiched between two convolutional layers, and max pools the outputs of all three. The output of the module is also subjected to the dropout transformation. Furthermore, they are followed by two fully connected layers and then a Softmax layer. In total, there are 277,082 weights for a size of 1.1 MBytes.
+    
+    \item The final model is based on the residual architecture. It is consisted of two convolutional layers and a Softmax layers. The input of the network feeds the convolutional layers, but it also skips them and is directly connected to the Softmax layer. Furthermore, the dropout transformation is applied to the input of the Softmax layer. It has 539,466 parameters and is about 2.16 MBytes in size.
+\end{enumerate}
 
 \section{Experiments}
-point of experiments
-what can we see, no timining look for global epochs
-\subsection{Distributed SGD with IID data}
-This experiment tests the algorithm with IDD distributed data. A simple CNN that classifies images of the Fashion MNIST dataset and the Adam optimizer are used. The neural network consists of approximately 420,000 Float32 trainable variables which produce messages of ~1.7MB. As the server and all the clients are running on the same machine, communication takes place on the operating system's loopback and no substantial timing can be made. The following experiment focus on model accuracy and the convergence rate of the FL algorithm in comparison to locally train a model. The training dataset, which consist of 60,000 images, is split equally between the clients. The following set of parameters and hyperparameters are set.
+A number of experiments, each concentrating on a different component of the FL algorithm, have been conducted to demonstrate the robustness of the developed FL environment. Additionally, the tests begin with straightforward cases and progress to more complicated ones by building on their findings. The training problem is image recognition on the Fashion-MNIST dataset. % why the experiments, from simple cases to more complex ones, problem 
 
-\begin{center}
-    \begin{tabular}{|c|c|}
+As the main goal of these experiments is to prove the algorithmic soundness of the FL environment, they were carried out on a single machine. As a result, the participating processes are competing for computing resources, and communication takes place on the operating system's loopback. Thus, it is impossible to draw any meaningful real-time inferences from these experiments; instead the communication frequency is used as a benchmark value. % what looking into and why.
+
+\subsection{Distributed SGD with IID data}
+The first experiment focuses on the most straitforward case, distributed SGD with IID data. The training dataset is split equally between the participating clients. The third model in the collection is used, and for simplicity's sake, the Adam optimizer with default parameters is employed. 
+
+\begin{table}[H]
+    \center
+    \begin{tabular}{ | c | c | }
         \hline
-        \multicolumn{2}{|c|}{ parameters } \\
+        \multicolumn{2}{ | c | }{ parameters } \\
         \hline\hline
+        participating clients & 4 \\
+        \hline
         local epochs & 1 \\
         \hline
         steps per epoch & 3 \\
@@ -196,344 +220,205 @@ This experiment tests the algorithm with IDD distributed data. A simple CNN that
         batch size & 10 \\
         \hline
     \end{tabular}
-    \quad
-    \begin{tabular}{|c|c|}
-        \hline
-        \multicolumn{2}{|c|}{ hyperparameters } \\
-        \hline\hline
-        global epochs & 500 \\
-        \hline
-        clients & 4 \\
-        \hline
-        \multicolumn{2}{c}{ } \\
-    \end{tabular}
-\end{center}
+    \caption[Experiment 1 Parameters]{The parameters of the first experiment.}
+    \label{table:Experiment 1 parameters}
+\end{table}
 
-With these parameters and 4 clients per GE, all data will be passed once every 500 GEs. For the sake of clarity and to not be confused with the global and local epochs, each pass through all data is called a Session.
+Using the aforementioned parameters, each client consumes 30 examples per GE. Considering that all four clients participate in each GE, 500 GEs are necessary to exhaust all training data.
 
-\medskip
-The accuracy of the FL trained model is compared with the accuracy of a locally trained model. This model has the same batch size, and steps per epoch equal with the number of the data divided by the batch size. Thus, an epoch equals a Session. The following diagram shows the accuracy of the two models on the test data for each Session.
+The FL trained model is compared to a centrally trained one with same parameters. To do this properly, a common scale is required. As such, the number of times the training dataset is repeated is used.
 
-\begin{center}
-    \begin{tikzpicture}
-        \begin{axis}
-            [
-                xmin = 0,
-                xmax = 21,
-                xlabel = Session,
-                xtick = { 1 , 2 ,..., 20 },
-                ylabel = Test Accuracy,
-                legend pos = south east,
-                thick,
-                scale = 1.25,
-                every node/.style = {transform shape},
-                scaled x ticks = false
-            ]
-            \addplot table [y=FL, x=P]{data/experiment1.dat};
-            \addplot +[restrict x to domain=1:15] table [y=LL, x=P]{data/experiment1.dat};
-            \addlegendentry{FL training}
-            \addlegendentry{local training}
-            
-        \end{axis}
-    \end{tikzpicture}
-    \captionof*{figure}{Experiment 1 results}
-\end{center}
+\begin{figure}[H]
+    \center
+    \input{experiments/1.tex}
+    \caption[Experiment 1 results]{Experiment 1 results}
+    \label{fig:Experiment 1 results}
+\end{figure}
 
-\medskip
-According to the diagram of the experiment, the FL trained model achieves the same accuracy as the locally trained model, albeit at a slower rate. The first model is updated every 150 examples while the second one every 10 examples. According to FL theory, the fewer are the examples that are used every GE, the faster the convergence is. Although, in that case more global epochs are required and the communication overhead increases. In contrast, if more examples are consumed each GE, less communication is required but the convergence rate is smaller and occasionally the model might not even converge. The original FL algorithm without deadline limitations achieved accuracy of 0.92 for Fashion-MNIST with IID data distribution which is comparable with the above results. Experiments with different parameters seems to corroborate this.
+The aforementioned findings demonstrate that training the model via FL yields the same accuracy as training it centrally, albeit at a slower rate. This is understandable given that the model in the first case is updated every 150 examples, whereas in the second case it is updated every 10 examples.
 
-\medskip
-Another observation from the above diagram is that FL training combats over-training in some degree. In the locally trained model, the training loss decreased with each step, however this did not translate to higher test accuracy. In contrast, the averaging of the FL algorithm can incur a rebalancing effect and pull out the local models from local extremum. During training the loss of the client models was not always decreasing.
-
-\clearpage
+Another observation is the re-balancing effect of the FL algorithm. In centralized training, due to overfitting, the accuracy of the model degrades after peaking. This is not true when trained under the federated setting, as overfitted parameters are regularized when averaging multiple local models.
 
 \subsection{Distributed SGD with non-IID data}
-In this experiment, the algorithm is tested with heavily unbalanced non-IID data and the previous neural network architecture. The fashion MNIST dataset is used and distributed between five clients. The first client holds all the examples with labels 0 or 1, the second client holds all the examples with labels 2 or 3 etc. This is an extreme case of unbalanced data, clients hold no knowledge of the other classes and if they train the network by themselves, a maximum accuracy of 20\% is achieved. In such cases, according to FL theory, better accuracy is achieved by minimizing the batch size and examples used per GE.
+In this experiment, the third model is trained with distributed SGD and a pathological non-IID dataset. It is interesting to see how the batch size affects the performance of Distributed SGD, given that it is notorious for being unable to handle non-IID datasets. Thus, the test was repeated with three distinct combinations of parameters.
 
-\medskip
-For this experiment batch sizes of 1,2 and 4 are used. The local epoch and steps per epoch are set to 1. The global epochs are set in such a way that all data are passed once every session.
+\begin{table}[H]
+    \center
+    \begin{tabular}{ | c | c | c | c | }
+        \hline
+        case & 1 & 2 & 3\\
+        \hline\hline
+        participating clients & 5 & 5 & 5 \\
+        \hline
+        local epochs & 1 & 1 & 1 \\
+        \hline
+        steps per epoch & 1 & 1 & 1 \\
+        \hline
+        batch size & 1 & 2 & 4 \\
+        \hline
+    \end{tabular}
+    \caption[Experiment 2 Parameters]{The parameters of the second experiment.}
+    \label{table:Experiment 2 parameters}
+\end{table}
 
-    \begin{center}
-        \begin{tikzpicture}
-            \begin{axis}
-                [
-                    xmin = 0,
-                    xmax = 21,
-                    xlabel = Session,
-                    xtick = { 1 , 2 ,..., 20 },
-                    ylabel = Test Accuracy,
-                    legend pos = south east,
-                    thick,
-                       scale = 1.25,
-                    every node/.style = {transform shape},
-                    scaled x ticks = false
-                ]
-                \addplot table [ x=P , y=b1 ]{data/experiment2.dat};
-                \addplot table [ x=P , y=b2 ]{data/experiment2.dat};
-                \addplot table [ x=P , y=b4 ]{data/experiment2.dat};
-                
-                % \addplot [ very thin , blue ] 
-                %     gnuplot [raw gnuplot] {
-                %          f(x) = a * x^3 + b * x^2 + c * x + d;
-                %          a = 0.0001;
-                %          b = 0.0001;
-                %          c = 0.1;
-                %          d = 80;
-                %          fit f(x) 'data/experiment2.dat' using 1:2 via a,b,c,d; 
-                %          plot [x=1:20] f(x);
-                %     };
-                % \addplot [ very thin , red ] 
-                %     gnuplot [raw gnuplot] {
-                %          f(x) = a * x^3 + b * x^2 + c * x + d;
-                %          a = 0.0001;
-                %          b = 0.0001;
-                %          c = 0.1;
-                %          d = 80;
-                %          fit f(x) 'data/experiment2.dat' using 1:3 via a,b,c,d; 
-                %          plot [x=1:20] f(x);
-                %     };
-                % \addplot [ very thin , olive ] 
-                %     gnuplot [raw gnuplot] {
-                %          f(x) = a * x^3 + b * x^2 + c * x + d;
-                %          a = 0.0001;
-                %          b = 0.0001;
-                %          c = 0.1;
-                %          d = 80;
-                %          fit f(x) 'data/experiment2.dat' using 1:4 via a,b,c,d; 
-                %          plot [x=1:20] f(x);
-                %     };
-                
-                \addlegendentry{batch size = 1}
-                \addlegendentry{batch size = 2}
-                \addlegendentry{batch size = 4}
-                
-            \end{axis}
-        \end{tikzpicture}
-        \captionof*{figure}{Experiment 2 results}
-    \end{center}
+The dataset is split between 5 clients, with each one getting all the examples of two labels. The first client holds all the examples with labels 0 or 1, the second client holds all the examples with labels 2 or 3 etc. As clients holds no knowledge on the other classes, self-training the model can only achieve a maximum accuracy of 20\%. Therefore, it is required to either centralize the dataset or use a decentralized training method.
 
-From the above diagram it appears that the algorithm follows FL theory. Training with batch size 2 or 4 does not converge, while with batch size 1 accuracy seems to follow a stable positive trend after a few sessions. In addition with reducing batch size, better accuracy can be achieved with operations like data rebalanching or using a large pool of clients. The accuracy results are comparable with previous works.
+\begin{figure}[H]
+    \center
+    \input{experiments/2.tex}
+    \caption[Experiment 2 results]{Experiment 2 results}
+    \label{fig:Experiment 2 results}
+\end{figure}
 
-\medskip
-This experiment should be redone with the advances of the following results and different sets of FL algorithms and advancements.
+Distributed SGD appears to struggle with non-IID data. With a batch size of just one example, it achieves accuracy consistent with prior works\cite{FL-original-paper}, but it is unable to converge with bigger batch sizes. This observation is consistent with FL theory, and in order to improve outcomes, additional techniques such as data rebalancing or expanding the client pool are needed.
 
-\section{Experiment 3 - Client Selection}
-In FL training, it is typical to have more clients available than needed during some epochs. Then, the optimal strategy is to use a subset of them to economize in training examples and keep a consistent rate of data consumption. This functionality is implemented and then tested by integrating the LeNet5 model. Eight clients are connected, but only three randomly selected are used each epoch. Each of owns a shard of the fashion-MNIST dataset, which contains 1/8 of the total number of samples. 
+\subsection{Client Selection}
+In FL, it is frequently preferable to use a portion of the clients in each GE when there are several of them. In this method, data efficiency and model performance are improved since the global model can be updated more times before the training data run out. This experiment aims to test this functionality.
 
-\medskip
-Because FL training necessitates multiple runs through the data, the risk of overtraining is increased. To combat this, data reshuffling is introduced. When all of the data in a client possession are consumed, they get reshuffled and new batches are created. This is also used during local training in this experiment. The batch size is set to 20 and the steps per epoch to 2. Additionally, 10000 GE are required to consume the data 20 times during training.
+Eight clients are participating in training the Lenet-5 model. Every GE, only three clients are used. The dataset is split into 8 identically sized, mutually exclusive random shards, each of which is given to a client.
 
-\begin{center}
-    \begin{tikzpicture}
-        \begin{axis}
-            [
-                xmin = 0,
-                xmax = 21,
-                xlabel = Session,
-                xtick = { 1 , 2 ,..., 20 },
-                ylabel = Test Accuracy,
-                legend pos = south east,
-                thick,
-                   scale = 1.25,
-                every node/.style = {transform shape},
-                scaled x ticks = false
-            ]
-            \addplot table [ x=session , y=FL_training ]{data/experiment3.dat};
-            \addplot table [ x=session , y=local_training ]{data/experiment3.dat};
-            
-            \addlegendentry{FL training}
-            \addlegendentry{local training}
-            
-        \end{axis}
-    \end{tikzpicture}
-    \captionof*{figure}{Experiment 3 results}
-\end{center}
+\begin{table}[H]
+    \center
+    \begin{tabular}{ | c | c | }
+        \hline
+        \multicolumn{2}{|c|}{ parameters } \\
+        \hline\hline
+         total clients & 8 \\
+        \hline
+        clients per GE & 3 \\
+        \hline
+        local epochs & 1 \\
+        \hline
+        steps per epoch & 2 \\
+        \hline
+        batch size & 20 \\
+        \hline
+    \end{tabular}
+    \caption[Experiment 3 Parameters]{The parameters of the third experiment.}
+    \label{table:Experiment 3 parameters}
+\end{table}
 
-According to the diagram, The algorithm operates normally and reaches similar accuracy with training locally. Also, no signs of overtraining are present.
+Data reshuffling is also incorporated in FL and centralized training. When all of the examples of a dataset have been used, it is resuffled and rebatched. Overfitting is thereby expected to diminish in both scenarios.
 
-\section{Experiment 4 - Complex models, greater data per GE consumption}
-In this experiment, a CNN model architecture is implemented, which utilizes the inception module from GoogLeNet. It consists of 277082 trainable variables and uses the Adam optimizer. Furthermore, the data is IID distributed and data reshuffling is included. The first goal is to assess the response of the FL algorithm with more complex structures. 
+\begin{figure}[H]
+    \center
+    \input{experiments/3.tex}
+    \caption[Experiment 3 results]{Experiment 3 results}
+    \label{fig:Experiment 3 results}
+\end{figure}
 
-\medskip
-Two sets of parameters and hyperparameters are used and are detailed in the following array. In both cases, the data is equally divided between 5 clients, but only 3 are used each epoch. The difference between the sets is how many examples are consumed each GE. The second goal of the experiment is to assess the impact of the data utilization per epoch.
+In comparison to the first trial, where there was no client selection, FL training produces results that are comparable to those of centralized training more quickly. Furthermore, overfitting is decreased in both scenarios.
 
-\medskip
+\subsection{Greater data per GE consumption}
+The primary objective of this experiment is to assess the impact of increasing the consumption of local data per GE, prior migrating to the Federated Averaging algorithm. Furthermore, the FL environment is tested with a more complex architecture by using the ninth model that contains an inception module and a dropout layer.
+
+The data is distributed randomly to 5 clients, but only 3 of them are used each GE. Two sets of parameters are used, with different number of local updates per GE.
     
 \begin{table}[H]
     \center
     \begin{tabular}
-        {
-            | l | c | c | c |
-        }
+        { | l | c | c | c | }
         \hline
-        parameters & FL set 1 & FL set 2 & local training\\\hline
+        parameters & FL set 1 & FL set 2 & Centralized training\\\hline
         total clients & 5 & 5 & 1\\\hline
         clients per GE & 3 & 3 & 1\\\hline
         steps per GE & 1 & 2 & examples/batch size \\\hline
         batch size & 20  & 20  & 20 \\\hline
         examples per GE & 60  & 120  & all \\\hline
-        GEs to use all examples (Session) & 1000  & 500  & - \\\hline
+        GEs to use all examples & 1000  & 500  & - \\\hline
     \end{tabular}
-    
-    \caption{Experiment 4 parameters}
+    \caption[Experiment 4 parameters]{Experiment 4 parameters}
+    \label{table:Experiment 4 parameters}
 \end{table}
-    
-\medskip
-The results show that both FL sets reach satisfactory accuracy, albeit at a slower rate than local training. While the second produce slightly less accuracy, it is worth noting that it requires half of the communication of first set. This has the effect of doubling the computation to communication ratio and being a more lucrative target for parallelization. Experiments with larger batch size and steps per epoch should be conducted.
 
-\begin{center}
-    \begin{tikzpicture}
-        \begin{axis}
-            [
-                xmin = 0,
-                xmax = 21,
-                xlabel = Session,
-                xtick = { 1 , 2 ,..., 20 },
-                ylabel = Test Accuracy,
-                legend pos = south east,
-                thick,
-                   scale = 1.25,
-                every node/.style = {transform shape},
-                scaled x ticks = false
-            ]
-            \addplot table [ x=session , y=set1 ]{data/experiment4.dat};
-            \addplot table [ x=session , y=set2 ]{data/experiment4.dat};
-            \addplot table [ x=session , y=local_training ]{data/experiment4.dat};
-            
-            \addlegendentry{FL set 1}
-            \addlegendentry{FL set 2}
-            \addlegendentry{local training}
-            
-        \end{axis}
-    \end{tikzpicture}
-        \captionof*{figure}{Experiment 4 results}
-\end{center}
+It is important to note that, compared to the first set of parameters, the second one needs only half as many communication rounds to exhaust the dataset.
     
-\section{Experiment 5 - Client unreliability}
-In an edge environment, the clients tend be unreliable and any algorithm must be resilient to random faults. To simulate such a case, the second setting from the previous experiment is used with one extra client, which gets disconnected 1/10 into training. That means for 90\% of the training, 1/6 of the data are inaccessible. The CNN from the first experiment is used with the Adam optimizer.
+\begin{figure}[H]
+    \center
+    \input{experiments/4.tex}
+    \caption[Experiment 4 results]{Experiment 4 results}
+    \label{fig:Experiment 4 results}
+\end{figure}
+
+Both FL scenarios reach comparable accuracy with centralized training. Although the second one appears to progress at a slower pace than the first, it only updates the global model half as often and needs half as much communication. This results in double the computation to communication ratio and being a more viable target for parallelization.
+
+\subsection{Client unreliability}
+In an edge environment, the clients may be unreliable and any algorithm must be resilient to random faults. This experiment aims to simulate such a case. To achieve this, 6 clients are initially participating in training the third model, but around 1/10 into training one of them abruptly disconnects. That means for 90\% of the training, 1/6 of the data are inaccessible.
 
 \begin{table}[H]
     \center
     \begin{tabular}
-        {
-            | l | c |
-        }
-        parameters\\\hline
-        total clients   & 6\\\hline
-        clients per GE  & 3\\\hline
-        steps per epoch & 1\\\hline
-        batch size      & 20\\\hline
+        { | l | c | c | }
+        \hline
+        parameters & normal op & faulty op\\\hline
+        total clients   & 5 & 6\\\hline
+        clients per GE  & 3 & 3\\\hline
+        steps per GE    & 1 & 1\\\hline
+        batch size      & 20 & 20\\\hline
     \end{tabular}
-    \caption{Experiment 5 parameters}
+    \caption[Experiment 5 parameters]{Experiment 5 parameters}
+    \label{table:Experiment 5 parameters}
 \end{table}
     
-    
-\begin{center}
-    \begin{tikzpicture}
-        \begin{axis}
-            [
-                xmin = 0,
-                xmax = 21,
-                xlabel = Session,
-                xtick = { 1 , 2 ,..., 20 },
-                ylabel = Test Accuracy,
-                legend pos = south east,
-                thick,
-                   scale = 1.25,
-                every node/.style = {transform shape},
-                scaled x ticks = false
-            ]
-            \addplot table [ x=session , y=normal_operation ]{data/experiment5.dat};
-            \addplot table [ x=session , y=faulty_client ]{data/experiment5.dat};
-            \addplot[mark=*] coordinates {(2,0.823400020599365)} node[pin=0:{client disconnects}]{} ;
-            
-            \addlegendentry{Normal operation}
-            \addlegendentry{Faulty client}
-            
-        \end{axis}
-    \end{tikzpicture}
-        \captionof*{figure}{Experiment 5 results}
-\end{center}
-
-While the accuracy of the model suffers, the effect is not disastrous as training continues and accuracy is still in acceptable range. In a real-world scenario, such a problem can be solved by deferring a portion of the training in a time when new data is available from clients.
-
-\clearpage
-
-\section{Experiment 6 - NN initialization}
-The initialization of a neural network used in FL can affect final accuracy and training time. According to previous works, all clients should start with the same initialized network to achieve the best accuracy. The purpose of this test is to evaluate its effect. Furthermore, the SGD optimizer is used.
-
-\medskip
-The CNN architecture from the first experiment is used with the Glorot initializer, which is seeded in order to produce the same variables on all clients. The model is compared with a locally trained one and a FL trained one without seeded initialization.
-
-\medskip
-
-\begin{table}
+\begin{figure}[H]
     \center
-    \begin{tabular}
-        {
-            | l | c | c | c |
-        }
-        parameters & FL, seeded init & FL, random init & local training\\\hline
-        total clients & 5 & 5 & 1\\\hline
-        clients per GE & 3 & 3 & 1\\\hline
-        steps per GE & 5 & 5 & examples/batch size \\\hline
-        batch size & 20  & 20  & 20 \\\hline
-        examples per GE & 300  & 300  & all \\\hline
-        GEs to use all examples (Session) & 200  & 200  & - \\\hline
-    \end{tabular}
-        \caption{Experiment 6 parameters}
+    \input{experiments/5.tex}
+    \caption[Experiment 5 results]{Experiment 5 results}
+    \label{fig:Experiment 5 results}
+\end{figure}
+
+Although the model's final accuracy drops, the effect is manageable as training continues and accuracy is still within acceptable bounds. In a real-world scenario, this issue can be resolved by postponing a portion of the training until after lost data resurfaces or new data becomes available.
+
+\subsection{Neural Network initialization}
+
+The initialization of an ANN can have a significant impact on the final accuracy, convergence rate, and training time, according to FL theory. It is generally accepted that the best course of action is to use the same initialization for all clients \cite{FL-original-paper}.  This major objective of this experiment is to assess this convention. To further emphasize the consequences of the initialization, the SGD optimizer with a low learning rate is employed.
+
+\begin{table}[H]
+    \center
+    \makebox[0pt]{
+        \begin{tabular}
+            { | l | c | c | c | }
+            \hline
+            parameters & FL seeded init & FL random init & centralized training\\\hline
+            total clients & 5 & 5 & 1\\\hline
+            clients per GE & 3 & 3 & 1\\\hline
+            steps per GE & 5 & 5 & examples/batch \\\hline
+            batch size & 20  & 20  & 20 \\\hline
+            examples per GE & 300  & 300  & all \\\hline
+            GEs to use all examples & 200  & 200  & - \\\hline
+        \end{tabular}
+    }
+    \caption[Experiment 6 parameters]{Experiment 6 parameters}
+    \label{table:Experiment 6 parameters}
 \end{table}
-    
-\medskip
-    
-\begin{center}
-    \begin{tikzpicture}
-        \begin{axis}
-            [
-                xmin = 0,
-                xmax = 41,
-                xlabel = Session,
-                xtick = { 1 , 4 ,..., 40 },
-                ylabel = Test Accuracy,
-                legend pos = south east,
-                scale = 1.25,
-                every node/.style = {transform shape},
-                scaled x ticks = false
-            ]
-            \addplot table [ x=session , y=different_init ]{data/experiment6.dat};
-            \addplot table [ x=session , y=same_init ]{data/experiment6.dat};
-            \addplot +[restrict x to domain=1:20] table [ x=session , y=local_training ]{data/experiment6.dat};
-            
-            \addlegendentry{FL, seeded initialization}
-            \addlegendentry{FL, random initialization}
-            \addlegendentry{Local training}
-            
-        \end{axis}
-    \end{tikzpicture}
-        \captionof*{figure}{Experiment 6 results}
-\end{center}
 
-The unseeded network seems to reach a local minima and its accuracy plateaus. In contrast, the seeded one continues improving till it achieves the accuracy of the locally trained model.
+The third model is used and initialized with the Glorot initializer. The model is trained twice, once initialized with the same seed across all clients, the other using random different seeds.
 
-\section{Experiment 7 - learning rate (LR) decay strategies}
-Another aspect of FL worth investigating is learning rate (LR) decay strategies. Three of them are implemented.
+\begin{figure}[H]
+    \center
+    \input{experiments/6.tex}
+    \caption[Experiment 6 results]{Experiment 6 results}
+    \label{fig:Experiment 6 results}
+\end{figure}
+
+The model with a random initialization quickly approaches and settles in a suboptimal local minimum. Both centralized training and FL with seeded initialization surpass its accuracy. This behaviour is consistent with FL theory.
+
+\subsection{Learning Rate (LR) decay strategies}
+Another aspect of FL worth investigating is learning rate (LR) decay strategies. The following three of them are implemented:
 \begin{itemize}
     \item Decay the LR every set number of GEs. All clients have the same LR at every moment.
-    \item Decay the LR of a client based on the number of participated GEs. If a subset of the clients is used every GE, some clients may have been selected more times than others and as a result they will have lower LR.
-    \item The final strategy is to reduce a client's LR each time its data is completely utilized. This is an extension of the second strategy, where instead of decaying slowly the LR every few rounds, there is a big drop every \( \displaystyle \frac{\sum_{}^{}clients\ data}{\sum_{}^{} clients\ data\ used\ per\ GE} \) rounds of training.
+    \item Decay the LR of a client based on the number of participated GEs. If a subset of the clients is used every GE, some clients may have been selected more times than others and as a result they will have a lower LR.
+    \item The final strategy is to reduce a client's LR each time its dataset is repeated. This is an extension of the second strategy, where instead of decaying slowly the LR every few rounds, there is a big drop every \( \displaystyle \frac{\sum_{}^{}clients\ data}{\sum_{}^{} clients\ data\ used\ per\ GE} \) rounds of training.
 \end{itemize}
-Each strategy is tested three times with different decay periods. The decay period dictates how often the decay applies. E.g. the second strategy with the a decay period of three means that LR decays every three participated rounds. The results are compared with a FL trained model without LR decay.
 
 \begin{table}[H]
     \center
     \hspace*{-9mm} \makebox[0pt]
     {
         \begin{tabular}
-            {
-                | l | c | c | c | c |
-            }
+            { | l | c | c | c | c | }
             \hline
-            parameters & FL, no decay & FL, strategy 1 & FL, strategy 2 & FL, strategy 3\\\hline
+            parameters & FL, no decay & FL strategy 1 & FL strategy 2 & FL strategy 3\\\hline
             total clients   &     5 &     5 &     5 &     5\\\hline
             clients per GE  &     3 &     3 &     3 &     3\\\hline
             steps per GE    &     5 &     5 &     5 &     5\\\hline
@@ -544,112 +429,36 @@ Each strategy is tested three times with different decay periods. The decay peri
             \( \displaystyle \frac{ x\ participated\ GEs*\sum clients\ data }{ \sum clients\ data\ used\ per\ GE } \)\\\hline
         \end{tabular}
     }
-    \caption{Experiment 7 parameters}
+    \caption[Experiment 7 parameters]{Experiment 7 parameters}
+    \label{table:Experiment 7 parameters}
 \end{table}
 
-\medskip
-The following tables compare each strategy against the no LR decay FedSGD respectively.
-
-\begin{center}
+Each strategy is tested three times with different decay periods. The decay period dictates how often the decay applies. E.g. the second strategy with the a decay period of three means that LR decays every three participated rounds. A FL trained model without LR decay is used as a baseline.
+\medskip\medskip
+\begin{figure}[H]
+    \center
     \addtolength{\leftskip} {-2cm}
     \addtolength{\rightskip}{-2cm}
-    \begin{tikzpicture}
-        \begin{axis}
-            [
-                xmin = 0,
-                xmax = 41,
-                ymin = 0.86,
-                xlabel style = {align=center},
-                xlabel = Session\\\\Strategy 1,
-                xtick = { 1 , 4 ,..., 40 },
-                ylabel = Test Accuracy,
-                legend pos = south east,
-                scale = 1,
-                no markers
-            ]
-            \addplot [black] table [ x=session , y=no_decay ]{data/experiment7.dat};
-            \addplot [red] table [ x=session , y=s1_dp1 ]{data/experiment7.dat};
-            \addplot [blue] table [ x=session , y=s1_dp2 ]{data/experiment7.dat};
-            \addplot [green] table [ x=session , y=s1_dp3 ]{data/experiment7.dat};
-            
-            \addlegendentry{no decay}
-            \addlegendentry{ x = 1 }
-            \addlegendentry{ x = 2 }
-            \addlegendentry{ x = 3 }
-            
-        \end{axis}
-    \end{tikzpicture} %\captionof*{figure}{Experiment 6a}
-%
-    \begin{tikzpicture}
-        \begin{axis}
-            [
-                xmin = 0,
-                xmax = 41,
-                ymin = 0.86,
-                xlabel style = {align=center},
-                xlabel = Session\\\\Strategy 2,
-                xtick = { 1 , 4 ,..., 40 },
-                ylabel = Test Accuracy,
-                legend pos = south east,
-                scale = 1,
-                no markers,
-            ]
-            \addplot [black] table [ x=session , y=no_decay ]{data/experiment7.dat};
-            \addplot [red] table [ x=session , y=s2_dp1 ]{data/experiment7.dat};
-            \addplot [blue] table [ x=session , y=s2_dp2 ]{data/experiment7.dat};
-            \addplot [green] table [ x=session , y=s2_dp3 ]{data/experiment7.dat};
-            
-            \addlegendentry{no decay}
-            \addlegendentry{ x = 1 }
-            \addlegendentry{ x = 2 }
-            \addlegendentry{ x = 3 }
-            
-        \end{axis}
-    \end{tikzpicture}
-    
-    \vspace{0.5cm} 
- 
-    \begin{tikzpicture}
-        \begin{axis}
-            [
-                xmin = 0,
-                xmax = 41,
-                ymin = 0.86,
-                xlabel style = {align=center},
-                xlabel = Session\\\\Strategy 3,
-                xtick = { 1 , 4 ,..., 40 },
-                ylabel = Test Accuracy,
-                legend pos = south east,
-                scale = 1,
-                no markers
-            ]
-            \addplot [black] table [ x=session , y=no_decay ]{data/experiment7.dat};
-            \addplot [red] table [ x=session , y=s3_dp1 ]{data/experiment7.dat};
-            \addplot [blue] table [ x=session , y=s3_dp2 ]{data/experiment7.dat};
-            \addplot [green] table [ x=session , y=s3_dp3 ]{data/experiment7.dat};
-            
-            \addlegendentry{no decay}
-            \addlegendentry{ x = 1 }
-            \addlegendentry{ x = 2 }
-            \addlegendentry{ x = 3 }
-            
-        \end{axis}
-    \end{tikzpicture}
-\end{center}
+    \input{experiments/7a.tex}%
+    \input{experiments/7b.tex}
+    \caption[Experiment 7 results]{Experiment 7 results, strategies 1 and 2.}
+\end{figure}%
+\begin{figure}[H]\ContinuedFloat
+    \center
+    \input{experiments/7c.tex}
+    \caption[Experiment 7 results]{Experiment 7 results, strategy 3.}
+    \label{fig:Experiment 7 results}
+\end{figure}
 
-All strategies seems to to perform slightly better than the baseline, except the first one with decay period = 1. In that case, the decay is too fast and the LR degenerates in a state that cannot substantially alter the weights of the NN. The last strategy appears to be the most promising, whereas outperforming the others is the most straightforward.
+All strategies seems to to perform slightly better than the baseline, except the first one with decay period = 1. In that case, the decay is too fast and the LR degenerates in a state that cannot substantially alter the weights of the NN. The last strategy appears to be the most promising, which while outperforming the others is the most straightforward.
 
-\section{Experiment 8 - FederatedAveraging (FedAvg) }
-FedAvg is a popular FL algorithm in which clients use all of their data and perform multiple SGD iterations during a participating GE. As a result, few rounds of communication are required, and the parameters should be tuned accordingly. In the prior experiment, a client had to participate in 200 GEs to consume all of its data, whereas with FedAvg, only one GE (at most) is required. As a result, the LR decay must be calibrated in consideration of the fewer decay events. This is the subject of this experiment.
+\subsection{Federated Averaging (FedAvg)}
+In FedAvg, a client, when participating in a training round, uses all of its data and executes multiple SGD iterations. In the prior experiment, for a client to consume all of its data 200 GEs were necessary; whereas with FedAvg, only one GE (at most) is needed. The main objective of this experiment is to demonstrate the algorithm's compatibility with the developed FL environment.
 
-\medskip
-In the prior experiment, with the second or the third strategy a LR of ~0.818649 is reached when the examples of a client are exhausted. For the first test, this is the value of the LR decay. Furthermore, three more test are performed, each with half the descent slope of the previous one. Finally, a test without LR decay is run.
-\begin{table}
-\center
+\begin{table}[H]
+    \center
     \begin{tabular}
-        {
-            | l | c |
-        }
+        { | l | c | }
         \hline
         parameters & FedAvg\\\hline
         total clients   & 5\\\hline
@@ -659,50 +468,25 @@ In the prior experiment, with the second or the third strategy a LR of ~0.818649
         batch size      & 20\\\hline
         initial LR      &  1e-2\\\hline
     \end{tabular}
-    \caption{Experiment 8 parameters}
+    \caption[Experiment 8 parameters]{Experiment 8 parameters}
+    \label{table:Experiment 8 parameters}
 \end{table}
 
-\medskip
-From now on, the y axis of the tests is the elapsed GEs, as in each GE all data are consumed. Furthermore two metrics will be monitored, maximum accuracy and communication rounds to reach a target accuracy of 0.92.
-\medskip
+The LR decay needs to be corrected to account for the reduced number of decay events, thus the model is trained multiple times to identify its ideal values. The prior experiment's LR decay is utilized for the first run of training, and each additional training reduces the descent slope by half. The model is also trained without LR decay.
     
 \begin{figure}[H]
-    \centering
-    \begin{tikzpicture}[baseline=(current axis.outer east)]
-        \begin{axis}
-            [
-                xmin = 0,
-                xmax = 50,
-                ymin = 0.8,
-                xlabel = Global Epoch,
-                xtick = { 1 , 5 ,..., 50 },
-                ylabel = Test Accuracy,
-                legend pos = south east,
-                scale = 1.25,
-                no markers,
-            ]
-            \addplot [blue] table [ x=GE , y={lr_decay=0.818649} ]{data/experiment8.dat};
-            \addplot [red] table [ x=GE , y={lr_decay=0.9093245} ]{data/experiment8.dat};
-            \addplot [green] table [ x=GE , y={lr_decay=0.95466225} ]{data/experiment8.dat};
-            \addplot [yellow] table [ x=GE , y={lr_decay=0.977331125} ]{data/experiment8.dat};
-            \addplot [black] table [ x=GE , y={no_decay} ]{data/experiment8.dat};
-            \addplot[ domain=0:50 , mark=none , black , thin , dotted , samples=2 ] {0.92};
-            
-            \addlegendentry{LR decay $\approx$ 0.819}
-            \addlegendentry{LR decay $\approx$ 0.909}
-            \addlegendentry{LR decay $\approx$ 0.955}
-            \addlegendentry{LR decay $\approx$ 0.977}
-            \addlegendentry{No decay}
-            
-        \end{axis}
-    \end{tikzpicture}
+    \center
+    \input{experiments/8.tex}
+    \caption[Experiment 8 results]{Experiment 8 results}
+    \label{fig:Experiment 8 results}
 \end{figure}
-\begin{table}
+
+The maximum accuracy of this model when trained locally is 92\%. This is now regarded as the minimum baseline. In addition of showing maximum accuracy, the GE where that baseline was reached is also presented.
+
+\begin{table}[H]
     \center
     \begin{tabular}
-        {
-            | c | c | c |
-        }
+        { | c | c | c | }
         \hline
         LR decay & Max accuracy & 0.92 @GE\\\hline
         0.819 & 0.913 & -\\\hline
@@ -711,15 +495,18 @@ From now on, the y axis of the tests is the elapsed GEs, as in each GE all data 
         0.977 & 0.9245 & 27\\\hline
         No decay & 0.9224 & 34\\\hline
     \end{tabular}
-    \caption{Experiment 8 results}
+    \caption[Experiment 8 results]{Experiment 8 results}
+    \label{table:Experiment 8 results}
 \end{table}
 
-A number of observations can be made. To begin with, much fewer communication rounds are required to achieve the desired accuracy in comparison with the previous experiments.\footnote{Comparing with the experiment 7, x100-200 less communication with the same computation cost.} However, there is a hidden cost in that less averaging occurs and its rebalancing effect is reduced. When comparing the different LR decay values, it seems that the most conservative options perform better; decaying the LR too quickly causes the NN to set in a low accuracy value.
+In comparison to the previous experiment, FedAvg requires \(\times\)100-200 less communication and the same computation to reach the target accuracy. However, there is a hidden cost in that less averaging occurs and the rebalancing effect is diminished. This becomes quite clear when training without LR decay, where overfitting is apparent.
 
-\section{Experiment 9 - Client Participation / Increasing parallelism}
-This experiment explores the amount of multi-client parallelism that can be exploited and its effect on training. The dataset is split between 10 clients, each one holding 6000 training examples. The CNN architecture from the previous experiment is trained multiple times with different number of participating clients per GE. Training with one client per epoch serves as a baseline. The relative reduction in communication is calculated for all other tests.
+Considering the different LR decay values, the more conservative options appear to perform best; decaying the LR too quickly causes the ANN to set in sub-optimal minima.
+
+\subsection{Client Participation and Increasing parallelism}
+This experiment explores the amount of multi-client parallelism that can be exploited and its effect on training. The dataset is split between 10 clients, each one holding 6000 training examples. The third model is trained with different number of participating clients per GE. 
     
-\begin{table}
+\begin{table}[H]
     \center
     \begin{tabular}{ | l | c | c | c | c | }
         \hline
@@ -732,38 +519,16 @@ This experiment explores the amount of multi-client parallelism that can be expl
         initial LR      & 1e-2 & 1e-2 & 1e-2 & 1e-2\\\hline
         LR decay        & 0.977 & 0.977 & 0.977 & 0.977\\\hline
     \end{tabular}
-    \caption{Experiment 9 parameters}
+    \caption[Experiment 9 parameters]{Experiment 9 parameters}
 \end{table}
-    
+
+Training with one client per epoch serves as the baseline. The relative reduction in communication is calculated for the other training runs.
+
 \begin{figure}[H]
     \center
-    \begin{tikzpicture}[baseline=(current axis.outer east)]
-        \begin{axis}
-            [
-                xmin = 0,
-                xmax = 200,
-                ymin = 0.8,
-                xlabel = Global Epoch,
-                xtick = { 1 , 20 ,..., 200 },
-                ylabel = Test Accuracy,
-                legend pos = south east,
-                scale = 1.25,
-                no markers,
-                thin
-            ]
-            \addplot [black] table [ x=GE , y={client1} ]{data/experiment9.dat};
-            \addplot +[restrict x to domain=1:100] [red] table [ x=GE , y={client3} ]{data/experiment9.dat};
-            \addplot +[restrict x to domain=1:100] [green] table [ x=GE , y={client5} ]{data/experiment9.dat};
-            \addplot +[restrict x to domain=1:100] [blue] table [ x=GE , y={client10} ]{data/experiment9.dat};
-            \addplot [ domain=0:200 , mark=none , black , thin , dotted , samples=2 ] {0.92};
-            
-            \addlegendentry{1 client per GE}
-            \addlegendentry{3 clients per GE}
-            \addlegendentry{5 clients per GE}
-            \addlegendentry{10 clients per GE}
-            
-        \end{axis}
-    \end{tikzpicture}
+    \input{experiments/9.tex}
+    \caption[Experiment 9 results]{Experiment 9 results}
+    \label{fig:Experiment 9 results}
 \end{figure}
 
 \begin{table}[H]
@@ -776,15 +541,15 @@ This experiment explores the amount of multi-client parallelism that can be expl
         5 & 46 (3.4$\times$)\\\hline
         10 & 51 (3.1$\times$)\\\hline
     \end{tabular}
-    \caption{Experiment 9 results}
+    \caption[Experiment 9 results]{Experiment 9 results, with relative reduction in GEs.}
 \end{table}
     
-    Using more clients every GE substantially lowers the rounds of communication needed to achieve the target accuracy. Others works that are focused on simulations of hundreds of clients with small dataset each, have shown similar reductions. Empirically, using a bit more than half of the clients in each GE appears to yield the best results. If all the clients are used every GE, in some cases like non-IID data distribution, the network may not converge in an acceptable solution.
+Using more clients per GE substantially lowers the rounds of communication needed to achieve the target accuracy. This is consistent with others works, which show even on simulations of hundreds of clients with a small dataset each, using a bit more than half of the clients in each GE yields the best results. If all the clients are used every GE, especially when under non-IID data, the model may not converge in an acceptable solution.
     
-\section{Experiment 10 - Increasing computation per client}
-    In this section, the computation per client is fluctuated in order to investigate its effect on the number of required GEs. The number of local SGD updates per GE can be increased by either executing more local epochs (LE), decreasing the batch size (B), or both. The CNN from the previous experiment is used, the dataset is split between 5 clients and 3 of them participate each epoch. Learning rate and its decay are amortised in order to have the same behavior across all tests. The target is to minimize the number of required GEs to reach the target accuracy of 0.92.
+\subsection{Increasing computation per client}
+To further reduce communication, clients can perform more local updates per GE. This may be accomplished by increasing the number of local epochs (LE), reducing the batch size (B), or both. The third model is trained by 5 clients, with 3 of them participating each GE. LR and its decay are amortized to maintain a consistent LR at each GE, regardless of the number of local updates. The goal of this experiment is to identify the behavior of the algorithm across different sets of parameters.
 
-\begin{table}
+\begin{table}[H]
     \center
     \begin{tabular}{ | c | c c | c c | }
         \hline
@@ -798,7 +563,7 @@ This experiment explores the amount of multi-client parallelism that can be expl
         20 & 600 & 25 & 1800 & 7\\
         10 & 1200 & 18 & 3600 & 15\\\hline
     \end{tabular}
-    \caption{Experiment 10 results}
+    \caption[Experiment 10 results]{Experiment 10 results}
 \end{table}
 
-According to the experimental results, increasing local updates directly decreases the required global updates. Unlike most works, this one concentrates on small groups of clients with large dataset in each. As a result, increasing the number of local epochs produces inconsistent results due to the introduction of overfitting on the local models. On the other hand, providing that the batch size is large enough to completely utilize the client's hardware parallelism, there is no cost in lowering it.
+According to the results of the experimental, increasing local updates directly decreases the required global updates. Unlike most works, this one concentrates on small groups of clients with large local datasets. As a result, increasing the number of local epochs produces inconsistent results due to the introduction of overfitting in the local models. Regarding the batch size, there is no cost in reducing it, providing that it is large enough to completely utilize the client's hardware parallelism.

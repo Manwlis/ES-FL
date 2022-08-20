@@ -1,0 +1,22 @@
+\begin{tikzpicture}
+    \begin{axis}
+        [
+            xmin = 0,
+            xmax = 41,
+            xlabel = Dataset Repetitions,
+            xtick = { 1 , 4 ,..., 40 },
+            ylabel = Test Accuracy,
+            legend pos = south east,
+            scale = 1.25,
+            every node/.style = {transform shape},
+            scaled x ticks = false
+        ]
+        \addplot table [ x=session , y=different_init ]{data/experiment6.dat};
+        \addplot table [ x=session , y=same_init ]{data/experiment6.dat};
+        \addplot +[restrict x to domain=1:20] table [ x=session , y=local_training ]{data/experiment6.dat};
+        
+        \addlegendentry{FL, seeded initialization}
+        \addlegendentry{FL, random initialization}
+        \addlegendentry{Local training}
+    \end{axis}
+\end{tikzpicture}

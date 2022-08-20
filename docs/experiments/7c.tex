@@ -1,0 +1,26 @@
+\begin{tikzpicture}
+    \begin{axis}
+        [
+            xmin = 0,
+            xmax = 41,
+            ymin = 0.86,
+            xlabel style = {align=center},
+            xlabel = Dataset Repetitions,
+            xtick = { 1 , 4 ,..., 40 },
+            ylabel = Test Accuracy,
+            legend pos = south east,
+            scale = 1,
+            no markers
+        ]
+        \addplot [black] table [ x=session , y=no_decay ]{data/experiment7.dat};
+        \addplot [red] table [ x=session , y=s3_dp1 ]{data/experiment7.dat};
+        \addplot [blue] table [ x=session , y=s3_dp2 ]{data/experiment7.dat};
+        \addplot [green] table [ x=session , y=s3_dp3 ]{data/experiment7.dat};
+        
+        \addlegendentry{no decay}
+        \addlegendentry{ x = 1 }
+        \addlegendentry{ x = 2 }
+        \addlegendentry{ x = 3 }
+        
+    \end{axis}
+\end{tikzpicture}
