@@ -4,7 +4,7 @@ import tensorflow as tf
 import tensorflow_datasets as tfds
 
 #data import
-dataset , metadata = tfds.load( 'fashion_mnist' , as_supervised=True , with_info=True )
+dataset , metadata = tfds.load( 'fashion_mnist' , data_dir="~/tensorflow_datasets/" , as_supervised=True , with_info=True )
 
 # pre-process data
 # The map function applies the normalize function to each element in the train and test datasets

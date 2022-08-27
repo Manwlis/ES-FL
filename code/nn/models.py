@@ -12,7 +12,7 @@ from keras.layers import Resizing
 from keras.layers import ZeroPadding2D
 from keras.layers import add
 from keras.layers import Activation
-from keras.layers.merge import concatenate
+from keras.layers import concatenate #TODO: see why WSL2 requires from keras.layers.merge
 from keras.initializers import GlorotUniform
 
 initializer=GlorotUniform( seed=0 )
@@ -239,7 +239,7 @@ def residual_model_declaration():
 
 	output = Dense( 10 , activation='softmax' ) ( layer )
 
-	return Model(inputs=visible, outputs=output )
+	return Model( inputs=visible , outputs=output )
 
 residual = residual_model_declaration()
 

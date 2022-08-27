@@ -10,9 +10,9 @@ all: $(OBJECTS) $(EXECUTABLES)
 
 # executables
 server : server.o lib.a
-	$(CC) $(CFLAGS) $^ -lpython3.10 -o $@
+	$(CC) $(CFLAGS) $^ -o $@ -lpython3.10
 client : client.o lib.a
-	$(CC) $(CFLAGS) $^ -lpython3.10 -o $@
+	$(CC) $(CFLAGS) $^ -o $@ -lpython3.10
 tests : unit_tests.o lib.a
 	$(CC) $(CFLAGS) $^ -o $@
 
@@ -21,15 +21,15 @@ lib.a : utils.o fake_data.o messages.o computation_unit.o
 	ar rcs $@ $^
 
 # object files
-.cpp.o :  *.hpp
-	$(CC) $(CFLAGS) -I /usr/include/python3.10/ -c client.cpp -o client.o
-	$(CC) $(CFLAGS) -I /usr/include/python3.10/ -c server.cpp -o server.o
-	$(CC) $(CFLAGS) -c unit_tests.cpp -o unit_tests.o
+%.o : %.cpp  *.hpp
+	$(CC) $(CFLAGS) -c client.cpp           -o client.o           -I /usr/include/python3.10/
+	$(CC) $(CFLAGS) -c server.cpp           -o server.o           -I /usr/include/python3.10/
+	$(CC) $(CFLAGS) -c unit_tests.cpp       -o unit_tests.o
 
-	$(CC) $(CFLAGS) -c utils.cpp -o utils.o
-	$(CC) $(CFLAGS) -c fake_data.cpp -o fake_data.o
-	$(CC) $(CFLAGS) -c messages.cpp -o messages.o
-	$(CC) $(CFLAGS) -I /usr/include/python3.10/ -c computation_unit.cpp -o computation_unit.o
+	$(CC) $(CFLAGS) -c utils.cpp            -o utils.o
+	$(CC) $(CFLAGS) -c fake_data.cpp        -o fake_data.o
+	$(CC) $(CFLAGS) -c messages.cpp         -o messages.o
+	$(CC) $(CFLAGS) -c computation_unit.cpp -o computation_unit.o -I /usr/include/python3.10/ -I ~/.local/lib/python3.10/site-packages/
 #	$(CC) $(CFLAGS) -I/usr/include/python3.10/ -c $< -o $@
 
 # clean up

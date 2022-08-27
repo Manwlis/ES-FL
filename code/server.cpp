@@ -155,14 +155,9 @@ int main( int argc , char** argv )
 	/**************************************************************************************************/
 	/* Set up a socket to receive incoming connections on. TCP.                                       */
 	/**************************************************************************************************/
-	int server_port = SERVER_PORT;
-
-	int listening_socket_fd;
-	struct sockaddr_in server_addr;
-
 	// Create socket as TCP & non blocking
-	rv = listening_socket_fd = socket( AF_INET , SOCK_STREAM | SOCK_NONBLOCK , 0 );
-	if ( rv < 0 )
+	int listening_socket_fd = socket( AF_INET , SOCK_STREAM | SOCK_NONBLOCK , 0 );
+	if ( listening_socket_fd < 0 )
 		Utils::error( "Server socket creation failed." );
 
 	// Set socket as reusable. New sockets will inherit this state.
@@ -172,10 +167,11 @@ int main( int argc , char** argv )
 		Utils::error( "Setting server socket fd as reusable failed" );
 
 	// Setup socket structure
+	struct sockaddr_in server_addr;
 	memset( &server_addr , 0 , sizeof(server_addr) );
 	server_addr.sin_family = AF_INET;					// IPv4 address family
 	server_addr.sin_addr.s_addr = htonl( INADDR_ANY );	// fill with current host IP address
-	server_addr.sin_port = htons( server_port );		// convert port to network byte order
+	server_addr.sin_port = htons( SERVER_PORT );		// convert port to network byte order
 
 	// Bind socket
 	rv = bind( listening_socket_fd , (const sockaddr*) &server_addr , sizeof(server_addr) );
@@ -187,7 +183,7 @@ int main( int argc , char** argv )
 	if ( rv < 0 )
 		Utils::error( "Listen server socket failed" );
 	
-	LOGGING( Logger::Level::initialization , "Listening port " << server_port  );
+	LOGGING( Logger::Level::initialization , "Listening port " << SERVER_PORT );
 
 	/**************************************************************************************************/
 	/* Initialize polling structure.                                                                  */

@@ -40,9 +40,6 @@ int main ( int argc , char** argv )
 	static Client_to_server_msg send_message;
 	static unsigned char buffer[SERVER_TO_CLIENT_BUF_SIZE];
 
-
-	const unsigned long examples_per_global_epoch = BATCH_SIZE * LOCAL_EPOCHS * STEPS_PER_EPOCH;
-	unsigned long examples_used = 0;
 	/**************************************************************************************************/
 	/* Set up a socket to communicate with server and connect.                                        */
 	/**************************************************************************************************/
@@ -146,16 +143,6 @@ int main ( int argc , char** argv )
 		/**************************************************************************************************/
 		// call python function
 		python_with_TF.train();
-//TODO:remove this propably, it does not do anything
-		examples_used += examples_per_global_epoch;
-
-		if( examples_used == python_with_TF.m_num_examples )
-		{
-			LOGGING( Logger::Level::warning , "Reshufling. " << examples_used << "	" << python_with_TF.m_num_examples );
-			python_with_TF.shuffle_data();
-			examples_used = 0;
-		}
-//TODO:till here
 
 		// calculate deltas
 		#if MSG_VARIABLE_MODE == DELTAS
@@ -208,13 +195,17 @@ sockaddr_in find_server( const char* server_name , const char* server_port )
 {
 	addrinfo hints;
 	memset( &hints , 0 , sizeof(hints) );
-	hints.ai_socktype = SOCK_STREAM;
-	hints.ai_family = AF_INET;
-	hints.ai_protocol = IPPROTO_TCP;
+	hints.ai_family = AF_INET;			// IPv4
+	hints.ai_socktype = SOCK_STREAM;	// connection-based protocol
+	hints.ai_protocol = IPPROTO_TCP;	// TCP
+	hints.ai_flags = (AI_V4MAPPED | AI_ADDRCONFIG); // any
+	hints.ai_canonname = NULL;
+	hints.ai_addr = NULL;
+	hints.ai_next = NULL;
 	
 	addrinfo* server_addr_info;
 
-	int rv = getaddrinfo( server_name , server_port , nullptr , &server_addr_info );
+	int rv = getaddrinfo( server_name , server_port , &hints , &server_addr_info );
 	if ( rv != 0 )
 		Utils::error( "getaddrinfo failed." );
 

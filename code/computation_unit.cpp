@@ -1,6 +1,6 @@
 #include "computation_unit.hpp"
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION // suppress numpy version warnings
-#include </home/epetrakos/.local/lib/python3.10/site-packages/numpy/core/include/numpy/arrayobject.h>
+#include <numpy/core/include/numpy/arrayobject.h>
 
 Computation_unit::Computation_unit( Server_to_client_msg* input_message , Client_to_server_msg* output_message )
 	: m_input_message( input_message ) , m_output_message( output_message )
@@ -66,7 +66,6 @@ Python_with_TF::Python_with_TF( Server_to_client_msg* input_message , Client_to_
 
 	m_py_train = PyObject_GetAttrString( py_module , py_train_function );
 	m_py_eval = PyObject_GetAttrString( py_module , py_eval_function );
-	m_py_shuffle_data = PyObject_GetAttrString( py_module , py_shuffle_data_function );
 	m_py_print_accuracy_history = PyObject_GetAttrString( py_module , "print_accuracy_history" );
 
 	Py_DECREF( py_module );
@@ -89,7 +88,6 @@ Python_with_TF::~Python_with_TF( )
 {
 	Py_DECREF( m_py_train );
 	Py_DECREF( m_py_eval );
-	Py_DECREF( m_py_shuffle_data );
 	Py_DECREF( m_py_print_accuracy_history );
 	Py_DECREF( m_py_array_input );
 	Py_DECREF( m_py_array_output );
@@ -121,11 +119,6 @@ void Python_with_TF::evaluate()
 	PyObject_CallFunctionObjArgs( m_py_eval , m_py_array_input , m_py_epoch , NULL );
 
 	PyErr_Print();
-}
-
-void Python_with_TF::shuffle_data() const
-{
-	PyObject_CallFunctionObjArgs( m_py_shuffle_data , NULL );
 }
 
 void Python_with_TF::print_accuracy_history() const

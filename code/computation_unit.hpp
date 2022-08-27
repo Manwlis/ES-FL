@@ -1,4 +1,3 @@
-
 #include "messages.hpp"		/* msg structs */
 #include "definitions.hpp"	/*  */
 
@@ -33,7 +32,6 @@ private:
 	// python module and functions
 	PyObject* m_py_train;
 	PyObject* m_py_eval;
-	PyObject* m_py_shuffle_data;
 	PyObject* m_py_print_accuracy_history;
 
 public:
