@@ -63,6 +63,17 @@
         "iomanip": "cpp",
         "ranges": "cpp",
         "compare": "cpp",
-        "concepts": "cpp"
+        "concepts": "cpp",
+        "complex": "cpp",
+        "cstring": "cpp",
+        "forward_list": "cpp",
+        "list": "cpp",
+        "numbers": "cpp",
+        "semaphore": "cpp",
+        "stop_token": "cpp",
+        "typeindex": "cpp",
+        "variant": "cpp",
+        "*.inc": "cpp",
+        "a": "cpp"
     }
 }
