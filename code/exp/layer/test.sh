@@ -1,39 +1,40 @@
 #!/usr/bin/env bash
 # 
 
-# Compile
-g++ -Wall cnn.cpp -o cnn
-
-# Execute
-./cnn
+# Create temp directory
+mkdir temp
 
 # Generate golden results
 python3 cnn.py
 
+# Compile
+g++ -Wall cnn.cpp -o temp/cnn
+
+# Execute
+./temp/cnn
+
 # Compare results
 
-diff --brief --report-identical-files --ignore-all-space output/layer0_tf.txt	output/layer0_cpp.txt
+echo ""
+diff --brief --report-identical-files --ignore-all-space output/l0_conv32_tf.txt	output/l0_conv32_cpp.txt
 
 echo ""
-diff --brief --report-identical-files --ignore-all-space output/layer1_tf.txt	output/layer1_cpp.txt
+diff --brief --report-identical-files --ignore-all-space output/l1_maxp32_tf.txt	output/l1_maxp32_cpp.txt
 
 echo ""
-diff --brief --report-identical-files --ignore-all-space output/layer2_tf.txt	output/layer2_cpp.txt
+diff --brief --report-identical-files --ignore-all-space output/l2_conv64_tf.txt	output/l2_conv64_cpp.txt
 
 echo ""
-diff --brief --report-identical-files --ignore-all-space output/layer3_tf.txt	output/layer3_cpp.txt
+diff --brief --report-identical-files --ignore-all-space output/l3_maxp64_tf.txt	output/l3_maxp64_cpp.txt
 
 echo ""
-diff --brief --report-identical-files --ignore-all-space output/layer4_tf.txt	output/layer4_cpp.txt
+diff --brief --report-identical-files --ignore-all-space output/l4_dense_tf.txt		output/l4_dense_cpp.txt
 
 echo ""
-diff --brief --report-identical-files --ignore-all-space output/layer5_tf.txt	output/layer5_cpp.txt
+diff --brief --report-identical-files --ignore-all-space output/l5_softmax_tf.txt	output/l5_softmax_cpp.txt
 
 echo ""
-diff --brief --report-identical-files --ignore-all-space output/cnn_tf.txt		output/layer5_cpp.txt
+diff --brief --report-identical-files --ignore-all-space output/cnn_tf.txt			output/l5_softmax_cpp.txt
 
 # clean up
-cleanup_files=(
-	cnn
-)
-rm ${cleanup_files}
+rm -r temp

@@ -3,22 +3,24 @@
 int main ( int argc , char** argv )
 {
 	/*********************************/
-	/********** Create input *********/
+	/*********** Get input ***********/
 	/*********************************/
-	unsigned char input[image_maps][image_height][image_width];
+    std::ifstream input_file("temp/array.txt");
+	std::string temp;
+
+	float input[image_maps][image_height][image_width];
 	for( int i = 0 ; i < image_height ; i++ )
 		for ( int y = 0 ; y < image_width ; y++ )
-			input[0][i][y] = (i+y)/2;
-	input[0][5][7] = 0;
-	input[0][9][3] = 0;
-	input[0][27][27] = 0;
-
+		{
+			input_file >> temp;
+			input[0][i][y] = std::stof(temp);
+		}
 	/*********************************/
 	/******** Create variables *******/
 	/*********************************/
 	static float layer0_weights[conv2d_32_num_filters][image_maps][conv2d_32_filter_height][conv2d_32_filter_width];
 	static float layer2_weights[conv2d_64_num_filters][conv2d_64_input_maps][conv2d_64_filter_height][conv2d_64_filter_width];
-	static float layer4_weights[dense_num_kernels][dense_num_inputs];
+	static float layer4_weights[dense_num_inputs][dense_num_kernels];
 	static float layer5_weights[softmax_num_kernels][softmax_num_inputs];
 
 	static float layer0_biases[conv2d_32_num_filters];
@@ -27,10 +29,10 @@ int main ( int argc , char** argv )
 	static float layer5_biases[softmax_num_kernels];
 
 	set_variables < 
-		conv2d_32_num_filters , image_maps , conv2d_32_filter_height , conv2d_32_filter_width ,
+		conv2d_32_num_filters ,           image_maps , conv2d_32_filter_height , conv2d_32_filter_width ,
 		conv2d_64_num_filters , conv2d_64_input_maps , conv2d_64_filter_height , conv2d_64_filter_width ,
-		dense_num_kernels , dense_num_inputs ,
-		softmax_num_kernels , softmax_num_inputs >
+		    dense_num_kernels ,     dense_num_inputs ,
+		  softmax_num_kernels ,   softmax_num_inputs >
 		(
 		layer0_weights , layer0_biases ,
 		layer2_weights , layer2_biases ,
@@ -40,6 +42,7 @@ int main ( int argc , char** argv )
 	/*********************************/
 	/***** Pass through layers *******/
 	/*********************************/
+	// layer outputs
 	static float conv2d_32_feature_map[conv2d_32_output_maps][conv2d_32_output_height][conv2d_32_output_width];
 	static float maxpool2d_32_feature_map[maxpool2d_32_output_maps][maxpool2d_32_output_height][maxpool2d_32_output_width];
 	static float conv2d_64_feature_map[conv2d_64_output_maps][conv2d_64_output_height][conv2d_64_output_width];
@@ -50,7 +53,7 @@ int main ( int argc , char** argv )
 	// Layer 0
 	conv2d <
 	// conv2d_window < 
-		unsigned char , 
+		float , 
 		image_maps , image_height , image_width , 
 		conv2d_32_output_maps , conv2d_32_output_height , conv2d_32_output_width , 
 		conv2d_32_num_filters , conv2d_32_filter_height , conv2d_32_filter_width >
@@ -82,33 +85,38 @@ int main ( int argc , char** argv )
 		( conv2d_64_feature_map , maxpool2d_64_feature_map );
 
 	// Layer 4
-	dense < 128 , 3136 >
+	dense < dense_num_kernels , dense_num_inputs >
 		( reinterpret_cast<float*>(maxpool2d_64_feature_map) , dense_map , layer4_weights , layer4_biases );
 
 	// Layer 5
-	softmax_clasifier < 10 , 128 >
+	softmax_clasifier < softmax_num_kernels , softmax_num_inputs >
 		( dense_map , softmax_output , layer5_weights , layer5_biases );
 
+	double entropy = sparce_categorical_cross_entropy < softmax_num_kernels >
+		( softmax_output , 4 );
+		
 	/*********************************/
 	/********* Show outputs **********/
 	/*********************************/
 	save_feature_map < conv2d_32_output_maps , conv2d_32_output_height , conv2d_32_output_width >
-		( conv2d_32_feature_map , "output/layer0_cpp.txt" , 1 );
+		( conv2d_32_feature_map , "output/l0_conv32_cpp.txt" , 4 );
 
 	save_feature_map < maxpool2d_32_output_maps , maxpool2d_32_output_height , maxpool2d_32_output_width >
-		( maxpool2d_32_feature_map , "output/layer1_cpp.txt" , 1 );
+		( maxpool2d_32_feature_map , "output/l1_maxp32_cpp.txt" , 4 );
 
 	save_feature_map < conv2d_64_output_maps , conv2d_64_output_height , conv2d_64_output_width >
-		( conv2d_64_feature_map , "output/layer2_cpp.txt" , 1 );
+		( conv2d_64_feature_map , "output/l2_conv64_cpp.txt" , 4 );
 
 	save_feature_map < maxpool2d_64_output_maps , maxpool2d_64_output_height , maxpool2d_64_output_width >
-		( maxpool2d_64_feature_map , "output/layer3_cpp.txt" , 1 );
+		( maxpool2d_64_feature_map , "output/l3_maxp64_cpp.txt" , 4 );
 
 	save_feature_map < 1 , 1 , dense_num_kernels >
-		( *reinterpret_cast<float (*)[1][1][128]>(&dense_map) , "output/layer4_cpp.txt" , 3 );
+		( *reinterpret_cast<float (*)[1][1][128]>(&dense_map) , "output/l4_dense_cpp.txt" , 4 );
 
 	save_feature_map < 1 , 1 , softmax_num_kernels >
-		( *reinterpret_cast<float (*)[1][1][10]>(&softmax_output) , "output/layer5_cpp.txt" , 8 );
+		( *reinterpret_cast<float (*)[1][1][10]>(&softmax_output) , "output/l5_softmax_cpp.txt" , 4 );
+
+	std::cout << "C++ entropy: " << std::setprecision(6) << entropy << "\n";
 }
 
 /******************************************/
@@ -122,48 +130,100 @@ template <
 void set_variables (
 	float layer0_weights[l0_num_kernels][l0_num_maps][l0_kernel_height][l0_kernel_width] , float layer0_biases[l0_num_kernels] ,
 	float layer2_weights[l2_num_kernels][l2_num_maps][l2_kernel_height][l2_kernel_width] , float layer2_biases[l2_num_kernels] ,
-	float layer4_weights[l4_num_kernels][l4_num_inputs] , float layer4_biases[l4_num_kernels] ,
+	float layer4_weights[l4_num_inputs][l4_num_kernels] , float layer4_biases[l4_num_kernels] ,
 	float layer5_weights[l5_num_kernels][l5_num_inputs] , float layer5_biases[l5_num_kernels] )
 {
+	std::ifstream file;
+	std::string line;
+
 	/********** layer 0 **********/
+	file.open("./temp/l0_weights.txt");
 	for ( int filter = 0 ; filter < l0_num_kernels ; filter++ )
 		for ( int in_map = 0 ; in_map < l0_num_maps ; in_map++ )
 			for( int i = 0 ; i < l0_kernel_height ; i++ )
 				for ( int y = 0 ; y < l0_kernel_width ; y++ )
-					layer0_weights[filter][in_map][i][y] = 0.2f;
-	layer0_weights[0][0][1][1] = -1.f;
+				{
+					getline( file , line );
+					layer0_weights[filter][in_map][i][y] = std::stof(line);
+				}
+	file.close();
 
+	// for ( int filter = 0 ; filter < l0_num_kernels ; filter++ )
+	// {
+	// 	for ( int in_map = 0 ; in_map < l0_num_maps ; in_map++ )
+	// 		for( int i = 0 ; i < l0_kernel_height ; i++ )
+	// 		{
+	// 			for ( int y = 0 ; y < l0_kernel_width ; y++ )
+	// 			{
+	// 				std::cout << std::setw(5) << layer0_weights[filter][in_map][i][y] << " ";
+	// 			}
+	// 			std::cout << "\n";
+	// 		}
+	// 	std::cout << "\n";
+	// }	
+
+	file.open("./temp/l0_biases.txt");
 	for( int k = 0 ; k < l0_num_kernels ; k++ )
-		layer0_biases[k] = 0.5f;
+	{
+		getline( file , line );
+		layer0_biases[k] = std::stof(line);
+	}
+	file.close();
 
 	/********** layer 2 **********/
+	file.open("./temp/l2_weights.txt");
 	for ( int filter = 0 ; filter < l2_num_kernels ; filter++ )
 		for ( int in_map = 0 ; in_map < l2_num_maps ; in_map++ )
 			for( int i = 0 ; i < l2_kernel_height ; i++ )
 				for ( int y = 0 ; y < l2_kernel_width ; y++ )
-					layer2_weights[filter][in_map][i][y] = 0.1f;
-	layer2_weights[0][0][1][1] = -1.f;
+				{
+					getline( file , line );
+					layer2_weights[filter][in_map][i][y] = std::stof(line);
+				}
+	file.close();
 
+	file.open("./temp/l2_biases.txt");
 	for( int k = 0 ; k < l2_num_kernels ; k++ )
-		layer2_biases[k] = 0.5f;
-
+	{
+		getline( file , line );
+		layer2_biases[k] = std::stof(line);
+	}
+	file.close();
+	
 	/********** layer 4 **********/
-	for ( int kernel = 0 ; kernel < l4_num_kernels ; kernel++ )
-		for ( int i = 0 ; i < l4_num_inputs ; i++ )
-			layer4_weights[kernel][i] = 0.1f;
-	layer4_weights[0][0] = 1.f;
+	file.open("./temp/l4_weights.txt");
+	for ( int i = 0 ; i < l4_num_inputs ; i++ )
+		for ( int kernel = 0 ; kernel < l4_num_kernels ; kernel++ )
+		{
+			getline( file , line );
+			layer4_weights[i][kernel] = std::stof(line);
+		}
+	file.close();
 
+	file.open("./temp/l4_biases.txt");
 	for( int k = 0 ; k < l4_num_kernels ; k++ )
-		layer4_biases[k] = 0.5f;
+	{
+		getline( file , line );
+		layer4_biases[k] = std::stof(line);
+	}
+	file.close();
 
 	/********** layer 5 **********/
+	file.open("./temp/l5_weights.txt");
 	for ( int kernel = 0 ; kernel < l5_num_kernels ; kernel++ )
 		for ( int i = 0 ; i < l5_num_inputs ; i++ )
-			layer5_weights[kernel][i] = 0.1f;
-	layer5_weights[0][0] = -1.f;
+		{
+			getline( file , line );
+			layer5_weights[kernel][i] = std::stof(line);
+		}
+	file.close();
 
+	file.open("./temp/l5_biases.txt");
 	for( int k = 0 ; k < l5_num_kernels ; k++ )
-		layer5_biases[k] = 0.5f;
+	{
+		getline( file , line );
+		layer5_biases[k] = std::stof(line);
+	}
 }
 
 /******************************************/
@@ -444,16 +504,18 @@ void maxpool2d_window (
 template < int num_kernels , int num_inputs >
 void dense ( 
 	float input[num_inputs] , float output[num_kernels] , 
-	float weights[num_kernels][num_inputs] , float bias[num_kernels] )
+	float weights[num_inputs][num_kernels] , float bias[num_kernels] )
 {
 	// float sum[num_kernels];
 	// for( int kernel = 0 ; kernel < num_kernels ; kernel++ )
+	// {
 	// 	sum[kernel] = 0;
+	// }
 	// for ( int i = 0 ; i < num_inputs ; i++ )
 	// {
 	// 	for ( int kernel = 0 ; kernel < num_kernels ; kernel++ )
 	// 	{
-	// 		sum[kernel] += input2[i] * weights[kernel][i];
+	// 		sum[kernel] += input[i] * weights[i][kernel];
 	// 	}
 	// }
 	// for ( int kernel = 0 ; kernel < num_kernels ; kernel++ )
@@ -461,15 +523,16 @@ void dense (
 	// 	sum[kernel] += bias[kernel];
 	// 	output[kernel] = ( sum[kernel] > 0 ) ? sum[kernel] : 0;
 	// }
+
 	for ( int kernel = 0 ; kernel < num_kernels ; kernel++ )
 	{
-		float sum = 0;
+		float sum = 0.f;
 		for ( int i = 0 ; i < num_inputs ; i++ )
 		{
-			sum += input[i] * weights[kernel][i];
+			sum += input[i] * weights[i][kernel];
 		}
 		sum += bias[kernel];
-		output[kernel] = ( sum > 0 ) ? sum : 0;
+		output[kernel] = ( sum > 0.f ) ? sum : 0.f;
 	}
 }
 
@@ -502,6 +565,22 @@ void softmax_clasifier (
 	for ( int kernel = 0 ; kernel < num_kernels ; kernel++ )
 		output[kernel] = std::exp( sum[kernel] - constant );
 }
+
+template < int num_inputs >
+double sparce_categorical_cross_entropy( float prediction[num_inputs] , int label )
+{
+	// double sum = 0.d;
+	// for ( int i = 0 ; i < num_inputs ; i++ )
+	// {
+	// 	sum += (label == i) * std::log( prediction[i] ) + (1 - (label == i) ) * std::log( 1.0d - prediction[i] );
+	// }
+	// sum = - sum / num_inputs;
+
+	double sum = - std::log( prediction[label] );
+
+	return sum;
+}
+
 
 /******************************************/
 /***************** Closing ****************/
