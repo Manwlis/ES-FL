@@ -70,11 +70,25 @@
 #define softmax_num_inputs	dense_num_outputs	// 128
 #define softmax_num_outputs	softmax_num_kernels	//  10
 
+#define learning_rate_const 0.01f
 
-template < int num_maps , int height , int width >
-void save_feature_map( float feature_maps[num_maps][height][width] , const char* file_name , int precision );
+/******************************************/
+/**************** Load Data ***************/
+/******************************************/
+template < 
+	int l0_num_kernels , int l0_num_maps , int l0_kernel_height , int l0_kernel_width ,
+	int l2_num_kernels , int l2_num_maps , int l2_kernel_height , int l2_kernel_width ,
+	int l4_num_kernels , int l4_num_inputs ,
+	int l5_num_kernels , int l5_num_inputs >
+void set_variables (
+	float layer0_weights[l0_num_kernels][l0_num_maps][l0_kernel_height][l0_kernel_width] , float layer0_biases[l0_num_kernels] ,
+	float layer2_weights[l2_num_kernels][l2_num_maps][l2_kernel_height][l2_kernel_width] , float layer2_biases[l2_num_kernels] ,
+	float layer4_weights[l4_num_inputs][l4_num_kernels] , float layer4_biases[l4_num_kernels] ,
+	float layer5_weights[l5_num_inputs][l5_num_kernels] , float layer5_biases[l5_num_kernels] );
 
-
+/******************************************/
+/*********** Forward Propagation **********/
+/******************************************/
 template < 
 	typename input_type ,
 	int input_num_maps , int input_height , int input_width ,
@@ -84,8 +98,7 @@ template <
 void conv2d (
 	input_type input[input_num_maps][input_height][input_width] ,
 	float output[output_maps][output_height][output_width] ,
-	float weights[num_filters][input_num_maps][filter_height][filter_width] , float bias[ num_filters ]
-);
+	float weights[num_filters][input_num_maps][filter_height][filter_width] , float bias[ num_filters ] );
 
 template < 
 	typename input_type ,
@@ -96,8 +109,7 @@ template <
 void conv2d_window (
 	input_type input[input_num_maps][input_height][input_width] ,
 	float output[output_maps][output_height][output_width] ,
-	float weights[num_filters][input_num_maps][filter_height][filter_width] , float bias[ num_filters ]
-);
+	float weights[num_filters][input_num_maps][filter_height][filter_width] , float bias[ num_filters ] );
 
 template <
 	int input_num_maps , int input_height , int input_width ,
@@ -105,8 +117,7 @@ template <
 	int filter_height , int filter_width , int filter_stride >
 void maxpool2d(
 	float input[input_num_maps][input_height][input_width] ,
-	float output[output_maps][output_height][output_width]
-);
+	float output[output_maps][output_height][output_width] );
 
 template <
 	int input_num_maps , int input_height , int input_width ,
@@ -114,31 +125,56 @@ template <
 	int filter_height , int filter_width , int filter_stride >
 void maxpool2d_window (
 	float input[input_num_maps][input_height][input_width] ,
-	float output[output_maps][output_height][output_width]
-);
+	float output[output_maps][output_height][output_width] );
 
 template < int num_kernels , int num_inputs >
 void dense ( 
-	float input[num_inputs] , float output[num_kernels] , 
-	float weights[num_inputs][num_kernels] , float bias[num_kernels]
-);
+	float input[num_inputs] , float output[num_kernels] , bool activations[num_kernels] ,
+	float weights[num_inputs][num_kernels] , float bias[num_kernels] );
 
 template < int num_kernels , int num_inputs >
 void softmax_clasifier ( 
 	float input[num_inputs] , float output[num_kernels] , 
-	float weights[num_kernels][num_inputs] , float bias[num_kernels]
-);
+	float weights[num_inputs][num_kernels] , float bias[num_kernels] );
 
-template < int num_inputs >
-double sparce_categorical_cross_entropy( float prediction[num_inputs] , int label );
+/******************************************/
+/************ Back Propagation ************/
+/******************************************/
+template < int num_kernels >
+double sparce_categorical_cross_entropy(
+	float prediction[num_kernels] , int label , 
+	float softmax_error_vector[num_kernels] );
 
-template < 
-	int l0_num_kernels , int l0_num_maps , int l0_kernel_height , int l0_kernel_width ,
-	int l2_num_kernels , int l2_num_maps , int l2_kernel_height , int l2_kernel_width ,
-	int l4_num_kernels , int l4_num_inputs ,
-	int l5_num_kernels , int l5_num_inputs >
-void set_variables (
-	float layer0_weights[l0_num_kernels][l0_num_maps][l0_kernel_height][l0_kernel_width] , float layer0_biases[l0_num_kernels] ,
-	float layer2_weights[l2_num_kernels][l2_num_maps][l2_kernel_height][l2_kernel_width] , float layer2_biases[l2_num_kernels] ,
-	float layer4_weights[l4_num_inputs][l4_num_kernels] , float layer4_biases[l4_num_kernels] ,
-	float layer5_weights[l5_num_kernels][l5_num_inputs] , float layer5_biases[l5_num_kernels] );
+template < int num_kernels , int num_inputs >
+void softmax_error_propagation( 
+	float weights[num_inputs][num_kernels] , float output_error[num_kernels] , 
+	float input_error[num_inputs] );
+
+template < int num_kernels , int num_inputs >
+void dense_error_propagation(
+	float weights[num_inputs][num_kernels] , float output_error[num_kernels] , bool activations[num_kernels] , float input_error[num_inputs] );
+
+/******************************************/
+/********** Gradient Calculation **********/
+/******************************************/
+template < int num_kernels , int num_inputs >
+void softmax_variables_regression( 
+	float layer_inputs[num_inputs] , float softmax_error_vector[num_kernels] ,
+	float bias_gradients[num_kernels] ,  float weight_gradients[num_inputs][num_kernels] );
+
+template < int num_kernels , int num_inputs >
+void dense_variables_regression(
+	float layer_inputs[num_inputs] , bool activations[num_kernels] , float output_error[num_kernels] ,
+	float bias_gradients[num_kernels] ,  float weight_gradients[num_inputs][num_kernels] );
+
+/******************************************/
+/************ Variable updates ************/
+/******************************************/
+template < int num_kernels , int num_inputs >
+void gradient_descend( float variables[num_inputs][num_kernels] , float gradients[num_inputs][num_kernels] , float learning_rate );
+
+/******************************************/
+/**************** Save Data ***************/
+/******************************************/
+template < int num_maps , int height , int width >
+void save_feature_map( float feature_maps[num_maps][height][width] , const char* file_name , int precision );

@@ -16,12 +16,13 @@ int main ( int argc , char** argv )
 			input[0][i][y] = std::stof(temp);
 		}
 	/*********************************/
-	/******** Create variables *******/
+	/******** Import variables *******/
 	/*********************************/
+#pragma region
 	static float layer0_weights[conv2d_32_num_filters][image_maps][conv2d_32_filter_height][conv2d_32_filter_width];
 	static float layer2_weights[conv2d_64_num_filters][conv2d_64_input_maps][conv2d_64_filter_height][conv2d_64_filter_width];
 	static float layer4_weights[dense_num_inputs][dense_num_kernels];
-	static float layer5_weights[softmax_num_kernels][softmax_num_inputs];
+	static float layer5_weights[softmax_num_inputs][softmax_num_kernels];
 
 	static float layer0_biases[conv2d_32_num_filters];
 	static float layer2_biases[conv2d_64_num_filters];
@@ -38,10 +39,11 @@ int main ( int argc , char** argv )
 		layer2_weights , layer2_biases ,
 		layer4_weights , layer4_biases ,
 		layer5_weights , layer5_biases );
-
+#pragma endregion
 	/*********************************/
-	/***** Pass through layers *******/
+	/***** Forward Propagation *******/
 	/*********************************/
+#pragma region
 	// layer outputs
 	static float conv2d_32_feature_map[conv2d_32_output_maps][conv2d_32_output_height][conv2d_32_output_width];
 	static float maxpool2d_32_feature_map[maxpool2d_32_output_maps][maxpool2d_32_output_height][maxpool2d_32_output_width];
@@ -49,6 +51,8 @@ int main ( int argc , char** argv )
 	static float maxpool2d_64_feature_map[maxpool2d_64_output_maps][maxpool2d_64_output_height][maxpool2d_64_output_width];
 	static float dense_map[dense_num_outputs];
 	static float softmax_output[softmax_num_outputs];
+
+	static bool dense_activations[dense_num_outputs]; // need to remember if relu activated to get its derivative. ReLU > 0 => ReLU' = input, ReLU <= 0 => ReLU' = 0
 
 	// Layer 0
 	conv2d <
@@ -86,42 +90,149 @@ int main ( int argc , char** argv )
 
 	// Layer 4
 	dense < dense_num_kernels , dense_num_inputs >
-		( reinterpret_cast<float*>(maxpool2d_64_feature_map) , dense_map , layer4_weights , layer4_biases );
+		( reinterpret_cast<float*>(maxpool2d_64_feature_map) , dense_map , dense_activations , layer4_weights , layer4_biases );
 
 	// Layer 5
 	softmax_clasifier < softmax_num_kernels , softmax_num_inputs >
 		( dense_map , softmax_output , layer5_weights , layer5_biases );
 
-	double entropy = sparce_categorical_cross_entropy < softmax_num_kernels >
-		( softmax_output , 4 );
-		
+#pragma endregion
+	/*********************************/
+	/******* Back Propagation ********/
+	/*********************************/
+#pragma region
+	static float softmax_output_error[softmax_num_kernels];
+
+	double entropy = sparce_categorical_cross_entropy < softmax_num_kernels > ( softmax_output , 4 , softmax_output_error );
+
+	static float softmax_input_error[softmax_num_inputs];
+	static float dense_input_error[dense_num_inputs];
+
+	softmax_error_propagation < softmax_num_kernels , softmax_num_inputs >
+		( layer5_weights , softmax_output_error , softmax_input_error );
+
+	dense_error_propagation < dense_num_kernels , dense_num_inputs >
+		( layer4_weights , softmax_input_error , dense_activations , dense_input_error );
+
+#pragma endregion
+	/*********************************/
+	/****** Calculate Gradients ******/
+	/*********************************/
+#pragma region
+	static float layer5_weight_gradients[softmax_num_inputs][softmax_num_kernels];
+	static float layer4_weight_gradients[dense_num_inputs][dense_num_kernels];
+
+	static float layer5_bias_gradients[softmax_num_kernels];
+	static float layer4_bias_gradients[dense_num_kernels];
+
+	// layer 5
+	softmax_variables_regression < softmax_num_kernels , softmax_num_inputs >
+		( dense_map , softmax_output_error , layer5_bias_gradients , layer5_weight_gradients );
+
+	// layer 4
+	dense_variables_regression < dense_num_kernels , dense_num_inputs > (
+		reinterpret_cast<float*>(maxpool2d_64_feature_map) , dense_activations ,
+		softmax_input_error , // error of activation of dense layer == error of input of softmax layer
+		layer4_bias_gradients , layer4_weight_gradients );
+
+#pragma endregion
+	/*********************************/
+	/******** Variable updates *******/
+	/*********************************/
+#pragma region
+	// layer 5
+	gradient_descend < softmax_num_kernels , softmax_num_inputs >
+		( layer5_weights , layer5_weight_gradients , learning_rate_const );
+
+	gradient_descend < softmax_num_kernels , 1 > (
+		*reinterpret_cast<float (*)[1][softmax_num_kernels]>(&layer5_biases) , 
+		*reinterpret_cast<float (*)[1][softmax_num_kernels]>(&layer5_bias_gradients) , learning_rate_const );
+
+	// layer 4
+	gradient_descend < dense_num_kernels , dense_num_inputs >
+		( layer4_weights , layer4_weight_gradients , learning_rate_const );
+
+	gradient_descend < dense_num_kernels , 1 > (
+		*reinterpret_cast<float (*)[1][dense_num_kernels]>(&layer4_biases) , 
+		*reinterpret_cast<float (*)[1][dense_num_kernels]>(&layer4_bias_gradients) , learning_rate_const );
+
+#pragma endregion
 	/*********************************/
 	/********* Show outputs **********/
 	/*********************************/
+#pragma region // Forward Propagation
+	// layer 0
 	save_feature_map < conv2d_32_output_maps , conv2d_32_output_height , conv2d_32_output_width >
-		( conv2d_32_feature_map , "output/l0_conv32_cpp.txt" , 4 );
+		( conv2d_32_feature_map , "activations/l0_conv32_cpp.txt" , 4 );
 
+	// layer 1
 	save_feature_map < maxpool2d_32_output_maps , maxpool2d_32_output_height , maxpool2d_32_output_width >
-		( maxpool2d_32_feature_map , "output/l1_maxp32_cpp.txt" , 4 );
+		( maxpool2d_32_feature_map , "activations/l1_maxp32_cpp.txt" , 4 );
 
+	// layer 2
 	save_feature_map < conv2d_64_output_maps , conv2d_64_output_height , conv2d_64_output_width >
-		( conv2d_64_feature_map , "output/l2_conv64_cpp.txt" , 4 );
+		( conv2d_64_feature_map , "activations/l2_conv64_cpp.txt" , 4 );
 
+	// layer 3
 	save_feature_map < maxpool2d_64_output_maps , maxpool2d_64_output_height , maxpool2d_64_output_width >
-		( maxpool2d_64_feature_map , "output/l3_maxp64_cpp.txt" , 4 );
+		( maxpool2d_64_feature_map , "activations/l3_maxp64_cpp.txt" , 4 );
 
+	// layer 4
 	save_feature_map < 1 , 1 , dense_num_kernels >
-		( *reinterpret_cast<float (*)[1][1][128]>(&dense_map) , "output/l4_dense_cpp.txt" , 4 );
+		( *reinterpret_cast<float (*)[1][1][dense_num_kernels]>(&dense_map) , "activations/l4_dense_cpp.txt" , 4 );
+
+	// layer 5
+	save_feature_map < 1 , 1 , softmax_num_kernels >
+		( *reinterpret_cast<float (*)[1][1][softmax_num_kernels]>(&softmax_output) , "activations/l5_softmax_cpp.txt" , 4 );
+#pragma endregion
+
+#pragma region // back propagation
+	save_feature_map < 1 , 1 , softmax_num_inputs >
+		( *reinterpret_cast<float (*)[1][1][softmax_num_inputs]>(&softmax_input_error) , "output_gradients/l4_dense_cpp.txt" , 4 );
+
+	save_feature_map < 1 , 1 , dense_num_inputs >
+		( *reinterpret_cast<float (*)[1][1][dense_num_inputs]>(&dense_input_error) , "output_gradients/l3_maxp64_cpp.txt" , 4 );
+#pragma endregion
+
+#pragma region // variable gradients
+	std::cout << "C++ entropy: " << std::setprecision(8) << entropy << "\n";
+
+	// layer 5
+	save_feature_map < 1 , softmax_num_inputs , softmax_num_kernels >
+		( *reinterpret_cast<float (*)[1][softmax_num_inputs][softmax_num_kernels]>(&layer5_weight_gradients) , "variable_gradients/l5_weights_cpp.txt" , 4 );
 
 	save_feature_map < 1 , 1 , softmax_num_kernels >
-		( *reinterpret_cast<float (*)[1][1][10]>(&softmax_output) , "output/l5_softmax_cpp.txt" , 4 );
+		( *reinterpret_cast<float (*)[1][1][softmax_num_kernels]>(&layer5_bias_gradients) , "variable_gradients/l5_biases_cpp.txt" , 4 );
 
-	std::cout << "C++ entropy: " << std::setprecision(6) << entropy << "\n";
+	// layer 4
+	save_feature_map < 1 , dense_num_inputs , dense_num_kernels >
+		( *reinterpret_cast<float (*)[1][dense_num_inputs][dense_num_kernels]>(&layer4_weight_gradients) , "variable_gradients/l4_weights_cpp.txt" , 4 );
+
+	save_feature_map < 1 , 1 , dense_num_kernels >
+		( *reinterpret_cast<float (*)[1][1][dense_num_kernels]>(&layer4_bias_gradients) , "variable_gradients/l4_biases_cpp.txt" , 4 );
+#pragma endregion
+
+#pragma region // updated variables
+	// layer 5
+	save_feature_map < 1 , softmax_num_inputs , softmax_num_kernels >
+		( *reinterpret_cast<float (*)[1][softmax_num_inputs][softmax_num_kernels]>(&layer5_weights) , "variables/l5_weights_cpp.txt" , 6 );
+	
+	save_feature_map < 1 , 1 , softmax_num_kernels >
+		( *reinterpret_cast<float (*)[1][1][softmax_num_kernels]>(&layer5_biases) , "variables/l5_biases_cpp.txt" , 6 );
+
+	// layer 4
+	save_feature_map < 1 , dense_num_inputs , dense_num_kernels >
+		( *reinterpret_cast<float (*)[1][dense_num_inputs][dense_num_kernels]>(&layer4_weights) , "variables/l4_weights_cpp.txt" , 6 );
+	
+	save_feature_map < 1 , 1 , dense_num_kernels >
+		( *reinterpret_cast<float (*)[1][1][dense_num_kernels]>(&layer4_biases) , "variables/l4_biases_cpp.txt" , 6 );
+#pragma endregion
 }
 
 /******************************************/
-/**************** Prepatory ***************/
+/**************** Load Data ***************/
 /******************************************/
+#pragma region
 template < 
 	int l0_num_kernels , int l0_num_maps , int l0_kernel_height , int l0_kernel_width ,
 	int l2_num_kernels , int l2_num_maps , int l2_kernel_height , int l2_kernel_width ,
@@ -131,7 +242,7 @@ void set_variables (
 	float layer0_weights[l0_num_kernels][l0_num_maps][l0_kernel_height][l0_kernel_width] , float layer0_biases[l0_num_kernels] ,
 	float layer2_weights[l2_num_kernels][l2_num_maps][l2_kernel_height][l2_kernel_width] , float layer2_biases[l2_num_kernels] ,
 	float layer4_weights[l4_num_inputs][l4_num_kernels] , float layer4_biases[l4_num_kernels] ,
-	float layer5_weights[l5_num_kernels][l5_num_inputs] , float layer5_biases[l5_num_kernels] )
+	float layer5_weights[l5_num_inputs][l5_num_kernels] , float layer5_biases[l5_num_kernels] )
 {
 	std::ifstream file;
 	std::string line;
@@ -210,11 +321,11 @@ void set_variables (
 
 	/********** layer 5 **********/
 	file.open("./temp/l5_weights.txt");
-	for ( int kernel = 0 ; kernel < l5_num_kernels ; kernel++ )
-		for ( int i = 0 ; i < l5_num_inputs ; i++ )
+	for ( int i = 0 ; i < l5_num_inputs ; i++ )
+		for ( int kernel = 0 ; kernel < l5_num_kernels ; kernel++ )
 		{
 			getline( file , line );
-			layer5_weights[kernel][i] = std::stof(line);
+			layer5_weights[i][kernel] = std::stof(line);
 		}
 	file.close();
 
@@ -226,9 +337,11 @@ void set_variables (
 	}
 }
 
+#pragma endregion
 /******************************************/
-/***************** Layers *****************/
+/*********** Forward Propagation **********/
 /******************************************/
+#pragma region
 template < 
 	typename input_type ,
 	int input_num_maps , int input_height , int input_width ,
@@ -503,7 +616,7 @@ void maxpool2d_window (
 
 template < int num_kernels , int num_inputs >
 void dense ( 
-	float input[num_inputs] , float output[num_kernels] , 
+	float input[num_inputs] , float output[num_kernels] , bool activations[num_kernels] ,
 	float weights[num_inputs][num_kernels] , float bias[num_kernels] )
 {
 	// float sum[num_kernels];
@@ -533,20 +646,21 @@ void dense (
 		}
 		sum += bias[kernel];
 		output[kernel] = ( sum > 0.f ) ? sum : 0.f;
+		activations[kernel] = ( sum > 0.f );
 	}
 }
 
 template < int num_kernels , int num_inputs >
 void softmax_clasifier ( 
 	float input[num_inputs] , float output[num_kernels] , 
-	float weights[num_kernels][num_inputs] , float bias[num_kernels] )
+	float weights[num_inputs][num_kernels] , float bias[num_kernels] )
 {
 	// array multiplication
 	double sum[num_kernels];
 	for ( int kernel = 0 ; kernel < num_kernels ; kernel++ )
 	{
 		for ( int i = 0 ; i < num_inputs ; i++ )
-			sum[kernel] += input[i] * weights[kernel][i];
+			sum[kernel] += input[i] * weights[i][kernel];
 		
 		sum[kernel] += bias[kernel];
 	}
@@ -565,26 +679,107 @@ void softmax_clasifier (
 	for ( int kernel = 0 ; kernel < num_kernels ; kernel++ )
 		output[kernel] = std::exp( sum[kernel] - constant );
 }
-
-template < int num_inputs >
-double sparce_categorical_cross_entropy( float prediction[num_inputs] , int label )
+#pragma endregion
+/******************************************/
+/************ Back Propagation ************/
+/******************************************/
+#pragma region
+template < int num_kernels >
+double sparce_categorical_cross_entropy( float prediction[num_kernels] , int label , float softmax_output_error[num_kernels] )
 {
-	// double sum = 0.d;
-	// for ( int i = 0 ; i < num_inputs ; i++ )
-	// {
-	// 	sum += (label == i) * std::log( prediction[i] ) + (1 - (label == i) ) * std::log( 1.0d - prediction[i] );
-	// }
-	// sum = - sum / num_inputs;
+	for ( int kernel = 0 ; kernel < num_kernels ; kernel++ )
+		softmax_output_error[kernel] = - ( ( label == kernel ) - prediction[kernel] ); // -(yi - ai)
 
+	// one-hot distribution. Loss of non-label classes equals to zero. 
 	double sum = - std::log( prediction[label] );
 
 	return sum;
 }
 
+// calculate the error of the output in respect of the input
+template < int num_kernels , int num_inputs >
+void softmax_error_propagation( 
+	float weights[num_inputs][num_kernels] , float output_error[num_kernels] , float input_error[num_inputs] )
+{
+	for ( int input = 0 ; input < num_inputs ; input++ )
+	{
+		float sum = 0.f;
+		for ( int kernel = 0 ; kernel < num_kernels ; kernel++ )
+		{
+			sum += weights[input][kernel] * output_error[kernel];
+		}
+		input_error[input] = sum; // move here. need to see layer_inputs[num_inputs]
+	}
+}
+
+template < int num_kernels , int num_inputs >
+void dense_error_propagation(
+	float weights[num_inputs][num_kernels] , float output_error[num_kernels] , bool activations[num_kernels] , float input_error[num_inputs] )
+{
+	for ( int input = 0 ; input < num_inputs ; input++ )
+	{
+		float sum = 0.f;
+		for ( int kernel = 0 ; kernel < num_kernels ; kernel++ )
+		{
+			if ( activations[kernel] ) // relu was activated => error propagates backward?
+				sum += weights[input][kernel] * output_error[kernel];
+		}
+		input_error[input] = sum;
+	}
+}
+
+#pragma endregion
+/******************************************/
+/********** Gradient Calculation **********/
+/******************************************/
+#pragma region
+// https://www.youtube.com/watch?v=aeM-fmcdkXU
+template < int num_kernels , int num_inputs >
+void softmax_variables_regression( 
+	float layer_inputs[num_inputs] , float softmax_output_error[num_kernels] ,
+	float bias_gradients[num_kernels] ,  float weight_gradients[num_inputs][num_kernels] )
+{
+	for ( int kernel = 0 ; kernel < num_kernels ; kernel++ )
+		bias_gradients[kernel] = softmax_output_error[kernel]; // -(yi - ai)
+
+	for ( int i = 0 ; i < num_inputs ; i++ )
+		for ( int kernel = 0 ; kernel < num_kernels ; kernel++ )
+			weight_gradients[i][kernel] = softmax_output_error[kernel] * layer_inputs[i]; // -(yi - ai) * xi
+}
+
+template < int num_kernels , int num_inputs >
+void dense_variables_regression(
+	float layer_inputs[num_inputs] , bool activations[num_kernels] , float output_error[num_kernels] ,
+	float bias_gradients[num_kernels] ,  float weight_gradients[num_inputs][num_kernels] )
+{
+	float kernel_error[num_kernels];
+	for ( int kernel = 0 ; kernel < num_kernels ; kernel++ )
+		kernel_error[kernel] = output_error[kernel] * activations[kernel];
+
+	for ( int kernel = 0 ; kernel < num_kernels ; kernel++ )
+		bias_gradients[kernel] = kernel_error[kernel];
+
+	for ( int input = 0 ; input < num_inputs ; input++ )
+		for ( int kernel = 0 ; kernel < num_kernels ; kernel++ )
+				weight_gradients[input][kernel] = kernel_error[kernel] * layer_inputs[input];
+}
+
+#pragma endregion
+/******************************************/
+/************ Variable updates ************/
+/******************************************/
+template < int num_kernels , int num_inputs >
+void gradient_descend( float variables[num_inputs][num_kernels] , float gradients[num_inputs][num_kernels] , float learning_rate )
+{
+	for ( int kernel = 0 ; kernel < num_kernels ; kernel++ )
+		for ( int input = 0 ; input < num_inputs ; input++ )
+			variables[input][kernel] = variables[input][kernel] - learning_rate * gradients[input][kernel];
+}
 
 /******************************************/
-/***************** Closing ****************/
+/**************** Save Data ***************/
 /******************************************/
+// Helper function to save 3d arrays as vectors, to files.
 template < int num_maps , int height , int width >
 void save_feature_map( float feature_maps[num_maps][height][width] ,  const char* file_name , int precision )
 {

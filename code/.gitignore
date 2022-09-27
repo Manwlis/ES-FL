@@ -1,3 +1,8 @@
 .vscode/
 nn/__pycache__/
 IO_files/
+exp/layer/activations/
+exp/layer/output_gradients/
+exp/layer/variable_gradients/
+exp/layer/variables/
+exp/layer/temp/
