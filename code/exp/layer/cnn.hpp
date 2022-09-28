@@ -55,7 +55,6 @@
 #define maxpool2d_64_input_height	conv2d_64_output_height	// 14
 #define maxpool2d_64_input_width	conv2d_64_output_width	// 14
 
-// 64x7x7
 #define maxpool2d_64_output_maps	maxpool2d_64_input_maps	// 64
 #define maxpool2d_64_output_height	maxpool2d_64_input_height / maxpool2d_64_filter_stride	// 7
 #define maxpool2d_64_output_width	maxpool2d_64_input_width  / maxpool2d_64_filter_stride	// 7
@@ -112,20 +111,22 @@ void conv2d_window (
 	float weights[num_filters][input_num_maps][filter_height][filter_width] , float bias[ num_filters ] );
 
 template <
-	int input_num_maps , int input_height , int input_width ,
-	int output_maps , int output_height , int output_width , 
-	int filter_height , int filter_width , int filter_stride >
+	uint input_num_maps , uint input_height , uint input_width ,
+	uint output_maps , uint output_height , uint output_width , 
+	uint filter_height , uint filter_width , uint filter_stride >
 void maxpool2d(
 	float input[input_num_maps][input_height][input_width] ,
-	float output[output_maps][output_height][output_width] );
+	float output[output_maps][output_height][output_width] ,
+	short max_indices[ output_maps * output_height * output_width ][3] );
 
 template <
-	int input_num_maps , int input_height , int input_width ,
-	int output_maps , int output_height , int output_width , 
-	int filter_height , int filter_width , int filter_stride >
+	uint input_num_maps , uint input_height , uint input_width ,
+	uint output_maps , uint output_height , uint output_width , 
+	uint filter_height , uint filter_width , uint filter_stride >
 void maxpool2d_window (
 	float input[input_num_maps][input_height][input_width] ,
-	float output[output_maps][output_height][output_width] );
+	float output[output_maps][output_height][output_width] , 
+	short max_indices[ output_maps * output_height * output_width ][3] );
 
 template < int num_kernels , int num_inputs >
 void dense ( 
@@ -154,6 +155,14 @@ template < int num_kernels , int num_inputs >
 void dense_error_propagation(
 	float weights[num_inputs][num_kernels] , float output_error[num_kernels] , bool activations[num_kernels] , float input_error[num_inputs] );
 
+template < 
+	uint input_num_maps , uint input_height , uint input_width ,
+	uint output_maps , uint output_height , uint output_width >
+void maxpool_error_propagation(
+	float output_error[ output_maps * output_height * output_width ] ,
+	short max_indices[ output_maps * output_height * output_width ][3] ,
+	float input_error[input_num_maps][input_height][input_width]);
+	
 /******************************************/
 /********** Gradient Calculation **********/
 /******************************************/

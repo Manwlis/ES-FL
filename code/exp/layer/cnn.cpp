@@ -52,11 +52,13 @@ int main ( int argc , char** argv )
 	static float dense_map[dense_num_outputs];
 	static float softmax_output[softmax_num_outputs];
 
+	static short maxpool2d_32_max_indices[maxpool2d_32_output_maps * maxpool2d_32_output_height * maxpool2d_32_output_width][3];
+	static short maxpool2d_64_max_indices[maxpool2d_64_output_maps * maxpool2d_64_output_height * maxpool2d_64_output_width][3];
 	static bool dense_activations[dense_num_outputs]; // need to remember if relu activated to get its derivative. ReLU > 0 => ReLU' = input, ReLU <= 0 => ReLU' = 0
 
 	// Layer 0
-	conv2d <
-	// conv2d_window < 
+	// conv2d <
+	conv2d_window < 
 		float , 
 		image_maps , image_height , image_width , 
 		conv2d_32_output_maps , conv2d_32_output_height , conv2d_32_output_width , 
@@ -64,16 +66,16 @@ int main ( int argc , char** argv )
 		( input , conv2d_32_feature_map , layer0_weights , layer0_biases );
 	
 	// Layer 1
-	maxpool2d <
-	// maxpool2d_window <
+	// maxpool2d <
+	maxpool2d_window <
 		maxpool2d_32_input_maps , maxpool2d_32_input_height , maxpool2d_32_input_width ,
 		maxpool2d_32_output_maps , maxpool2d_32_output_height , maxpool2d_32_output_width , 
 		maxpool2d_32_filter_height , maxpool2d_32_filter_width , maxpool2d_32_filter_stride >
-		( conv2d_32_feature_map , maxpool2d_32_feature_map );
+		( conv2d_32_feature_map , maxpool2d_32_feature_map , maxpool2d_32_max_indices );
 
 	// Layer 2
-	conv2d <
-	// conv2d_window <
+	// conv2d <
+	conv2d_window <
 		float , 
 		conv2d_64_input_maps , conv2d_64_input_height , conv2d_64_input_width , 
 		conv2d_64_output_maps , conv2d_64_output_height , conv2d_64_output_width , 
@@ -81,12 +83,12 @@ int main ( int argc , char** argv )
 		( maxpool2d_32_feature_map , conv2d_64_feature_map , layer2_weights , layer2_biases );
 
 	// Layer 3
-	maxpool2d <
-	// maxpool2d_window <
+	// maxpool2d <
+	maxpool2d_window <
 		maxpool2d_64_input_maps , maxpool2d_64_input_height , maxpool2d_64_input_width ,
 		maxpool2d_64_output_maps , maxpool2d_64_output_height , maxpool2d_64_output_width , 
 		maxpool2d_64_filter_height , maxpool2d_64_filter_width , maxpool2d_64_filter_stride >
-		( conv2d_64_feature_map , maxpool2d_64_feature_map );
+		( conv2d_64_feature_map , maxpool2d_64_feature_map , maxpool2d_64_max_indices );
 
 	// Layer 4
 	dense < dense_num_kernels , dense_num_inputs >
@@ -102,17 +104,22 @@ int main ( int argc , char** argv )
 	/*********************************/
 #pragma region
 	static float softmax_output_error[softmax_num_kernels];
-
-	double entropy = sparce_categorical_cross_entropy < softmax_num_kernels > ( softmax_output , 4 , softmax_output_error );
-
 	static float softmax_input_error[softmax_num_inputs];
 	static float dense_input_error[dense_num_inputs];
+	static float maxpool2d_64_input_error[maxpool2d_64_input_maps][maxpool2d_64_input_height][maxpool2d_64_input_width];
+
+	double entropy = sparce_categorical_cross_entropy < softmax_num_kernels > ( softmax_output , 4 , softmax_output_error );
 
 	softmax_error_propagation < softmax_num_kernels , softmax_num_inputs >
 		( layer5_weights , softmax_output_error , softmax_input_error );
 
 	dense_error_propagation < dense_num_kernels , dense_num_inputs >
 		( layer4_weights , softmax_input_error , dense_activations , dense_input_error );
+
+	maxpool_error_propagation < 
+		maxpool2d_64_input_maps , maxpool2d_64_input_height , maxpool2d_64_input_width ,
+		maxpool2d_64_output_maps , maxpool2d_64_output_height , maxpool2d_64_output_width >
+		( dense_input_error , maxpool2d_64_max_indices , maxpool2d_64_input_error );
 
 #pragma endregion
 	/*********************************/
@@ -192,6 +199,10 @@ int main ( int argc , char** argv )
 
 	save_feature_map < 1 , 1 , dense_num_inputs >
 		( *reinterpret_cast<float (*)[1][1][dense_num_inputs]>(&dense_input_error) , "output_gradients/l3_maxp64_cpp.txt" , 4 );
+
+	save_feature_map < maxpool2d_64_input_maps , maxpool2d_64_input_height , maxpool2d_64_input_width >
+		( maxpool2d_64_input_error , "output_gradients/l2_conv64_cpp.txt" , 4 );
+
 #pragma endregion
 
 #pragma region // variable gradients
@@ -503,48 +514,58 @@ void conv2d_window (
 }
 
 template <
-	int input_num_maps , int input_height , int input_width ,
-	int output_maps , int output_height , int output_width , 
-	int filter_height , int filter_width , int filter_stride >
+	uint input_num_maps , uint input_height , uint input_width ,
+	uint output_maps , uint output_height , uint output_width , 
+	uint filter_height , uint filter_width , uint filter_stride >
 void maxpool2d (
 	float input[input_num_maps][input_height][input_width] ,
-	float output[output_maps][output_height][output_width] )
+	float output[output_maps][output_height][output_width] ,
+	short max_indices[ output_maps * output_height * output_width ][3] )
 {
 	/*********************************/
 	/***** 2-D Max pooling Layer *****/
 	/*********************************/
+	uint processed_windows_counter = 0;
 	// input loops, one pixel at a time
-	for( int in_filter = 0 ; in_filter < input_num_maps ; in_filter++ )
+	for( uint in_filter = 0 ; in_filter < input_num_maps ; in_filter++ )
 	{
-		for( int in_column = 0 ; in_column < input_height ; in_column += filter_stride )
+		for( uint in_column = 0 ; in_column < input_height ; in_column += filter_stride )
 		{
-			for ( int in_row = 0 ; in_row < input_width ; in_row += filter_stride )
+			for ( uint in_row = 0 ; in_row < input_width ; in_row += filter_stride )
 			{
 				float max = -std::numeric_limits<float>::infinity();
 
 				// filter loops
-				for( int filter_column = 0 ; filter_column < filter_height ; filter_column++ )
+				for( uint filter_column = 0 ; filter_column < filter_height ; filter_column++ )
 				{
-					for ( int filter_row = 0 ; filter_row < filter_width ; filter_row++ )
+					for ( uint filter_row = 0 ; filter_row < filter_width ; filter_row++ )
 					{
 						if ( input[in_filter][in_column+filter_column][in_row+filter_row] > max )
+						{
 							max = input[in_filter][in_column+filter_column][in_row+filter_row];
+
+							max_indices[processed_windows_counter][0] = in_filter;
+							max_indices[processed_windows_counter][1] = in_column + filter_column;
+							max_indices[processed_windows_counter][2] = in_row + filter_row;
+						}
 						
 					}
 				}// end filter loops
 				output[in_filter][in_column/2][in_row/2] = max;
+				processed_windows_counter++;
 			}
 		}
 	}// end input loops
 }
 
 template <
-	int input_num_maps , int input_height , int input_width ,
-	int output_maps , int output_height , int output_width , 
-	int filter_height , int filter_width , int filter_stride >
+	uint input_num_maps , uint input_height , uint input_width ,
+	uint output_maps , uint output_height , uint output_width , 
+	uint filter_height , uint filter_width , uint filter_stride > // stride is square, same value for height and width
 void maxpool2d_window (
 	float input[input_num_maps][input_height][input_width] ,
-	float output[output_maps][output_height][output_width] )
+	float output[output_maps][output_height][output_width] ,
+	short max_indices[ output_maps * output_height * output_width ][3] ) // remember positions of maxes for backpropagating error
 {
 	/*********************************/
 	/********** 2-D Window ***********/
@@ -552,45 +573,35 @@ void maxpool2d_window (
 	struct window { float pix[filter_height][filter_width]; } temp_window;
 	std::queue<window> window_fifo;
 
-	// pointer on the input array
-	uint pos_filter = 0;
-	uint pos_height = 0;
-	uint pos_width = 0;
-	
-	uint num_windows = input_num_maps * input_height * input_width / ( filter_height * filter_width );
-	for ( uint i = 0 ; i < num_windows; i++ )
+	float* input_1D = reinterpret_cast<float*>(input);
+	for( uint line_counter = 0 ; line_counter < input_num_maps * input_height ; line_counter += 2 )
 	{
-		// fill window
-		temp_window.pix[0][0] = input[pos_filter][pos_height][pos_width];
-		temp_window.pix[0][1] = input[pos_filter][pos_height][pos_width+1];
-		temp_window.pix[1][0] = input[pos_filter][pos_height+1][pos_width];
-		temp_window.pix[1][1] = input[pos_filter][pos_height+1][pos_width+1];
+		// simulates that the input comes as vectors. Equals two pops from vector stream
+		std::vector<float> in_vector0( input_1D + line_counter * input_width , input_1D + line_counter * input_width + input_width );
+		std::vector<float> in_vector1( input_1D + (line_counter+1) * input_width , input_1D + (line_counter+1) * input_width + input_width );
 
-		// move to next window, stride = ( 1 , 2 , 2 )
-		pos_width += 2;
-		if( pos_width == input_width )
+		// create windows from the vectors
+		for( uint i = 0 ; i < input_height / filter_stride ; i++ )
 		{
-			pos_width = 0;
-			pos_height += 2;
-		}
-		if( pos_height == input_height )
-		{
-			pos_height = 0;
-			pos_filter++;
-		}
+			temp_window.pix[0][0] = in_vector0[ i * filter_stride ];
+			temp_window.pix[0][1] = in_vector0[ i * filter_stride + 1 ];
+			temp_window.pix[1][0] = in_vector1[ i * filter_stride ];
+			temp_window.pix[1][1] = in_vector1[ i * filter_stride + 1 ];
 
-		// put it in the stream
-		window_fifo.push( temp_window );
+			window_fifo.push( temp_window );
+		}
 	}
 	/*********************************/
 	/***** 2-D Max pooling Layer *****/
 	/*********************************/
+	int processed_windows_counter = 0;
+
 	// input loops, one pixel at a time
-	for( int in_filter = 0 ; in_filter < input_num_maps ; in_filter++ )
+	for( uint in_filter = 0 ; in_filter < input_num_maps ; in_filter++ )
 	{
-		for( int in_column = 0 ; in_column < input_height ; in_column += filter_stride )
+		for( uint in_column = 0 ; in_column < input_height ; in_column += filter_stride )
 		{
-			for ( int in_row = 0 ; in_row < input_width ; in_row += filter_stride )
+			for ( uint in_row = 0 ; in_row < input_width ; in_row += filter_stride )
 			{
 				// pop window from queue
 				window temp_window;
@@ -600,18 +611,47 @@ void maxpool2d_window (
 				float max = -std::numeric_limits<float>::infinity();
 
 				// filter loops
-				for( int filter_column = 0 ; filter_column < filter_height ; filter_column++ )
+				for( uint filter_column = 0 ; filter_column < filter_height ; filter_column++ )
 				{
-					for ( int filter_row = 0 ; filter_row < filter_width ; filter_row++ )
+					for ( uint filter_row = 0 ; filter_row < filter_width ; filter_row++ )
 					{
 						if ( temp_window.pix[filter_column][filter_row] > max )
+						{
 							max = temp_window.pix[filter_column][filter_row];
+
+							max_indices[processed_windows_counter][0] = in_filter;
+							max_indices[processed_windows_counter][1] = in_column + filter_column;
+							max_indices[processed_windows_counter][2] = in_row + filter_row;
+						}
 					}
 				}// end filter loops
 				output[in_filter][in_column/2][in_row/2] = max;
+				processed_windows_counter++;
 			}
 		}
 	}// end input loops
+	// print max_indices and input
+	// if( input_height == 14 ) {
+	// 	for( int i = 0 ; i < output_maps * output_height * output_width ; i++ )
+	// 	{
+	// 		std::cout << "[" << max_indices[i][0] << "]" << "[" << max_indices[i][1] << "]" << "[" << max_indices[i][2] << "]\n";
+	// 	}
+	// 	std::ofstream file;
+	// 	file.open( "test.txt" );
+	// 	file.precision( 4 );
+	// 	for( int in_filter = 0 ; in_filter < input_num_maps ; in_filter++ )
+	// 	{
+	// 		for( int in_column = 0 ; in_column < input_height ; in_column++ )
+	// 		{
+	// 			for ( int in_row = 0 ; in_row < input_width ; in_row++ )
+	// 			{
+	// 				file << std::fixed << input[in_filter][in_column][in_row] << " ";
+	// 			}
+	// 			file << "\n";
+	// 		}
+	// 		file << "\n";
+	// 	}
+	// }
 }
 
 template < int num_kernels , int num_inputs >
@@ -726,6 +766,23 @@ void dense_error_propagation(
 		}
 		input_error[input] = sum;
 	}
+}
+
+template < 
+	uint input_num_maps , uint input_height , uint input_width ,
+	uint output_maps , uint output_height , uint output_width >
+void maxpool_error_propagation(
+	float output_error[ output_maps * output_height * output_width ] ,
+	short max_indices[ output_maps * output_height * output_width ][3] ,
+	float input_error[input_num_maps][input_height][input_width])
+{
+	for( uint input_map = 0 ; input_map < input_num_maps ; input_map++ )
+		for( uint in_column = 0 ; in_column < input_height ; in_column++ )
+			for ( uint in_row = 0 ; in_row < input_width ; in_row++ )
+				input_error[input_map][in_column][in_row] = 0;
+
+	for ( uint i = 0 ; i < output_maps * output_height * output_width ; i++ )
+		input_error[max_indices[i][0]][max_indices[i][1]][max_indices[i][2]] = output_error[i];
 }
 
 #pragma endregion
