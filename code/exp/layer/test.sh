@@ -17,7 +17,7 @@ mkdir --parents variables
 python3 cnn.py
 
 # Compile
-g++ -Wall -Wno-unknown-pragmas cnn.cpp -o temp/cnn
+g++ -Wall -Wno-unknown-pragmas cnn2.cpp -o temp/cnn
 
 # Execute
 ./temp/cnn
@@ -63,6 +63,12 @@ diff ${flags} variable_gradients/l4_weights_tf.txt	variable_gradients/l4_weights
 
 echo ""
 diff ${flags} variable_gradients/l4_biases_tf.txt	variable_gradients/l4_biases_cpp.txt
+
+echo ""
+diff ${flags} variable_gradients/l2_weights_tf.txt	variable_gradients/l2_weights_cpp.txt
+
+echo ""
+diff ${flags} variable_gradients/l2_biases_tf.txt	variable_gradients/l2_biases_cpp.txt
 
 echo -e "\n~~~~~~~~~~~ Updated Variables ~~~~~~~~~~~~\n"
 diff ${flags} variables/l5_weights_tf.txt	variables/l5_weights_cpp.txt

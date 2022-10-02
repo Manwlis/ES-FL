@@ -52,7 +52,9 @@ int main ( int argc , char** argv )
 	static float dense_map[dense_num_outputs];
 	static float softmax_output[softmax_num_outputs];
 
+	static bool conv2d_32_activations[conv2d_32_output_maps][conv2d_32_output_height][conv2d_32_output_width];
 	static short maxpool2d_32_max_indices[maxpool2d_32_output_maps * maxpool2d_32_output_height * maxpool2d_32_output_width][3];
+	static bool conv2d_64_activations[conv2d_64_output_maps][conv2d_64_output_height][conv2d_64_output_width];
 	static short maxpool2d_64_max_indices[maxpool2d_64_output_maps * maxpool2d_64_output_height * maxpool2d_64_output_width][3];
 	static bool dense_activations[dense_num_outputs]; // need to remember if relu activated to get its derivative. ReLU > 0 => ReLU' = input, ReLU <= 0 => ReLU' = 0
 
@@ -63,7 +65,7 @@ int main ( int argc , char** argv )
 		image_maps , image_height , image_width , 
 		conv2d_32_output_maps , conv2d_32_output_height , conv2d_32_output_width , 
 		conv2d_32_num_filters , conv2d_32_filter_height , conv2d_32_filter_width >
-		( input , conv2d_32_feature_map , layer0_weights , layer0_biases );
+		( input , conv2d_32_feature_map , conv2d_32_activations , layer0_weights , layer0_biases );
 	
 	// Layer 1
 	// maxpool2d <
@@ -80,7 +82,7 @@ int main ( int argc , char** argv )
 		conv2d_64_input_maps , conv2d_64_input_height , conv2d_64_input_width , 
 		conv2d_64_output_maps , conv2d_64_output_height , conv2d_64_output_width , 
 		conv2d_64_num_filters , conv2d_64_filter_height , conv2d_64_filter_width >
-		( maxpool2d_32_feature_map , conv2d_64_feature_map , layer2_weights , layer2_biases );
+		( maxpool2d_32_feature_map , conv2d_64_feature_map , conv2d_64_activations , layer2_weights , layer2_biases );
 
 	// Layer 3
 	// maxpool2d <
@@ -128,9 +130,11 @@ int main ( int argc , char** argv )
 #pragma region
 	static float layer5_weight_gradients[softmax_num_inputs][softmax_num_kernels];
 	static float layer4_weight_gradients[dense_num_inputs][dense_num_kernels];
+	static float layer2_weight_gradients[conv2d_64_num_filters][conv2d_64_input_maps][conv2d_64_filter_height][conv2d_64_filter_width];
 
 	static float layer5_bias_gradients[softmax_num_kernels];
 	static float layer4_bias_gradients[dense_num_kernels];
+	static float layer2_bias_gradients[conv2d_64_num_filters];
 
 	// layer 5
 	softmax_variables_regression < softmax_num_kernels , softmax_num_inputs >
@@ -141,6 +145,16 @@ int main ( int argc , char** argv )
 		reinterpret_cast<float*>(maxpool2d_64_feature_map) , dense_activations ,
 		softmax_input_error , // error of activation of dense layer == error of input of softmax layer
 		layer4_bias_gradients , layer4_weight_gradients );
+
+	// layer 2
+	// conv2d_variables_regression
+	conv2d_window_variables_regression <
+		float ,
+		conv2d_64_input_maps , conv2d_64_input_height , conv2d_64_input_width ,
+		conv2d_64_output_maps , conv2d_64_output_height , conv2d_64_output_width ,
+		conv2d_64_num_filters , conv2d_64_filter_height , conv2d_64_filter_width > (
+		maxpool2d_32_feature_map , maxpool2d_64_input_error , conv2d_64_activations ,
+		layer2_weight_gradients , layer2_bias_gradients );
 
 #pragma endregion
 	/*********************************/
@@ -221,6 +235,16 @@ int main ( int argc , char** argv )
 
 	save_feature_map < 1 , 1 , dense_num_kernels >
 		( *reinterpret_cast<float (*)[1][1][dense_num_kernels]>(&layer4_bias_gradients) , "variable_gradients/l4_biases_cpp.txt" , 4 );
+
+	// layer 2
+	save_4d_array < conv2d_64_num_filters , conv2d_64_input_maps , conv2d_64_filter_height , conv2d_64_filter_width >
+		( layer2_weight_gradients , "variable_gradients/l2_weights_cpp.txt" , 4 );
+
+	save_feature_map < 1 , 1 , conv2d_64_num_filters >
+		( *reinterpret_cast<float (*)[1][1][conv2d_64_num_filters]>(&layer2_bias_gradients) , "variable_gradients/l2_biases_cpp.txt" , 4 );
+
+	// layer 0
+	
 #pragma endregion
 
 #pragma region // updated variables
@@ -353,7 +377,7 @@ void set_variables (
 /*********** Forward Propagation **********/
 /******************************************/
 #pragma region
-template < 
+template <
 	typename input_type ,
 	int input_num_maps , int input_height , int input_width ,
 	int output_maps , int output_height , int output_width ,
@@ -410,7 +434,7 @@ template <
 	int num_filters , int filter_height , int filter_width >
 void conv2d_window (
 	input_type input[input_num_maps][input_height][input_width] ,
-	float output[output_maps][output_height][output_width] ,
+	float output[output_maps][output_height][output_width] , bool activations [output_maps][output_height][output_width] ,
 	float weights[num_filters][input_num_maps][filter_height][filter_width] , float bias[ num_filters ] )
 {
 	float* input_1D = reinterpret_cast<float*>(input);
@@ -508,6 +532,7 @@ void conv2d_window (
 				// add bias & activate with relu
 				sum += bias[filter];
 				output[filter][in_column][in_row] = ( sum > 0 ) ? sum : 0;
+				activations[filter][in_column][in_row] = ( sum > 0 );
 			}
 		}
 	}
@@ -619,6 +644,7 @@ void maxpool2d_window (
 						{
 							max = temp_window.pix[filter_column][filter_row];
 
+							// pisteuw oti allazei eukola se size input an paei to midenisma tou pinaka prin apo to loop kai mpainoun times se gia ola.
 							max_indices[processed_windows_counter][0] = in_filter;
 							max_indices[processed_windows_counter][1] = in_column + filter_column;
 							max_indices[processed_windows_counter][2] = in_row + filter_row;
@@ -774,7 +800,7 @@ template <
 void maxpool_error_propagation(
 	float output_error[ output_maps * output_height * output_width ] ,
 	short max_indices[ output_maps * output_height * output_width ][3] ,
-	float input_error[input_num_maps][input_height][input_width])
+	float input_error[input_num_maps][input_height][input_width] )
 {
 	for( uint input_map = 0 ; input_map < input_num_maps ; input_map++ )
 		for( uint in_column = 0 ; in_column < input_height ; in_column++ )
@@ -784,6 +810,19 @@ void maxpool_error_propagation(
 	for ( uint i = 0 ; i < output_maps * output_height * output_width ; i++ )
 		input_error[max_indices[i][0]][max_indices[i][1]][max_indices[i][2]] = output_error[i];
 }
+
+
+template < 
+	uint input_num_maps , uint input_height , uint input_width ,
+	uint output_maps , uint output_height , uint output_width >
+void conv2d_error_propagation(
+	float output_error[output_maps][output_height][output_width] ,
+	bool activations[output_maps][output_height][output_width] ,
+	float input_error[input_num_maps][input_height][input_width] )
+{
+
+}
+
 
 #pragma endregion
 /******************************************/
@@ -807,11 +846,11 @@ void softmax_variables_regression(
 template < int num_kernels , int num_inputs >
 void dense_variables_regression(
 	float layer_inputs[num_inputs] , bool activations[num_kernels] , float output_error[num_kernels] ,
-	float bias_gradients[num_kernels] ,  float weight_gradients[num_inputs][num_kernels] )
+	float bias_gradients[num_kernels] , float weight_gradients[num_inputs][num_kernels] )
 {
 	float kernel_error[num_kernels];
 	for ( int kernel = 0 ; kernel < num_kernels ; kernel++ )
-		kernel_error[kernel] = output_error[kernel] * activations[kernel];
+		kernel_error[kernel] = activations[kernel] ? output_error[kernel] : 0;
 
 	for ( int kernel = 0 ; kernel < num_kernels ; kernel++ )
 		bias_gradients[kernel] = kernel_error[kernel];
@@ -819,6 +858,186 @@ void dense_variables_regression(
 	for ( int input = 0 ; input < num_inputs ; input++ )
 		for ( int kernel = 0 ; kernel < num_kernels ; kernel++ )
 				weight_gradients[input][kernel] = kernel_error[kernel] * layer_inputs[input];
+}
+
+template <
+	typename input_type ,
+	int input_num_maps , int input_height , int input_width ,
+	int output_maps , int output_height , int output_width ,
+	int num_filters , int filter_height , int filter_width >
+void conv2d_variables_regression(
+	input_type input[input_num_maps][input_height][input_width] ,
+	float output_error[output_maps][output_height][output_width] , bool activations [output_maps][output_height][output_width] ,
+	float weight_gradients[num_filters][input_num_maps][filter_height][filter_width] , float bias_gradients[num_filters] )
+{
+	/*********************************/
+	/***** 2-D Convolution Layer *****/
+	/*********************************/
+	for( int in_column = 0 ; in_column < input_height ; in_column++ )
+	{
+		for ( int in_row = 0 ; in_row < input_width ; in_row++ )
+		{
+			for( int filter = 0 ; filter < num_filters ; filter++ )
+			{
+				float kernel_error = output_error[filter][in_column][in_row];
+				if ( activations[filter][in_column][in_row] )
+				{
+					for ( int in_map = 0 ; in_map < input_num_maps ; in_map++ )
+					{
+						for( int filter_column = 0 ; filter_column < filter_height ; filter_column++ )
+						{
+							for ( int filter_row = 0 ; filter_row < filter_width ; filter_row++ )
+							{
+								// get neighboring pixels' coordinates
+								input_type padded_pixel;
+								int x_offseted = ( in_row + filter_row - ( filter_width / 2 ) );
+								int y_offseted = ( in_column + filter_column - ( filter_height / 2 ) );
+
+								// pad with zeros if coordinates out of bounds
+								if ( ( y_offseted < 0 ) || ( y_offseted >= input_height ) || ( x_offseted < 0 ) || ( x_offseted >= input_width ) )
+									padded_pixel = 0;
+								else
+									padded_pixel = input[in_map][y_offseted][x_offseted];
+
+								weight_gradients[filter][in_map][filter_column][filter_row] += float(padded_pixel) * kernel_error;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	for( int filter = 0 ; filter < num_filters ; filter++ )
+		for( int out_column = 0 ; out_column < output_height ; out_column++ )
+			for( int out_row = 0 ; out_row < output_width ; out_row++ )
+				if ( activations[filter][out_column][out_row] )
+					bias_gradients[filter] += output_error[filter][out_column][out_row];
+}
+
+template <
+	typename input_type ,
+	int input_num_maps , int input_height , int input_width ,
+	int output_maps , int output_height , int output_width ,
+	int num_filters , int filter_height , int filter_width >
+void conv2d_window_variables_regression(
+	input_type input[input_num_maps][input_height][input_width] ,
+	float output_error[output_maps][output_height][output_width] , bool activations [output_maps][output_height][output_width] ,
+	float weight_gradients[num_filters][input_num_maps][filter_height][filter_width] , float bias_gradients[num_filters] )
+{
+	float* input_1D = reinterpret_cast<float*>(input);
+	/*********************************/
+	/********** 2-D Window ***********/
+	/*********************************/
+	struct window { input_type pix[filter_height][filter_width]; };
+
+	// one quee per input map
+	std::queue<window> window_fifo[input_num_maps];
+
+	// line buffer and window
+	input_type line_buffer[filter_height-1][input_width];
+	window temp_window;
+
+	// required iterations to fill buffers
+	uint ramp_up = input_width * ( ( filter_width - 1 ) / 2 ) + ( ( filter_height - 1 ) / 2 );
+	uint num_pixels = input_width * input_height;
+
+	for ( uint in_map = 0 ; in_map < input_num_maps ; in_map++ )
+	{
+		// points where in the line buffers the window is going to shift
+		uint col_ptr = 0;
+		for ( uint i = 0 ; i < num_pixels + ramp_up ; i++ )
+		{
+			//get new pixel
+			input_type new_pixel = ( i < num_pixels ) ? input_1D[ in_map * num_pixels + i ] : 0; // in_map * i + i to get to the other feature maps of the input
+
+			// shift window and add new pixels
+			for( int filter_column = 0 ; filter_column < filter_height ; filter_column++ )
+			{
+				for ( int filter_row = 0 ; filter_row < filter_width - 1 ; filter_row++ )
+					temp_window.pix[filter_column][filter_row] = temp_window.pix[filter_column][filter_row+1];
+			
+				temp_window.pix[filter_column][filter_width - 1] = 
+					( filter_column < filter_height - 1 ) ? line_buffer[filter_column][col_ptr] : new_pixel;
+			}
+
+			// shift line buffer and add new pixel
+			for( int line = 0 ; line < filter_height - 2 ; line++ )
+				line_buffer[line][col_ptr] = line_buffer[line+1][col_ptr];
+			line_buffer[filter_height - 2][col_ptr] = new_pixel;
+
+			// move window on the line buffers
+			if( col_ptr == input_width - 1 )
+				col_ptr = 0;
+			else
+				col_ptr++;
+
+			// dont write until the window fills up with usefull data
+			if ( i >= ramp_up )
+				window_fifo[in_map].push( temp_window );
+		}
+	}
+
+	/*********************************/
+	/*** Error per kernel element ****/
+	/*********************************/
+	float kernel_element_errors[num_filters][output_height][output_width];
+	for( int filter = 0 ; filter < num_filters ; filter++ )
+	{
+		float bias_sum = 0;
+		for( int out_column = 0 ; out_column < output_height ; out_column++ )
+		{
+			for( int out_row = 0 ; out_row < output_width ; out_row++ )
+			{
+				kernel_element_errors[filter][out_column][out_row] = ( activations[filter][out_column][out_row] ) ? output_error[filter][out_column][out_row] : 0;
+				bias_sum += kernel_element_errors[filter][out_column][out_row];
+			}
+		}
+		bias_gradients[filter] = bias_sum;
+	}
+
+	/*********************************/
+	/******** 2-D Convolution  *******/
+	/*********************************/
+	for( int in_column = 0 ; in_column < input_height ; in_column++ )
+	{
+		for ( int in_row = 0 ; in_row < input_width ; in_row++ )
+		{
+			// pop windows from queues, one per input map
+			window temp_window[input_num_maps];
+			for ( int in_map = 0 ; in_map < input_num_maps ; in_map++ )
+			{
+				std::memcpy( &(temp_window[in_map]) , &(window_fifo[in_map].front()) , sizeof(window) );
+				window_fifo[in_map].pop();
+			}
+			for( int filter = 0 ; filter < num_filters ; filter++ )
+			{
+				float element_error = kernel_element_errors[filter][in_column][in_row];
+
+				for ( int in_map = 0 ; in_map < input_num_maps ; in_map++ )
+				{
+					for( int filter_column = 0 ; filter_column < filter_height ; filter_column++ )
+					{
+						for ( int filter_row = 0 ; filter_row < filter_width ; filter_row++ )
+						{
+							// get neighboring pixels' coordinates
+							input_type padded_pixel;
+							int x_offseted = ( in_row + filter_row - ( filter_width / 2 ) );
+							int y_offseted = ( in_column + filter_column - ( filter_height / 2 ) );
+
+							// pad with zeros if coordinates out of bounds
+							if ( ( y_offseted < 0 ) || ( y_offseted >= input_height ) || ( x_offseted < 0 ) || ( x_offseted >= input_width ) )
+								padded_pixel = 0;
+							else
+								padded_pixel = temp_window[in_map].pix[filter_column][filter_row];
+
+							weight_gradients[filter][in_map][filter_column][filter_row] += float(padded_pixel) * element_error;
+						}
+					}
+				}
+			}
+		}
+	}
 }
 
 #pragma endregion
@@ -838,7 +1057,7 @@ void gradient_descend( float variables[num_inputs][num_kernels] , float gradient
 /******************************************/
 // Helper function to save 3d arrays as vectors, to files.
 template < int num_maps , int height , int width >
-void save_feature_map( float feature_maps[num_maps][height][width] ,  const char* file_name , int precision )
+void save_feature_map( float feature_maps[num_maps][height][width] , const char* file_name , int precision )
 {
 	std::ofstream file;
 	file.open( file_name );
@@ -849,6 +1068,23 @@ void save_feature_map( float feature_maps[num_maps][height][width] ,  const char
 			for ( int row = 0 ; row < width ; row++ )
 				file << std::fixed << feature_maps[map][column][row] << "\n";
 				// file << "fmap[" << map << "][" << column << "][" << row << "] = " << std::fixed << feature_maps[map][column][row] << "\n";
+
+	file.close();
+}
+
+// for convolutional weights
+template < uint num_filters , uint num_maps , uint height, uint width >
+void save_4d_array( float input[num_filters][num_maps][height][width] , const char* file_name , int precision )
+{
+	std::ofstream file;
+	file.open( file_name );
+	file.precision( precision );
+
+	for( uint filter = 0 ; filter < num_filters ; filter++ )
+		for ( uint map = 0 ; map < num_maps ; map++ )
+			for( uint column = 0 ; column < height ; column++ )
+				for ( uint row = 0 ; row < width ; row++ )
+					file << std::fixed << input[filter][map][column][row] << "\n";
 
 	file.close();
 }

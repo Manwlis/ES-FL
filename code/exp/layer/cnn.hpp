@@ -107,7 +107,7 @@ template <
 	>
 void conv2d_window (
 	input_type input[input_num_maps][input_height][input_width] ,
-	float output[output_maps][output_height][output_width] ,
+	float output[output_maps][output_height][output_width] , bool activations [output_maps][output_height][output_width] ,
 	float weights[num_filters][input_num_maps][filter_height][filter_width] , float bias[ num_filters ] );
 
 template <
@@ -176,6 +176,26 @@ void dense_variables_regression(
 	float layer_inputs[num_inputs] , bool activations[num_kernels] , float output_error[num_kernels] ,
 	float bias_gradients[num_kernels] ,  float weight_gradients[num_inputs][num_kernels] );
 
+template <
+	typename input_type ,
+	int input_num_maps , int input_height , int input_width ,
+	int output_maps , int output_height , int output_width ,
+	int num_filters , int filter_height , int filter_width >
+void conv2d_variables_regression(
+	input_type input[input_num_maps][input_height][input_width] ,
+	float output_error[output_maps][output_height][output_width] , bool activations [output_maps][output_height][output_width] ,
+	float weight_gradients[num_filters][input_num_maps][filter_height][filter_width] , float bias_gradients[num_filters] );
+
+template <
+	typename input_type ,
+	int input_num_maps , int input_height , int input_width ,
+	int output_maps , int output_height , int output_width ,
+	int num_filters , int filter_height , int filter_width >
+void conv2d_window_variables_regression(
+	input_type input[input_num_maps][input_height][input_width] ,
+	float output_error[output_maps][output_height][output_width] , bool activations [output_maps][output_height][output_width] ,
+	float weight_gradients[num_filters][input_num_maps][filter_height][filter_width] , float bias_gradients[num_filters] );
+	
 /******************************************/
 /************ Variable updates ************/
 /******************************************/
@@ -187,3 +207,6 @@ void gradient_descend( float variables[num_inputs][num_kernels] , float gradient
 /******************************************/
 template < int num_maps , int height , int width >
 void save_feature_map( float feature_maps[num_maps][height][width] , const char* file_name , int precision );
+
+template < uint num_filters , uint num_maps , uint height, uint width >
+void save_4d_array( float input[num_filters][num_maps][height][width] , const char* file_name , int precision );

@@ -15,67 +15,50 @@ def share_trainable_variables( model ):
 	###### Layer 0 weights ######
 	# get variables
 	np_array = model.trainable_variables[0].numpy()
-
-	# transpose to C++ format
-	np_array = np.transpose( np_array , (3,2,0,1) )
-
 	#save to file
 	file = open( "temp/l0_weights.txt" , "w" )
-	for dim3 in range( 0 , 32 , 1 ):
-			for dim2 in range( 0 , 1 , 1 ):
-				for dim1 in range( 0 , 3 , 1 ):
-					for dim0 in range( 0 , 3 , 1 ):
+	for dim3 in range( 0 , 3 , 1 ):
+			for dim2 in range( 0 , 3 , 1 ):
+				for dim1 in range( 0 , 1 , 1 ):
+					for dim0 in range( 0 , 32 , 1 ):
 						file.write( '{}\n'.format( np_array[dim3][dim2][dim1][dim0] ) )
 
 	###### Layer 0 biases ######
 	np_array = model.trainable_variables[1].numpy()
-
 	file = open( "temp/l0_biases.txt" , "w" )
 	for dim0 in range( 0 , 32 , 1 ):
 		file.write( '{}\n'.format( np_array[dim0] ) )
 
 	###### Layer 2 weights ######
 	np_array = model.trainable_variables[2].numpy()
-
-	np_array = np.transpose( np_array , (3,2,0,1) )
-
 	file = open( "temp/l2_weights.txt" , "w" )
-	for dim3 in range( 0 , 64 , 1 ):
-			for dim2 in range( 0 , 32 , 1 ):
-				for dim1 in range( 0 , 3 , 1 ):
-					for dim0 in range( 0 , 3 , 1 ):
+	for dim3 in range( 0 , 3 , 1 ):
+		for dim2 in range( 0 , 3 , 1 ):
+			for dim1 in range( 0 , 32 , 1 ):
+				for dim0 in range( 0 , 64 , 1 ):
 						file.write( '{}\n'.format( np_array[dim3][dim2][dim1][dim0] ) )
 
 	###### Layer 2 biases ######
 	np_array = model.trainable_variables[3].numpy()
-
 	file = open( "temp/l2_biases.txt" , "w" )
 	for dim0 in range( 0 , 64 , 1 ):
 		file.write( '{}\n'.format( np_array[dim0] ) )
 
 	###### Layer 4 weights ######
 	np_array = model.trainable_variables[4].numpy()
-
-	# reshape to fit the shape of the input in the C++ code
-	np_array = np.reshape( np_array , ( 7 , 7 , 64 , 128 ) )
-	np_array = np.transpose( np_array , ( 2 , 0 , 1 , 3 ) )
-	np_array = np.reshape( np_array , (3136, 128) )
-
 	file = open( "temp/l4_weights.txt" , "w" )
-	for dim0 in range( 0 , 3136 , 1 ):
-		for dim1 in range( 0 , 128 , 1 ):
-			file.write( '{}\n'.format( np_array[dim0][dim1] ) )
+	for dim1 in range( 0 , 3136 , 1 ):
+		for dim0 in range( 0 , 128 , 1 ):
+			file.write( '{}\n'.format( np_array[dim1][dim0] ) )
 			
 	###### Layer 4 biases ######
 	np_array = model.trainable_variables[5].numpy()
-	
 	file = open( "temp/l4_biases.txt" , "w" )
 	for dim0 in range( 0 , 128 , 1 ):
 		file.write( '{}\n'.format( np_array[dim0] ) )
 
 	###### Layer 5 weights ######
 	np_array = model.trainable_variables[6].numpy()
-
 	file = open( "temp/l5_weights.txt" , "w" )
 	for dim1 in range( 0 , 128 , 1 ):
 		for dim0 in range( 0 , 10 , 1 ):
@@ -83,7 +66,6 @@ def share_trainable_variables( model ):
 			
 	###### Layer 5 biases ######
 	np_array = model.trainable_variables[7].numpy()
-
 	file = open( "temp/l5_biases.txt" , "w" )
 	for dim0 in range( 0 , 10 , 1 ):
 		file.write( '{}\n'.format( np_array[dim0] ) )
@@ -92,33 +74,33 @@ def save_activations( activations ):
 	###### Layer 0 activations ######
 	np_array = np.copy( activations[0] )
 	file = open( "activations/l0_conv32_tf.txt" , "w" )
-	for filter in range( 0 , 32 , 1 ):
-		for i in range( 0 , 28 , 1 ):
-			for k in range( 0 , 28 , 1 ):
+	for i in range( 0 , 28 , 1 ):
+		for k in range( 0 , 28 , 1 ):
+			for filter in range( 0 , 32 , 1 ):
 				file.write( '{:.4f}\n'.format( np_array[0][i][k][filter] ) )
 
 	###### Layer 1 activations ######
 	np_array = np.copy( activations[1] )
 	file = open( "activations/l1_maxp32_tf.txt" , "w" )
-	for filter in range( 0 , 32 , 1 ):
-		for i in range( 0 , 14 , 1 ):
-			for k in range( 0 , 14 , 1 ):
+	for i in range( 0 , 14 , 1 ):
+		for k in range( 0 , 14 , 1 ):
+			for filter in range( 0 , 32 , 1 ):
 				file.write( '{:.4f}\n'.format( np_array[0][i][k][filter] ) )
 
 	###### Layer 2 activations ######
 	np_array = np.copy( activations[2] )
 	file = open( "activations/l2_conv64_tf.txt" , "w" )
-	for filter in range( 0 , 64 , 1 ):
-		for i in range( 0 , 14 , 1 ):
-			for k in range( 0 , 14 , 1 ):
+	for i in range( 0 , 14 , 1 ):
+		for k in range( 0 , 14 , 1 ):
+			for filter in range( 0 , 64 , 1 ):
 				file.write( '{:.4f}\n'.format( np_array[0][i][k][filter] ) )
 
 	###### Layer 3 activations ######
 	np_array = np.copy( activations[3] )
 	file = open( "activations/l3_maxp64_tf.txt" , "w" )
-	for filter in range( 0 , 64 , 1 ):
-		for i in range( 0 , 7 , 1 ):
-			for k in range( 0 , 7 , 1 ):
+	for i in range( 0 , 7 , 1 ):
+		for k in range( 0 , 7 , 1 ):
+			for filter in range( 0 , 64 , 1 ):
 				file.write( '{:.4f}\n'.format( np_array[0][i][k][filter] ) )
 
 	###### Layer 4 activations ######
@@ -133,39 +115,33 @@ def save_activations( activations ):
 	for i in range( 0 , 10 , 1 ):
 		file.write( '{:.4f}\n'.format( np_array[0][i] ) )
 
-# layer 5 has no output gradients
 def save_output_gradients( output_gradients ):
 	###### Layer 0 output gradients ######
 	np_array = np.copy( output_gradients[0] )
 	file = open( "output_gradients/l0_conv32_tf.txt" , "w" )
-	for filter in range( 0 , 32 , 1 ):
-		for i in range( 0 , 28 , 1 ):
-			for k in range( 0 , 28 , 1 ):
+	for i in range( 0 , 28 , 1 ):
+		for k in range( 0 , 28 , 1 ):
+			for filter in range( 0 , 32 , 1 ):
 				file.write( '{:.4f}\n'.format( np_array[0][i][k][filter] ) )
 	
 	###### Layer 1 output gradients ######
 	np_array = np.copy( output_gradients[1] )
 	file = open( "output_gradients/l1_maxp32_tf.txt" , "w" )
-	for filter in range( 0 , 32 , 1 ):
-		for i in range( 0 , 14 , 1 ):
-			for k in range( 0 , 14 , 1 ):
+	for i in range( 0 , 14 , 1 ):
+		for k in range( 0 , 14 , 1 ):
+			for filter in range( 0 , 32 , 1 ):
 				file.write( '{:.4f}\n'.format( np_array[0][i][k][filter] ) )
 
 	###### Layer 2 output gradients ######
 	np_array = np.copy( output_gradients[2] )
 	file = open( "output_gradients/l2_conv64_tf.txt" , "w" )
-	for filter in range( 0 , 64 , 1 ):
-		for i in range( 0 , 14 , 1 ):
-			for k in range( 0 , 14 , 1 ):
+	for i in range( 0 , 14 , 1 ):
+		for k in range( 0 , 14 , 1 ):
+			for filter in range( 0 , 64 , 1 ):
 				file.write( '{:.4f}\n'.format( np_array[0][i][k][filter] ) )
 
 	###### Layer 3 output gradients ######
 	np_array = np.copy( output_gradients[4] )
-
-	np_array = np.reshape( np_array , ( 7 , 7 , 64 ) )
-	np_array = np.transpose( np_array , ( 2 , 0 , 1 ) )
-	np_array = np.reshape( np_array , ( 1 , 3136 ) )
-
 	file = open( "output_gradients/l3_maxp64_tf.txt" , "w" )
 	for filter in range( 0 , 3136 , 1 ):
 		file.write( '{:.4f}\n'.format( np_array[0][filter] ) )
@@ -175,9 +151,9 @@ def save_output_gradients( output_gradients ):
 	file = open( "output_gradients/l4_dense_tf.txt" , "w" )
 	for i in range( 0 , 128 , 1 ):
 		file.write( '{:.4f}\n'.format( np_array[0][i] ) )
+	# layer 5 has no output gradients
 
-
-def save_variable_gradients( gradients ):
+def save_variable_gradients( gradients ): # TODO: dims check, propably wrong
 	###### Layer 0 weights ######
 	np_array = np.copy( gradients[0] )
 	file = open( "variable_gradients/l0_weights_tf.txt" , "w" )
@@ -246,7 +222,7 @@ def save_variable_gradients( gradients ):
 	for dim0 in range( 0 , 10 , 1 ):
 		file.write( '{:.4f}\n'.format( np_array[dim0] ) )
 	
-def save_trained_variables( variables ):
+def save_trained_variables( variables ): # TODO: dims check, propably wrong
 	###### Layer 4 weights ######
 	np_array = variables[4].numpy()
 
