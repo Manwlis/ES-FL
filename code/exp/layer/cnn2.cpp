@@ -66,7 +66,7 @@ int main ( int argc , char** argv )
 	std::queue < window < float , conv2d_32_filter_height , conv2d_32_filter_width > > conv2d_32_window_stream;
 
 	// create windows
-	window_input_conv2d < float , conv2d_32_in_height , conv2d_32_in_width , conv2d_32_in_channels , conv2d_32_filter_height , conv2d_32_filter_width >
+	create_window_stream_conv2d < float , conv2d_32_in_height , conv2d_32_in_width , conv2d_32_in_channels , conv2d_32_filter_height , conv2d_32_filter_width >
 		( input , conv2d_32_window_stream );
 
 	// full convolution
@@ -95,7 +95,7 @@ int main ( int argc , char** argv )
 
 	/***** layer 2, 28x28x32 -> conv 64 filters of 3x3, padded, stride 1 -> 28x28x64 *****/
 	std::queue < window < float , conv2d_64_filter_height , conv2d_64_filter_width > > conv2d_64_window_stream;
-	window_input_conv2d < float , conv2d_64_in_height , conv2d_64_in_width , conv2d_64_in_channels , conv2d_64_filter_height , conv2d_64_filter_width >
+	create_window_stream_conv2d < float , conv2d_64_in_height , conv2d_64_in_width , conv2d_64_in_channels , conv2d_64_filter_height , conv2d_64_filter_width >
 		( maxp2d_32_feature_map , conv2d_64_window_stream );
 	
 	conv2d < float , 
@@ -136,18 +136,48 @@ int main ( int argc , char** argv )
 	static float softmax_in_error[softmax_num_in];
 	static float dense_in_error[dense_num_in];
 	static float maxp2d_64_in_error[maxp2d_64_in_height][maxp2d_64_in_width][maxp2d_64_in_channels];
+	static float conv2d_64_in_error[conv2d_64_in_height][conv2d_64_in_width][conv2d_64_in_channels];
+	static float maxp2d_32_in_error[maxp2d_32_in_height][maxp2d_32_in_width][maxp2d_32_in_channels];
 
 	double entropy = sparce_categorical_cross_entropy < softmax_num_kernels > ( softmax_output , 4 , softmax_out_error );
 
+	/* Layer 5, 10 -> dense error propagation, softmax activation -> 128 */
 	softmax_error_propagation < softmax_num_kernels , softmax_num_in > ( softmax_out_error , layer5_weights , softmax_in_error );
 
+	/* Layer 4, 128 -> dense error propagation, relu activation -> 3136 */
 	dense_error_propagation < dense_num_kernels , dense_num_in > ( softmax_in_error , layer4_weights , dense_activations , dense_in_error );
 
-	maxpool_error_propagation <
+	/* Layer 3, 3136 (7x7x64) -> maxp2d error propagation -> 14x14x64 */
+	maxp2d_error_propagation <
 		maxp2d_64_in_height ,     maxp2d_64_in_width ,     maxp2d_64_in_channels ,
-		maxp2d_64_out_height ,    maxp2d_64_out_width ,    maxp2d_64_out_channels , 
+		maxp2d_64_out_height ,    maxp2d_64_out_width ,    maxp2d_64_out_channels ,
 		maxp2d_64_filter_height , maxp2d_64_filter_width , maxp2d_64_filter_stride >
 		( dense_in_error , maxp2d_64_activations_window_stream , maxp2d_64_in_error );
+
+	/* Layer 2, 14x14x64 -> conv2d error propagation, relu activation, 32 input channels -> 14x14x32 */
+	std::queue < window < float , conv2d_64_filter_height , conv2d_64_filter_width > > conv2d_64_error_window_stream;
+	std::queue < window < bool  , conv2d_64_filter_height , conv2d_64_filter_width > > conv2d_64_activations_window_stream;
+
+	create_window_stream_conv2d < float , 
+		conv2d_64_out_height , conv2d_64_out_width , conv2d_64_out_channels , conv2d_64_filter_height , conv2d_64_filter_width >
+		( maxp2d_64_in_error , conv2d_64_error_window_stream );
+		
+	create_window_stream_conv2d < bool , 
+		conv2d_64_out_height , conv2d_64_out_width , conv2d_64_out_channels , conv2d_64_filter_height , conv2d_64_filter_width >
+		( conv2d_64_activations , conv2d_64_activations_window_stream );
+
+	conv2d_error_propagation < 
+		conv2d_64_in_height ,     conv2d_64_in_width ,     conv2d_64_in_channels ,
+		conv2d_64_out_height ,    conv2d_64_out_width ,    conv2d_64_out_channels ,
+		conv2d_64_filter_height , conv2d_64_filter_width , conv2d_64_num_filters >
+		( conv2d_64_error_window_stream , conv2d_64_activations_window_stream , layer2_weights , conv2d_64_in_error );
+
+	/* Layer 1, 14x14x32 -> maxp2d error propagation -> 28x28x32 */
+	maxp2d_error_propagation <
+		maxp2d_32_in_height ,     maxp2d_32_in_width ,     maxp2d_32_in_channels ,
+		maxp2d_32_out_height ,    maxp2d_32_out_width ,    maxp2d_32_out_channels ,
+		maxp2d_32_filter_height , maxp2d_32_filter_width , maxp2d_32_filter_stride >
+		( reinterpret_cast<float*>(conv2d_64_in_error) , maxp2d_32_activations_window_stream , maxp2d_32_in_error );
 
 #pragma endregion
 	/*********************************/
@@ -179,6 +209,12 @@ int main ( int argc , char** argv )
 
 	save_array < maxp2d_64_in_height * maxp2d_64_in_width * maxp2d_64_in_channels > (
 		reinterpret_cast<float*>(maxp2d_64_in_error) , "output_gradients/l2_conv64_cpp.txt" , 4 );
+
+	save_array < conv2d_64_in_height * conv2d_64_in_width * conv2d_64_in_channels > (
+		reinterpret_cast<float*>(conv2d_64_in_error) , "output_gradients/l1_maxp32_cpp.txt" , 4 );
+
+	save_array < maxp2d_32_in_height * maxp2d_32_in_width * maxp2d_32_in_channels > (
+		reinterpret_cast<float*>(maxp2d_32_in_error) , "output_gradients/l0_conv32_cpp.txt" , 4 );
 
 #pragma endregion
 }
@@ -288,7 +324,7 @@ void set_variables (
 template < typename in_type ,
 	uint in_height     , uint in_width    , uint in_channels ,
 	uint filter_height , uint filter_width >
-void window_input_conv2d (
+void create_window_stream_conv2d (
 	in_type input[in_height][in_width][in_channels] , 
 	std::queue< window < in_type , filter_height , filter_width > >& conv2d_window_stream )
 {
@@ -384,8 +420,8 @@ void conv2d (
 				for ( uint filter_x = 0 ; filter_x < filter_width ; filter_x++ )
 				{
 					// get neighboring pixel's coordinates
-					int y_offseted = ( int(in_y) + int(filter_y) - ( int(filter_height) / 2 ) );
-					int x_offseted = ( int(in_x) + int(filter_x) - ( int(filter_width) / 2 ) );
+					int y_offseted = static_cast<int>( in_y + filter_y - filter_height / 2 );
+					int x_offseted = static_cast<int>( in_x + filter_x - filter_width / 2 );
 
 					// in 2d conv, windows pass through all feature maps, cumulative
 					for ( uint channel = 0 ; channel < in_channels ; channel++ )
@@ -680,7 +716,7 @@ void softmax_clasifier (
 /***********************************************************************************/
 #pragma region
 template < int num_kernels >
-double sparce_categorical_cross_entropy( float prediction[num_kernels] , int label , float softmax_output_error[num_kernels] )
+double sparce_categorical_cross_entropy ( float prediction[num_kernels] , int label , float softmax_output_error[num_kernels] )
 {
 	for ( int kernel = 0 ; kernel < num_kernels ; kernel++ )
 		softmax_output_error[kernel] = - ( ( label == kernel ) - prediction[kernel] ); // -(yi - ai)
@@ -692,7 +728,7 @@ double sparce_categorical_cross_entropy( float prediction[num_kernels] , int lab
 }
 
 template < int num_kernels , int num_inputs >
-void softmax_error_propagation( float output_error[num_kernels] , float weights[num_inputs][num_kernels] , float input_error[num_inputs] )
+void softmax_error_propagation ( float output_error[num_kernels] , float weights[num_inputs][num_kernels] , float input_error[num_inputs] )
 {
 	for ( int input = 0 ; input < num_inputs ; input++ )
 	{
@@ -706,7 +742,7 @@ void softmax_error_propagation( float output_error[num_kernels] , float weights[
 }
 
 template < int num_kernels , int num_inputs >
-void dense_error_propagation(
+void dense_error_propagation (
 	float output_error[num_kernels] ,float weights[num_inputs][num_kernels] ,  bool activations[num_kernels] , float input_error[num_inputs] )
 {
 	for ( int input = 0 ; input < num_inputs ; input++ )
@@ -725,10 +761,10 @@ template <
 	uint     in_height , uint     in_width , uint   in_channels ,
 	uint    out_height , uint    out_width , uint  out_channels ,
 	uint filter_height , uint filter_width , uint filter_stride >
-void maxpool_error_propagation(
+void maxp2d_error_propagation (
 	float output_error[ out_height * out_width * out_channels ] ,
 	std::queue< window < bool , filter_height , filter_width > >& maxp2d_activations_window_stream ,
-	float input_error[in_height][in_width][in_channels] ) // outputs
+	float input_error[in_height][in_width][in_channels] ) // output
 {
 	// store two lines before sending them
 	float line_buffers[filter_height][in_width][in_channels];
@@ -737,7 +773,6 @@ void maxpool_error_propagation(
 	// output_error dimension loops. Each pixel of the output_error is processed one by one
 	for ( uint out_y = 0 ; out_y < out_height ; out_y++ )
 	{
-		
 		for ( uint out_x = 0 ; out_x < out_width ; out_x++ )
 		{
 			uint in_x = out_x * filter_stride;
@@ -748,9 +783,9 @@ void maxpool_error_propagation(
 			// update the counter to be ready for the next pixel
 			out_error_counter += out_channels;
 
-			// pop window of activations
+			// pop windows of activations, one for each channel
 			window < bool , filter_height , filter_width > activations_temp_window[in_channels];
-			for (uint channel = 0 ; channel < out_channels ; channel++ )
+			for ( uint channel = 0 ; channel < out_channels ; channel++ )
 			{
 				std::memcpy( &(activations_temp_window[channel]) , &(maxp2d_activations_window_stream.front()) , sizeof( activations_temp_window[channel] ) );
 				maxp2d_activations_window_stream.pop();
@@ -776,7 +811,67 @@ void maxpool_error_propagation(
 	}
 }
 
+template <
+	uint     in_height , uint     in_width , uint   in_channels ,
+	uint    out_height , uint    out_width , uint  out_channels ,
+	uint filter_height , uint filter_width , uint   num_filters >
+void conv2d_error_propagation (
+	std::queue < window < float , conv2d_64_filter_height , conv2d_64_filter_width > > error_window_stream ,
+	std::queue < window < bool  , conv2d_64_filter_height , conv2d_64_filter_width > > activations_window_stream ,
+	float weights[filter_height][filter_width][in_channels][num_filters] , // variables
+	float input_error[in_height][in_width][in_channels] ) // output
+{
+	// input / output dimensions loops, in_x/y == out_x/y
+	for( uint out_y = 0 ; out_y < out_height ; out_y++ )
+	{
+		for ( uint out_x = 0 ; out_x < out_width ; out_x++ )
+		{
+			// pop windows from queues, one per input channel
+			window < float , filter_height , filter_width > temp_window[out_channels];
+			window < bool  , filter_height , filter_width > temp_activations[out_channels];
+			for ( uint filter = 0 ; filter < num_filters ; filter++ )
+			{
+				std::memcpy( &(temp_window[filter]) , &(error_window_stream.front()) , sizeof( temp_window[filter] ) );
+				error_window_stream.pop();
+				std::memcpy( &(temp_activations[filter]) , &(activations_window_stream.front()) , sizeof( temp_activations[filter] ) );
+				activations_window_stream.pop();
+			}
+			float sum[in_channels];
+			for ( uint channel = 0 ; channel < in_channels ; channel++ )
+				sum[channel] = 0;
 
+			// filter dimensions loops, filter_y/x == window_y/x
+			for( uint filter_y = 0 ; filter_y < filter_height ; filter_y++ )
+			{
+				for ( uint filter_x = 0 ; filter_x < filter_width ; filter_x++ )
+				{
+					// get neighboring pixel's coordinates
+					int y_offseted = static_cast<int>( out_y + filter_y - filter_height / 2 );
+					int x_offseted = static_cast<int>( out_x + filter_x - filter_width / 2 );
+
+					// in 2d conv, windows pass through all feature maps, cumulative
+					for ( uint channel = 0 ; channel < in_channels ; channel++ )
+					{
+						// num_filters == out_channels
+						for( uint filter = 0 ; filter < num_filters ; filter++ )
+						{
+							if ( ! ( ( y_offseted < 0 ) || ( y_offseted >= int(out_height) ) || ( x_offseted < 0 ) || ( x_offseted >= int(out_width) ) ) )
+							{
+								float padded_pixel = temp_window[filter].elements[filter_y][filter_x];
+								bool activation = temp_activations[filter].elements[filter_y][filter_x];
+
+								sum[channel] += activation ? 
+									float(padded_pixel) * weights[filter_height - 1 - filter_y][filter_width - 1 - filter_x][channel][filter] : 0;
+							}
+						}
+					}
+				}
+			}
+			for ( uint channel = 0 ; channel < in_channels ; channel++ )
+				input_error[out_y][out_x][channel] = sum[channel];
+		}
+	}
+}
 #pragma endregion
 /***********************************************************************************/
 /************************************ Save Data ************************************/

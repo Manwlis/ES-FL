@@ -320,7 +320,7 @@ def main():
 
 		# back prop
 		output_gradients = g.gradient( loss , features )
-		variable_gradients = g.gradient( loss , cnn.trainable_variables ) # back prop
+		variable_gradients = g.gradient( loss , cnn.trainable_variables )
 
 		# apply gradients
 		optimizer.apply_gradients( zip( variable_gradients , cnn.trainable_variables ) )

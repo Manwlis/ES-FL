@@ -99,7 +99,7 @@ struct window { in_type elements[filter_height][filter_width]; };
 template < typename in_type ,
 	uint in_height     , uint in_width    , uint in_channels ,
 	uint filter_height , uint filter_width >
-void window_input_conv2d (
+void create_window_stream_conv2d (
 	in_type input[in_height][in_width][in_channels] ,
 	std::queue< window < in_type , filter_height , filter_width > >& conv2d_window_streams );
 
@@ -165,9 +165,19 @@ template <
 	uint     in_height , uint     in_width , uint   in_channels ,
 	uint    out_height , uint    out_width , uint  out_channels ,
 	uint filter_height , uint filter_width , uint filter_stride >
-void maxpool_error_propagation(
+void maxp2d_error_propagation(
 	float output_error[ out_height * out_width * out_channels ] ,
 	std::queue< window < bool , filter_height , filter_width > >& maxp2d_activations_window_stream ,
+	float input_error[in_height][in_width][in_channels] );
+
+template <
+	uint     in_height , uint     in_width , uint   in_channels ,
+	uint    out_height , uint    out_width , uint  out_channels ,
+	uint filter_height , uint filter_width , uint   num_filters >
+void conv2d_error_propagation (
+	std::queue < window < float , conv2d_64_filter_height , conv2d_64_filter_width > > error_window_stream ,
+	std::queue < window < bool  , conv2d_64_filter_height , conv2d_64_filter_width > > activations_window_stream ,
+	float weights[filter_height][filter_width][in_channels][num_filters] ,
 	float input_error[in_height][in_width][in_channels] );
 /******************************************/
 /**************** Save Data ***************/

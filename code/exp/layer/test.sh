@@ -52,6 +52,12 @@ diff ${flags} output_gradients/l3_maxp64_tf.txt	output_gradients/l3_maxp64_cpp.t
 echo ""
 diff ${flags} output_gradients/l2_conv64_tf.txt	output_gradients/l2_conv64_cpp.txt
 
+echo ""
+diff ${flags} output_gradients/l1_maxp32_tf.txt	output_gradients/l1_maxp32_cpp.txt
+
+echo ""
+diff ${flags} output_gradients/l0_conv32_tf.txt	output_gradients/l0_conv32_cpp.txt
+
 echo -e "\n~~~~~~~~~~~ Variable Gradients ~~~~~~~~~~~\n"
 diff ${flags} variable_gradients/l5_weights_tf.txt	variable_gradients/l5_weights_cpp.txt
 
