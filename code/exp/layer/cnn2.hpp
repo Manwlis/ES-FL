@@ -17,9 +17,9 @@
 #define conv2d_32_filter_width  3
 #define conv2d_32_num_filters  32
 
-#define conv2d_32_in_height   image_height
-#define conv2d_32_in_width    image_width
-#define conv2d_32_in_channels image_channels
+#define conv2d_32_in_height   image_height   // 28
+#define conv2d_32_in_width    image_width    // 28
+#define conv2d_32_in_channels image_channels // 1
 
 #define conv2d_32_out_height   conv2d_32_in_height   // 28
 #define conv2d_32_out_width	   conv2d_32_in_width    // 28
@@ -138,12 +138,12 @@ void maxp2d_window_integrated (
 	std::queue< window < bool , filter_height , filter_width > >& maxp2d_activations_window_stream );
 
 
-template < int num_kernels , int num_inputs >
+template < uint num_kernels , uint num_inputs >
 void dense ( 
 	float input[num_inputs] , float output[num_kernels] , bool activations[num_kernels] ,
 	float weights[num_inputs][num_kernels] , float biases[num_kernels] );
 
-template < int num_kernels , int num_inputs >
+template < uint num_kernels , uint num_inputs >
 void softmax_clasifier ( 
 	float input[num_inputs] , float output[num_kernels] , 
 	float weights[num_inputs][num_kernels] , float biases[num_kernels] );
@@ -151,15 +151,15 @@ void softmax_clasifier (
 /******************************************/
 /************* Back Propagation ***********/
 /******************************************/
-template < int num_kernels >
-double sparce_categorical_cross_entropy( float prediction[num_kernels] , int label , float softmax_output_error[num_kernels] );
+template < uint num_kernels >
+float sparce_categorical_cross_entropy( float prediction[num_kernels] , uint label , float softmax_output_error[num_kernels] );
 
-template < int num_kernels , int num_inputs >
+template < uint num_kernels , uint num_inputs >
 void softmax_error_propagation( float output_error[num_kernels] , float weights[num_inputs][num_kernels] , float input_error[num_inputs] );
 
-template < int num_kernels , int num_inputs >
+template < uint num_kernels , uint num_inputs >
 void dense_error_propagation(
-	float output_error[num_kernels] ,float weights[num_inputs][num_kernels] ,  bool activations[num_kernels] , float input_error[num_inputs] );
+	float output_error[num_kernels] ,float weights[num_inputs][num_kernels] , bool activations[num_kernels] , float input_error[num_inputs] );
 
 template <
 	uint     in_height , uint     in_width , uint   in_channels ,
@@ -175,10 +175,40 @@ template <
 	uint    out_height , uint    out_width , uint  out_channels ,
 	uint filter_height , uint filter_width , uint   num_filters >
 void conv2d_error_propagation (
-	std::queue < window < float , conv2d_64_filter_height , conv2d_64_filter_width > > error_window_stream ,
-	std::queue < window < bool  , conv2d_64_filter_height , conv2d_64_filter_width > > activations_window_stream ,
-	float weights[filter_height][filter_width][in_channels][num_filters] ,
+	std::queue < window < float , filter_height , filter_width > > out_error_window_stream ,
+	std::queue < window < bool  , filter_height , filter_width > > activations_window_stream ,
+	float weights[filter_height][filter_width][in_channels][num_filters] , // variables
 	float input_error[in_height][in_width][in_channels] );
+
+/******************************************/
+/********** Gradient Calculation **********/
+/******************************************/
+template < uint num_inputs , uint num_kernels >
+void softmax_regression(
+	float inputs[num_inputs] , float output_error[num_kernels] ,
+	float weight_gradients[num_inputs][num_kernels] , float bias_gradients[num_kernels] );
+
+template < uint num_inputs , uint num_kernels >
+void dense_regression (
+	float inputs[num_inputs] , float output_error[num_kernels] , bool activations[num_kernels] ,
+	float weight_gradients[num_inputs][num_kernels] , float bias_gradients[num_kernels] );
+
+template < typename in_type ,
+	uint     in_height , uint     in_width , uint   in_channels ,
+	uint    out_height , uint    out_width , uint  out_channels ,
+	uint filter_height , uint filter_width , uint   num_filters >
+void conv2d_regression (
+	std::queue< window < in_type , filter_height , filter_width > >& input_window_stream ,
+	float output_error[out_height][out_width][out_channels] ,
+	bool activations[out_height][out_width][out_channels] ,
+	float weight_gradients[filter_height][filter_width][in_channels][num_filters] , float bias_gradients[num_filters] );
+
+/***********************************************************************************/
+/******************************** Variable Updating ********************************/
+/***********************************************************************************/
+template < uint num_variables >
+void gradient_descend ( float variables[num_variables] , float gradients[num_variables] , float learning_rate );
+
 /******************************************/
 /**************** Save Data ***************/
 /******************************************/

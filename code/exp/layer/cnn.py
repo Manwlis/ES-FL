@@ -157,59 +157,48 @@ def save_variable_gradients( gradients ): # TODO: dims check, propably wrong
 	###### Layer 0 weights ######
 	np_array = np.copy( gradients[0] )
 	file = open( "variable_gradients/l0_weights_tf.txt" , "w" )
-	for dim3 in range( 0 , 32 , 1 ):
-			for dim2 in range( 0 , 1 , 1 ):
-				for dim1 in range( 0 , 3 , 1 ):
-					for dim0 in range( 0 , 3 , 1 ):
-						file.write( '{:.4f}\n'.format( np_array[dim1][dim0][dim2][dim3] ) )
+	for dim3 in range( 0 , 3 , 1 ):
+			for dim2 in range( 0 , 3 , 1 ):
+				for dim1 in range( 0 , 1 , 1 ):
+					for dim0 in range( 0 , 32 , 1 ):
+						file.write( '{:.4f}\n'.format( np_array[dim3][dim2][dim1][dim0] ) )
 
 	###### Layer 0 biases ######
 	np_array = np.copy( gradients[1] )
-
 	file = open( "variable_gradients/l0_biases_tf.txt" , "w" )
 	for dim0 in range( 0 , 32 , 1 ):
 		file.write( '{:.4f}\n'.format( np_array[dim0] ) )
 
 	###### Layer 2 weights ######
 	np_array = np.copy( gradients[2] )
-
 	file = open( "variable_gradients/l2_weights_tf.txt" , "w" )
-	for dim3 in range( 0 , 64 , 1 ):
-			for dim2 in range( 0 , 32 , 1 ):
-				for dim1 in range( 0 , 3 , 1 ):
-					for dim0 in range( 0 , 3 , 1 ):
-						file.write( '{:.4f}\n'.format( np_array[dim1][dim0][dim2][dim3] ) )
+	for dim3 in range( 0 , 3 , 1 ):
+		for dim2 in range( 0 , 3 , 1 ):
+			for dim1 in range( 0 , 32 , 1 ):
+				for dim0 in range( 0 , 64 , 1 ):
+						file.write( '{:.4f}\n'.format( np_array[dim3][dim2][dim1][dim0] ) )
 
 	###### Layer 2 biases ######
 	np_array = np.copy( gradients[3] )
-
 	file = open( "variable_gradients/l2_biases_tf.txt" , "w" )
 	for dim0 in range( 0 , 64 , 1 ):
 		file.write( '{:.4f}\n'.format( np_array[dim0] ) )
 
 	###### Layer 4 weights ######
 	np_array = np.copy( gradients[4] )
-
-	# reshape to fit the shape of the input in the C++ code TODO: check this extra
-	np_array = np.reshape( np_array , ( 7 , 7 , 64 , 128 ) )
-	np_array = np.transpose( np_array , ( 2 , 0 , 1 , 3 ) )
-	np_array = np.reshape( np_array , (3136, 128) )
-
 	file = open( "variable_gradients/l4_weights_tf.txt" , "w" )
-	for dim0 in range( 0 , 3136 , 1 ):
-		for dim1 in range( 0 , 128 , 1 ):
-			file.write( '{:.4f}\n'.format( np_array[dim0][dim1] ) )
+	for dim1 in range( 0 , 3136 , 1 ):
+		for dim0 in range( 0 , 128 , 1 ):
+			file.write( '{:.4f}\n'.format( np_array[dim1][dim0] ) )
 			
 	###### Layer 4 biases ######
 	np_array = np.copy( gradients[5] )
-	
 	file = open( "variable_gradients/l4_biases_tf.txt" , "w" )
 	for dim0 in range( 0 , 128 , 1 ):
 		file.write( '{:.4f}\n'.format( np_array[dim0] ) )
 
 	###### Layer 5 weights ######
 	np_array = np.copy( gradients[6] )
-
 	file = open( "variable_gradients/l5_weights_tf.txt" , "w" )
 	for dim1 in range( 0 , 128 , 1 ):
 		for dim0 in range( 0 , 10 , 1 ):
@@ -217,42 +206,63 @@ def save_variable_gradients( gradients ): # TODO: dims check, propably wrong
 
 	###### Layer 5 biases ######
 	np_array = np.copy( gradients[7] )
-
 	file = open( "variable_gradients/l5_biases_tf.txt" , "w" )
 	for dim0 in range( 0 , 10 , 1 ):
 		file.write( '{:.4f}\n'.format( np_array[dim0] ) )
 	
 def save_trained_variables( variables ): # TODO: dims check, propably wrong
+	###### Layer 0 weights ######
+	np_array = np.copy( variables[0] )
+	file = open( "variables/l0_weights_tf.txt" , "w" )
+	for dim3 in range( 0 , 3 , 1 ):
+			for dim2 in range( 0 , 3 , 1 ):
+				for dim1 in range( 0 , 1 , 1 ):
+					for dim0 in range( 0 , 32 , 1 ):
+						file.write( '{:.6f}\n'.format( np_array[dim3][dim2][dim1][dim0] ) )
+
+	###### Layer 0 biases ######
+	np_array = np.copy( variables[1] )
+	file = open( "variables/l0_biases_tf.txt" , "w" )
+	for dim0 in range( 0 , 32 , 1 ):
+		file.write( '{:.6f}\n'.format( np_array[dim0] ) )
+
+	###### Layer 2 weights ######
+	np_array = np.copy( variables[2] )
+	file = open( "variables/l2_weights_tf.txt" , "w" )
+	for dim3 in range( 0 , 3 , 1 ):
+		for dim2 in range( 0 , 3 , 1 ):
+			for dim1 in range( 0 , 32 , 1 ):
+				for dim0 in range( 0 , 64 , 1 ):
+						file.write( '{:.6f}\n'.format( np_array[dim3][dim2][dim1][dim0] ) )
+
+	###### Layer 2 biases ######
+	np_array = np.copy( variables[3] )
+	file = open( "variables/l2_biases_tf.txt" , "w" )
+	for dim0 in range( 0 , 64 , 1 ):
+		file.write( '{:.6f}\n'.format( np_array[dim0] ) )
+
 	###### Layer 4 weights ######
-	np_array = variables[4].numpy()
-
-	np_array = np.reshape( np_array , ( 7 , 7 , 64 , 128 ) )
-	np_array = np.transpose( np_array , ( 2 , 0 , 1 , 3 ) )
-	np_array = np.reshape( np_array , (3136, 128) )
-
+	np_array = np.copy( variables[4] )
 	file = open( "variables/l4_weights_tf.txt" , "w" )
-	for dim0 in range( 0 , 3136 , 1 ):
-		for dim1 in range( 0 , 128 , 1 ):
-			file.write( '{:.6f}\n'.format( np_array[dim0][dim1] ) )
+	for dim1 in range( 0 , 3136 , 1 ):
+		for dim0 in range( 0 , 128 , 1 ):
+			file.write( '{:.6f}\n'.format( np_array[dim1][dim0] ) )
 			
 	###### Layer 4 biases ######
-	np_array = variables[5].numpy()
-
+	np_array = np.copy( variables[5] )
 	file = open( "variables/l4_biases_tf.txt" , "w" )
 	for dim0 in range( 0 , 128 , 1 ):
 		file.write( '{:.6f}\n'.format( np_array[dim0] ) )
 
 	###### Layer 5 weights ######
-	np_array = variables[6].numpy()
-
+	np_array = np.copy( variables[6] )
 	file = open( "variables/l5_weights_tf.txt" , "w" )
 	for dim1 in range( 0 , 128 , 1 ):
 		for dim0 in range( 0 , 10 , 1 ):
 			file.write( '{:.6f}\n'.format( np_array[dim1][dim0] ) )
-			
-	###### Layer 5 biases ######
-	np_array = variables[7].numpy()
 
+	###### Layer 5 biases ######
+	np_array = np.copy( variables[7] )
 	file = open( "variables/l5_biases_tf.txt" , "w" )
 	for dim0 in range( 0 , 10 , 1 ):
 		file.write( '{:.6f}\n'.format( np_array[dim0] ) )

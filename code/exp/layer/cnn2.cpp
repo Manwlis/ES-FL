@@ -22,15 +22,15 @@ int main ( int argc , char** argv )
 	/******** Import variables *******/
 	/*********************************/
 #pragma region
-	static float layer0_weights[conv2d_32_filter_height][conv2d_32_filter_width][conv2d_32_in_channels][conv2d_32_num_filters];
-	static float layer2_weights[conv2d_64_filter_height][conv2d_64_filter_width][conv2d_64_in_channels][conv2d_64_num_filters];
-	static float layer4_weights[dense_num_in][dense_num_kernels];
-	static float layer5_weights[softmax_num_in][softmax_num_kernels];
+	static float conv2d_32_weights[conv2d_32_filter_height][conv2d_32_filter_width][conv2d_32_in_channels][conv2d_32_num_filters];
+	static float conv2d_64_weights[conv2d_64_filter_height][conv2d_64_filter_width][conv2d_64_in_channels][conv2d_64_num_filters];
+	static float dense_weights[dense_num_in][dense_num_kernels];
+	static float softmax_weights[softmax_num_in][softmax_num_kernels];
 
-	static float layer0_biases[conv2d_32_num_filters];
-	static float layer2_biases[conv2d_64_num_filters];
-	static float layer4_biases[dense_num_kernels];
-	static float layer5_biases[softmax_num_kernels];
+	static float conv2d_32_biases[conv2d_32_num_filters];
+	static float conv2d_64_biases[conv2d_64_num_filters];
+	static float dense_biases[dense_num_kernels];
+	static float softmax_biases[softmax_num_kernels];
 
 	set_variables < 
 		conv2d_32_filter_height , conv2d_32_filter_width , conv2d_32_in_channels , conv2d_32_num_filters ,
@@ -38,10 +38,10 @@ int main ( int argc , char** argv )
 		  dense_num_in ,   dense_num_kernels ,     
 		softmax_num_in , softmax_num_kernels >
 		(
-		layer0_weights , layer0_biases ,
-		layer2_weights , layer2_biases ,
-		layer4_weights , layer4_biases ,
-		layer5_weights , layer5_biases );
+		conv2d_32_weights , conv2d_32_biases ,
+		conv2d_64_weights , conv2d_64_biases ,
+		dense_weights , dense_biases ,
+		softmax_weights , softmax_biases );
 #pragma endregion
 	/*********************************/
 	/****** Forward Propagation ******/
@@ -62,7 +62,7 @@ int main ( int argc , char** argv )
 	static bool dense_activations[dense_num_out]; // need to remember if relu activated to get its derivative. ReLU > 0 => ReLU' = input, ReLU <= 0 => ReLU' = 0
 
 	/***** layer 0, 28x28x1 -> conv 32 filters of 3x3, padded, stride 1 -> 28x28x32 *****/
-	// queue of windows, one for each channels
+	// queue of windows
 	std::queue < window < float , conv2d_32_filter_height , conv2d_32_filter_width > > conv2d_32_window_stream;
 
 	// create windows
@@ -74,7 +74,7 @@ int main ( int argc , char** argv )
 		conv2d_32_in_height ,     conv2d_32_in_width ,     conv2d_32_in_channels , 
 		conv2d_32_out_height ,    conv2d_32_out_width ,    conv2d_32_out_channels ,
 		conv2d_32_filter_height , conv2d_32_filter_width , conv2d_32_num_filters >
-		( conv2d_32_window_stream , layer0_weights , layer0_biases , conv2d_32_feature_map , conv2d_32_activations );
+		( conv2d_32_window_stream , conv2d_32_weights , conv2d_32_biases , conv2d_32_feature_map , conv2d_32_activations );
 
 	/***** layer 1, 28x28x32 -> maxpool 2x2, stride 2,2 -> 14x14x32 *****/
 	// std::queue < window < float , maxp2d_32_filter_height , maxp2d_32_filter_width > > maxp2d_32_window_stream;
@@ -102,7 +102,7 @@ int main ( int argc , char** argv )
 		conv2d_64_in_height , conv2d_64_in_width , conv2d_64_in_channels , 
 		conv2d_64_out_height , conv2d_64_out_width , conv2d_64_out_channels ,
 		conv2d_64_filter_height , conv2d_64_filter_width , conv2d_64_num_filters >
-		( conv2d_64_window_stream , layer2_weights , layer2_biases , conv2d_64_feature_map , conv2d_64_activations );
+		( conv2d_64_window_stream , conv2d_64_weights , conv2d_64_biases , conv2d_64_feature_map , conv2d_64_activations );
 
 	/***** layer 3, 14x14x64 -> maxpool 2x2, stride 2,2 -> 7x7x64 *****/
 	// std::queue < window < float , maxp2d_64_filter_height , maxp2d_64_filter_width > > maxp2d_64_window_stream;
@@ -123,10 +123,10 @@ int main ( int argc , char** argv )
 
 	/***** layer 4, 7x7x64 = 3136 -> fully connected 128 -> 128 *****/
 	dense < dense_num_kernels , dense_num_in >
-		( *reinterpret_cast<float (*)[dense_num_kernels]>(&maxp2d_64_feature_map) , dense_map , dense_activations , layer4_weights , layer4_biases );
+		( *reinterpret_cast<float (*)[dense_num_kernels]>(&maxp2d_64_feature_map) , dense_map , dense_activations , dense_weights , dense_biases );
 
 	/***** layer 5, 128 -> fully connected softmax 10 -> 10 normalized *****/
-	softmax_clasifier < softmax_num_kernels , softmax_num_in > ( dense_map , softmax_output , layer5_weights , layer5_biases );
+	softmax_clasifier < softmax_num_kernels , softmax_num_in > ( dense_map , softmax_output , softmax_weights , softmax_biases );
 #pragma endregion
 	/*********************************/
 	/******* Back Propagation ********/
@@ -139,13 +139,13 @@ int main ( int argc , char** argv )
 	static float conv2d_64_in_error[conv2d_64_in_height][conv2d_64_in_width][conv2d_64_in_channels];
 	static float maxp2d_32_in_error[maxp2d_32_in_height][maxp2d_32_in_width][maxp2d_32_in_channels];
 
-	double entropy = sparce_categorical_cross_entropy < softmax_num_kernels > ( softmax_output , 4 , softmax_out_error );
+	float entropy = sparce_categorical_cross_entropy < softmax_num_kernels > ( softmax_output , 4 , softmax_out_error );
 
 	/* Layer 5, 10 -> dense error propagation, softmax activation -> 128 */
-	softmax_error_propagation < softmax_num_kernels , softmax_num_in > ( softmax_out_error , layer5_weights , softmax_in_error );
+	softmax_error_propagation < softmax_num_kernels , softmax_num_in > ( softmax_out_error , softmax_weights , softmax_in_error );
 
 	/* Layer 4, 128 -> dense error propagation, relu activation -> 3136 */
-	dense_error_propagation < dense_num_kernels , dense_num_in > ( softmax_in_error , layer4_weights , dense_activations , dense_in_error );
+	dense_error_propagation < dense_num_kernels , dense_num_in > ( softmax_in_error , dense_weights , dense_activations , dense_in_error );
 
 	/* Layer 3, 3136 (7x7x64) -> maxp2d error propagation -> 14x14x64 */
 	maxp2d_error_propagation <
@@ -170,7 +170,7 @@ int main ( int argc , char** argv )
 		conv2d_64_in_height ,     conv2d_64_in_width ,     conv2d_64_in_channels ,
 		conv2d_64_out_height ,    conv2d_64_out_width ,    conv2d_64_out_channels ,
 		conv2d_64_filter_height , conv2d_64_filter_width , conv2d_64_num_filters >
-		( conv2d_64_error_window_stream , conv2d_64_activations_window_stream , layer2_weights , conv2d_64_in_error );
+		( conv2d_64_error_window_stream , conv2d_64_activations_window_stream , conv2d_64_weights , conv2d_64_in_error );
 
 	/* Layer 1, 14x14x32 -> maxp2d error propagation -> 28x28x32 */
 	maxp2d_error_propagation <
@@ -178,7 +178,88 @@ int main ( int argc , char** argv )
 		maxp2d_32_out_height ,    maxp2d_32_out_width ,    maxp2d_32_out_channels ,
 		maxp2d_32_filter_height , maxp2d_32_filter_width , maxp2d_32_filter_stride >
 		( reinterpret_cast<float*>(conv2d_64_in_error) , maxp2d_32_activations_window_stream , maxp2d_32_in_error );
+#pragma endregion
+	/*********************************/
+	/***** Gradient Calculation ******/
+	/*********************************/
+#pragma region
+	static float softmax_weight_gradients[softmax_num_in][softmax_num_kernels];
+	static float softmax_bias_gradients[softmax_num_kernels];
 
+	static float dense_weight_gradients[dense_num_in][dense_num_kernels];
+	static float dense_bias_gradients[dense_num_kernels];
+
+	static float conv2d_64_weight_gradients[conv2d_64_filter_height][conv2d_64_filter_width][conv2d_64_in_channels][conv2d_64_num_filters];
+	static float conv2d_64_bias_gradients[conv2d_64_num_filters];
+
+	static float conv2d_32_weight_gradients[conv2d_32_filter_height][conv2d_32_filter_width][conv2d_32_in_channels][conv2d_32_num_filters];
+	static float conv2d_32_bias_gradients[conv2d_32_num_filters];
+	/* Layer 5 */
+	softmax_regression < softmax_num_in , softmax_num_kernels >
+		( dense_map , softmax_out_error , softmax_weight_gradients , softmax_bias_gradients );
+
+	/* Layer 4 */
+	dense_regression < dense_num_in , dense_num_kernels >
+		( *reinterpret_cast<float (*)[dense_num_kernels]>(&maxp2d_64_feature_map) , softmax_in_error , dense_activations , 
+		dense_weight_gradients , dense_bias_gradients );
+
+	/* Layer 2 */
+	std::queue < window < float , conv2d_64_filter_height , conv2d_64_filter_width > > conv2d_64_window_stream2;
+	create_window_stream_conv2d < float ,
+		conv2d_64_in_height , conv2d_64_in_width , conv2d_64_in_channels ,
+		conv2d_64_filter_height , conv2d_64_filter_width >
+		( maxp2d_32_feature_map , conv2d_64_window_stream2 );
+
+	conv2d_regression < float ,
+		conv2d_64_in_height ,     conv2d_64_in_width ,     conv2d_64_in_channels ,
+		conv2d_64_out_height ,    conv2d_64_out_width ,    conv2d_64_out_channels ,
+		conv2d_64_filter_height , conv2d_64_filter_width , conv2d_64_num_filters >
+		( conv2d_64_window_stream2 , maxp2d_64_in_error , conv2d_64_activations , conv2d_64_weight_gradients , conv2d_64_bias_gradients );
+
+	/* Layer 0 */
+	std::queue < window < float , conv2d_32_filter_height , conv2d_32_filter_width > > conv2d_32_window_stream2;
+	create_window_stream_conv2d < float ,
+		conv2d_32_in_height , conv2d_32_in_width , conv2d_32_in_channels ,
+		conv2d_32_filter_height , conv2d_32_filter_width >
+		( input , conv2d_32_window_stream2 );
+
+	conv2d_regression < float ,
+		conv2d_32_in_height ,     conv2d_32_in_width ,     conv2d_32_in_channels ,
+		conv2d_32_out_height ,    conv2d_32_out_width ,    conv2d_32_out_channels ,
+		conv2d_32_filter_height , conv2d_32_filter_width , conv2d_32_num_filters >
+		( conv2d_32_window_stream2 , maxp2d_32_in_error , conv2d_32_activations , conv2d_32_weight_gradients , conv2d_32_bias_gradients );
+#pragma endregion
+	/*********************************/
+	/******* Variable Updates ********/
+	/*********************************/	
+#pragma region // layers 1 & 3 have no trainable variables
+	// layer 0
+	gradient_descend < conv2d_32_filter_height * conv2d_32_filter_width * conv2d_32_in_channels * conv2d_32_num_filters > 
+		( reinterpret_cast<float*>(conv2d_32_weights) , reinterpret_cast<float*>(conv2d_32_weight_gradients) , learning_rate_const );
+
+	gradient_descend < conv2d_32_num_filters > 
+		( conv2d_32_biases , conv2d_32_bias_gradients , learning_rate_const );
+
+	// layer 2
+	gradient_descend < conv2d_64_filter_height * conv2d_64_filter_width * conv2d_64_in_channels * conv2d_64_num_filters > 
+		( reinterpret_cast<float*>(conv2d_64_weights) , reinterpret_cast<float*>(conv2d_64_weight_gradients) , learning_rate_const );
+
+	gradient_descend < conv2d_64_num_filters > 
+		( conv2d_64_biases , conv2d_64_bias_gradients , learning_rate_const );
+
+	// layer 4
+	gradient_descend < dense_num_in * dense_num_kernels > 
+		( reinterpret_cast<float*>(dense_weights) , reinterpret_cast<float*>(dense_weight_gradients) , learning_rate_const );
+
+	gradient_descend < dense_num_kernels > 
+		( dense_biases , dense_bias_gradients , learning_rate_const );
+
+	// layer 5
+	gradient_descend < softmax_num_in * softmax_num_kernels > 
+		( reinterpret_cast<float*>(softmax_weights) , reinterpret_cast<float*>(softmax_weight_gradients) , learning_rate_const );
+
+	gradient_descend < softmax_num_kernels > 
+		( softmax_biases , softmax_bias_gradients , learning_rate_const );
 #pragma endregion
 	/*********************************/
 	/********* Show outputs **********/
@@ -215,7 +296,46 @@ int main ( int argc , char** argv )
 
 	save_array < maxp2d_32_in_height * maxp2d_32_in_width * maxp2d_32_in_channels > (
 		reinterpret_cast<float*>(maxp2d_32_in_error) , "output_gradients/l0_conv32_cpp.txt" , 4 );
+#pragma endregion
+#pragma region // variable gradients
+	save_array < softmax_num_in * softmax_num_kernels > ( 
+		reinterpret_cast<float*>(softmax_weight_gradients) , "variable_gradients/l5_weights_cpp.txt" , 4 );
 
+	save_array < softmax_num_kernels > ( softmax_bias_gradients , "variable_gradients/l5_biases_cpp.txt" , 4 );
+
+	save_array < dense_num_in * dense_num_kernels > ( 
+		reinterpret_cast<float*>(dense_weight_gradients) , "variable_gradients/l4_weights_cpp.txt" , 4 );
+
+	save_array < dense_num_kernels > ( dense_bias_gradients , "variable_gradients/l4_biases_cpp.txt" , 4 );
+
+	save_array < conv2d_64_filter_height * conv2d_64_filter_width * conv2d_64_in_channels * conv2d_64_num_filters > ( 
+		reinterpret_cast<float*>(conv2d_64_weight_gradients) , "variable_gradients/l2_weights_cpp.txt" , 4 );
+
+	save_array < conv2d_64_num_filters > ( conv2d_64_bias_gradients , "variable_gradients/l2_biases_cpp.txt" , 4 );
+
+	save_array < conv2d_32_filter_height * conv2d_32_filter_width * conv2d_32_in_channels * conv2d_32_num_filters > ( 
+		reinterpret_cast<float*>(conv2d_32_weight_gradients) , "variable_gradients/l0_weights_cpp.txt" , 4 );
+
+	save_array < conv2d_32_num_filters > ( conv2d_32_bias_gradients , "variable_gradients/l0_biases_cpp.txt" , 4 );
+#pragma endregion
+#pragma region // updated variables
+	save_array < conv2d_32_filter_height * conv2d_32_filter_width * conv2d_32_in_channels * conv2d_32_num_filters > 
+		( reinterpret_cast<float*>(conv2d_32_weights) , "variables/l0_weights_cpp.txt" , 6 );
+
+	save_array < conv2d_32_num_filters > ( conv2d_32_biases , "variables/l0_biases_cpp.txt" , 6 );
+
+	save_array < conv2d_64_filter_height * conv2d_64_filter_width * conv2d_64_in_channels * conv2d_64_num_filters > 
+		( reinterpret_cast<float*>(conv2d_64_weights) , "variables/l2_weights_cpp.txt" , 6 );
+
+	save_array < conv2d_64_num_filters > ( conv2d_64_biases , "variables/l2_biases_cpp.txt" , 6 );
+
+	save_array < dense_num_in * dense_num_kernels > ( reinterpret_cast<float*>(dense_weights) , "variables/l4_weights_cpp.txt" , 6 );
+
+	save_array < dense_num_kernels > ( dense_biases , "variables/l4_biases_cpp.txt" , 6 );
+
+	save_array < softmax_num_in * softmax_num_kernels > ( reinterpret_cast<float*>(softmax_weights) , "variables/l5_weights_cpp.txt" , 6 );
+
+	save_array < softmax_num_kernels > ( softmax_biases , "variables/l5_biases_cpp.txt" , 6 );
 #pragma endregion
 }
 
@@ -229,10 +349,10 @@ template <
 	int l4_num_inputs , int l4_num_kernels ,
 	int l5_num_inputs , int l5_num_kernels >
 void set_variables (
-	float layer0_weights[l0_kernel_height][l0_kernel_width][l0_num_channels][l0_num_kernels] , float layer0_biases[l0_num_kernels] ,
-	float layer2_weights[l2_kernel_height][l2_kernel_width][l2_num_channels][l2_num_kernels] , float layer2_biases[l2_num_kernels] ,
-	float layer4_weights[l4_num_inputs][l4_num_kernels] , float layer4_biases[l4_num_kernels] ,
-	float layer5_weights[l5_num_inputs][l5_num_kernels] , float layer5_biases[l5_num_kernels] )
+	float conv2d_32_weights[l0_kernel_height][l0_kernel_width][l0_num_channels][l0_num_kernels] , float conv2d_32_biases[l0_num_kernels] ,
+	float conv2d_64_weights[l2_kernel_height][l2_kernel_width][l2_num_channels][l2_num_kernels] , float conv2d_64_biases[l2_num_kernels] ,
+	float dense_weights[l4_num_inputs][l4_num_kernels] , float dense_biases[l4_num_kernels] ,
+	float softmax_weights[l5_num_inputs][l5_num_kernels] , float softmax_biases[l5_num_kernels] )
 {
 	std::ifstream file;
 	std::string line;
@@ -245,7 +365,7 @@ void set_variables (
 				for ( int kernel = 0 ; kernel < l0_num_kernels ; kernel++ )
 				{
 					getline( file , line );
-					layer0_weights[y][x][channel][kernel] = std::stof(line);
+					conv2d_32_weights[y][x][channel][kernel] = std::stof(line);
 				}
 	file.close();
 
@@ -253,7 +373,7 @@ void set_variables (
 	for( int kernel = 0 ; kernel < l0_num_kernels ; kernel++ )
 	{
 		getline( file , line );
-		layer0_biases[kernel] = std::stof(line);
+		conv2d_32_biases[kernel] = std::stof(line);
 	}
 	file.close();
 
@@ -265,7 +385,7 @@ void set_variables (
 				for ( int kernel = 0 ; kernel < l2_num_kernels ; kernel++ )
 				{
 					getline( file , line );
-					layer2_weights[y][x][channel][kernel] = std::stof(line);
+					conv2d_64_weights[y][x][channel][kernel] = std::stof(line);
 				}
 	file.close();
 
@@ -273,7 +393,7 @@ void set_variables (
 	for( int kernel = 0 ; kernel < l2_num_kernels ; kernel++ )
 	{
 		getline( file , line );
-		layer2_biases[kernel] = std::stof(line);
+		conv2d_64_biases[kernel] = std::stof(line);
 	}
 	file.close();
 
@@ -283,7 +403,7 @@ void set_variables (
 		for ( int kernel = 0 ; kernel < l4_num_kernels ; kernel++ )
 		{
 			getline( file , line );
-			layer4_weights[i][kernel] = std::stof(line);
+			dense_weights[i][kernel] = std::stof(line);
 		}
 	file.close();
 
@@ -291,7 +411,7 @@ void set_variables (
 	for( int k = 0 ; k < l4_num_kernels ; k++ )
 	{
 		getline( file , line );
-		layer4_biases[k] = std::stof(line);
+		dense_biases[k] = std::stof(line);
 	}
 	file.close();
 
@@ -301,7 +421,7 @@ void set_variables (
 		for ( int kernel = 0 ; kernel < l5_num_kernels ; kernel++ )
 		{
 			getline( file , line );
-			layer5_weights[i][kernel] = std::stof(line);
+			softmax_weights[i][kernel] = std::stof(line);
 		}
 	file.close();
 
@@ -309,7 +429,7 @@ void set_variables (
 	for( int k = 0 ; k < l5_num_kernels ; k++ )
 	{
 		getline( file , line );
-		layer5_biases[k] = std::stof(line);
+		softmax_biases[k] = std::stof(line);
 	}
 }
 #pragma endregion
@@ -332,7 +452,7 @@ void create_window_stream_conv2d (
 
 	// line and window buffer
 	in_type line_buffer[filter_height-1][in_width][in_channels];
-	window < in_type , filter_height , filter_width > temp_window[in_channels]; // one temp window per channel
+	window < in_type , filter_height , filter_width > temp_windows[in_channels]; // one temp window per channel
 
 	// required iterations to fill buffers
 	uint ramp_up = in_width * ( ( filter_width - 1 ) / 2 ) + ( ( filter_height - 1 ) / 2 );
@@ -348,7 +468,7 @@ void create_window_stream_conv2d (
 			if( pixel_counter < num_pixels )
 				new_pixel[channel] = input_1D[ pixel_counter * in_channels + channel ];
 			else
-				new_pixel[channel] = 0;
+				new_pixel[channel] = 0.f;
 
 		// shift window and add new pixels
 		for( uint filter_y = 0 ; filter_y < filter_height ; filter_y++ )
@@ -356,14 +476,14 @@ void create_window_stream_conv2d (
 			// all columns except last
 			for ( uint filter_x = 0 ; filter_x < filter_width - 1 ; filter_x++ )
 				for( uint channel = 0 ; channel < in_channels ; channel++ )
-					temp_window[channel].elements[filter_y][filter_x] = temp_window[channel].elements[filter_y][filter_x+1];
+					temp_windows[channel].elements[filter_y][filter_x] = temp_windows[channel].elements[filter_y][filter_x+1];
 		
 			// last column
 			for( uint channel = 0 ; channel < in_channels ; channel++ )
 				if ( filter_y < filter_height - 1 )
-					temp_window[channel].elements[filter_y][filter_width-1] = line_buffer[filter_y][col_ptr][channel];
+					temp_windows[channel].elements[filter_y][filter_width-1] = line_buffer[filter_y][col_ptr][channel];
 				else
-					temp_window[channel].elements[filter_y][filter_width-1] = new_pixel[channel];
+					temp_windows[channel].elements[filter_y][filter_width-1] = new_pixel[channel];
 		}
 
 		// shift line buffer and add new pixel
@@ -382,7 +502,7 @@ void create_window_stream_conv2d (
 		// dont write until the window fills up with usefull data
 		if ( pixel_counter >= ramp_up )
 			for( uint channel = 0 ; channel < in_channels ; channel++ )
-				conv2d_window_stream.push( temp_window[channel] );
+				conv2d_window_stream.push( temp_windows[channel] );
 	}
 }
 
@@ -392,7 +512,7 @@ template <
 	uint out_height    , uint out_width    , uint out_channels ,
 	uint filter_height , uint filter_width , uint num_filters >
 void conv2d (
-	std::queue< window < in_type , filter_height , filter_width > >& conv2d_window_stream, // inputs
+	std::queue< window < in_type , filter_height , filter_width > >& input_window_stream, // inputs
 	float weights[filter_height][filter_width][in_channels][num_filters] , float bias[num_filters] , // variables
 	float output[out_height][out_width][out_channels] , bool activations [out_height][out_width][out_channels] ) // outputs
 {
@@ -402,17 +522,17 @@ void conv2d (
 		for ( uint in_x = 0 ; in_x < in_width ; in_x++ )
 		{
 			// pop windows from queues, one per input channel
-			window < in_type , filter_height , filter_width > temp_window[in_channels];
+			window < in_type , filter_height , filter_width > temp_windows[in_channels];
 			for ( uint channel = 0 ; channel < in_channels ; channel++ )
 			{
-				std::memcpy( &(temp_window[channel]) , &(conv2d_window_stream.front()) , sizeof( temp_window[channel] ) );
-				conv2d_window_stream.pop();
+				std::memcpy( &(temp_windows[channel]) , &(input_window_stream.front()) , sizeof( temp_windows[channel] ) );
+				input_window_stream.pop();
 			}
 			// one sum per filter. The outputs of a filter are indepentent of the outputs of the the other filters, 
 			// can be parallelized indefinetly.
 			float sum[num_filters];
 			for( uint filter = 0 ; filter < num_filters ; filter++ )
-				sum[filter] = 0;
+				sum[filter] = 0.f;
 
 			// filter dimensions loops, filter_y/x == window_y/x
 			for( uint filter_y = 0 ; filter_y < filter_height ; filter_y++ )
@@ -429,27 +549,26 @@ void conv2d (
 						// pad with zeros if coordinates of neighboring pixelout of bounds
 						in_type padded_pixel;
 						if ( ( y_offseted < 0 ) || ( y_offseted >= int(in_height) ) || ( x_offseted < 0 ) || ( x_offseted >= int(in_width) ) )
-							padded_pixel = 0;
+							padded_pixel = 0.f;
 						else
-							padded_pixel = temp_window[channel].elements[filter_y][filter_x];
+							padded_pixel = temp_windows[channel].elements[filter_y][filter_x];
 
 						// num_filters == out_channels
 						for( uint filter = 0 ; filter < num_filters ; filter++ )
-						{
 							sum[filter] += float(padded_pixel) * weights[filter_y][filter_x][channel][filter];
-						}
 					}
 				}
-			}
+			} // end filter dimensions loops
 			// add bias & activate with relu
 			for( uint filter = 0 ; filter < num_filters ; filter++ )
 			{
 				sum[filter] += bias[filter];
-				output[in_y][in_x][filter] = ( sum[filter] > 0 ) ? sum[filter] : 0;
-				activations[in_y][in_x][filter] = ( sum[filter] > 0 );
+				bool activation = sum[filter] > 0.f;
+				output[in_y][in_x][filter] = activation ? sum[filter] : 0.f;
+				activations[in_y][in_x][filter] = activation;
 			}
 		}
-	}
+	} // end input / output dimensions loops
 }
 	/*********************************/
 	/******* 2-D Maxpool Layer *******/
@@ -464,7 +583,7 @@ void window_input_maxp2d (
 	float* input_1D = reinterpret_cast<in_type*>(input);
 
 	in_type line_buffer[filter_height][in_width][in_channels];
-	window < in_type , filter_height , filter_width > temp_window[in_channels];
+	window < in_type , filter_height , filter_width > temp_windows[in_channels];
 
 	uint num_pixels = in_width * in_height;
 	uint col_insert_ptr = 0;
@@ -488,11 +607,11 @@ void window_input_maxp2d (
 					// check if enough data to fill window, y axis && x axis
 					if( col_insert_ptr == filter_height - 1 && row_insert_ptr % filter_width == 1 ) // this if can go before the filter loops if needed
 					{
-						temp_window[channel].elements[filter_y][filter_x] =
-							line_buffer[ col_insert_ptr - 1 + filter_y ][ row_insert_ptr - 1 + filter_x ][channel]; // TODO: maybe find max here, the other function uselless
+						temp_windows[channel].elements[filter_y][filter_x] =
+							line_buffer[ col_insert_ptr - 1 + filter_y ][ row_insert_ptr - 1 + filter_x ][channel];
 						// final pixel in, write in stream
 						if( filter_y == filter_height - 1 && filter_x == filter_width - 1 )
-							maxp2d_window_stream.push( temp_window[channel] );
+							maxp2d_window_stream.push( temp_windows[channel] );
 					}
 
 		// keep track of where we are in the line buffers
@@ -522,10 +641,10 @@ void maxp2d (
 		for( uint out_x = 0 ; out_x < out_width ; out_x++ )
 		{
 			// pop window, one per channel
-			window < in_type , filter_height , filter_width > temp_window[in_channels];
+			window < in_type , filter_height , filter_width > temp_windows[in_channels];
 			for ( uint channel = 0 ; channel < in_channels ; channel++ )
 			{
-				std::memcpy( &(temp_window[channel]) , &(maxp2d_window_stream.front()) , sizeof( temp_window[channel] ) );
+				std::memcpy( &(temp_windows[channel]) , &(maxp2d_window_stream.front()) , sizeof( temp_windows[channel] ) );
 				maxp2d_window_stream.pop();
 			}
 			// init temp variables
@@ -548,15 +667,15 @@ void maxp2d (
 						temp_activation_window[channel].elements[filter_y][filter_x] = false;
 
 						// check if max
-						if ( temp_window[channel].elements[filter_y][filter_x] > max[channel] )
+						if ( temp_windows[channel].elements[filter_y][filter_x] > max[channel] )
 						{
-							max[channel] = temp_window[channel].elements[filter_y][filter_x];
+							max[channel] = temp_windows[channel].elements[filter_y][filter_x];
 
 							// remember the position of last max
 							max_pos[channel][0] = filter_y;
 							max_pos[channel][1] = filter_x;
 						}
-						// all elements in the window have been processed
+						// all elements in the window have been processed, push it
 						if( filter_y == filter_height - 1 && filter_x == filter_width - 1 )
 						{
 							output[out_y][out_x][channel] = max[channel];
@@ -656,23 +775,23 @@ void maxp2d_window_integrated (
 	/*********************************/
 	/********** Dense Layer **********/
 	/*********************************/
-template < int num_kernels , int num_inputs >
+template < uint num_kernels , uint num_inputs >
 void dense ( 
 	float input[num_inputs] , float output[num_kernels] , bool activations[num_kernels] ,
 	float weights[num_inputs][num_kernels] , float biases[num_kernels] )
 {
 	float sum[num_kernels];
 	// initialize the sum of each kernel with its bias
-	for( int kernel = 0 ; kernel < num_kernels ; kernel++ )
+	for( uint kernel = 0 ; kernel < num_kernels ; kernel++ )
 		sum[kernel] = biases[kernel];
 
 	// pull one input and use it with all the kernels
-	for ( int i = 0 ; i < num_inputs ; i++ )
-		for ( int kernel = 0 ; kernel < num_kernels ; kernel++ )
+	for ( uint i = 0 ; i < num_inputs ; i++ )
+		for ( uint kernel = 0 ; kernel < num_kernels ; kernel++ )
 			sum[kernel] += input[i] * weights[i][kernel];
 
 	// relu activation for all kernels
-	for ( int kernel = 0 ; kernel < num_kernels ; kernel++ )
+	for ( uint kernel = 0 ; kernel < num_kernels ; kernel++ )
 	{
 		bool activation = ( sum[kernel] > 0 );
 		output[kernel] = activation ? sum[kernel] : 0;
@@ -682,32 +801,33 @@ void dense (
 	/*********************************/
 	/********* Softmax Layer *********/
 	/*********************************/
-template < int num_kernels , int num_inputs >
+template < uint num_kernels , uint num_inputs >
 void softmax_clasifier ( 
 	float input[num_inputs] , float output[num_kernels] , 
 	float weights[num_inputs][num_kernels] , float biases[num_kernels] )
 {
-	// array multiplication
 	double sum[num_kernels];
-	for ( int kernel = 0 ; kernel < num_kernels ; kernel++ )
-	{
-		for ( int i = 0 ; i < num_inputs ; i++ )
+	// initialize the sum of each kernel with its bias
+	for( uint kernel = 0 ; kernel < num_kernels ; kernel++ )
+		sum[kernel] = biases[kernel];
+
+	// pull one input and use it with all the kernels
+	for ( uint i = 0 ; i < num_inputs ; i++ )
+		for ( uint kernel = 0 ; kernel < num_kernels ; kernel++ )
 			sum[kernel] += input[i] * weights[i][kernel];
-		
-		sum[kernel] += biases[kernel];
-	}
+			
 	// softmax, normalized inputs by the largest value
 	double softmax_max = -std::numeric_limits<double>::infinity();
-	for ( int kernel = 0 ; kernel < num_kernels ; kernel++ )
+	for ( uint kernel = 0 ; kernel < num_kernels ; kernel++ )
 		if ( sum[kernel] > softmax_max )
 			softmax_max = sum[kernel];
 
 	double softmax_sum = 0.f;
-	for ( int kernel = 0 ; kernel < num_kernels ; kernel++ )
+	for ( uint kernel = 0 ; kernel < num_kernels ; kernel++ )
 		softmax_sum += std::exp( sum[kernel] - softmax_max );
 
 	double constant = softmax_max + std::log( softmax_sum );
-	for ( int kernel = 0 ; kernel < num_kernels ; kernel++ )
+	for ( uint kernel = 0 ; kernel < num_kernels ; kernel++ )
 		output[kernel] = std::exp( sum[kernel] - constant );
 }
 #pragma endregion
@@ -715,25 +835,25 @@ void softmax_clasifier (
 /******************************** Back Propagation *********************************/
 /***********************************************************************************/
 #pragma region
-template < int num_kernels >
-double sparce_categorical_cross_entropy ( float prediction[num_kernels] , int label , float softmax_output_error[num_kernels] )
+template < uint num_kernels >
+float sparce_categorical_cross_entropy ( float prediction[num_kernels] , uint label , float softmax_output_error[num_kernels] )
 {
-	for ( int kernel = 0 ; kernel < num_kernels ; kernel++ )
+	for ( uint kernel = 0 ; kernel < num_kernels ; kernel++ )
 		softmax_output_error[kernel] = - ( ( label == kernel ) - prediction[kernel] ); // -(yi - ai)
 
 	// one-hot distribution. Loss of non-label classes equals to zero. 
-	double sum = - std::log( prediction[label] );
+	float sum = - std::log( prediction[label] );
 
 	return sum;
 }
 
-template < int num_kernels , int num_inputs >
+template < uint num_kernels , uint num_inputs >
 void softmax_error_propagation ( float output_error[num_kernels] , float weights[num_inputs][num_kernels] , float input_error[num_inputs] )
 {
-	for ( int input = 0 ; input < num_inputs ; input++ )
+	for ( uint input = 0 ; input < num_inputs ; input++ )
 	{
 		float sum = 0.f;
-		for ( int kernel = 0 ; kernel < num_kernels ; kernel++ )
+		for ( uint kernel = 0 ; kernel < num_kernels ; kernel++ )
 		{
 			sum += weights[input][kernel] * output_error[kernel];
 		}
@@ -741,14 +861,14 @@ void softmax_error_propagation ( float output_error[num_kernels] , float weights
 	}
 }
 
-template < int num_kernels , int num_inputs >
+template < uint num_kernels , uint num_inputs >
 void dense_error_propagation (
 	float output_error[num_kernels] ,float weights[num_inputs][num_kernels] ,  bool activations[num_kernels] , float input_error[num_inputs] )
 {
-	for ( int input = 0 ; input < num_inputs ; input++ )
+	for ( uint input = 0 ; input < num_inputs ; input++ )
 	{
 		float sum = 0.f;
-		for ( int kernel = 0 ; kernel < num_kernels ; kernel++ )
+		for ( uint kernel = 0 ; kernel < num_kernels ; kernel++ )
 		{
 			if ( activations[kernel] ) // relu was activated => error propagates backward?
 				sum += weights[input][kernel] * output_error[kernel];
@@ -799,7 +919,7 @@ void maxp2d_error_propagation (
 						if( activations_temp_window[channel].elements[filter_y][filter_x] )
 							line_buffers[filter_y][in_x+filter_x][channel] = pixel_error[channel];
 						else // pixel did not activate
-							line_buffers[filter_y][in_x+filter_x][channel] = 0;
+							line_buffers[filter_y][in_x+filter_x][channel] = 0.f;
 					}
 		}
 		uint in_y = out_y * filter_stride; // keep track of equivalent input dimensions
@@ -816,8 +936,8 @@ template <
 	uint    out_height , uint    out_width , uint  out_channels ,
 	uint filter_height , uint filter_width , uint   num_filters >
 void conv2d_error_propagation (
-	std::queue < window < float , conv2d_64_filter_height , conv2d_64_filter_width > > error_window_stream ,
-	std::queue < window < bool  , conv2d_64_filter_height , conv2d_64_filter_width > > activations_window_stream ,
+	std::queue < window < float , filter_height , filter_width > > out_error_window_stream ,
+	std::queue < window < bool  , filter_height , filter_width > > activations_window_stream ,
 	float weights[filter_height][filter_width][in_channels][num_filters] , // variables
 	float input_error[in_height][in_width][in_channels] ) // output
 {
@@ -827,12 +947,12 @@ void conv2d_error_propagation (
 		for ( uint out_x = 0 ; out_x < out_width ; out_x++ )
 		{
 			// pop windows from queues, one per input channel
-			window < float , filter_height , filter_width > temp_window[out_channels];
+			window < float , filter_height , filter_width > temp_windows[out_channels];
 			window < bool  , filter_height , filter_width > temp_activations[out_channels];
 			for ( uint filter = 0 ; filter < num_filters ; filter++ )
 			{
-				std::memcpy( &(temp_window[filter]) , &(error_window_stream.front()) , sizeof( temp_window[filter] ) );
-				error_window_stream.pop();
+				std::memcpy( &(temp_windows[filter]) , &(out_error_window_stream.front()) , sizeof( temp_windows[filter] ) );
+				out_error_window_stream.pop();
 				std::memcpy( &(temp_activations[filter]) , &(activations_window_stream.front()) , sizeof( temp_activations[filter] ) );
 				activations_window_stream.pop();
 			}
@@ -857,11 +977,11 @@ void conv2d_error_propagation (
 						{
 							if ( ! ( ( y_offseted < 0 ) || ( y_offseted >= int(out_height) ) || ( x_offseted < 0 ) || ( x_offseted >= int(out_width) ) ) )
 							{
-								float padded_pixel = temp_window[filter].elements[filter_y][filter_x];
-								bool activation = temp_activations[filter].elements[filter_y][filter_x];
+								float padded_pixel = temp_windows[num_filters - 1 - filter].elements[filter_y][filter_x];
+								bool activation = temp_activations[num_filters - 1 - filter].elements[filter_y][filter_x];
 
-								sum[channel] += activation ? 
-									float(padded_pixel) * weights[filter_height - 1 - filter_y][filter_width - 1 - filter_x][channel][filter] : 0;
+								sum[in_channels - 1 - channel] += activation ? 
+									float(padded_pixel) * weights[filter_height - 1 - filter_y][filter_width - 1 - filter_x][in_channels - 1 - channel][num_filters - 1 - filter] : 0;
 							}
 						}
 					}
@@ -871,6 +991,127 @@ void conv2d_error_propagation (
 				input_error[out_y][out_x][channel] = sum[channel];
 		}
 	}
+}
+#pragma endregion
+/***********************************************************************************/
+/****************************** Gradient Calculation *******************************/
+/***********************************************************************************/
+#pragma region
+// https://www.youtube.com/watch?v=aeM-fmcdkXU
+template < uint num_inputs , uint num_kernels >
+void softmax_regression (
+	float inputs[num_inputs] , float output_error[num_kernels] ,
+	float weight_gradients[num_inputs][num_kernels] , float bias_gradients[num_kernels] )
+{
+	for ( uint i = 0 ; i < num_inputs ; i++ )
+		for ( uint kernel = 0 ; kernel < num_kernels ; kernel++ )
+			weight_gradients[i][kernel] = output_error[kernel] * inputs[i]; // -(yi - ai) * xi
+
+	for ( uint kernel = 0 ; kernel < num_kernels ; kernel++ )
+		bias_gradients[kernel] = output_error[kernel]; // -(yi - ai)
+}
+
+template < uint num_inputs , uint num_kernels >
+void dense_regression (
+	float inputs[num_inputs] , float output_error[num_kernels] , bool activations[num_kernels] ,
+	float weight_gradients[num_inputs][num_kernels] , float bias_gradients[num_kernels] )
+{
+	float kernel_error[num_kernels];
+	for ( uint kernel = 0 ; kernel < num_kernels ; kernel++ )
+		kernel_error[kernel] = activations[kernel] ? output_error[kernel] : 0.f;
+
+	for ( uint input = 0 ; input < num_inputs ; input++ )
+		for ( uint kernel = 0 ; kernel < num_kernels ; kernel++ )
+				weight_gradients[input][kernel] = kernel_error[kernel] * inputs[input];
+
+	for ( uint kernel = 0 ; kernel < num_kernels ; kernel++ )
+		bias_gradients[kernel] = kernel_error[kernel];
+}
+
+template < typename in_type ,
+	uint     in_height , uint     in_width , uint   in_channels ,
+	uint    out_height , uint    out_width , uint  out_channels ,
+	uint filter_height , uint filter_width , uint   num_filters >
+void conv2d_regression (
+	std::queue< window < in_type , filter_height , filter_width > >& input_window_stream ,
+	float output_error[out_height][out_width][out_channels] ,
+	bool activations[out_height][out_width][out_channels] ,
+	float weight_gradients[filter_height][filter_width][in_channels][num_filters] , float bias_gradients[num_filters] )
+{
+	/******* error per output ********/
+	float out_map_error[out_height][out_width][num_filters];
+
+	float bias_sum[num_filters];
+	for( uint filter = 0 ; filter < num_filters ; filter++ )
+		bias_sum[filter] = 0;
+
+	for( uint out_y = 0 ; out_y < out_height ; out_y++ )
+		for( uint out_x = 0 ; out_x < out_width ; out_x++ )
+			for( uint filter = 0 ; filter < num_filters ; filter++ )
+			{
+				out_map_error[out_y][out_x][filter] = activations[out_y][out_x][filter] ? output_error [out_y][out_x][filter] : 0.f;
+				bias_sum[filter] += out_map_error[out_y][out_x][filter];
+			}
+	
+	for( uint filter = 0 ; filter < num_filters ; filter++ )
+		bias_gradients[filter] = bias_sum[filter];
+
+	/******** 2-D Convolution  *******/
+	// input / output dimensions loops, in_x/y == out_x/y
+	for( uint in_y = 0 ; in_y < in_height ; in_y++ )
+	{
+		for( uint in_x = 0 ; in_x < in_width ; in_x++ )
+		{
+			// pop windows from queues, one per input channel
+			window < in_type , filter_height , filter_width > temp_windows[in_channels];
+			for ( uint channel = 0 ; channel < in_channels ; channel++ )
+			{
+				std::memcpy( &(temp_windows[channel]) , &(input_window_stream.front()) , sizeof( temp_windows[channel] ) );
+				input_window_stream.pop();
+			}
+			// one sum per filter. The outputs of a filter are indepentent of the outputs of the the other filters
+			float pixel_error[num_filters];
+			for( uint filter = 0 ; filter < num_filters ; filter++ )
+				pixel_error[filter] = out_map_error[in_y][in_x][filter];
+
+			// filter dimensions loops, filter_y/x == window_y/x
+			for( uint filter_y = 0 ; filter_y < filter_height ; filter_y++ )
+			{
+				for ( uint filter_x = 0 ; filter_x < filter_width ; filter_x++ )
+				{
+					// get neighboring pixel's coordinates
+					int y_offseted = static_cast<int>( in_y + filter_y - filter_height / 2 );
+					int x_offseted = static_cast<int>( in_x + filter_x - filter_width / 2 );
+
+					// channel dim loops
+					for ( uint channel = 0 ; channel < in_channels ; channel++ )
+					{
+						// pad with zeros if coordinates of neighboring pixelout of bounds
+						in_type padded_pixel;
+						if ( ( y_offseted < 0 ) || ( y_offseted >= int(in_height) ) || ( x_offseted < 0 ) || ( x_offseted >= int(in_width) ) )
+							padded_pixel = 0.f;
+						else
+							padded_pixel = temp_windows[channel].elements[filter_y][filter_x];
+
+						// num_filters == out_channels
+						for( uint filter = 0 ; filter < num_filters ; filter++ )
+							weight_gradients[filter_y][filter_x][channel][filter] += float(padded_pixel) * pixel_error[filter];
+					}
+				}
+			}
+		}
+	}
+}
+#pragma endregion
+/***********************************************************************************/
+/******************************** Variable Updating ********************************/
+/***********************************************************************************/
+#pragma region
+template < uint num_variables >
+void gradient_descend ( float variables[num_variables] , float gradients[num_variables] , float learning_rate )
+{
+	for ( uint i = 0 ; i < num_variables ; i++ )
+		variables[i] = variables[i] - learning_rate * gradients[i];
 }
 #pragma endregion
 /***********************************************************************************/

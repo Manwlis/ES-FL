@@ -76,6 +76,12 @@ diff ${flags} variable_gradients/l2_weights_tf.txt	variable_gradients/l2_weights
 echo ""
 diff ${flags} variable_gradients/l2_biases_tf.txt	variable_gradients/l2_biases_cpp.txt
 
+echo ""
+diff ${flags} variable_gradients/l0_weights_tf.txt	variable_gradients/l0_weights_cpp.txt
+
+echo ""
+diff ${flags} variable_gradients/l0_biases_tf.txt	variable_gradients/l0_biases_cpp.txt
+
 echo -e "\n~~~~~~~~~~~ Updated Variables ~~~~~~~~~~~~\n"
 diff ${flags} variables/l5_weights_tf.txt	variables/l5_weights_cpp.txt
 
@@ -87,6 +93,18 @@ diff ${flags} variables/l4_weights_tf.txt	variables/l4_weights_cpp.txt
 
 echo ""
 diff ${flags} variables/l4_biases_tf.txt	variables/l4_biases_cpp.txt
+
+echo ""
+diff ${flags} variables/l2_weights_tf.txt	variables/l2_weights_cpp.txt
+
+echo ""
+diff ${flags} variables/l2_biases_tf.txt	variables/l2_biases_cpp.txt
+
+echo ""
+diff ${flags} variables/l0_weights_tf.txt	variables/l0_weights_cpp.txt
+
+echo ""
+diff ${flags} variables/l0_biases_tf.txt	variables/l0_biases_cpp.txt
 
 # clean up temporary files
 rm -r temp
