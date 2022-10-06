@@ -1,4 +1,4 @@
-#include "cnn2.hpp"
+#include "cnn.hpp"
 
 int main ( int argc , char** argv )
 {

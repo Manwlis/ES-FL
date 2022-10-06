@@ -153,7 +153,7 @@ def save_output_gradients( output_gradients ):
 		file.write( '{:.4f}\n'.format( np_array[0][i] ) )
 	# layer 5 has no output gradients
 
-def save_variable_gradients( gradients ): # TODO: dims check, propably wrong
+def save_variable_gradients( gradients ):
 	###### Layer 0 weights ######
 	np_array = np.copy( gradients[0] )
 	file = open( "variable_gradients/l0_weights_tf.txt" , "w" )
@@ -210,7 +210,7 @@ def save_variable_gradients( gradients ): # TODO: dims check, propably wrong
 	for dim0 in range( 0 , 10 , 1 ):
 		file.write( '{:.4f}\n'.format( np_array[dim0] ) )
 	
-def save_trained_variables( variables ): # TODO: dims check, propably wrong
+def save_trained_variables( variables ):
 	###### Layer 0 weights ######
 	np_array = np.copy( variables[0] )
 	file = open( "variables/l0_weights_tf.txt" , "w" )

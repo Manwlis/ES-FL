@@ -17,7 +17,7 @@ mkdir --parents variables
 python3 cnn.py
 
 # Compile
-g++ -Wall -Wno-unknown-pragmas cnn2.cpp -o temp/cnn
+g++ -Wall -Wno-unknown-pragmas cnn.cpp -o temp/cnn
 
 # Execute
 ./temp/cnn
