@@ -1,0 +1,470 @@
+<profile>
+
+<section name = "Vitis HLS Report for 'conv2d_sum_1c_float_28u_28u_3u_3u_32u_s'" level="0">
+<item name = "Date">Tue Oct 18 21:15:51 2022
+</item>
+<item name = "Version">2022.1 (Build 3526262 on Mon Apr 18 15:47:01 MDT 2022)</item>
+<item name = "Project">forward_prop</item>
+<item name = "Solution">solution1 (Vitis Kernel Flow Target)</item>
+<item name = "Product family">virtexuplus</item>
+<item name = "Target device">xcvu5p-flva2104-1-e</item>
+</section>
+
+<section name = "Performance Estimates" level="0">
+<item name = "Timing">
+<section name = "" level="1">
+<item name = "Summary"><table name="" hasTotal="0">
+<keys size="4">Clock, Target, Estimated, Uncertainty</keys>
+<column name="ap_clk">10.00 ns, 7.624 ns, 2.70 ns</column>
+</table>
+</item>
+</section>
+</item>
+<item name = "Latency">
+<section name = "" level="1">
+<item name = "Summary"><table name="" hasTotal="0">
+<keys size="8">, min, max, min, max, min, max, Type</keys>
+<column name="">25276, 25276, 0.253 ms, 0.253 ms, 25276, 25276, no</column>
+</table>
+</item>
+<item name = "Detail">
+<section name = "" level="1">
+<item name = "Instance"><table name="" hasTotal="0">
+<keys size="9">Instance, Module, min, max, min, max, min, max, Type</keys>
+<column name="grp_conv2d_sum_1c_float_28u_28u_3u_3u_32u_Pipeline_inputs_fu_3496">conv2d_sum_1c_float_28u_28u_3u_3u_32u_Pipeline_inputs, 25131, 25131, 0.251 ms, 0.251 ms, 25131, 25131, no</column>
+</table>
+</item>
+<item name = "Loop"><table name="" hasTotal="0">
+<keys size="8">Loop Name, min, max, Latency, achieved, target, Count, Pipelined</keys>
+</table>
+</item>
+</section>
+</item>
+</section>
+</item>
+</section>
+
+<section name = "Utilization Estimates" level="0">
+<item name = "Summary"><table name="" hasTotal="1">
+<keys size="6">Name, BRAM_18K, DSP, FF, LUT, URAM</keys>
+<column name="DSP">-, -, -, -, -</column>
+<column name="Expression">-, -, 0, 2, -</column>
+<column name="FIFO">-, -, -, -, -</column>
+<column name="Instance">-, 45, 7146, 6030, -</column>
+<column name="Memory">-, -, -, -, -</column>
+<column name="Multiplexer">-, -, -, 2501, -</column>
+<column name="Register">-, -, 10389, -, -</column>
+<specialColumn name="Available SLR">1024, 1737, 600577, 300288, 235</specialColumn>
+<specialColumn name="Utilization SLR (%)">0, 2, 2, 2, 0</specialColumn>
+<specialColumn name="Available">2048, 3474, 1201154, 600577, 470</specialColumn>
+<specialColumn name="Utilization (%)">0, 1, 1, 1, 0</specialColumn>
+</table>
+</item>
+<item name = "Detail">
+<section name = "" level="1">
+<item name = "Instance"><table name="" hasTotal="1">
+<keys size="7">Instance, Module, BRAM_18K, DSP, FF, LUT, URAM</keys>
+<column name="grp_conv2d_sum_1c_float_28u_28u_3u_3u_32u_Pipeline_inputs_fu_3496">conv2d_sum_1c_float_28u_28u_3u_3u_32u_Pipeline_inputs, 0, 45, 7146, 6030, 0</column>
+</table>
+</item>
+<item name = "DSP"><table name="" hasTotal="0">
+<keys size="3">Instance, Module, Expression</keys>
+</table>
+</item>
+<item name = "Memory"><table name="" hasTotal="1">
+<keys size="10">Memory, Module, BRAM_18K, FF, LUT, URAM, Words, Bits, Banks, W*Bits*Banks</keys>
+</table>
+</item>
+<item name = "FIFO"><table name="" hasTotal="1">
+<keys size="8">Name, BRAM_18K, FF, LUT, URAM, Depth, Bits, Size:D*B</keys>
+</table>
+</item>
+<item name = "Expression"><table name="" hasTotal="1">
+<keys size="7">Variable Name, Operation, DSP, FF, LUT, Bitwidth P0, Bitwidth P1</keys>
+<column name="ap_block_state1">or, 0, 0, 2, 1, 1</column>
+</table>
+</item>
+<item name = "Multiplexer"><table name="" hasTotal="1">
+<keys size="5">Name, LUT, Input Size, Bits, Total Bits</keys>
+<column name="ap_NS_fsm">775, 147, 1, 147</column>
+<column name="ap_done">9, 2, 1, 2</column>
+<column name="biases_address0">81, 17, 5, 85</column>
+<column name="biases_address1">81, 17, 5, 85</column>
+<column name="conv2d_32_padded_window_stream_read">9, 2, 1, 2</column>
+<column name="kernel_sums136_write">9, 2, 1, 2</column>
+<column name="real_start">9, 2, 1, 2</column>
+<column name="weights_address0">764, 145, 9, 1305</column>
+<column name="weights_address1">764, 145, 9, 1305</column>
+</table>
+</item>
+<item name = "Register"><table name="" hasTotal="1">
+<keys size="5">Name, FF, LUT, Bits, Const Bits</keys>
+<column name="ap_CS_fsm">146, 0, 146, 0</column>
+<column name="ap_done_reg">1, 0, 1, 0</column>
+<column name="biases_load_10_reg_6628">32, 0, 32, 0</column>
+<column name="biases_load_11_reg_6633">32, 0, 32, 0</column>
+<column name="biases_load_12_reg_6668">32, 0, 32, 0</column>
+<column name="biases_load_13_reg_6673">32, 0, 32, 0</column>
+<column name="biases_load_14_reg_6708">32, 0, 32, 0</column>
+<column name="biases_load_15_reg_6713">32, 0, 32, 0</column>
+<column name="biases_load_16_reg_6748">32, 0, 32, 0</column>
+<column name="biases_load_17_reg_6753">32, 0, 32, 0</column>
+<column name="biases_load_18_reg_6788">32, 0, 32, 0</column>
+<column name="biases_load_19_reg_6793">32, 0, 32, 0</column>
+<column name="biases_load_1_reg_6433">32, 0, 32, 0</column>
+<column name="biases_load_20_reg_6828">32, 0, 32, 0</column>
+<column name="biases_load_21_reg_6833">32, 0, 32, 0</column>
+<column name="biases_load_22_reg_6868">32, 0, 32, 0</column>
+<column name="biases_load_23_reg_6873">32, 0, 32, 0</column>
+<column name="biases_load_24_reg_6908">32, 0, 32, 0</column>
+<column name="biases_load_25_reg_6913">32, 0, 32, 0</column>
+<column name="biases_load_26_reg_6948">32, 0, 32, 0</column>
+<column name="biases_load_27_reg_6953">32, 0, 32, 0</column>
+<column name="biases_load_28_reg_6988">32, 0, 32, 0</column>
+<column name="biases_load_29_reg_6993">32, 0, 32, 0</column>
+<column name="biases_load_2_reg_6468">32, 0, 32, 0</column>
+<column name="biases_load_30_reg_7008">32, 0, 32, 0</column>
+<column name="biases_load_31_reg_7013">32, 0, 32, 0</column>
+<column name="biases_load_3_reg_6473">32, 0, 32, 0</column>
+<column name="biases_load_4_reg_6508">32, 0, 32, 0</column>
+<column name="biases_load_5_reg_6513">32, 0, 32, 0</column>
+<column name="biases_load_6_reg_6548">32, 0, 32, 0</column>
+<column name="biases_load_7_reg_6553">32, 0, 32, 0</column>
+<column name="biases_load_8_reg_6588">32, 0, 32, 0</column>
+<column name="biases_load_9_reg_6593">32, 0, 32, 0</column>
+<column name="biases_load_reg_6428">32, 0, 32, 0</column>
+<column name="grp_conv2d_sum_1c_float_28u_28u_3u_3u_32u_Pipeline_inputs_fu_3496_ap_start_reg">1, 0, 1, 0</column>
+<column name="start_once_reg">1, 0, 1, 0</column>
+<column name="weights_load_18401_reg_3853">32, 0, 32, 0</column>
+<column name="weights_load_18402_reg_3868">32, 0, 32, 0</column>
+<column name="weights_load_18403_reg_3873">32, 0, 32, 0</column>
+<column name="weights_load_18404_reg_3888">32, 0, 32, 0</column>
+<column name="weights_load_18405_reg_3893">32, 0, 32, 0</column>
+<column name="weights_load_18406_reg_3908">32, 0, 32, 0</column>
+<column name="weights_load_18407_reg_3913">32, 0, 32, 0</column>
+<column name="weights_load_18408_reg_3928">32, 0, 32, 0</column>
+<column name="weights_load_18409_reg_3933">32, 0, 32, 0</column>
+<column name="weights_load_18410_reg_3948">32, 0, 32, 0</column>
+<column name="weights_load_18411_reg_3953">32, 0, 32, 0</column>
+<column name="weights_load_18412_reg_3968">32, 0, 32, 0</column>
+<column name="weights_load_18413_reg_3973">32, 0, 32, 0</column>
+<column name="weights_load_18414_reg_3988">32, 0, 32, 0</column>
+<column name="weights_load_18415_reg_3993">32, 0, 32, 0</column>
+<column name="weights_load_18416_reg_4008">32, 0, 32, 0</column>
+<column name="weights_load_18417_reg_4013">32, 0, 32, 0</column>
+<column name="weights_load_18418_reg_4028">32, 0, 32, 0</column>
+<column name="weights_load_18419_reg_4033">32, 0, 32, 0</column>
+<column name="weights_load_18420_reg_4048">32, 0, 32, 0</column>
+<column name="weights_load_18421_reg_4053">32, 0, 32, 0</column>
+<column name="weights_load_18422_reg_4068">32, 0, 32, 0</column>
+<column name="weights_load_18423_reg_4073">32, 0, 32, 0</column>
+<column name="weights_load_18424_reg_4088">32, 0, 32, 0</column>
+<column name="weights_load_18425_reg_4093">32, 0, 32, 0</column>
+<column name="weights_load_18426_reg_4108">32, 0, 32, 0</column>
+<column name="weights_load_18427_reg_4113">32, 0, 32, 0</column>
+<column name="weights_load_18428_reg_4128">32, 0, 32, 0</column>
+<column name="weights_load_18429_reg_4133">32, 0, 32, 0</column>
+<column name="weights_load_18430_reg_4148">32, 0, 32, 0</column>
+<column name="weights_load_18431_reg_4153">32, 0, 32, 0</column>
+<column name="weights_load_18432_reg_4168">32, 0, 32, 0</column>
+<column name="weights_load_18433_reg_4173">32, 0, 32, 0</column>
+<column name="weights_load_18434_reg_4188">32, 0, 32, 0</column>
+<column name="weights_load_18435_reg_4193">32, 0, 32, 0</column>
+<column name="weights_load_18436_reg_4208">32, 0, 32, 0</column>
+<column name="weights_load_18437_reg_4213">32, 0, 32, 0</column>
+<column name="weights_load_18438_reg_4228">32, 0, 32, 0</column>
+<column name="weights_load_18439_reg_4233">32, 0, 32, 0</column>
+<column name="weights_load_18440_reg_4248">32, 0, 32, 0</column>
+<column name="weights_load_18441_reg_4253">32, 0, 32, 0</column>
+<column name="weights_load_18442_reg_4268">32, 0, 32, 0</column>
+<column name="weights_load_18443_reg_4273">32, 0, 32, 0</column>
+<column name="weights_load_18444_reg_4288">32, 0, 32, 0</column>
+<column name="weights_load_18445_reg_4293">32, 0, 32, 0</column>
+<column name="weights_load_18446_reg_4308">32, 0, 32, 0</column>
+<column name="weights_load_18447_reg_4313">32, 0, 32, 0</column>
+<column name="weights_load_18448_reg_4328">32, 0, 32, 0</column>
+<column name="weights_load_18449_reg_4333">32, 0, 32, 0</column>
+<column name="weights_load_18450_reg_4348">32, 0, 32, 0</column>
+<column name="weights_load_18451_reg_4353">32, 0, 32, 0</column>
+<column name="weights_load_18452_reg_4368">32, 0, 32, 0</column>
+<column name="weights_load_18453_reg_4373">32, 0, 32, 0</column>
+<column name="weights_load_18454_reg_4388">32, 0, 32, 0</column>
+<column name="weights_load_18455_reg_4393">32, 0, 32, 0</column>
+<column name="weights_load_18456_reg_4408">32, 0, 32, 0</column>
+<column name="weights_load_18457_reg_4413">32, 0, 32, 0</column>
+<column name="weights_load_18458_reg_4428">32, 0, 32, 0</column>
+<column name="weights_load_18459_reg_4433">32, 0, 32, 0</column>
+<column name="weights_load_18460_reg_4448">32, 0, 32, 0</column>
+<column name="weights_load_18461_reg_4453">32, 0, 32, 0</column>
+<column name="weights_load_18462_reg_4468">32, 0, 32, 0</column>
+<column name="weights_load_18463_reg_4473">32, 0, 32, 0</column>
+<column name="weights_load_18464_reg_4488">32, 0, 32, 0</column>
+<column name="weights_load_18465_reg_4493">32, 0, 32, 0</column>
+<column name="weights_load_18466_reg_4508">32, 0, 32, 0</column>
+<column name="weights_load_18467_reg_4513">32, 0, 32, 0</column>
+<column name="weights_load_18468_reg_4528">32, 0, 32, 0</column>
+<column name="weights_load_18469_reg_4533">32, 0, 32, 0</column>
+<column name="weights_load_18470_reg_4548">32, 0, 32, 0</column>
+<column name="weights_load_18471_reg_4553">32, 0, 32, 0</column>
+<column name="weights_load_18472_reg_4568">32, 0, 32, 0</column>
+<column name="weights_load_18473_reg_4573">32, 0, 32, 0</column>
+<column name="weights_load_18474_reg_4588">32, 0, 32, 0</column>
+<column name="weights_load_18475_reg_4593">32, 0, 32, 0</column>
+<column name="weights_load_18476_reg_4608">32, 0, 32, 0</column>
+<column name="weights_load_18477_reg_4613">32, 0, 32, 0</column>
+<column name="weights_load_18478_reg_4628">32, 0, 32, 0</column>
+<column name="weights_load_18479_reg_4633">32, 0, 32, 0</column>
+<column name="weights_load_18480_reg_4648">32, 0, 32, 0</column>
+<column name="weights_load_18481_reg_4653">32, 0, 32, 0</column>
+<column name="weights_load_18482_reg_4668">32, 0, 32, 0</column>
+<column name="weights_load_18483_reg_4673">32, 0, 32, 0</column>
+<column name="weights_load_18484_reg_4688">32, 0, 32, 0</column>
+<column name="weights_load_18485_reg_4693">32, 0, 32, 0</column>
+<column name="weights_load_18486_reg_4708">32, 0, 32, 0</column>
+<column name="weights_load_18487_reg_4713">32, 0, 32, 0</column>
+<column name="weights_load_18488_reg_4728">32, 0, 32, 0</column>
+<column name="weights_load_18489_reg_4733">32, 0, 32, 0</column>
+<column name="weights_load_18490_reg_4748">32, 0, 32, 0</column>
+<column name="weights_load_18491_reg_4753">32, 0, 32, 0</column>
+<column name="weights_load_18492_reg_4768">32, 0, 32, 0</column>
+<column name="weights_load_18493_reg_4773">32, 0, 32, 0</column>
+<column name="weights_load_18494_reg_4788">32, 0, 32, 0</column>
+<column name="weights_load_18495_reg_4793">32, 0, 32, 0</column>
+<column name="weights_load_18496_reg_4808">32, 0, 32, 0</column>
+<column name="weights_load_18497_reg_4813">32, 0, 32, 0</column>
+<column name="weights_load_18498_reg_4828">32, 0, 32, 0</column>
+<column name="weights_load_18499_reg_4833">32, 0, 32, 0</column>
+<column name="weights_load_18500_reg_4848">32, 0, 32, 0</column>
+<column name="weights_load_18501_reg_4853">32, 0, 32, 0</column>
+<column name="weights_load_18502_reg_4868">32, 0, 32, 0</column>
+<column name="weights_load_18503_reg_4873">32, 0, 32, 0</column>
+<column name="weights_load_18504_reg_4888">32, 0, 32, 0</column>
+<column name="weights_load_18505_reg_4893">32, 0, 32, 0</column>
+<column name="weights_load_18506_reg_4908">32, 0, 32, 0</column>
+<column name="weights_load_18507_reg_4913">32, 0, 32, 0</column>
+<column name="weights_load_18508_reg_4928">32, 0, 32, 0</column>
+<column name="weights_load_18509_reg_4933">32, 0, 32, 0</column>
+<column name="weights_load_18510_reg_4948">32, 0, 32, 0</column>
+<column name="weights_load_18511_reg_4953">32, 0, 32, 0</column>
+<column name="weights_load_18512_reg_4968">32, 0, 32, 0</column>
+<column name="weights_load_18513_reg_4973">32, 0, 32, 0</column>
+<column name="weights_load_18514_reg_4988">32, 0, 32, 0</column>
+<column name="weights_load_18515_reg_4993">32, 0, 32, 0</column>
+<column name="weights_load_18516_reg_5008">32, 0, 32, 0</column>
+<column name="weights_load_18517_reg_5013">32, 0, 32, 0</column>
+<column name="weights_load_18518_reg_5028">32, 0, 32, 0</column>
+<column name="weights_load_18519_reg_5033">32, 0, 32, 0</column>
+<column name="weights_load_18520_reg_5048">32, 0, 32, 0</column>
+<column name="weights_load_18521_reg_5053">32, 0, 32, 0</column>
+<column name="weights_load_18522_reg_5068">32, 0, 32, 0</column>
+<column name="weights_load_18523_reg_5073">32, 0, 32, 0</column>
+<column name="weights_load_18524_reg_5088">32, 0, 32, 0</column>
+<column name="weights_load_18525_reg_5093">32, 0, 32, 0</column>
+<column name="weights_load_18526_reg_5108">32, 0, 32, 0</column>
+<column name="weights_load_18527_reg_5113">32, 0, 32, 0</column>
+<column name="weights_load_18528_reg_5128">32, 0, 32, 0</column>
+<column name="weights_load_18529_reg_5133">32, 0, 32, 0</column>
+<column name="weights_load_18530_reg_5148">32, 0, 32, 0</column>
+<column name="weights_load_18531_reg_5153">32, 0, 32, 0</column>
+<column name="weights_load_18532_reg_5168">32, 0, 32, 0</column>
+<column name="weights_load_18533_reg_5173">32, 0, 32, 0</column>
+<column name="weights_load_18534_reg_5188">32, 0, 32, 0</column>
+<column name="weights_load_18535_reg_5193">32, 0, 32, 0</column>
+<column name="weights_load_18536_reg_5208">32, 0, 32, 0</column>
+<column name="weights_load_18537_reg_5213">32, 0, 32, 0</column>
+<column name="weights_load_18538_reg_5228">32, 0, 32, 0</column>
+<column name="weights_load_18539_reg_5233">32, 0, 32, 0</column>
+<column name="weights_load_18540_reg_5248">32, 0, 32, 0</column>
+<column name="weights_load_18541_reg_5253">32, 0, 32, 0</column>
+<column name="weights_load_18542_reg_5268">32, 0, 32, 0</column>
+<column name="weights_load_18543_reg_5273">32, 0, 32, 0</column>
+<column name="weights_load_18544_reg_5288">32, 0, 32, 0</column>
+<column name="weights_load_18545_reg_5293">32, 0, 32, 0</column>
+<column name="weights_load_18546_reg_5308">32, 0, 32, 0</column>
+<column name="weights_load_18547_reg_5313">32, 0, 32, 0</column>
+<column name="weights_load_18548_reg_5328">32, 0, 32, 0</column>
+<column name="weights_load_18549_reg_5333">32, 0, 32, 0</column>
+<column name="weights_load_18550_reg_5348">32, 0, 32, 0</column>
+<column name="weights_load_18551_reg_5353">32, 0, 32, 0</column>
+<column name="weights_load_18552_reg_5368">32, 0, 32, 0</column>
+<column name="weights_load_18553_reg_5373">32, 0, 32, 0</column>
+<column name="weights_load_18554_reg_5388">32, 0, 32, 0</column>
+<column name="weights_load_18555_reg_5393">32, 0, 32, 0</column>
+<column name="weights_load_18556_reg_5408">32, 0, 32, 0</column>
+<column name="weights_load_18557_reg_5413">32, 0, 32, 0</column>
+<column name="weights_load_18558_reg_5428">32, 0, 32, 0</column>
+<column name="weights_load_18559_reg_5433">32, 0, 32, 0</column>
+<column name="weights_load_18560_reg_5448">32, 0, 32, 0</column>
+<column name="weights_load_18561_reg_5453">32, 0, 32, 0</column>
+<column name="weights_load_18562_reg_5468">32, 0, 32, 0</column>
+<column name="weights_load_18563_reg_5473">32, 0, 32, 0</column>
+<column name="weights_load_18564_reg_5488">32, 0, 32, 0</column>
+<column name="weights_load_18565_reg_5493">32, 0, 32, 0</column>
+<column name="weights_load_18566_reg_5508">32, 0, 32, 0</column>
+<column name="weights_load_18567_reg_5513">32, 0, 32, 0</column>
+<column name="weights_load_18568_reg_5528">32, 0, 32, 0</column>
+<column name="weights_load_18569_reg_5533">32, 0, 32, 0</column>
+<column name="weights_load_18570_reg_5548">32, 0, 32, 0</column>
+<column name="weights_load_18571_reg_5553">32, 0, 32, 0</column>
+<column name="weights_load_18572_reg_5568">32, 0, 32, 0</column>
+<column name="weights_load_18573_reg_5573">32, 0, 32, 0</column>
+<column name="weights_load_18574_reg_5588">32, 0, 32, 0</column>
+<column name="weights_load_18575_reg_5593">32, 0, 32, 0</column>
+<column name="weights_load_18576_reg_5608">32, 0, 32, 0</column>
+<column name="weights_load_18577_reg_5613">32, 0, 32, 0</column>
+<column name="weights_load_18578_reg_5628">32, 0, 32, 0</column>
+<column name="weights_load_18579_reg_5633">32, 0, 32, 0</column>
+<column name="weights_load_18580_reg_5648">32, 0, 32, 0</column>
+<column name="weights_load_18581_reg_5653">32, 0, 32, 0</column>
+<column name="weights_load_18582_reg_5668">32, 0, 32, 0</column>
+<column name="weights_load_18583_reg_5673">32, 0, 32, 0</column>
+<column name="weights_load_18584_reg_5688">32, 0, 32, 0</column>
+<column name="weights_load_18585_reg_5693">32, 0, 32, 0</column>
+<column name="weights_load_18586_reg_5708">32, 0, 32, 0</column>
+<column name="weights_load_18587_reg_5713">32, 0, 32, 0</column>
+<column name="weights_load_18588_reg_5728">32, 0, 32, 0</column>
+<column name="weights_load_18589_reg_5733">32, 0, 32, 0</column>
+<column name="weights_load_18590_reg_5748">32, 0, 32, 0</column>
+<column name="weights_load_18591_reg_5753">32, 0, 32, 0</column>
+<column name="weights_load_18592_reg_5768">32, 0, 32, 0</column>
+<column name="weights_load_18593_reg_5773">32, 0, 32, 0</column>
+<column name="weights_load_18594_reg_5788">32, 0, 32, 0</column>
+<column name="weights_load_18595_reg_5793">32, 0, 32, 0</column>
+<column name="weights_load_18596_reg_5808">32, 0, 32, 0</column>
+<column name="weights_load_18597_reg_5813">32, 0, 32, 0</column>
+<column name="weights_load_18598_reg_5828">32, 0, 32, 0</column>
+<column name="weights_load_18599_reg_5833">32, 0, 32, 0</column>
+<column name="weights_load_18600_reg_5848">32, 0, 32, 0</column>
+<column name="weights_load_18601_reg_5853">32, 0, 32, 0</column>
+<column name="weights_load_18602_reg_5868">32, 0, 32, 0</column>
+<column name="weights_load_18603_reg_5873">32, 0, 32, 0</column>
+<column name="weights_load_18604_reg_5888">32, 0, 32, 0</column>
+<column name="weights_load_18605_reg_5893">32, 0, 32, 0</column>
+<column name="weights_load_18606_reg_5908">32, 0, 32, 0</column>
+<column name="weights_load_18607_reg_5913">32, 0, 32, 0</column>
+<column name="weights_load_18608_reg_5928">32, 0, 32, 0</column>
+<column name="weights_load_18609_reg_5933">32, 0, 32, 0</column>
+<column name="weights_load_18610_reg_5948">32, 0, 32, 0</column>
+<column name="weights_load_18611_reg_5953">32, 0, 32, 0</column>
+<column name="weights_load_18612_reg_5968">32, 0, 32, 0</column>
+<column name="weights_load_18613_reg_5973">32, 0, 32, 0</column>
+<column name="weights_load_18614_reg_5988">32, 0, 32, 0</column>
+<column name="weights_load_18615_reg_5993">32, 0, 32, 0</column>
+<column name="weights_load_18616_reg_6008">32, 0, 32, 0</column>
+<column name="weights_load_18617_reg_6013">32, 0, 32, 0</column>
+<column name="weights_load_18618_reg_6028">32, 0, 32, 0</column>
+<column name="weights_load_18619_reg_6033">32, 0, 32, 0</column>
+<column name="weights_load_18620_reg_6048">32, 0, 32, 0</column>
+<column name="weights_load_18621_reg_6053">32, 0, 32, 0</column>
+<column name="weights_load_18622_reg_6068">32, 0, 32, 0</column>
+<column name="weights_load_18623_reg_6073">32, 0, 32, 0</column>
+<column name="weights_load_18624_reg_6088">32, 0, 32, 0</column>
+<column name="weights_load_18625_reg_6093">32, 0, 32, 0</column>
+<column name="weights_load_18626_reg_6108">32, 0, 32, 0</column>
+<column name="weights_load_18627_reg_6113">32, 0, 32, 0</column>
+<column name="weights_load_18628_reg_6128">32, 0, 32, 0</column>
+<column name="weights_load_18629_reg_6133">32, 0, 32, 0</column>
+<column name="weights_load_18630_reg_6148">32, 0, 32, 0</column>
+<column name="weights_load_18631_reg_6153">32, 0, 32, 0</column>
+<column name="weights_load_18632_reg_6168">32, 0, 32, 0</column>
+<column name="weights_load_18633_reg_6173">32, 0, 32, 0</column>
+<column name="weights_load_18634_reg_6188">32, 0, 32, 0</column>
+<column name="weights_load_18635_reg_6193">32, 0, 32, 0</column>
+<column name="weights_load_18636_reg_6208">32, 0, 32, 0</column>
+<column name="weights_load_18637_reg_6213">32, 0, 32, 0</column>
+<column name="weights_load_18638_reg_6228">32, 0, 32, 0</column>
+<column name="weights_load_18639_reg_6233">32, 0, 32, 0</column>
+<column name="weights_load_18640_reg_6248">32, 0, 32, 0</column>
+<column name="weights_load_18641_reg_6253">32, 0, 32, 0</column>
+<column name="weights_load_18642_reg_6268">32, 0, 32, 0</column>
+<column name="weights_load_18643_reg_6273">32, 0, 32, 0</column>
+<column name="weights_load_18644_reg_6288">32, 0, 32, 0</column>
+<column name="weights_load_18645_reg_6293">32, 0, 32, 0</column>
+<column name="weights_load_18646_reg_6308">32, 0, 32, 0</column>
+<column name="weights_load_18647_reg_6313">32, 0, 32, 0</column>
+<column name="weights_load_18648_reg_6328">32, 0, 32, 0</column>
+<column name="weights_load_18649_reg_6333">32, 0, 32, 0</column>
+<column name="weights_load_18650_reg_6348">32, 0, 32, 0</column>
+<column name="weights_load_18651_reg_6353">32, 0, 32, 0</column>
+<column name="weights_load_18652_reg_6368">32, 0, 32, 0</column>
+<column name="weights_load_18653_reg_6373">32, 0, 32, 0</column>
+<column name="weights_load_18654_reg_6398">32, 0, 32, 0</column>
+<column name="weights_load_18655_reg_6403">32, 0, 32, 0</column>
+<column name="weights_load_18656_reg_6438">32, 0, 32, 0</column>
+<column name="weights_load_18657_reg_6443">32, 0, 32, 0</column>
+<column name="weights_load_18658_reg_6478">32, 0, 32, 0</column>
+<column name="weights_load_18659_reg_6483">32, 0, 32, 0</column>
+<column name="weights_load_18660_reg_6518">32, 0, 32, 0</column>
+<column name="weights_load_18661_reg_6523">32, 0, 32, 0</column>
+<column name="weights_load_18662_reg_6558">32, 0, 32, 0</column>
+<column name="weights_load_18663_reg_6563">32, 0, 32, 0</column>
+<column name="weights_load_18664_reg_6598">32, 0, 32, 0</column>
+<column name="weights_load_18665_reg_6603">32, 0, 32, 0</column>
+<column name="weights_load_18666_reg_6638">32, 0, 32, 0</column>
+<column name="weights_load_18667_reg_6643">32, 0, 32, 0</column>
+<column name="weights_load_18668_reg_6678">32, 0, 32, 0</column>
+<column name="weights_load_18669_reg_6683">32, 0, 32, 0</column>
+<column name="weights_load_18670_reg_6718">32, 0, 32, 0</column>
+<column name="weights_load_18671_reg_6723">32, 0, 32, 0</column>
+<column name="weights_load_18672_reg_6758">32, 0, 32, 0</column>
+<column name="weights_load_18673_reg_6763">32, 0, 32, 0</column>
+<column name="weights_load_18674_reg_6798">32, 0, 32, 0</column>
+<column name="weights_load_18675_reg_6803">32, 0, 32, 0</column>
+<column name="weights_load_18676_reg_6838">32, 0, 32, 0</column>
+<column name="weights_load_18677_reg_6843">32, 0, 32, 0</column>
+<column name="weights_load_18678_reg_6878">32, 0, 32, 0</column>
+<column name="weights_load_18679_reg_6883">32, 0, 32, 0</column>
+<column name="weights_load_18680_reg_6918">32, 0, 32, 0</column>
+<column name="weights_load_18681_reg_6923">32, 0, 32, 0</column>
+<column name="weights_load_18682_reg_6958">32, 0, 32, 0</column>
+<column name="weights_load_18683_reg_6963">32, 0, 32, 0</column>
+<column name="weights_load_18684_reg_6998">32, 0, 32, 0</column>
+<column name="weights_load_18685_reg_7003">32, 0, 32, 0</column>
+<column name="weights_load_18686_reg_7018">32, 0, 32, 0</column>
+<column name="weights_load_18687_reg_7023">32, 0, 32, 0</column>
+<column name="weights_load_reg_3848">32, 0, 32, 0</column>
+</table>
+</item>
+</section>
+</item>
+</section>
+
+<section name = "Interface" level="0">
+<item name = "Summary"><table name="" hasTotal="0">
+<keys size="6">RTL Ports, Dir, Bits, Protocol, Source Object, C Type</keys>
+<column name="ap_clk">in, 1, ap_ctrl_hs, conv2d_sum_1c&lt;float, 28u, 28u, 3u, 3u, 32u&gt;, return value</column>
+<column name="ap_rst">in, 1, ap_ctrl_hs, conv2d_sum_1c&lt;float, 28u, 28u, 3u, 3u, 32u&gt;, return value</column>
+<column name="ap_start">in, 1, ap_ctrl_hs, conv2d_sum_1c&lt;float, 28u, 28u, 3u, 3u, 32u&gt;, return value</column>
+<column name="start_full_n">in, 1, ap_ctrl_hs, conv2d_sum_1c&lt;float, 28u, 28u, 3u, 3u, 32u&gt;, return value</column>
+<column name="ap_done">out, 1, ap_ctrl_hs, conv2d_sum_1c&lt;float, 28u, 28u, 3u, 3u, 32u&gt;, return value</column>
+<column name="ap_continue">in, 1, ap_ctrl_hs, conv2d_sum_1c&lt;float, 28u, 28u, 3u, 3u, 32u&gt;, return value</column>
+<column name="ap_idle">out, 1, ap_ctrl_hs, conv2d_sum_1c&lt;float, 28u, 28u, 3u, 3u, 32u&gt;, return value</column>
+<column name="ap_ready">out, 1, ap_ctrl_hs, conv2d_sum_1c&lt;float, 28u, 28u, 3u, 3u, 32u&gt;, return value</column>
+<column name="start_out">out, 1, ap_ctrl_hs, conv2d_sum_1c&lt;float, 28u, 28u, 3u, 3u, 32u&gt;, return value</column>
+<column name="start_write">out, 1, ap_ctrl_hs, conv2d_sum_1c&lt;float, 28u, 28u, 3u, 3u, 32u&gt;, return value</column>
+<column name="conv2d_32_padded_window_stream_dout">in, 288, ap_fifo, conv2d_32_padded_window_stream, pointer</column>
+<column name="conv2d_32_padded_window_stream_num_data_valid">in, 3, ap_fifo, conv2d_32_padded_window_stream, pointer</column>
+<column name="conv2d_32_padded_window_stream_fifo_cap">in, 3, ap_fifo, conv2d_32_padded_window_stream, pointer</column>
+<column name="conv2d_32_padded_window_stream_empty_n">in, 1, ap_fifo, conv2d_32_padded_window_stream, pointer</column>
+<column name="conv2d_32_padded_window_stream_read">out, 1, ap_fifo, conv2d_32_padded_window_stream, pointer</column>
+<column name="weights_address0">out, 9, ap_memory, weights, array</column>
+<column name="weights_ce0">out, 1, ap_memory, weights, array</column>
+<column name="weights_q0">in, 32, ap_memory, weights, array</column>
+<column name="weights_address1">out, 9, ap_memory, weights, array</column>
+<column name="weights_ce1">out, 1, ap_memory, weights, array</column>
+<column name="weights_q1">in, 32, ap_memory, weights, array</column>
+<column name="biases_address0">out, 5, ap_memory, biases, array</column>
+<column name="biases_ce0">out, 1, ap_memory, biases, array</column>
+<column name="biases_q0">in, 32, ap_memory, biases, array</column>
+<column name="biases_address1">out, 5, ap_memory, biases, array</column>
+<column name="biases_ce1">out, 1, ap_memory, biases, array</column>
+<column name="biases_q1">in, 32, ap_memory, biases, array</column>
+<column name="kernel_sums136_din">out, 32, ap_fifo, kernel_sums136, pointer</column>
+<column name="kernel_sums136_num_data_valid">in, 3, ap_fifo, kernel_sums136, pointer</column>
+<column name="kernel_sums136_fifo_cap">in, 3, ap_fifo, kernel_sums136, pointer</column>
+<column name="kernel_sums136_full_n">in, 1, ap_fifo, kernel_sums136, pointer</column>
+<column name="kernel_sums136_write">out, 1, ap_fifo, kernel_sums136, pointer</column>
+</table>
+</item>
+</section>
+</profile>

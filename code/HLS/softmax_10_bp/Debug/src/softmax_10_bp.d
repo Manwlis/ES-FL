@@ -1,0 +1,177 @@
+src/softmax_10_bp.o: ../src/softmax_10_bp.cpp ../src/softmax_10_bp.hpp \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_stream.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_stream_thread_unsafe.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/ap_axi_sdata.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/ap_int.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/ap_common.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/ap_decl.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/etc/ap_private.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_half.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_half_fpo.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_fpo.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/floating_point_v7_0_bitacc_cmodel.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/gmp.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/mpfr.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/gmp.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/mpfr.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/ap_decl.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_half_x_utils.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/ap_int_base.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/ap_int_ref.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/ap_int_special.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/ap_fixed.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/ap_fixed_base.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/ap_int.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/ap_fixed_ref.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/ap_fixed_special.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_math.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_half.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_hotbm_apfixed.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/ap_fixed.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/utils/x_hls_defines.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/utils/hls_version.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/utils/x_hls_utils.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_cordic_apfixed.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_exp_apfixed.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_log_apfixed.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_sqrt_apfixed.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_round_copysign_apfixed.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_pow_apfixed.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_diff_apfixed.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_comparison_apfixed.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_frexp_apfixed.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_modf_apfixed.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_isequal_isnotequal_apfixed.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_all_any_apfixed.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_select_bitselect_apfixed.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_erf_apfixed.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_fmod_rem_quo_remainder_divide_apfixed.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_lgamma_apfixed.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/utils/x_hls_traits.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_x_complex.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/utils/x_hls_utils.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/utils/x_hls_defines.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_tgamma_apfixed.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_fract_apfixed.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_mad_apfixed.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_cbrt_apfixed.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_hypot_apfixed.h \
+ /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_ldexp_apfixed.h
+
+../src/softmax_10_bp.hpp:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_stream.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_stream_thread_unsafe.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/ap_axi_sdata.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/ap_int.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/ap_common.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/ap_decl.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/etc/ap_private.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_half.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_half_fpo.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_fpo.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/floating_point_v7_0_bitacc_cmodel.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/gmp.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/mpfr.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/gmp.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/mpfr.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/ap_decl.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_half_x_utils.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/ap_int_base.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/ap_int_ref.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/ap_int_special.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/ap_fixed.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/ap_fixed_base.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/ap_int.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/ap_fixed_ref.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/ap_fixed_special.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_math.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_half.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_hotbm_apfixed.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/ap_fixed.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/utils/x_hls_defines.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/utils/hls_version.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/utils/x_hls_utils.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_cordic_apfixed.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_exp_apfixed.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_log_apfixed.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_sqrt_apfixed.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_round_copysign_apfixed.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_pow_apfixed.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_diff_apfixed.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_comparison_apfixed.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_frexp_apfixed.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_modf_apfixed.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_isequal_isnotequal_apfixed.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_all_any_apfixed.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_select_bitselect_apfixed.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_erf_apfixed.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_fmod_rem_quo_remainder_divide_apfixed.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_lgamma_apfixed.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/utils/x_hls_traits.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_x_complex.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/utils/x_hls_utils.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/utils/x_hls_defines.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_tgamma_apfixed.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_fract_apfixed.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_mad_apfixed.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_cbrt_apfixed.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_hypot_apfixed.h:
+
+/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/include/hls_ldexp_apfixed.h:

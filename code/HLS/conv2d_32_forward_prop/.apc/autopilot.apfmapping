@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<autopilotfilemapping:AutoPilotFileMapping xmlns:autopilotfilemapping="www.autoesl.com/autopilotfilemapping">
+  <source>
+    <originFiles name="conv_2d_fwp.hpp" path="/home/msi/ES-FL/code/HLS/conv2d_32_forward_prop/src/conv_2d_fwp.hpp"/>
+    <originFiles name="conv_2d_fwp.cpp" path="/home/msi/ES-FL/code/HLS/conv2d_32_forward_prop/src/conv_2d_fwp.cpp"/>
+  </source>
+  <testbench>
+    <originFiles name="temp" path="/home/msi/ES-FL/code/HLS/conv2d_32_forward_prop/src/temp"/>
+    <originFiles name="testbench.cpp" path="/home/msi/ES-FL/code/HLS/conv2d_32_forward_prop/src/testbench.cpp"/>
+  </testbench>
+</autopilotfilemapping:AutoPilotFileMapping>

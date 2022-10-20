@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vivadoHLSLog:LogRoot xmlns:vivadoHLSLog="www.xilinx.com/vivadoHLSLog">
+  <errorLogs>
+    <logs>
+      <synLog/>
+    </logs>
+  </errorLogs>
+  <warningLogs>
+    <logs>
+      <synLog>
+        <logs message="WARNING: [RTGEN 206-101] Setting dangling out port 'read_mem_wrapper_Pipeline_write_in_stream33/m_axi_gmem_ARUSER' to 0." projectName="conv2d_64_forward_prop" solutionName="solution1" date="2022-10-20T17:13:45.703+0300" type="Warning"/>
+        <logs message="WARNING: [RTGEN 206-101] Setting dangling out port 'read_mem_wrapper_Pipeline_write_in_stream33/m_axi_gmem_ARREGION' to 0." projectName="conv2d_64_forward_prop" solutionName="solution1" date="2022-10-20T17:13:45.685+0300" type="Warning"/>
+      </synLog>
+    </logs>
+  </warningLogs>
+</vivadoHLSLog:LogRoot>

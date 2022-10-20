@@ -1,0 +1,50 @@
+<profile>
+
+<section name = "Vitis HLS Report for 'accel'" level="0">
+<item name = "Date">Thu Oct 20 03:40:34 2022
+</item>
+<item name = "Version">2022.1 (Build 3526262 on Mon Apr 18 15:47:01 MDT 2022)</item>
+<item name = "Project">softmax_10_bp</item>
+<item name = "Solution">solution1 (Vitis Kernel Flow Target)</item>
+<item name = "Product family">zynquplus</item>
+<item name = "Target device">xczu9eg-ffvb1156-2-e</item>
+</section>
+
+<section name = "Performance Estimates" level="0">
+<item name = "Timing">
+<section name = "" level="1">
+<item name = "Summary"><table name="" hasTotal="0">
+<keys size="4">Clock, Target, Estimated, Uncertainty</keys>
+<column name="ap_clk">10.00 ns, 7.300 ns, 2.70 ns</column>
+</table>
+</item>
+</section>
+</item>
+<item name = "Latency">
+<section name = "" level="1">
+<item name = "Summary"><table name="" hasTotal="0">
+<keys size="8">, min, max, min, max, min, max, Type</keys>
+<column name="">1668, 1668, 16.680 us, 16.680 us, 1440, 1440, dataflow</column>
+</table>
+</item>
+<item name = "Detail">
+<section name = "" level="1">
+<item name = "Instance"><table name="" hasTotal="0">
+<keys size="9">Instance, Module, min, max, min, max, min, max, Type</keys>
+<column name="grp_save_variables_locally_10u_128u_s_fu_148">save_variables_locally_10u_128u_s, 1439, 1439, 14.390 us, 14.390 us, 1439, 1439, no</column>
+<column name="call_ln57_entry_proc_fu_161">entry_proc, 0, 0, 0 ns, 0 ns, 0, 0, no</column>
+<column name="grp_sparce_categorical_cross_entropy_10u_s_fu_171">sparce_categorical_cross_entropy_10u_s, 21, 21, 0.210 us, 0.210 us, 21, 21, no</column>
+<column name="grp_softmax_error_propagation_10u_128u_s_fu_178">softmax_error_propagation_10u_128u_s, 170, 170, 1.700 us, 1.700 us, 170, 170, no</column>
+<column name="grp_write_mem_float_128u_s_fu_185">write_mem_float_128u_s, 202, 202, 2.020 us, 2.020 us, 202, 202, no</column>
+</table>
+</item>
+<item name = "Loop"><table name="" hasTotal="0">
+<keys size="8">Loop Name, min, max, Latency, achieved, target, Count, Pipelined</keys>
+</table>
+</item>
+</section>
+</item>
+</section>
+</item>
+</section>
+</profile>

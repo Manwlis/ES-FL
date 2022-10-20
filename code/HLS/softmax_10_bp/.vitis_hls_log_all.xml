@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vivadoHLSLog:LogRoot xmlns:vivadoHLSLog="www.xilinx.com/vivadoHLSLog">
+  <errorLogs>
+    <logs>
+      <synLog/>
+      <simLog/>
+      <mgLog/>
+      <packageLog/>
+      <csimLog/>
+    </logs>
+  </errorLogs>
+  <warningLogs>
+    <logs>
+      <synLog>
+        <logs message="WARNING: [RTGEN 206-101] RTL data type mismatch (logic vs. lv) for signal 'softmax_weights_t_we0'." projectName="softmax_10_bp" solutionName="solution1" date="2022-10-20T03:40:36.544+0300" type="Warning"/>
+        <logs message="WARNING: [RTGEN 206-101] RTL data type mismatch (logic vs. lv) for signal 'softmax_weights_i_we0'." projectName="softmax_10_bp" solutionName="solution1" date="2022-10-20T03:40:36.539+0300" type="Warning"/>
+        <logs message="WARNING: [RTGEN 206-101] Design contains AXI ports. Reset is fixed to synchronous and active low." projectName="softmax_10_bp" solutionName="solution1" date="2022-10-20T03:40:36.510+0300" type="Warning"/>
+        <logs message="WARNING: [RTGEN 206-101] Setting dangling out port 'write_mem_float_128u_Pipeline_write_out_mem/m_axi_gmem_BREADY' to 0." projectName="softmax_10_bp" solutionName="solution1" date="2022-10-20T03:40:36.256+0300" type="Warning"/>
+        <logs message="WARNING: [RTGEN 206-101] Setting dangling out port 'write_mem_float_128u_Pipeline_write_out_mem/m_axi_gmem_AWUSER' to 0." projectName="softmax_10_bp" solutionName="solution1" date="2022-10-20T03:40:36.231+0300" type="Warning"/>
+        <logs message="WARNING: [RTGEN 206-101] Setting dangling out port 'write_mem_float_128u_Pipeline_write_out_mem/m_axi_gmem_AWREGION' to 0." projectName="softmax_10_bp" solutionName="solution1" date="2022-10-20T03:40:36.227+0300" type="Warning"/>
+        <logs message="WARNING: [RTGEN 206-101] Setting dangling out port 'write_mem_float_128u_Pipeline_write_out_mem/m_axi_gmem_AWQOS' to 0." projectName="softmax_10_bp" solutionName="solution1" date="2022-10-20T03:40:36.223+0300" type="Warning"/>
+        <logs message="WARNING: [RTGEN 206-101] Setting dangling out port 'write_mem_float_128u_Pipeline_write_out_mem/m_axi_gmem_AWPROT' to 0." projectName="softmax_10_bp" solutionName="solution1" date="2022-10-20T03:40:36.217+0300" type="Warning"/>
+        <logs message="WARNING: [RTGEN 206-101] Setting dangling out port 'write_mem_float_128u_Pipeline_write_out_mem/m_axi_gmem_AWCACHE' to 0." projectName="softmax_10_bp" solutionName="solution1" date="2022-10-20T03:40:36.214+0300" type="Warning"/>
+        <logs message="WARNING: [RTGEN 206-101] Setting dangling out port 'write_mem_float_128u_Pipeline_write_out_mem/m_axi_gmem_AWLOCK' to 0." projectName="softmax_10_bp" solutionName="solution1" date="2022-10-20T03:40:36.212+0300" type="Warning"/>
+        <logs message="WARNING: [RTGEN 206-101] Setting dangling out port 'write_mem_float_128u_Pipeline_write_out_mem/m_axi_gmem_AWBURST' to 0." projectName="softmax_10_bp" solutionName="solution1" date="2022-10-20T03:40:36.208+0300" type="Warning"/>
+        <logs message="WARNING: [RTGEN 206-101] Setting dangling out port 'write_mem_float_128u_Pipeline_write_out_mem/m_axi_gmem_AWSIZE' to 0." projectName="softmax_10_bp" solutionName="solution1" date="2022-10-20T03:40:36.205+0300" type="Warning"/>
+        <logs message="WARNING: [RTGEN 206-101] Setting dangling out port 'write_mem_float_128u_Pipeline_write_out_mem/m_axi_gmem_AWLEN' to 0." projectName="softmax_10_bp" solutionName="solution1" date="2022-10-20T03:40:36.201+0300" type="Warning"/>
+        <logs message="WARNING: [RTGEN 206-101] Setting dangling out port 'write_mem_float_128u_Pipeline_write_out_mem/m_axi_gmem_AWID' to 0." projectName="softmax_10_bp" solutionName="solution1" date="2022-10-20T03:40:36.196+0300" type="Warning"/>
+        <logs message="WARNING: [RTGEN 206-101] Setting dangling out port 'write_mem_float_128u_Pipeline_write_out_mem/m_axi_gmem_AWADDR' to 0." projectName="softmax_10_bp" solutionName="solution1" date="2022-10-20T03:40:36.193+0300" type="Warning"/>
+        <logs message="WARNING: [RTGEN 206-101] Setting dangling out port 'write_mem_float_128u_Pipeline_write_out_mem/m_axi_gmem_AWVALID' to 0." projectName="softmax_10_bp" solutionName="solution1" date="2022-10-20T03:40:36.192+0300" type="Warning"/>
+        <logs message="WARNING: [HLS 200-1019] Consider increasing the depth of PIPO softmax_weights (from save_variables_locally_10u_128u_U0 to softmax_error_propagation_10u_128u_U0) to 3 to improve performance and/or avoid deadlocks." projectName="softmax_10_bp" solutionName="solution1" date="2022-10-20T03:40:33.996+0300" type="Warning"/>
+        <logs message="WARNING: [SYN 201-103] Legalizing function name 'write_mem&lt;float, 128u>' to 'write_mem_float_128u_s'." projectName="softmax_10_bp" solutionName="solution1" date="2022-10-20T03:40:30.722+0300" type="Warning"/>
+        <logs message="WARNING: [SYN 201-103] Legalizing function name 'write_mem&lt;float, 128u>_Pipeline_write_out_mem' to 'write_mem_float_128u_Pipeline_write_out_mem'." projectName="softmax_10_bp" solutionName="solution1" date="2022-10-20T03:40:30.711+0300" type="Warning"/>
+        <logs message="WARNING: [SYN 201-103] Legalizing function name 'softmax_error_propagation&lt;10u, 128u>' to 'softmax_error_propagation_10u_128u_s'." projectName="softmax_10_bp" solutionName="solution1" date="2022-10-20T03:40:30.708+0300" type="Warning"/>
+        <logs message="WARNING: [SYN 201-103] Legalizing function name 'softmax_error_propagation&lt;10u, 128u>_Pipeline_input' to 'softmax_error_propagation_10u_128u_Pipeline_input'." projectName="softmax_10_bp" solutionName="solution1" date="2022-10-20T03:40:30.706+0300" type="Warning"/>
+        <logs message="WARNING: [SYN 201-103] Legalizing function name 'softmax_error_propagation&lt;10u, 128u>_Pipeline_store_output_error' to 'softmax_error_propagation_10u_128u_Pipeline_store_output_error'." projectName="softmax_10_bp" solutionName="solution1" date="2022-10-20T03:40:30.702+0300" type="Warning"/>
+        <logs message="WARNING: [SYN 201-103] Legalizing function name 'sparce_categorical_cross_entropy&lt;10u>' to 'sparce_categorical_cross_entropy_10u_s'." projectName="softmax_10_bp" solutionName="solution1" date="2022-10-20T03:40:30.700+0300" type="Warning"/>
+        <logs message="WARNING: [SYN 201-103] Legalizing function name 'sparce_categorical_cross_entropy&lt;10u>_Pipeline_output_error' to 'sparce_categorical_cross_entropy_10u_Pipeline_output_error'." projectName="softmax_10_bp" solutionName="solution1" date="2022-10-20T03:40:30.698+0300" type="Warning"/>
+        <logs message="WARNING: [SYN 201-103] Legalizing function name 'save_variables_locally&lt;10u, 128u>' to 'save_variables_locally_10u_128u_s'." projectName="softmax_10_bp" solutionName="solution1" date="2022-10-20T03:40:30.696+0300" type="Warning"/>
+        <logs message="WARNING: [SYN 201-103] Legalizing function name 'save_variables_locally&lt;10u, 128u>_Pipeline_stream_input' to 'save_variables_locally_10u_128u_Pipeline_stream_input'." projectName="softmax_10_bp" solutionName="solution1" date="2022-10-20T03:40:30.693+0300" type="Warning"/>
+        <logs message="WARNING: [SYN 201-103] Legalizing function name 'save_variables_locally&lt;10u, 128u>_Pipeline_save_weights_L' to 'save_variables_locally_10u_128u_Pipeline_save_weights_L'." projectName="softmax_10_bp" solutionName="solution1" date="2022-10-20T03:40:30.690+0300" type="Warning"/>
+        <logs message="WARNING: [SYNCHK 200-23] softmax_10_bp/src/softmax_10_bp.cpp:5: in function 'save_variables_locally&lt;10, 128>': variable-indexed range selection may cause suboptimal QoR." projectName="softmax_10_bp" solutionName="solution1" date="2022-10-20T03:40:30.344+0300" type="Warning"/>
+      </synLog>
+      <simLog>
+        <logs message="WARNING: [XSIM 43-3431] One or more environment variables have been detected which affect the operation of the C compiler. These are typically not set in standard installations and are not tested by Xilinx, however they may be appropriate for your system, so the flow will attempt to continue.  If errors occur, try running xelab with the &quot;-mt off -v 1&quot; switches to see more information from the C compiler. The following environment variables have been detected:&#xA;    LIBRARY_PATH" projectName="softmax_10_bp" solutionName="solution1" date="2022-10-20T03:41:36.387+0300" type="Warning"/>
+        <logs message="WARNING: [IP_Flow 19-4832] The IP name 'accel_uitofp_32ns_32_4_no_dsp_1_ip' you have specified is long. The Windows operating system has path length limitations. It is recommended you use shorter names to reduce the likelihood of issues." projectName="softmax_10_bp" solutionName="solution1" date="2022-10-20T03:41:31.608+0300" type="Warning"/>
+        <logs message="WARNING: [IP_Flow 19-4832] The IP name 'accel_fadd_32ns_32ns_32_4_full_dsp_1_ip' you have specified is long. The Windows operating system has path length limitations. It is recommended you use shorter names to reduce the likelihood of issues." projectName="softmax_10_bp" solutionName="solution1" date="2022-10-20T03:41:31.071+0300" type="Warning"/>
+        <logs message="WARNING: [IP_Flow 19-4832] The IP name 'accel_fmul_32ns_32ns_32_3_max_dsp_1_ip' you have specified is long. The Windows operating system has path length limitations. It is recommended you use shorter names to reduce the likelihood of issues." projectName="softmax_10_bp" solutionName="solution1" date="2022-10-20T03:41:30.604+0300" type="Warning"/>
+        <logs message="WARNING: [IP_Flow 19-4832] The IP name 'accel_fsub_32ns_32ns_32_4_full_dsp_1_ip' you have specified is long. The Windows operating system has path length limitations. It is recommended you use shorter names to reduce the likelihood of issues." projectName="softmax_10_bp" solutionName="solution1" date="2022-10-20T03:41:30.038+0300" type="Warning"/>
+      </simLog>
+      <mgLog/>
+      <packageLog/>
+      <csimLog/>
+    </logs>
+  </warningLogs>
+</vivadoHLSLog:LogRoot>

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cdfg:DBCdfg xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cdfg="http://www.autoesl.com/DBCdfg" timeStamp="1666226435387">
+  <ports id="1" name="softmax_f_map_stream14" type="PortType" coreId="0" bitwidth="32" iftype="IfTypeRom">
+    <dataOutputObjs>call</dataOutputObjs>
+  </ports>
+  <ports id="2" name="label_r" type="PortType" coreName="FIFO_SRL" coreId="3619222469" bitwidth="32" iftype="IfTypeRom">
+    <dataOutputObjs>read</dataOutputObjs>
+  </ports>
+  <ports id="3" name="softmax_output_error_stream15" type="PortType" coreId="2147483647" bitwidth="32" direction="DirOut" iftype="IfTypeRom">
+    <dataInputObjs>call</dataInputObjs>
+  </ports>
+  <edges id="14" source_obj="//@ports.1" sink_obj="//@blocks.0/@node_objs.0"/>
+  <edges id="19" source_obj="//@ports.0" sink_obj="//@blocks.0/@node_objs.2"/>
+  <edges id="20" source_obj="//@blocks.0/@node_objs.0" sink_obj="//@blocks.0/@node_objs.2"/>
+  <edges id="21" source_obj="//@blocks.0/@node_objs.2" sink_obj="//@ports.2"/>
+  <edges id="89" edge_type="VirtEdge" source_obj="//@blocks.0/@node_objs.0" sink_obj="//@blocks.0/@node_objs.1"/>
+  <edges id="90" edge_type="VirtEdge" source_obj="//@blocks.0/@node_objs.1" sink_obj="//@blocks.0/@node_objs.2"/>
+  <blocks id="11" name="sparce_categorical_cross_entropy&lt;10u>" type="BlockType">
+    <node_objs xsi:type="cdfg:CdfgNode" id="5" name="label_read" coreName="FIFO_SRL" implIndex="srl" control="no" opType="fifo" coreId="81" bitwidth="32" opcode="read" m_display="0" m_delay="1.83" m_topoIndex="1" m_clusterGroupNumber="-1">
+      <dataInputObjs>label_r</dataInputObjs>
+      <dataOutputObjs>call</dataOutputObjs>
+    </node_objs>
+    <node_objs xsi:type="cdfg:CdfgNode" id="8" name="empty" coreId="731243882" bitwidth="32" opcode="wait" nodeLabel="1.0" m_display="0" m_topoIndex="2" m_clusterGroupNumber="-1"/>
+    <node_objs xsi:type="cdfg:CdfgNode" id="9" name="_ln0" rtlName="grp_sparce_categorical_cross_entropy_10u_Pipeline_output_error_fu_38" coreId="731640122" opcode="call" nodeLabel="1.0" nodeLatency="1" m_display="0" m_delay="6.18" m_topoIndex="3" m_clusterGroupNumber="-1">
+      <dataInputObjs>softmax_f_map_stream14</dataInputObjs>
+      <dataInputObjs>read</dataInputObjs>
+      <dataOutputObjs>softmax_output_error_stream15</dataOutputObjs>
+      <constName>sparce_categorical_cross_entropy_10u_Pipeline_output_error</constName>
+    </node_objs>
+    <node_objs xsi:type="cdfg:CdfgNode" id="10" name="_ln27" lineNumber="27" fileName="softmax_10_bp/src/softmax_10_bp.cpp" fileDirectory=".." coreId="3619122528" contextFuncName="sparce_categorical_cross_entropy_10_s" opcode="ret" nodeLabel="2.0" m_display="0" m_topoIndex="4" m_clusterGroupNumber="-1">
+      <inlineStackInfo fileName="softmax_10_bp/src/softmax_10_bp.cpp" linenumber="27" fileDirectory="/home/msi/ES-FL/code/HLS" functionName="sparce_categorical_cross_entropy&amp;lt;10&amp;gt;"/>
+    </node_objs>
+    <fileValidLineNumbers fileName="softmax_10_bp/src/softmax_10_bp.cpp">
+      <validLinenumbers>27</validLinenumbers>
+    </fileValidLineNumbers>
+  </blocks>
+  <ScheduleInfo time="0"/>
+  <ScheduleInfo time="1"/>
+  <ScheduleInfo time="2"/>
+  <regnodes realName="label_read_reg_47">
+    <nodeIds>5</nodeIds>
+  </regnodes>
+  <moduleNodes realName="grp_sparce_categorical_cross_entropy_10u_Pipeline_output_error_fu_38">
+    <nodeIds>9</nodeIds>
+  </moduleNodes>
+  <ioNodes realName="label_read_read_fu_32">
+    <nodeIds>5</nodeIds>
+  </ioNodes>
+  <ioPorts name="label_r">
+    <contents name="read">
+      <nodeIds>5</nodeIds>
+    </contents>
+  </ioPorts>
+  <ioPorts name="softmax_f_map_stream14">
+    <contents name="call">
+      <nodeIds>9</nodeIds>
+    </contents>
+  </ioPorts>
+  <ioPorts name="softmax_output_error_stream15">
+    <contents name="call">
+      <nodeIds>9</nodeIds>
+    </contents>
+  </ioPorts>
+  <fsm>
+    <states id="1">
+      <operations id="5" stage="1" latency="1"/>
+    </states>
+    <states id="2">
+      <operations id="8" stage="1" latency="1"/>
+      <operations id="9" stage="2" latency="2"/>
+    </states>
+    <states id="3">
+      <operations id="4" stage="1" latency="1"/>
+      <operations id="6" stage="1" latency="1"/>
+      <operations id="7" stage="1" latency="1"/>
+      <operations id="9" stage="1" latency="2"/>
+      <operations id="10" stage="1" latency="1"/>
+    </states>
+    <transitions inState="1" outState="2">
+      <condition id="-1"/>
+    </transitions>
+    <transitions inState="2" outState="3">
+      <condition id="-1"/>
+    </transitions>
+  </fsm>
+  <CFGRegionsRoot>
+    <cfgRegions mId="1" mTag="sparce_categorical_cross_entropy_10u_s" mII="-1" mDepth="-1" mMinTripCount="-1" mMaxTripCount="-1" mMinLatency="21" mMaxLatency="21">
+      <basicBlocks>11</basicBlocks>
+      <mDfPipe/>
+    </cfgRegions>
+  </CFGRegionsRoot>
+</cdfg:DBCdfg>

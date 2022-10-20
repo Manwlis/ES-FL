@@ -107,4 +107,4 @@ echo ""
 diff ${flags} variables/l0_biases_tf.txt	variables/l0_biases_cpp.txt
 
 # clean up temporary files
-rm -r temp
+# rm -r temp

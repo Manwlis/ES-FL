@@ -1,0 +1,222 @@
+
+
+================================================================
+== Vitis HLS Report for 'dense_128u_3136u_s'
+================================================================
+* Date:           Tue Oct 18 21:21:11 2022
+
+* Version:        2022.1 (Build 3526262 on Mon Apr 18 15:47:01 MDT 2022)
+* Project:        forward_prop
+* Solution:       solution1 (Vitis Kernel Flow Target)
+* Product family: virtexuplus
+* Target device:  xcvu5p-flva2104-1-e
+
+
+================================================================
+== Performance Estimates
+================================================================
++ Timing: 
+    * Summary: 
+    +--------+----------+----------+------------+
+    |  Clock |  Target  | Estimated| Uncertainty|
+    +--------+----------+----------+------------+
+    |ap_clk  |  10.00 ns|  7.297 ns|     2.70 ns|
+    +--------+----------+----------+------------+
+
++ Latency: 
+    * Summary: 
+    +---------+---------+----------+----------+-------+-------+---------+
+    |  Latency (cycles) |  Latency (absolute) |    Interval   | Pipeline|
+    |   min   |   max   |    min   |    max   |  min  |  max  |   Type  |
+    +---------+---------+----------+----------+-------+-------+---------+
+    |    25362|    25362|  0.254 ms|  0.254 ms|  25362|  25362|       no|
+    +---------+---------+----------+----------+-------+-------+---------+
+
+    + Detail: 
+        * Instance: 
+        +-------------------------------------------------+-------------------------------------+---------+---------+----------+----------+-------+-------+---------+
+        |                                                 |                                     |  Latency (cycles) |  Latency (absolute) |    Interval   | Pipeline|
+        |                     Instance                    |                Module               |   min   |   max   |    min   |    max   |  min  |  max  |   Type  |
+        +-------------------------------------------------+-------------------------------------+---------+---------+----------+----------+-------+-------+---------+
+        |grp_dense_128u_3136u_Pipeline_init_sums_fu_1070  |dense_128u_3136u_Pipeline_init_sums  |      130|      130|  1.300 us|  1.300 us|    130|    130|       no|
+        |grp_dense_128u_3136u_Pipeline_inputs_fu_1204     |dense_128u_3136u_Pipeline_inputs     |    25096|    25096|  0.251 ms|  0.251 ms|  25096|  25096|       no|
+        |grp_dense_128u_3136u_Pipeline_activate_fu_1482   |dense_128u_3136u_Pipeline_activate   |      130|      130|  1.300 us|  1.300 us|    130|    130|       no|
+        +-------------------------------------------------+-------------------------------------+---------+---------+----------+----------+-------+-------+---------+
+
+        * Loop: 
+        N/A
+
+
+
+================================================================
+== Utilization Estimates
+================================================================
+* Summary: 
++---------------------+---------+------+---------+--------+-----+
+|         Name        | BRAM_18K|  DSP |    FF   |   LUT  | URAM|
++---------------------+---------+------+---------+--------+-----+
+|DSP                  |        -|     -|        -|       -|    -|
+|Expression           |        -|     -|        0|       2|    -|
+|FIFO                 |        -|     -|        -|       -|    -|
+|Instance             |        -|    80|    17329|    9813|    -|
+|Memory               |        -|     -|        -|       -|    -|
+|Multiplexer          |        -|     -|        -|      88|    -|
+|Register             |        -|     -|       11|       -|    -|
++---------------------+---------+------+---------+--------+-----+
+|Total                |        0|    80|    17340|    9903|    0|
++---------------------+---------+------+---------+--------+-----+
+|Available SLR        |     1024|  1737|   600577|  300288|  235|
++---------------------+---------+------+---------+--------+-----+
+|Utilization SLR (%)  |        0|     4|        2|       3|    0|
++---------------------+---------+------+---------+--------+-----+
+|Available            |     2048|  3474|  1201154|  600577|  470|
++---------------------+---------+------+---------+--------+-----+
+|Utilization (%)      |        0|     2|        1|       1|    0|
++---------------------+---------+------+---------+--------+-----+
+
++ Detail: 
+    * Instance: 
+    +-------------------------------------------------+-------------------------------------+---------+----+-------+------+-----+
+    |                     Instance                    |                Module               | BRAM_18K| DSP|   FF  |  LUT | URAM|
+    +-------------------------------------------------+-------------------------------------+---------+----+-------+------+-----+
+    |grp_dense_128u_3136u_Pipeline_activate_fu_1482   |dense_128u_3136u_Pipeline_activate   |        0|   0|     43|   800|    0|
+    |grp_dense_128u_3136u_Pipeline_init_sums_fu_1070  |dense_128u_3136u_Pipeline_init_sums  |        0|   0|   4114|    64|    0|
+    |grp_dense_128u_3136u_Pipeline_inputs_fu_1204     |dense_128u_3136u_Pipeline_inputs     |        0|  80|  13172|  8949|    0|
+    +-------------------------------------------------+-------------------------------------+---------+----+-------+------+-----+
+    |Total                                            |                                     |        0|  80|  17329|  9813|    0|
+    +-------------------------------------------------+-------------------------------------+---------+----+-------+------+-----+
+
+    * DSP: 
+    N/A
+
+    * Memory: 
+    N/A
+
+    * FIFO: 
+    N/A
+
+    * Expression: 
+    +-----------------+----------+----+---+----+------------+------------+
+    |  Variable Name  | Operation| DSP| FF| LUT| Bitwidth P0| Bitwidth P1|
+    +-----------------+----------+----+---+----+------------+------------+
+    |ap_block_state1  |        or|   0|  0|   2|           1|           1|
+    +-----------------+----------+----+---+----+------------+------------+
+    |Total            |          |   0|  0|   2|           1|           1|
+    +-----------------+----------+----+---+----+------------+------------+
+
+    * Multiplexer: 
+    +--------------------------------------+----+-----------+-----+-----------+
+    |                 Name                 | LUT| Input Size| Bits| Total Bits|
+    +--------------------------------------+----+-----------+-----+-----------+
+    |ap_NS_fsm                             |  43|          8|    1|          8|
+    |ap_done                               |   9|          2|    1|          2|
+    |dense_activations_stream129_write     |   9|          2|    1|          2|
+    |dense_f_map_out134_write              |   9|          2|    1|          2|
+    |dense_feature_map_stream128_write     |   9|          2|    1|          2|
+    |maxp2d_64_feature_map_stream127_read  |   9|          2|    1|          2|
+    +--------------------------------------+----+-----------+-----+-----------+
+    |Total                                 |  88|         18|    6|         18|
+    +--------------------------------------+----+-----------+-----+-----------+
+
+    * Register: 
+    +--------------------------------------------------------------+---+----+-----+-----------+
+    |                             Name                             | FF| LUT| Bits| Const Bits|
+    +--------------------------------------------------------------+---+----+-----+-----------+
+    |ap_CS_fsm                                                     |  7|   0|    7|          0|
+    |ap_done_reg                                                   |  1|   0|    1|          0|
+    |grp_dense_128u_3136u_Pipeline_activate_fu_1482_ap_start_reg   |  1|   0|    1|          0|
+    |grp_dense_128u_3136u_Pipeline_init_sums_fu_1070_ap_start_reg  |  1|   0|    1|          0|
+    |grp_dense_128u_3136u_Pipeline_inputs_fu_1204_ap_start_reg     |  1|   0|    1|          0|
+    +--------------------------------------------------------------+---+----+-----+-----------+
+    |Total                                                         | 11|   0|   11|          0|
+    +--------------------------------------------------------------+---+----+-----+-----------+
+
+
+
+================================================================
+== Interface
+================================================================
+* Summary: 
++------------------------------------------------+-----+-----+------------+---------------------------------+--------------+
+|                    RTL Ports                   | Dir | Bits|  Protocol  |          Source Object          |    C Type    |
++------------------------------------------------+-----+-----+------------+---------------------------------+--------------+
+|ap_clk                                          |   in|    1|  ap_ctrl_hs|               dense<128u, 3136u>|  return value|
+|ap_rst                                          |   in|    1|  ap_ctrl_hs|               dense<128u, 3136u>|  return value|
+|ap_start                                        |   in|    1|  ap_ctrl_hs|               dense<128u, 3136u>|  return value|
+|ap_done                                         |  out|    1|  ap_ctrl_hs|               dense<128u, 3136u>|  return value|
+|ap_continue                                     |   in|    1|  ap_ctrl_hs|               dense<128u, 3136u>|  return value|
+|ap_idle                                         |  out|    1|  ap_ctrl_hs|               dense<128u, 3136u>|  return value|
+|ap_ready                                        |  out|    1|  ap_ctrl_hs|               dense<128u, 3136u>|  return value|
+|maxp2d_64_feature_map_stream127_dout            |   in|   32|     ap_fifo|  maxp2d_64_feature_map_stream127|       pointer|
+|maxp2d_64_feature_map_stream127_num_data_valid  |   in|    3|     ap_fifo|  maxp2d_64_feature_map_stream127|       pointer|
+|maxp2d_64_feature_map_stream127_fifo_cap        |   in|    3|     ap_fifo|  maxp2d_64_feature_map_stream127|       pointer|
+|maxp2d_64_feature_map_stream127_empty_n         |   in|    1|     ap_fifo|  maxp2d_64_feature_map_stream127|       pointer|
+|maxp2d_64_feature_map_stream127_read            |  out|    1|     ap_fifo|  maxp2d_64_feature_map_stream127|       pointer|
+|weights_0_address0                              |  out|   16|   ap_memory|                        weights_0|         array|
+|weights_0_ce0                                   |  out|    1|   ap_memory|                        weights_0|         array|
+|weights_0_q0                                    |   in|   32|   ap_memory|                        weights_0|         array|
+|weights_0_address1                              |  out|   16|   ap_memory|                        weights_0|         array|
+|weights_0_ce1                                   |  out|    1|   ap_memory|                        weights_0|         array|
+|weights_0_q1                                    |   in|   32|   ap_memory|                        weights_0|         array|
+|weights_1_address0                              |  out|   16|   ap_memory|                        weights_1|         array|
+|weights_1_ce0                                   |  out|    1|   ap_memory|                        weights_1|         array|
+|weights_1_q0                                    |   in|   32|   ap_memory|                        weights_1|         array|
+|weights_1_address1                              |  out|   16|   ap_memory|                        weights_1|         array|
+|weights_1_ce1                                   |  out|    1|   ap_memory|                        weights_1|         array|
+|weights_1_q1                                    |   in|   32|   ap_memory|                        weights_1|         array|
+|weights_2_address0                              |  out|   16|   ap_memory|                        weights_2|         array|
+|weights_2_ce0                                   |  out|    1|   ap_memory|                        weights_2|         array|
+|weights_2_q0                                    |   in|   32|   ap_memory|                        weights_2|         array|
+|weights_2_address1                              |  out|   16|   ap_memory|                        weights_2|         array|
+|weights_2_ce1                                   |  out|    1|   ap_memory|                        weights_2|         array|
+|weights_2_q1                                    |   in|   32|   ap_memory|                        weights_2|         array|
+|weights_3_address0                              |  out|   16|   ap_memory|                        weights_3|         array|
+|weights_3_ce0                                   |  out|    1|   ap_memory|                        weights_3|         array|
+|weights_3_q0                                    |   in|   32|   ap_memory|                        weights_3|         array|
+|weights_3_address1                              |  out|   16|   ap_memory|                        weights_3|         array|
+|weights_3_ce1                                   |  out|    1|   ap_memory|                        weights_3|         array|
+|weights_3_q1                                    |   in|   32|   ap_memory|                        weights_3|         array|
+|weights_4_address0                              |  out|   16|   ap_memory|                        weights_4|         array|
+|weights_4_ce0                                   |  out|    1|   ap_memory|                        weights_4|         array|
+|weights_4_q0                                    |   in|   32|   ap_memory|                        weights_4|         array|
+|weights_4_address1                              |  out|   16|   ap_memory|                        weights_4|         array|
+|weights_4_ce1                                   |  out|    1|   ap_memory|                        weights_4|         array|
+|weights_4_q1                                    |   in|   32|   ap_memory|                        weights_4|         array|
+|weights_5_address0                              |  out|   16|   ap_memory|                        weights_5|         array|
+|weights_5_ce0                                   |  out|    1|   ap_memory|                        weights_5|         array|
+|weights_5_q0                                    |   in|   32|   ap_memory|                        weights_5|         array|
+|weights_5_address1                              |  out|   16|   ap_memory|                        weights_5|         array|
+|weights_5_ce1                                   |  out|    1|   ap_memory|                        weights_5|         array|
+|weights_5_q1                                    |   in|   32|   ap_memory|                        weights_5|         array|
+|weights_6_address0                              |  out|   16|   ap_memory|                        weights_6|         array|
+|weights_6_ce0                                   |  out|    1|   ap_memory|                        weights_6|         array|
+|weights_6_q0                                    |   in|   32|   ap_memory|                        weights_6|         array|
+|weights_6_address1                              |  out|   16|   ap_memory|                        weights_6|         array|
+|weights_6_ce1                                   |  out|    1|   ap_memory|                        weights_6|         array|
+|weights_6_q1                                    |   in|   32|   ap_memory|                        weights_6|         array|
+|weights_7_address0                              |  out|   16|   ap_memory|                        weights_7|         array|
+|weights_7_ce0                                   |  out|    1|   ap_memory|                        weights_7|         array|
+|weights_7_q0                                    |   in|   32|   ap_memory|                        weights_7|         array|
+|weights_7_address1                              |  out|   16|   ap_memory|                        weights_7|         array|
+|weights_7_ce1                                   |  out|    1|   ap_memory|                        weights_7|         array|
+|weights_7_q1                                    |   in|   32|   ap_memory|                        weights_7|         array|
+|biases_address0                                 |  out|    7|   ap_memory|                           biases|         array|
+|biases_ce0                                      |  out|    1|   ap_memory|                           biases|         array|
+|biases_q0                                       |   in|   32|   ap_memory|                           biases|         array|
+|dense_feature_map_stream128_din                 |  out|   32|     ap_fifo|      dense_feature_map_stream128|       pointer|
+|dense_feature_map_stream128_num_data_valid      |   in|    3|     ap_fifo|      dense_feature_map_stream128|       pointer|
+|dense_feature_map_stream128_fifo_cap            |   in|    3|     ap_fifo|      dense_feature_map_stream128|       pointer|
+|dense_feature_map_stream128_full_n              |   in|    1|     ap_fifo|      dense_feature_map_stream128|       pointer|
+|dense_feature_map_stream128_write               |  out|    1|     ap_fifo|      dense_feature_map_stream128|       pointer|
+|dense_activations_stream129_din                 |  out|    1|     ap_fifo|      dense_activations_stream129|       pointer|
+|dense_activations_stream129_num_data_valid      |   in|    8|     ap_fifo|      dense_activations_stream129|       pointer|
+|dense_activations_stream129_fifo_cap            |   in|    8|     ap_fifo|      dense_activations_stream129|       pointer|
+|dense_activations_stream129_full_n              |   in|    1|     ap_fifo|      dense_activations_stream129|       pointer|
+|dense_activations_stream129_write               |  out|    1|     ap_fifo|      dense_activations_stream129|       pointer|
+|dense_f_map_out134_din                          |  out|   32|     ap_fifo|               dense_f_map_out134|       pointer|
+|dense_f_map_out134_num_data_valid               |   in|    8|     ap_fifo|               dense_f_map_out134|       pointer|
+|dense_f_map_out134_fifo_cap                     |   in|    8|     ap_fifo|               dense_f_map_out134|       pointer|
+|dense_f_map_out134_full_n                       |   in|    1|     ap_fifo|               dense_f_map_out134|       pointer|
+|dense_f_map_out134_write                        |  out|    1|     ap_fifo|               dense_f_map_out134|       pointer|
++------------------------------------------------+-----+-----+------------+---------------------------------+--------------+
+

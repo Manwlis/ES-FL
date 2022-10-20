@@ -1,0 +1,174 @@
+
+
+================================================================
+== Vitis HLS Report for 'sparce_categorical_cross_entropy_10u_Pipeline_output_error'
+================================================================
+* Date:           Thu Oct 20 03:40:35 2022
+
+* Version:        2022.1 (Build 3526262 on Mon Apr 18 15:47:01 MDT 2022)
+* Project:        softmax_10_bp
+* Solution:       solution1 (Vitis Kernel Flow Target)
+* Product family: zynquplus
+* Target device:  xczu9eg-ffvb1156-2-e
+
+
+================================================================
+== Performance Estimates
+================================================================
++ Timing: 
+    * Summary: 
+    +--------+----------+----------+------------+
+    |  Clock |  Target  | Estimated| Uncertainty|
+    +--------+----------+----------+------------+
+    |ap_clk  |  10.00 ns|  6.437 ns|     2.70 ns|
+    +--------+----------+----------+------------+
+
++ Latency: 
+    * Summary: 
+    +---------+---------+----------+----------+-----+-----+---------+
+    |  Latency (cycles) |  Latency (absolute) |  Interval | Pipeline|
+    |   min   |   max   |    min   |    max   | min | max |   Type  |
+    +---------+---------+----------+----------+-----+-----+---------+
+    |       19|       19|  0.190 us|  0.190 us|   19|   19|       no|
+    +---------+---------+----------+----------+-----+-----+---------+
+
+    + Detail: 
+        * Instance: 
+        N/A
+
+        * Loop: 
+        +----------------+---------+---------+----------+-----------+-----------+------+----------+
+        |                |  Latency (cycles) | Iteration|  Initiation Interval  | Trip |          |
+        |    Loop Name   |   min   |   max   |  Latency |  achieved |   target  | Count| Pipelined|
+        +----------------+---------+---------+----------+-----------+-----------+------+----------+
+        |- output_error  |       17|       17|         9|          1|          1|    10|       yes|
+        +----------------+---------+---------+----------+-----------+-----------+------+----------+
+
+
+
+================================================================
+== Utilization Estimates
+================================================================
+* Summary: 
++-----------------+---------+------+--------+--------+-----+
+|       Name      | BRAM_18K|  DSP |   FF   |   LUT  | URAM|
++-----------------+---------+------+--------+--------+-----+
+|DSP              |        -|     -|       -|       -|    -|
+|Expression       |        -|     -|       0|      45|    -|
+|FIFO             |        -|     -|       -|       -|    -|
+|Instance         |        -|     2|     227|     214|    -|
+|Memory           |        -|     -|       -|       -|    -|
+|Multiplexer      |        -|     -|       -|      54|    -|
+|Register         |        -|     -|     117|       -|    -|
++-----------------+---------+------+--------+--------+-----+
+|Total            |        0|     2|     344|     313|    0|
++-----------------+---------+------+--------+--------+-----+
+|Available        |     1824|  2520|  548160|  274080|    0|
++-----------------+---------+------+--------+--------+-----+
+|Utilization (%)  |        0|    ~0|      ~0|      ~0|    0|
++-----------------+---------+------+--------+--------+-----+
+
++ Detail: 
+    * Instance: 
+    +------------------------------------+--------------------------------+---------+----+-----+-----+-----+
+    |              Instance              |             Module             | BRAM_18K| DSP|  FF | LUT | URAM|
+    +------------------------------------+--------------------------------+---------+----+-----+-----+-----+
+    |fsub_32ns_32ns_32_4_full_dsp_1_U18  |fsub_32ns_32ns_32_4_full_dsp_1  |        0|   2|  227|  214|    0|
+    |uitofp_32ns_32_4_no_dsp_1_U19       |uitofp_32ns_32_4_no_dsp_1       |        0|   0|    0|    0|    0|
+    +------------------------------------+--------------------------------+---------+----+-----+-----+-----+
+    |Total                               |                                |        0|   2|  227|  214|    0|
+    +------------------------------------+--------------------------------+---------+----+-----+-----+-----+
+
+    * DSP: 
+    N/A
+
+    * Memory: 
+    N/A
+
+    * FIFO: 
+    N/A
+
+    * Expression: 
+    +---------------------------+----------+----+---+----+------------+------------+
+    |       Variable Name       | Operation| DSP| FF| LUT| Bitwidth P0| Bitwidth P1|
+    +---------------------------+----------+----+---+----+------------+------------+
+    |kernel_2_fu_86_p2          |         +|   0|  0|  12|           4|           1|
+    |icmp_ln21_fu_80_p2         |      icmp|   0|  0|   9|           4|           4|
+    |icmp_ln24_fu_96_p2         |      icmp|   0|  0|  20|          32|          32|
+    |ap_block_pp0_stage0_01001  |        or|   0|  0|   2|           1|           1|
+    |ap_enable_pp0              |       xor|   0|  0|   2|           1|           2|
+    +---------------------------+----------+----+---+----+------------+------------+
+    |Total                      |          |   0|  0|  45|          42|          40|
+    +---------------------------+----------+----+---+----+------------+------------+
+
+    * Multiplexer: 
+    +-------------------------------------+----+-----------+-----+-----------+
+    |                 Name                | LUT| Input Size| Bits| Total Bits|
+    +-------------------------------------+----+-----------+-----+-----------+
+    |ap_done_int                          |   9|          2|    1|          2|
+    |ap_enable_reg_pp0_iter1              |   9|          2|    1|          2|
+    |ap_sig_allocacmp_kernel_1            |   9|          2|    4|          8|
+    |kernel_fu_42                         |   9|          2|    4|          8|
+    |softmax_f_map_stream14_blk_n         |   9|          2|    1|          2|
+    |softmax_output_error_stream15_blk_n  |   9|          2|    1|          2|
+    +-------------------------------------+----+-----------+-----+-----------+
+    |Total                                |  54|         12|   12|         24|
+    +-------------------------------------+----+-----------+-----+-----------+
+
+    * Register: 
+    +-------------------------------------+----+----+-----+-----------+
+    |                 Name                | FF | LUT| Bits| Const Bits|
+    +-------------------------------------+----+----+-----+-----------+
+    |ap_CS_fsm                            |   1|   0|    1|          0|
+    |ap_done_reg                          |   1|   0|    1|          0|
+    |ap_enable_reg_pp0_iter1              |   1|   0|    1|          0|
+    |ap_enable_reg_pp0_iter2              |   1|   0|    1|          0|
+    |ap_enable_reg_pp0_iter3              |   1|   0|    1|          0|
+    |ap_enable_reg_pp0_iter4              |   1|   0|    1|          0|
+    |ap_enable_reg_pp0_iter5              |   1|   0|    1|          0|
+    |ap_enable_reg_pp0_iter6              |   1|   0|    1|          0|
+    |ap_enable_reg_pp0_iter7              |   1|   0|    1|          0|
+    |ap_enable_reg_pp0_iter8              |   1|   0|    1|          0|
+    |ap_loop_exit_ready_pp0_iter1_reg     |   1|   0|    1|          0|
+    |ap_loop_exit_ready_pp0_iter2_reg     |   1|   0|    1|          0|
+    |ap_loop_exit_ready_pp0_iter3_reg     |   1|   0|    1|          0|
+    |ap_loop_exit_ready_pp0_iter4_reg     |   1|   0|    1|          0|
+    |ap_loop_exit_ready_pp0_iter5_reg     |   1|   0|    1|          0|
+    |ap_loop_exit_ready_pp0_iter6_reg     |   1|   0|    1|          0|
+    |ap_loop_exit_ready_pp0_iter7_reg     |   1|   0|    1|          0|
+    |conv_reg_141                         |  32|   0|   32|          0|
+    |kernel_fu_42                         |   4|   0|    4|          0|
+    |softmax_f_map_stream14_read_reg_136  |  32|   0|   32|          0|
+    |temp_output_error_reg_151            |  32|   0|   32|          0|
+    +-------------------------------------+----+----+-----+-----------+
+    |Total                                | 117|   0|  117|          0|
+    +-------------------------------------+----+----+-----+-----------+
+
+
+
+================================================================
+== Interface
+================================================================
+* Summary: 
++----------------------------------------------+-----+-----+------------+-------------------------------------------------------------+--------------+
+|                   RTL Ports                  | Dir | Bits|  Protocol  |                        Source Object                        |    C Type    |
++----------------------------------------------+-----+-----+------------+-------------------------------------------------------------+--------------+
+|ap_clk                                        |   in|    1|  ap_ctrl_hs|  sparce_categorical_cross_entropy<10u>_Pipeline_output_error|  return value|
+|ap_rst                                        |   in|    1|  ap_ctrl_hs|  sparce_categorical_cross_entropy<10u>_Pipeline_output_error|  return value|
+|ap_start                                      |   in|    1|  ap_ctrl_hs|  sparce_categorical_cross_entropy<10u>_Pipeline_output_error|  return value|
+|ap_done                                       |  out|    1|  ap_ctrl_hs|  sparce_categorical_cross_entropy<10u>_Pipeline_output_error|  return value|
+|ap_idle                                       |  out|    1|  ap_ctrl_hs|  sparce_categorical_cross_entropy<10u>_Pipeline_output_error|  return value|
+|ap_ready                                      |  out|    1|  ap_ctrl_hs|  sparce_categorical_cross_entropy<10u>_Pipeline_output_error|  return value|
+|softmax_f_map_stream14_dout                   |   in|   32|     ap_fifo|                                       softmax_f_map_stream14|       pointer|
+|softmax_f_map_stream14_num_data_valid         |   in|    2|     ap_fifo|                                       softmax_f_map_stream14|       pointer|
+|softmax_f_map_stream14_fifo_cap               |   in|    2|     ap_fifo|                                       softmax_f_map_stream14|       pointer|
+|softmax_f_map_stream14_empty_n                |   in|    1|     ap_fifo|                                       softmax_f_map_stream14|       pointer|
+|softmax_f_map_stream14_read                   |  out|    1|     ap_fifo|                                       softmax_f_map_stream14|       pointer|
+|softmax_output_error_stream15_din             |  out|   32|     ap_fifo|                                softmax_output_error_stream15|       pointer|
+|softmax_output_error_stream15_num_data_valid  |   in|    4|     ap_fifo|                                softmax_output_error_stream15|       pointer|
+|softmax_output_error_stream15_fifo_cap        |   in|    4|     ap_fifo|                                softmax_output_error_stream15|       pointer|
+|softmax_output_error_stream15_full_n          |   in|    1|     ap_fifo|                                softmax_output_error_stream15|       pointer|
+|softmax_output_error_stream15_write           |  out|    1|     ap_fifo|                                softmax_output_error_stream15|       pointer|
+|label_load                                    |   in|   32|     ap_none|                                                   label_load|        scalar|
++----------------------------------------------+-----+-----+------------+-------------------------------------------------------------+--------------+
+

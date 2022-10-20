@@ -1,0 +1,15 @@
+<pragmas>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/hls_stream_39.h" line="208" pragmaType="inline" parentfunction="hls::stream<float, 2>::stream()" off="0" region="0" recursive="0"/>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/hls_stream_39.h" line="208" pragmaType="inline" parentfunction="hls::stream<float, 6>::stream()" off="0" region="0" recursive="0"/>
+<pragma file="softmax_10_bp/src/softmax_10_bp.cpp" line="57" pragmaType="dataflow" parentfunction="accel" disable_start_propagation="0"/>
+<pragma file="softmax_10_bp/src/softmax_10_bp.cpp" line="59" pragmaType="stream" parentfunction="accel" depth="2" type="pipo" variable="softmax_weights"/>
+<pragma file="softmax_10_bp/src/softmax_10_bp.cpp" line="61" pragmaType="array_reshape" parentfunction="accel" dim="2" factor="0" mode="complete" variable=""/>
+<pragma file="softmax_10_bp/src/softmax_10_bp.cpp" line="41" pragmaType="pipeline" parentfunction="softmax_error_propagation" off="0" ii="1" rewind="0" style=""/>
+<pragma file="softmax_10_bp/src/softmax_10_bp.cpp" line="44" pragmaType="unroll" parentfunction="softmax_error_propagation" factor="-1" skip_exit_check="0"/>
+<pragma file="softmax_10_bp/src/softmax_10_bp.cpp" line="36" pragmaType="pipeline" parentfunction="softmax_error_propagation" off="0" ii="1" rewind="0" style=""/>
+<pragma file="softmax_10_bp/src/softmax_10_bp.hpp" line="42" pragmaType="pipeline" parentfunction="write_mem" off="0" ii="1" rewind="0" style=""/>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/hls_stream_39.h" line="154" pragmaType="inline" parentfunction="read" off="0" region="0" recursive="0"/>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/hls_stream_39.h" line="144" pragmaType="inline" parentfunction="read" off="0" region="0" recursive="0"/>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/hls_stream_39.h" line="173" pragmaType="inline" parentfunction="write" off="0" region="0" recursive="0"/>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/hls_stream_39.h" line="103" pragmaType="inline" parentfunction="hls::stream<float, 0>::stream()" off="0" region="0" recursive="0"/>
+</pragmas>

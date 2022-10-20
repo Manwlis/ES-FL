@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vivadoHLSLog:LogRoot xmlns:vivadoHLSLog="www.xilinx.com/vivadoHLSLog">
+  <errorLogs>
+    <logs>
+      <synLog/>
+    </logs>
+  </errorLogs>
+  <warningLogs>
+    <logs>
+      <synLog>
+        <logs message="WARNING: [RTGEN 206-101] Design contains AXI ports. Reset is fixed to synchronous and active low." projectName="conv2d_32_forward_prop" solutionName="solution1" date="2022-10-20T15:59:51.594+0300" type="Warning"/>
+        <logs message="WARNING: [RTGEN 206-101] Setting dangling out port 'write_mem_wrapper_float_25088u_bool_25088u_Pipeline_write_out_mem/m_axi_gmem_BREADY' to 0." projectName="conv2d_32_forward_prop" solutionName="solution1" date="2022-10-20T15:59:51.189+0300" type="Warning"/>
+        <logs message="WARNING: [RTGEN 206-101] Setting dangling out port 'write_mem_wrapper_float_25088u_bool_25088u_Pipeline_write_out_mem/m_axi_gmem_AWUSER' to 0." projectName="conv2d_32_forward_prop" solutionName="solution1" date="2022-10-20T15:59:51.187+0300" type="Warning"/>
+        <logs message="WARNING: [RTGEN 206-101] Setting dangling out port 'write_mem_wrapper_float_25088u_bool_25088u_Pipeline_write_out_mem/m_axi_gmem_AWREGION' to 0." projectName="conv2d_32_forward_prop" solutionName="solution1" date="2022-10-20T15:59:51.184+0300" type="Warning"/>
+        <logs message="WARNING: [RTGEN 206-101] Setting dangling out port 'write_mem_wrapper_float_25088u_bool_25088u_Pipeline_write_out_mem/m_axi_gmem_AWQOS' to 0." projectName="conv2d_32_forward_prop" solutionName="solution1" date="2022-10-20T15:59:51.180+0300" type="Warning"/>
+        <logs message="WARNING: [RTGEN 206-101] Setting dangling out port 'write_mem_wrapper_float_25088u_bool_25088u_Pipeline_write_out_mem/m_axi_gmem_AWPROT' to 0." projectName="conv2d_32_forward_prop" solutionName="solution1" date="2022-10-20T15:59:51.178+0300" type="Warning"/>
+        <logs message="WARNING: [RTGEN 206-101] Setting dangling out port 'write_mem_wrapper_float_25088u_bool_25088u_Pipeline_write_out_mem/m_axi_gmem_AWCACHE' to 0." projectName="conv2d_32_forward_prop" solutionName="solution1" date="2022-10-20T15:59:51.175+0300" type="Warning"/>
+        <logs message="WARNING: [RTGEN 206-101] Setting dangling out port 'write_mem_wrapper_float_25088u_bool_25088u_Pipeline_write_out_mem/m_axi_gmem_AWLOCK' to 0." projectName="conv2d_32_forward_prop" solutionName="solution1" date="2022-10-20T15:59:51.168+0300" type="Warning"/>
+        <logs message="WARNING: [RTGEN 206-101] Setting dangling out port 'write_mem_wrapper_float_25088u_bool_25088u_Pipeline_write_out_mem/m_axi_gmem_AWBURST' to 0." projectName="conv2d_32_forward_prop" solutionName="solution1" date="2022-10-20T15:59:51.164+0300" type="Warning"/>
+        <logs message="WARNING: [RTGEN 206-101] Setting dangling out port 'write_mem_wrapper_float_25088u_bool_25088u_Pipeline_write_out_mem/m_axi_gmem_AWSIZE' to 0." projectName="conv2d_32_forward_prop" solutionName="solution1" date="2022-10-20T15:59:51.162+0300" type="Warning"/>
+        <logs message="WARNING: [RTGEN 206-101] Setting dangling out port 'write_mem_wrapper_float_25088u_bool_25088u_Pipeline_write_out_mem/m_axi_gmem_AWLEN' to 0." projectName="conv2d_32_forward_prop" solutionName="solution1" date="2022-10-20T15:59:51.160+0300" type="Warning"/>
+        <logs message="WARNING: [RTGEN 206-101] Setting dangling out port 'write_mem_wrapper_float_25088u_bool_25088u_Pipeline_write_out_mem/m_axi_gmem_AWID' to 0." projectName="conv2d_32_forward_prop" solutionName="solution1" date="2022-10-20T15:59:51.156+0300" type="Warning"/>
+      </synLog>
+    </logs>
+  </warningLogs>
+</vivadoHLSLog:LogRoot>

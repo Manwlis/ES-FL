@@ -1,0 +1,508 @@
+<profile>
+
+<section name = "Vitis HLS Report for 'dense_128u_3136u_Pipeline_init_sums'" level="0">
+<item name = "Date">Tue Oct 18 21:21:05 2022
+</item>
+<item name = "Version">2022.1 (Build 3526262 on Mon Apr 18 15:47:01 MDT 2022)</item>
+<item name = "Project">forward_prop</item>
+<item name = "Solution">solution1 (Vitis Kernel Flow Target)</item>
+<item name = "Product family">virtexuplus</item>
+<item name = "Target device">xcvu5p-flva2104-1-e</item>
+</section>
+
+<section name = "Performance Estimates" level="0">
+<item name = "Timing">
+<section name = "" level="1">
+<item name = "Summary"><table name="" hasTotal="0">
+<keys size="4">Clock, Target, Estimated, Uncertainty</keys>
+<column name="ap_clk">10.00 ns, 1.331 ns, 2.70 ns</column>
+</table>
+</item>
+</section>
+</item>
+<item name = "Latency">
+<section name = "" level="1">
+<item name = "Summary"><table name="" hasTotal="0">
+<keys size="8">, min, max, min, max, min, max, Type</keys>
+<column name="">130, 130, 1.300 us, 1.300 us, 130, 130, no</column>
+</table>
+</item>
+<item name = "Detail">
+<section name = "" level="1">
+<item name = "Instance"><table name="" hasTotal="0">
+<keys size="9">Instance, Module, min, max, min, max, min, max, Type</keys>
+</table>
+</item>
+<item name = "Loop"><table name="" hasTotal="0">
+<keys size="8">Loop Name, min, max, Latency, achieved, target, Count, Pipelined</keys>
+<column name="- init_sums">128, 128, 2, 1, 1, 128, yes</column>
+</table>
+</item>
+</section>
+</item>
+</section>
+</item>
+</section>
+
+<section name = "Utilization Estimates" level="0">
+<item name = "Summary"><table name="" hasTotal="1">
+<keys size="6">Name, BRAM_18K, DSP, FF, LUT, URAM</keys>
+<column name="DSP">-, -, -, -, -</column>
+<column name="Expression">-, -, 0, 28, -</column>
+<column name="FIFO">-, -, -, -, -</column>
+<column name="Instance">-, -, -, -, -</column>
+<column name="Memory">-, -, -, -, -</column>
+<column name="Multiplexer">-, -, -, 36, -</column>
+<column name="Register">-, -, 4114, -, -</column>
+<specialColumn name="Available SLR">1024, 1737, 600577, 300288, 235</specialColumn>
+<specialColumn name="Utilization SLR (%)">0, 0, ~0, ~0, 0</specialColumn>
+<specialColumn name="Available">2048, 3474, 1201154, 600577, 470</specialColumn>
+<specialColumn name="Utilization (%)">0, 0, ~0, ~0, 0</specialColumn>
+</table>
+</item>
+<item name = "Detail">
+<section name = "" level="1">
+<item name = "Instance"><table name="" hasTotal="1">
+<keys size="7">Instance, Module, BRAM_18K, DSP, FF, LUT, URAM</keys>
+</table>
+</item>
+<item name = "DSP"><table name="" hasTotal="0">
+<keys size="3">Instance, Module, Expression</keys>
+</table>
+</item>
+<item name = "Memory"><table name="" hasTotal="1">
+<keys size="10">Memory, Module, BRAM_18K, FF, LUT, URAM, Words, Bits, Banks, W*Bits*Banks</keys>
+</table>
+</item>
+<item name = "FIFO"><table name="" hasTotal="1">
+<keys size="8">Name, BRAM_18K, FF, LUT, URAM, Depth, Bits, Size:D*B</keys>
+</table>
+</item>
+<item name = "Expression"><table name="" hasTotal="1">
+<keys size="7">Variable Name, Operation, DSP, FF, LUT, Bitwidth P0, Bitwidth P1</keys>
+<column name="add_ln428_fu_1979_p2">+, 0, 0, 15, 8, 1</column>
+<column name="icmp_ln428_fu_1973_p2">icmp, 0, 0, 11, 8, 9</column>
+<column name="ap_enable_pp0">xor, 0, 0, 2, 1, 2</column>
+</table>
+</item>
+<item name = "Multiplexer"><table name="" hasTotal="1">
+<keys size="5">Name, LUT, Input Size, Bits, Total Bits</keys>
+<column name="ap_done_int">9, 2, 1, 2</column>
+<column name="ap_enable_reg_pp0_iter1">9, 2, 1, 2</column>
+<column name="ap_sig_allocacmp_k_1">9, 2, 8, 16</column>
+<column name="k_fu_540">9, 2, 8, 16</column>
+</table>
+</item>
+<item name = "Register"><table name="" hasTotal="1">
+<keys size="5">Name, FF, LUT, Bits, Const Bits</keys>
+<column name="ap_CS_fsm">1, 0, 1, 0</column>
+<column name="ap_done_reg">1, 0, 1, 0</column>
+<column name="ap_enable_reg_pp0_iter1">1, 0, 1, 0</column>
+<column name="k_fu_540">8, 0, 8, 0</column>
+<column name="kernel_sum_100_fu_944">32, 0, 32, 0</column>
+<column name="kernel_sum_101_fu_948">32, 0, 32, 0</column>
+<column name="kernel_sum_102_fu_952">32, 0, 32, 0</column>
+<column name="kernel_sum_103_fu_956">32, 0, 32, 0</column>
+<column name="kernel_sum_104_fu_960">32, 0, 32, 0</column>
+<column name="kernel_sum_105_fu_964">32, 0, 32, 0</column>
+<column name="kernel_sum_106_fu_968">32, 0, 32, 0</column>
+<column name="kernel_sum_107_fu_972">32, 0, 32, 0</column>
+<column name="kernel_sum_108_fu_976">32, 0, 32, 0</column>
+<column name="kernel_sum_109_fu_980">32, 0, 32, 0</column>
+<column name="kernel_sum_10_fu_584">32, 0, 32, 0</column>
+<column name="kernel_sum_110_fu_984">32, 0, 32, 0</column>
+<column name="kernel_sum_111_fu_988">32, 0, 32, 0</column>
+<column name="kernel_sum_112_fu_992">32, 0, 32, 0</column>
+<column name="kernel_sum_113_fu_996">32, 0, 32, 0</column>
+<column name="kernel_sum_114_fu_1000">32, 0, 32, 0</column>
+<column name="kernel_sum_115_fu_1004">32, 0, 32, 0</column>
+<column name="kernel_sum_116_fu_1008">32, 0, 32, 0</column>
+<column name="kernel_sum_117_fu_1012">32, 0, 32, 0</column>
+<column name="kernel_sum_118_fu_1016">32, 0, 32, 0</column>
+<column name="kernel_sum_119_fu_1020">32, 0, 32, 0</column>
+<column name="kernel_sum_11_fu_588">32, 0, 32, 0</column>
+<column name="kernel_sum_120_fu_1024">32, 0, 32, 0</column>
+<column name="kernel_sum_121_fu_1028">32, 0, 32, 0</column>
+<column name="kernel_sum_122_fu_1032">32, 0, 32, 0</column>
+<column name="kernel_sum_123_fu_1036">32, 0, 32, 0</column>
+<column name="kernel_sum_124_fu_1040">32, 0, 32, 0</column>
+<column name="kernel_sum_125_fu_1044">32, 0, 32, 0</column>
+<column name="kernel_sum_126_fu_1048">32, 0, 32, 0</column>
+<column name="kernel_sum_127_fu_1052">32, 0, 32, 0</column>
+<column name="kernel_sum_12_fu_592">32, 0, 32, 0</column>
+<column name="kernel_sum_13_fu_596">32, 0, 32, 0</column>
+<column name="kernel_sum_14_fu_600">32, 0, 32, 0</column>
+<column name="kernel_sum_15_fu_604">32, 0, 32, 0</column>
+<column name="kernel_sum_16_fu_608">32, 0, 32, 0</column>
+<column name="kernel_sum_17_fu_612">32, 0, 32, 0</column>
+<column name="kernel_sum_18_fu_616">32, 0, 32, 0</column>
+<column name="kernel_sum_19_fu_620">32, 0, 32, 0</column>
+<column name="kernel_sum_1_fu_548">32, 0, 32, 0</column>
+<column name="kernel_sum_20_fu_624">32, 0, 32, 0</column>
+<column name="kernel_sum_21_fu_628">32, 0, 32, 0</column>
+<column name="kernel_sum_22_fu_632">32, 0, 32, 0</column>
+<column name="kernel_sum_23_fu_636">32, 0, 32, 0</column>
+<column name="kernel_sum_24_fu_640">32, 0, 32, 0</column>
+<column name="kernel_sum_25_fu_644">32, 0, 32, 0</column>
+<column name="kernel_sum_26_fu_648">32, 0, 32, 0</column>
+<column name="kernel_sum_27_fu_652">32, 0, 32, 0</column>
+<column name="kernel_sum_28_fu_656">32, 0, 32, 0</column>
+<column name="kernel_sum_29_fu_660">32, 0, 32, 0</column>
+<column name="kernel_sum_2_fu_552">32, 0, 32, 0</column>
+<column name="kernel_sum_30_fu_664">32, 0, 32, 0</column>
+<column name="kernel_sum_31_fu_668">32, 0, 32, 0</column>
+<column name="kernel_sum_32_fu_672">32, 0, 32, 0</column>
+<column name="kernel_sum_33_fu_676">32, 0, 32, 0</column>
+<column name="kernel_sum_34_fu_680">32, 0, 32, 0</column>
+<column name="kernel_sum_35_fu_684">32, 0, 32, 0</column>
+<column name="kernel_sum_36_fu_688">32, 0, 32, 0</column>
+<column name="kernel_sum_37_fu_692">32, 0, 32, 0</column>
+<column name="kernel_sum_38_fu_696">32, 0, 32, 0</column>
+<column name="kernel_sum_39_fu_700">32, 0, 32, 0</column>
+<column name="kernel_sum_3_fu_556">32, 0, 32, 0</column>
+<column name="kernel_sum_40_fu_704">32, 0, 32, 0</column>
+<column name="kernel_sum_41_fu_708">32, 0, 32, 0</column>
+<column name="kernel_sum_42_fu_712">32, 0, 32, 0</column>
+<column name="kernel_sum_43_fu_716">32, 0, 32, 0</column>
+<column name="kernel_sum_44_fu_720">32, 0, 32, 0</column>
+<column name="kernel_sum_45_fu_724">32, 0, 32, 0</column>
+<column name="kernel_sum_46_fu_728">32, 0, 32, 0</column>
+<column name="kernel_sum_47_fu_732">32, 0, 32, 0</column>
+<column name="kernel_sum_48_fu_736">32, 0, 32, 0</column>
+<column name="kernel_sum_49_fu_740">32, 0, 32, 0</column>
+<column name="kernel_sum_4_fu_560">32, 0, 32, 0</column>
+<column name="kernel_sum_50_fu_744">32, 0, 32, 0</column>
+<column name="kernel_sum_51_fu_748">32, 0, 32, 0</column>
+<column name="kernel_sum_52_fu_752">32, 0, 32, 0</column>
+<column name="kernel_sum_53_fu_756">32, 0, 32, 0</column>
+<column name="kernel_sum_54_fu_760">32, 0, 32, 0</column>
+<column name="kernel_sum_55_fu_764">32, 0, 32, 0</column>
+<column name="kernel_sum_56_fu_768">32, 0, 32, 0</column>
+<column name="kernel_sum_57_fu_772">32, 0, 32, 0</column>
+<column name="kernel_sum_58_fu_776">32, 0, 32, 0</column>
+<column name="kernel_sum_59_fu_780">32, 0, 32, 0</column>
+<column name="kernel_sum_5_fu_564">32, 0, 32, 0</column>
+<column name="kernel_sum_60_fu_784">32, 0, 32, 0</column>
+<column name="kernel_sum_61_fu_788">32, 0, 32, 0</column>
+<column name="kernel_sum_62_fu_792">32, 0, 32, 0</column>
+<column name="kernel_sum_63_fu_796">32, 0, 32, 0</column>
+<column name="kernel_sum_64_fu_800">32, 0, 32, 0</column>
+<column name="kernel_sum_65_fu_804">32, 0, 32, 0</column>
+<column name="kernel_sum_66_fu_808">32, 0, 32, 0</column>
+<column name="kernel_sum_67_fu_812">32, 0, 32, 0</column>
+<column name="kernel_sum_68_fu_816">32, 0, 32, 0</column>
+<column name="kernel_sum_69_fu_820">32, 0, 32, 0</column>
+<column name="kernel_sum_6_fu_568">32, 0, 32, 0</column>
+<column name="kernel_sum_70_fu_824">32, 0, 32, 0</column>
+<column name="kernel_sum_71_fu_828">32, 0, 32, 0</column>
+<column name="kernel_sum_72_fu_832">32, 0, 32, 0</column>
+<column name="kernel_sum_73_fu_836">32, 0, 32, 0</column>
+<column name="kernel_sum_74_fu_840">32, 0, 32, 0</column>
+<column name="kernel_sum_75_fu_844">32, 0, 32, 0</column>
+<column name="kernel_sum_76_fu_848">32, 0, 32, 0</column>
+<column name="kernel_sum_77_fu_852">32, 0, 32, 0</column>
+<column name="kernel_sum_78_fu_856">32, 0, 32, 0</column>
+<column name="kernel_sum_79_fu_860">32, 0, 32, 0</column>
+<column name="kernel_sum_7_fu_572">32, 0, 32, 0</column>
+<column name="kernel_sum_80_fu_864">32, 0, 32, 0</column>
+<column name="kernel_sum_81_fu_868">32, 0, 32, 0</column>
+<column name="kernel_sum_82_fu_872">32, 0, 32, 0</column>
+<column name="kernel_sum_83_fu_876">32, 0, 32, 0</column>
+<column name="kernel_sum_84_fu_880">32, 0, 32, 0</column>
+<column name="kernel_sum_85_fu_884">32, 0, 32, 0</column>
+<column name="kernel_sum_86_fu_888">32, 0, 32, 0</column>
+<column name="kernel_sum_87_fu_892">32, 0, 32, 0</column>
+<column name="kernel_sum_88_fu_896">32, 0, 32, 0</column>
+<column name="kernel_sum_89_fu_900">32, 0, 32, 0</column>
+<column name="kernel_sum_8_fu_576">32, 0, 32, 0</column>
+<column name="kernel_sum_90_fu_904">32, 0, 32, 0</column>
+<column name="kernel_sum_91_fu_908">32, 0, 32, 0</column>
+<column name="kernel_sum_92_fu_912">32, 0, 32, 0</column>
+<column name="kernel_sum_93_fu_916">32, 0, 32, 0</column>
+<column name="kernel_sum_94_fu_920">32, 0, 32, 0</column>
+<column name="kernel_sum_95_fu_924">32, 0, 32, 0</column>
+<column name="kernel_sum_96_fu_928">32, 0, 32, 0</column>
+<column name="kernel_sum_97_fu_932">32, 0, 32, 0</column>
+<column name="kernel_sum_98_fu_936">32, 0, 32, 0</column>
+<column name="kernel_sum_99_fu_940">32, 0, 32, 0</column>
+<column name="kernel_sum_9_fu_580">32, 0, 32, 0</column>
+<column name="kernel_sum_fu_544">32, 0, 32, 0</column>
+<column name="trunc_ln429_reg_3934">7, 0, 7, 0</column>
+</table>
+</item>
+</section>
+</item>
+</section>
+
+<section name = "Interface" level="0">
+<item name = "Summary"><table name="" hasTotal="0">
+<keys size="6">RTL Ports, Dir, Bits, Protocol, Source Object, C Type</keys>
+<column name="ap_clk">in, 1, ap_ctrl_hs, dense&lt;128u, 3136u&gt;_Pipeline_init_sums, return value</column>
+<column name="ap_rst">in, 1, ap_ctrl_hs, dense&lt;128u, 3136u&gt;_Pipeline_init_sums, return value</column>
+<column name="ap_start">in, 1, ap_ctrl_hs, dense&lt;128u, 3136u&gt;_Pipeline_init_sums, return value</column>
+<column name="ap_done">out, 1, ap_ctrl_hs, dense&lt;128u, 3136u&gt;_Pipeline_init_sums, return value</column>
+<column name="ap_idle">out, 1, ap_ctrl_hs, dense&lt;128u, 3136u&gt;_Pipeline_init_sums, return value</column>
+<column name="ap_ready">out, 1, ap_ctrl_hs, dense&lt;128u, 3136u&gt;_Pipeline_init_sums, return value</column>
+<column name="biases_address0">out, 7, ap_memory, biases, array</column>
+<column name="biases_ce0">out, 1, ap_memory, biases, array</column>
+<column name="biases_q0">in, 32, ap_memory, biases, array</column>
+<column name="kernel_sum_127_out">out, 32, ap_vld, kernel_sum_127_out, pointer</column>
+<column name="kernel_sum_127_out_ap_vld">out, 1, ap_vld, kernel_sum_127_out, pointer</column>
+<column name="kernel_sum_126_out">out, 32, ap_vld, kernel_sum_126_out, pointer</column>
+<column name="kernel_sum_126_out_ap_vld">out, 1, ap_vld, kernel_sum_126_out, pointer</column>
+<column name="kernel_sum_125_out">out, 32, ap_vld, kernel_sum_125_out, pointer</column>
+<column name="kernel_sum_125_out_ap_vld">out, 1, ap_vld, kernel_sum_125_out, pointer</column>
+<column name="kernel_sum_124_out">out, 32, ap_vld, kernel_sum_124_out, pointer</column>
+<column name="kernel_sum_124_out_ap_vld">out, 1, ap_vld, kernel_sum_124_out, pointer</column>
+<column name="kernel_sum_123_out">out, 32, ap_vld, kernel_sum_123_out, pointer</column>
+<column name="kernel_sum_123_out_ap_vld">out, 1, ap_vld, kernel_sum_123_out, pointer</column>
+<column name="kernel_sum_122_out">out, 32, ap_vld, kernel_sum_122_out, pointer</column>
+<column name="kernel_sum_122_out_ap_vld">out, 1, ap_vld, kernel_sum_122_out, pointer</column>
+<column name="kernel_sum_121_out">out, 32, ap_vld, kernel_sum_121_out, pointer</column>
+<column name="kernel_sum_121_out_ap_vld">out, 1, ap_vld, kernel_sum_121_out, pointer</column>
+<column name="kernel_sum_120_out">out, 32, ap_vld, kernel_sum_120_out, pointer</column>
+<column name="kernel_sum_120_out_ap_vld">out, 1, ap_vld, kernel_sum_120_out, pointer</column>
+<column name="kernel_sum_119_out">out, 32, ap_vld, kernel_sum_119_out, pointer</column>
+<column name="kernel_sum_119_out_ap_vld">out, 1, ap_vld, kernel_sum_119_out, pointer</column>
+<column name="kernel_sum_118_out">out, 32, ap_vld, kernel_sum_118_out, pointer</column>
+<column name="kernel_sum_118_out_ap_vld">out, 1, ap_vld, kernel_sum_118_out, pointer</column>
+<column name="kernel_sum_117_out">out, 32, ap_vld, kernel_sum_117_out, pointer</column>
+<column name="kernel_sum_117_out_ap_vld">out, 1, ap_vld, kernel_sum_117_out, pointer</column>
+<column name="kernel_sum_116_out">out, 32, ap_vld, kernel_sum_116_out, pointer</column>
+<column name="kernel_sum_116_out_ap_vld">out, 1, ap_vld, kernel_sum_116_out, pointer</column>
+<column name="kernel_sum_115_out">out, 32, ap_vld, kernel_sum_115_out, pointer</column>
+<column name="kernel_sum_115_out_ap_vld">out, 1, ap_vld, kernel_sum_115_out, pointer</column>
+<column name="kernel_sum_114_out">out, 32, ap_vld, kernel_sum_114_out, pointer</column>
+<column name="kernel_sum_114_out_ap_vld">out, 1, ap_vld, kernel_sum_114_out, pointer</column>
+<column name="kernel_sum_113_out">out, 32, ap_vld, kernel_sum_113_out, pointer</column>
+<column name="kernel_sum_113_out_ap_vld">out, 1, ap_vld, kernel_sum_113_out, pointer</column>
+<column name="kernel_sum_112_out">out, 32, ap_vld, kernel_sum_112_out, pointer</column>
+<column name="kernel_sum_112_out_ap_vld">out, 1, ap_vld, kernel_sum_112_out, pointer</column>
+<column name="kernel_sum_111_out">out, 32, ap_vld, kernel_sum_111_out, pointer</column>
+<column name="kernel_sum_111_out_ap_vld">out, 1, ap_vld, kernel_sum_111_out, pointer</column>
+<column name="kernel_sum_110_out">out, 32, ap_vld, kernel_sum_110_out, pointer</column>
+<column name="kernel_sum_110_out_ap_vld">out, 1, ap_vld, kernel_sum_110_out, pointer</column>
+<column name="kernel_sum_109_out">out, 32, ap_vld, kernel_sum_109_out, pointer</column>
+<column name="kernel_sum_109_out_ap_vld">out, 1, ap_vld, kernel_sum_109_out, pointer</column>
+<column name="kernel_sum_108_out">out, 32, ap_vld, kernel_sum_108_out, pointer</column>
+<column name="kernel_sum_108_out_ap_vld">out, 1, ap_vld, kernel_sum_108_out, pointer</column>
+<column name="kernel_sum_107_out">out, 32, ap_vld, kernel_sum_107_out, pointer</column>
+<column name="kernel_sum_107_out_ap_vld">out, 1, ap_vld, kernel_sum_107_out, pointer</column>
+<column name="kernel_sum_106_out">out, 32, ap_vld, kernel_sum_106_out, pointer</column>
+<column name="kernel_sum_106_out_ap_vld">out, 1, ap_vld, kernel_sum_106_out, pointer</column>
+<column name="kernel_sum_105_out">out, 32, ap_vld, kernel_sum_105_out, pointer</column>
+<column name="kernel_sum_105_out_ap_vld">out, 1, ap_vld, kernel_sum_105_out, pointer</column>
+<column name="kernel_sum_104_out">out, 32, ap_vld, kernel_sum_104_out, pointer</column>
+<column name="kernel_sum_104_out_ap_vld">out, 1, ap_vld, kernel_sum_104_out, pointer</column>
+<column name="kernel_sum_103_out">out, 32, ap_vld, kernel_sum_103_out, pointer</column>
+<column name="kernel_sum_103_out_ap_vld">out, 1, ap_vld, kernel_sum_103_out, pointer</column>
+<column name="kernel_sum_102_out">out, 32, ap_vld, kernel_sum_102_out, pointer</column>
+<column name="kernel_sum_102_out_ap_vld">out, 1, ap_vld, kernel_sum_102_out, pointer</column>
+<column name="kernel_sum_101_out">out, 32, ap_vld, kernel_sum_101_out, pointer</column>
+<column name="kernel_sum_101_out_ap_vld">out, 1, ap_vld, kernel_sum_101_out, pointer</column>
+<column name="kernel_sum_100_out">out, 32, ap_vld, kernel_sum_100_out, pointer</column>
+<column name="kernel_sum_100_out_ap_vld">out, 1, ap_vld, kernel_sum_100_out, pointer</column>
+<column name="kernel_sum_99_out">out, 32, ap_vld, kernel_sum_99_out, pointer</column>
+<column name="kernel_sum_99_out_ap_vld">out, 1, ap_vld, kernel_sum_99_out, pointer</column>
+<column name="kernel_sum_98_out">out, 32, ap_vld, kernel_sum_98_out, pointer</column>
+<column name="kernel_sum_98_out_ap_vld">out, 1, ap_vld, kernel_sum_98_out, pointer</column>
+<column name="kernel_sum_97_out">out, 32, ap_vld, kernel_sum_97_out, pointer</column>
+<column name="kernel_sum_97_out_ap_vld">out, 1, ap_vld, kernel_sum_97_out, pointer</column>
+<column name="kernel_sum_96_out">out, 32, ap_vld, kernel_sum_96_out, pointer</column>
+<column name="kernel_sum_96_out_ap_vld">out, 1, ap_vld, kernel_sum_96_out, pointer</column>
+<column name="kernel_sum_95_out">out, 32, ap_vld, kernel_sum_95_out, pointer</column>
+<column name="kernel_sum_95_out_ap_vld">out, 1, ap_vld, kernel_sum_95_out, pointer</column>
+<column name="kernel_sum_94_out">out, 32, ap_vld, kernel_sum_94_out, pointer</column>
+<column name="kernel_sum_94_out_ap_vld">out, 1, ap_vld, kernel_sum_94_out, pointer</column>
+<column name="kernel_sum_93_out">out, 32, ap_vld, kernel_sum_93_out, pointer</column>
+<column name="kernel_sum_93_out_ap_vld">out, 1, ap_vld, kernel_sum_93_out, pointer</column>
+<column name="kernel_sum_92_out">out, 32, ap_vld, kernel_sum_92_out, pointer</column>
+<column name="kernel_sum_92_out_ap_vld">out, 1, ap_vld, kernel_sum_92_out, pointer</column>
+<column name="kernel_sum_91_out">out, 32, ap_vld, kernel_sum_91_out, pointer</column>
+<column name="kernel_sum_91_out_ap_vld">out, 1, ap_vld, kernel_sum_91_out, pointer</column>
+<column name="kernel_sum_90_out">out, 32, ap_vld, kernel_sum_90_out, pointer</column>
+<column name="kernel_sum_90_out_ap_vld">out, 1, ap_vld, kernel_sum_90_out, pointer</column>
+<column name="kernel_sum_89_out">out, 32, ap_vld, kernel_sum_89_out, pointer</column>
+<column name="kernel_sum_89_out_ap_vld">out, 1, ap_vld, kernel_sum_89_out, pointer</column>
+<column name="kernel_sum_88_out">out, 32, ap_vld, kernel_sum_88_out, pointer</column>
+<column name="kernel_sum_88_out_ap_vld">out, 1, ap_vld, kernel_sum_88_out, pointer</column>
+<column name="kernel_sum_87_out">out, 32, ap_vld, kernel_sum_87_out, pointer</column>
+<column name="kernel_sum_87_out_ap_vld">out, 1, ap_vld, kernel_sum_87_out, pointer</column>
+<column name="kernel_sum_86_out">out, 32, ap_vld, kernel_sum_86_out, pointer</column>
+<column name="kernel_sum_86_out_ap_vld">out, 1, ap_vld, kernel_sum_86_out, pointer</column>
+<column name="kernel_sum_85_out">out, 32, ap_vld, kernel_sum_85_out, pointer</column>
+<column name="kernel_sum_85_out_ap_vld">out, 1, ap_vld, kernel_sum_85_out, pointer</column>
+<column name="kernel_sum_84_out">out, 32, ap_vld, kernel_sum_84_out, pointer</column>
+<column name="kernel_sum_84_out_ap_vld">out, 1, ap_vld, kernel_sum_84_out, pointer</column>
+<column name="kernel_sum_83_out">out, 32, ap_vld, kernel_sum_83_out, pointer</column>
+<column name="kernel_sum_83_out_ap_vld">out, 1, ap_vld, kernel_sum_83_out, pointer</column>
+<column name="kernel_sum_82_out">out, 32, ap_vld, kernel_sum_82_out, pointer</column>
+<column name="kernel_sum_82_out_ap_vld">out, 1, ap_vld, kernel_sum_82_out, pointer</column>
+<column name="kernel_sum_81_out">out, 32, ap_vld, kernel_sum_81_out, pointer</column>
+<column name="kernel_sum_81_out_ap_vld">out, 1, ap_vld, kernel_sum_81_out, pointer</column>
+<column name="kernel_sum_80_out">out, 32, ap_vld, kernel_sum_80_out, pointer</column>
+<column name="kernel_sum_80_out_ap_vld">out, 1, ap_vld, kernel_sum_80_out, pointer</column>
+<column name="kernel_sum_79_out">out, 32, ap_vld, kernel_sum_79_out, pointer</column>
+<column name="kernel_sum_79_out_ap_vld">out, 1, ap_vld, kernel_sum_79_out, pointer</column>
+<column name="kernel_sum_78_out">out, 32, ap_vld, kernel_sum_78_out, pointer</column>
+<column name="kernel_sum_78_out_ap_vld">out, 1, ap_vld, kernel_sum_78_out, pointer</column>
+<column name="kernel_sum_77_out">out, 32, ap_vld, kernel_sum_77_out, pointer</column>
+<column name="kernel_sum_77_out_ap_vld">out, 1, ap_vld, kernel_sum_77_out, pointer</column>
+<column name="kernel_sum_76_out">out, 32, ap_vld, kernel_sum_76_out, pointer</column>
+<column name="kernel_sum_76_out_ap_vld">out, 1, ap_vld, kernel_sum_76_out, pointer</column>
+<column name="kernel_sum_75_out">out, 32, ap_vld, kernel_sum_75_out, pointer</column>
+<column name="kernel_sum_75_out_ap_vld">out, 1, ap_vld, kernel_sum_75_out, pointer</column>
+<column name="kernel_sum_74_out">out, 32, ap_vld, kernel_sum_74_out, pointer</column>
+<column name="kernel_sum_74_out_ap_vld">out, 1, ap_vld, kernel_sum_74_out, pointer</column>
+<column name="kernel_sum_73_out">out, 32, ap_vld, kernel_sum_73_out, pointer</column>
+<column name="kernel_sum_73_out_ap_vld">out, 1, ap_vld, kernel_sum_73_out, pointer</column>
+<column name="kernel_sum_72_out">out, 32, ap_vld, kernel_sum_72_out, pointer</column>
+<column name="kernel_sum_72_out_ap_vld">out, 1, ap_vld, kernel_sum_72_out, pointer</column>
+<column name="kernel_sum_71_out">out, 32, ap_vld, kernel_sum_71_out, pointer</column>
+<column name="kernel_sum_71_out_ap_vld">out, 1, ap_vld, kernel_sum_71_out, pointer</column>
+<column name="kernel_sum_70_out">out, 32, ap_vld, kernel_sum_70_out, pointer</column>
+<column name="kernel_sum_70_out_ap_vld">out, 1, ap_vld, kernel_sum_70_out, pointer</column>
+<column name="kernel_sum_69_out">out, 32, ap_vld, kernel_sum_69_out, pointer</column>
+<column name="kernel_sum_69_out_ap_vld">out, 1, ap_vld, kernel_sum_69_out, pointer</column>
+<column name="kernel_sum_68_out">out, 32, ap_vld, kernel_sum_68_out, pointer</column>
+<column name="kernel_sum_68_out_ap_vld">out, 1, ap_vld, kernel_sum_68_out, pointer</column>
+<column name="kernel_sum_67_out">out, 32, ap_vld, kernel_sum_67_out, pointer</column>
+<column name="kernel_sum_67_out_ap_vld">out, 1, ap_vld, kernel_sum_67_out, pointer</column>
+<column name="kernel_sum_66_out">out, 32, ap_vld, kernel_sum_66_out, pointer</column>
+<column name="kernel_sum_66_out_ap_vld">out, 1, ap_vld, kernel_sum_66_out, pointer</column>
+<column name="kernel_sum_65_out">out, 32, ap_vld, kernel_sum_65_out, pointer</column>
+<column name="kernel_sum_65_out_ap_vld">out, 1, ap_vld, kernel_sum_65_out, pointer</column>
+<column name="kernel_sum_64_out">out, 32, ap_vld, kernel_sum_64_out, pointer</column>
+<column name="kernel_sum_64_out_ap_vld">out, 1, ap_vld, kernel_sum_64_out, pointer</column>
+<column name="kernel_sum_63_out">out, 32, ap_vld, kernel_sum_63_out, pointer</column>
+<column name="kernel_sum_63_out_ap_vld">out, 1, ap_vld, kernel_sum_63_out, pointer</column>
+<column name="kernel_sum_62_out">out, 32, ap_vld, kernel_sum_62_out, pointer</column>
+<column name="kernel_sum_62_out_ap_vld">out, 1, ap_vld, kernel_sum_62_out, pointer</column>
+<column name="kernel_sum_61_out">out, 32, ap_vld, kernel_sum_61_out, pointer</column>
+<column name="kernel_sum_61_out_ap_vld">out, 1, ap_vld, kernel_sum_61_out, pointer</column>
+<column name="kernel_sum_60_out">out, 32, ap_vld, kernel_sum_60_out, pointer</column>
+<column name="kernel_sum_60_out_ap_vld">out, 1, ap_vld, kernel_sum_60_out, pointer</column>
+<column name="kernel_sum_59_out">out, 32, ap_vld, kernel_sum_59_out, pointer</column>
+<column name="kernel_sum_59_out_ap_vld">out, 1, ap_vld, kernel_sum_59_out, pointer</column>
+<column name="kernel_sum_58_out">out, 32, ap_vld, kernel_sum_58_out, pointer</column>
+<column name="kernel_sum_58_out_ap_vld">out, 1, ap_vld, kernel_sum_58_out, pointer</column>
+<column name="kernel_sum_57_out">out, 32, ap_vld, kernel_sum_57_out, pointer</column>
+<column name="kernel_sum_57_out_ap_vld">out, 1, ap_vld, kernel_sum_57_out, pointer</column>
+<column name="kernel_sum_56_out">out, 32, ap_vld, kernel_sum_56_out, pointer</column>
+<column name="kernel_sum_56_out_ap_vld">out, 1, ap_vld, kernel_sum_56_out, pointer</column>
+<column name="kernel_sum_55_out">out, 32, ap_vld, kernel_sum_55_out, pointer</column>
+<column name="kernel_sum_55_out_ap_vld">out, 1, ap_vld, kernel_sum_55_out, pointer</column>
+<column name="kernel_sum_54_out">out, 32, ap_vld, kernel_sum_54_out, pointer</column>
+<column name="kernel_sum_54_out_ap_vld">out, 1, ap_vld, kernel_sum_54_out, pointer</column>
+<column name="kernel_sum_53_out">out, 32, ap_vld, kernel_sum_53_out, pointer</column>
+<column name="kernel_sum_53_out_ap_vld">out, 1, ap_vld, kernel_sum_53_out, pointer</column>
+<column name="kernel_sum_52_out">out, 32, ap_vld, kernel_sum_52_out, pointer</column>
+<column name="kernel_sum_52_out_ap_vld">out, 1, ap_vld, kernel_sum_52_out, pointer</column>
+<column name="kernel_sum_51_out">out, 32, ap_vld, kernel_sum_51_out, pointer</column>
+<column name="kernel_sum_51_out_ap_vld">out, 1, ap_vld, kernel_sum_51_out, pointer</column>
+<column name="kernel_sum_50_out">out, 32, ap_vld, kernel_sum_50_out, pointer</column>
+<column name="kernel_sum_50_out_ap_vld">out, 1, ap_vld, kernel_sum_50_out, pointer</column>
+<column name="kernel_sum_49_out">out, 32, ap_vld, kernel_sum_49_out, pointer</column>
+<column name="kernel_sum_49_out_ap_vld">out, 1, ap_vld, kernel_sum_49_out, pointer</column>
+<column name="kernel_sum_48_out">out, 32, ap_vld, kernel_sum_48_out, pointer</column>
+<column name="kernel_sum_48_out_ap_vld">out, 1, ap_vld, kernel_sum_48_out, pointer</column>
+<column name="kernel_sum_47_out">out, 32, ap_vld, kernel_sum_47_out, pointer</column>
+<column name="kernel_sum_47_out_ap_vld">out, 1, ap_vld, kernel_sum_47_out, pointer</column>
+<column name="kernel_sum_46_out">out, 32, ap_vld, kernel_sum_46_out, pointer</column>
+<column name="kernel_sum_46_out_ap_vld">out, 1, ap_vld, kernel_sum_46_out, pointer</column>
+<column name="kernel_sum_45_out">out, 32, ap_vld, kernel_sum_45_out, pointer</column>
+<column name="kernel_sum_45_out_ap_vld">out, 1, ap_vld, kernel_sum_45_out, pointer</column>
+<column name="kernel_sum_44_out">out, 32, ap_vld, kernel_sum_44_out, pointer</column>
+<column name="kernel_sum_44_out_ap_vld">out, 1, ap_vld, kernel_sum_44_out, pointer</column>
+<column name="kernel_sum_43_out">out, 32, ap_vld, kernel_sum_43_out, pointer</column>
+<column name="kernel_sum_43_out_ap_vld">out, 1, ap_vld, kernel_sum_43_out, pointer</column>
+<column name="kernel_sum_42_out">out, 32, ap_vld, kernel_sum_42_out, pointer</column>
+<column name="kernel_sum_42_out_ap_vld">out, 1, ap_vld, kernel_sum_42_out, pointer</column>
+<column name="kernel_sum_41_out">out, 32, ap_vld, kernel_sum_41_out, pointer</column>
+<column name="kernel_sum_41_out_ap_vld">out, 1, ap_vld, kernel_sum_41_out, pointer</column>
+<column name="kernel_sum_40_out">out, 32, ap_vld, kernel_sum_40_out, pointer</column>
+<column name="kernel_sum_40_out_ap_vld">out, 1, ap_vld, kernel_sum_40_out, pointer</column>
+<column name="kernel_sum_39_out">out, 32, ap_vld, kernel_sum_39_out, pointer</column>
+<column name="kernel_sum_39_out_ap_vld">out, 1, ap_vld, kernel_sum_39_out, pointer</column>
+<column name="kernel_sum_38_out">out, 32, ap_vld, kernel_sum_38_out, pointer</column>
+<column name="kernel_sum_38_out_ap_vld">out, 1, ap_vld, kernel_sum_38_out, pointer</column>
+<column name="kernel_sum_37_out">out, 32, ap_vld, kernel_sum_37_out, pointer</column>
+<column name="kernel_sum_37_out_ap_vld">out, 1, ap_vld, kernel_sum_37_out, pointer</column>
+<column name="kernel_sum_36_out">out, 32, ap_vld, kernel_sum_36_out, pointer</column>
+<column name="kernel_sum_36_out_ap_vld">out, 1, ap_vld, kernel_sum_36_out, pointer</column>
+<column name="kernel_sum_35_out">out, 32, ap_vld, kernel_sum_35_out, pointer</column>
+<column name="kernel_sum_35_out_ap_vld">out, 1, ap_vld, kernel_sum_35_out, pointer</column>
+<column name="kernel_sum_34_out">out, 32, ap_vld, kernel_sum_34_out, pointer</column>
+<column name="kernel_sum_34_out_ap_vld">out, 1, ap_vld, kernel_sum_34_out, pointer</column>
+<column name="kernel_sum_33_out">out, 32, ap_vld, kernel_sum_33_out, pointer</column>
+<column name="kernel_sum_33_out_ap_vld">out, 1, ap_vld, kernel_sum_33_out, pointer</column>
+<column name="kernel_sum_32_out">out, 32, ap_vld, kernel_sum_32_out, pointer</column>
+<column name="kernel_sum_32_out_ap_vld">out, 1, ap_vld, kernel_sum_32_out, pointer</column>
+<column name="kernel_sum_31_out">out, 32, ap_vld, kernel_sum_31_out, pointer</column>
+<column name="kernel_sum_31_out_ap_vld">out, 1, ap_vld, kernel_sum_31_out, pointer</column>
+<column name="kernel_sum_30_out">out, 32, ap_vld, kernel_sum_30_out, pointer</column>
+<column name="kernel_sum_30_out_ap_vld">out, 1, ap_vld, kernel_sum_30_out, pointer</column>
+<column name="kernel_sum_29_out">out, 32, ap_vld, kernel_sum_29_out, pointer</column>
+<column name="kernel_sum_29_out_ap_vld">out, 1, ap_vld, kernel_sum_29_out, pointer</column>
+<column name="kernel_sum_28_out">out, 32, ap_vld, kernel_sum_28_out, pointer</column>
+<column name="kernel_sum_28_out_ap_vld">out, 1, ap_vld, kernel_sum_28_out, pointer</column>
+<column name="kernel_sum_27_out">out, 32, ap_vld, kernel_sum_27_out, pointer</column>
+<column name="kernel_sum_27_out_ap_vld">out, 1, ap_vld, kernel_sum_27_out, pointer</column>
+<column name="kernel_sum_26_out">out, 32, ap_vld, kernel_sum_26_out, pointer</column>
+<column name="kernel_sum_26_out_ap_vld">out, 1, ap_vld, kernel_sum_26_out, pointer</column>
+<column name="kernel_sum_25_out">out, 32, ap_vld, kernel_sum_25_out, pointer</column>
+<column name="kernel_sum_25_out_ap_vld">out, 1, ap_vld, kernel_sum_25_out, pointer</column>
+<column name="kernel_sum_24_out">out, 32, ap_vld, kernel_sum_24_out, pointer</column>
+<column name="kernel_sum_24_out_ap_vld">out, 1, ap_vld, kernel_sum_24_out, pointer</column>
+<column name="kernel_sum_23_out">out, 32, ap_vld, kernel_sum_23_out, pointer</column>
+<column name="kernel_sum_23_out_ap_vld">out, 1, ap_vld, kernel_sum_23_out, pointer</column>
+<column name="kernel_sum_22_out">out, 32, ap_vld, kernel_sum_22_out, pointer</column>
+<column name="kernel_sum_22_out_ap_vld">out, 1, ap_vld, kernel_sum_22_out, pointer</column>
+<column name="kernel_sum_21_out">out, 32, ap_vld, kernel_sum_21_out, pointer</column>
+<column name="kernel_sum_21_out_ap_vld">out, 1, ap_vld, kernel_sum_21_out, pointer</column>
+<column name="kernel_sum_20_out">out, 32, ap_vld, kernel_sum_20_out, pointer</column>
+<column name="kernel_sum_20_out_ap_vld">out, 1, ap_vld, kernel_sum_20_out, pointer</column>
+<column name="kernel_sum_19_out">out, 32, ap_vld, kernel_sum_19_out, pointer</column>
+<column name="kernel_sum_19_out_ap_vld">out, 1, ap_vld, kernel_sum_19_out, pointer</column>
+<column name="kernel_sum_18_out">out, 32, ap_vld, kernel_sum_18_out, pointer</column>
+<column name="kernel_sum_18_out_ap_vld">out, 1, ap_vld, kernel_sum_18_out, pointer</column>
+<column name="kernel_sum_17_out">out, 32, ap_vld, kernel_sum_17_out, pointer</column>
+<column name="kernel_sum_17_out_ap_vld">out, 1, ap_vld, kernel_sum_17_out, pointer</column>
+<column name="kernel_sum_16_out">out, 32, ap_vld, kernel_sum_16_out, pointer</column>
+<column name="kernel_sum_16_out_ap_vld">out, 1, ap_vld, kernel_sum_16_out, pointer</column>
+<column name="kernel_sum_15_out">out, 32, ap_vld, kernel_sum_15_out, pointer</column>
+<column name="kernel_sum_15_out_ap_vld">out, 1, ap_vld, kernel_sum_15_out, pointer</column>
+<column name="kernel_sum_14_out">out, 32, ap_vld, kernel_sum_14_out, pointer</column>
+<column name="kernel_sum_14_out_ap_vld">out, 1, ap_vld, kernel_sum_14_out, pointer</column>
+<column name="kernel_sum_13_out">out, 32, ap_vld, kernel_sum_13_out, pointer</column>
+<column name="kernel_sum_13_out_ap_vld">out, 1, ap_vld, kernel_sum_13_out, pointer</column>
+<column name="kernel_sum_12_out">out, 32, ap_vld, kernel_sum_12_out, pointer</column>
+<column name="kernel_sum_12_out_ap_vld">out, 1, ap_vld, kernel_sum_12_out, pointer</column>
+<column name="kernel_sum_11_out">out, 32, ap_vld, kernel_sum_11_out, pointer</column>
+<column name="kernel_sum_11_out_ap_vld">out, 1, ap_vld, kernel_sum_11_out, pointer</column>
+<column name="kernel_sum_10_out">out, 32, ap_vld, kernel_sum_10_out, pointer</column>
+<column name="kernel_sum_10_out_ap_vld">out, 1, ap_vld, kernel_sum_10_out, pointer</column>
+<column name="kernel_sum_9_out">out, 32, ap_vld, kernel_sum_9_out, pointer</column>
+<column name="kernel_sum_9_out_ap_vld">out, 1, ap_vld, kernel_sum_9_out, pointer</column>
+<column name="kernel_sum_8_out">out, 32, ap_vld, kernel_sum_8_out, pointer</column>
+<column name="kernel_sum_8_out_ap_vld">out, 1, ap_vld, kernel_sum_8_out, pointer</column>
+<column name="kernel_sum_7_out">out, 32, ap_vld, kernel_sum_7_out, pointer</column>
+<column name="kernel_sum_7_out_ap_vld">out, 1, ap_vld, kernel_sum_7_out, pointer</column>
+<column name="kernel_sum_6_out">out, 32, ap_vld, kernel_sum_6_out, pointer</column>
+<column name="kernel_sum_6_out_ap_vld">out, 1, ap_vld, kernel_sum_6_out, pointer</column>
+<column name="kernel_sum_5_out">out, 32, ap_vld, kernel_sum_5_out, pointer</column>
+<column name="kernel_sum_5_out_ap_vld">out, 1, ap_vld, kernel_sum_5_out, pointer</column>
+<column name="kernel_sum_4_out">out, 32, ap_vld, kernel_sum_4_out, pointer</column>
+<column name="kernel_sum_4_out_ap_vld">out, 1, ap_vld, kernel_sum_4_out, pointer</column>
+<column name="kernel_sum_3_out">out, 32, ap_vld, kernel_sum_3_out, pointer</column>
+<column name="kernel_sum_3_out_ap_vld">out, 1, ap_vld, kernel_sum_3_out, pointer</column>
+<column name="kernel_sum_2_out">out, 32, ap_vld, kernel_sum_2_out, pointer</column>
+<column name="kernel_sum_2_out_ap_vld">out, 1, ap_vld, kernel_sum_2_out, pointer</column>
+<column name="kernel_sum_1_out">out, 32, ap_vld, kernel_sum_1_out, pointer</column>
+<column name="kernel_sum_1_out_ap_vld">out, 1, ap_vld, kernel_sum_1_out, pointer</column>
+<column name="kernel_sum_out">out, 32, ap_vld, kernel_sum_out, pointer</column>
+<column name="kernel_sum_out_ap_vld">out, 1, ap_vld, kernel_sum_out, pointer</column>
+</table>
+</item>
+</section>
+</profile>

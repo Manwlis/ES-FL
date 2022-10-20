@@ -1,0 +1,426 @@
+
+
+================================================================
+== Vitis HLS Report for 'softmax_10u_128u_s'
+================================================================
+* Date:           Tue Oct 18 21:15:24 2022
+
+* Version:        2022.1 (Build 3526262 on Mon Apr 18 15:47:01 MDT 2022)
+* Project:        forward_prop
+* Solution:       solution1 (Vitis Kernel Flow Target)
+* Product family: virtexuplus
+* Target device:  xcvu5p-flva2104-1-e
+
+
+================================================================
+== Performance Estimates
+================================================================
++ Timing: 
+    * Summary: 
+    +--------+----------+----------+------------+
+    |  Clock |  Target  | Estimated| Uncertainty|
+    +--------+----------+----------+------------+
+    |ap_clk  |  10.00 ns|  7.297 ns|     2.70 ns|
+    +--------+----------+----------+------------+
+
++ Latency: 
+    * Summary: 
+    +---------+---------+----------+----------+-----+-----+---------+
+    |  Latency (cycles) |  Latency (absolute) |  Interval | Pipeline|
+    |   min   |   max   |    min   |    max   | min | max |   Type  |
+    +---------+---------+----------+----------+-----+-----+---------+
+    |      644|      644|  6.440 us|  6.440 us|  644|  644|       no|
+    +---------+---------+----------+----------+-----+-----+---------+
+
+    + Detail: 
+        * Instance: 
+        N/A
+
+        * Loop: 
+        N/A
+
+============================================================
++ Verbose Summary: Synthesis Manager
+============================================================
+InlineROM: 1
+ExposeGlobal: 0
+============================================================
++ Verbose Summary: CDFG Model
+============================================================
+IsTopModel: 0
+ResetActiveHigh: 1
+IsCombinational: 2
+IsDatapathOnly: 0
+HasWiredReturn: 1
+HasMFsm: 0
+HasVarLatency: 1
+IsPipeline: 0
+IsRtlPipelined: 0
+IsInstanceOverlapped: 0
+IsDontTouch: 0
+HasImplIP: 0
+IsGatedGlobalClock: 0
+
+
+============================================================
++ Verbose Summary: Schedule
+============================================================
+* Number of FSM states : 27
+* Pipeline : 0
+* Dataflow Pipeline: 0
+
+* FSM state transitions: 
+1 --> 2 
+2 --> 3 
+3 --> 4 
+4 --> 5 
+5 --> 6 
+6 --> 7 
+7 --> 8 
+8 --> 9 
+9 --> 10 
+10 --> 11 
+11 --> 12 
+12 --> 13 
+13 --> 14 
+14 --> 15 
+15 --> 16 
+16 --> 17 
+17 --> 18 
+18 --> 19 
+19 --> 20 
+20 --> 21 
+21 --> 22 
+22 --> 23 
+23 --> 24 
+24 --> 25 
+25 --> 26 
+26 --> 27 
+27 --> 
+
+* FSM state operations: 
+
+State 1 <SV = 0> <Delay = 0.00>
+ST_1 : Operation 28 [1/1] (0.00ns)   --->   "%softmax_sum_loc = alloca i64 1"   --->   Operation 28 'alloca' 'softmax_sum_loc' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 29 [1/1] (0.00ns)   --->   "%add1827_loc = alloca i64 1"   --->   Operation 29 'alloca' 'add1827_loc' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 30 [1/1] (0.00ns)   --->   "%add18_129_loc = alloca i64 1"   --->   Operation 30 'alloca' 'add18_129_loc' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 31 [1/1] (0.00ns)   --->   "%add18_231_loc = alloca i64 1"   --->   Operation 31 'alloca' 'add18_231_loc' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 32 [1/1] (0.00ns)   --->   "%add18_333_loc = alloca i64 1"   --->   Operation 32 'alloca' 'add18_333_loc' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 33 [1/1] (0.00ns)   --->   "%add18_435_loc = alloca i64 1"   --->   Operation 33 'alloca' 'add18_435_loc' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 34 [1/1] (0.00ns)   --->   "%add18_537_loc = alloca i64 1"   --->   Operation 34 'alloca' 'add18_537_loc' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 35 [1/1] (0.00ns)   --->   "%add18_639_loc = alloca i64 1"   --->   Operation 35 'alloca' 'add18_639_loc' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 36 [1/1] (0.00ns)   --->   "%add18_741_loc = alloca i64 1"   --->   Operation 36 'alloca' 'add18_741_loc' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 37 [1/1] (0.00ns)   --->   "%add18_843_loc = alloca i64 1"   --->   Operation 37 'alloca' 'add18_843_loc' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 38 [1/1] (0.00ns)   --->   "%add18_945_loc = alloca i64 1"   --->   Operation 38 'alloca' 'add18_945_loc' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 39 [1/1] (0.00ns)   --->   "%sum_loc = alloca i64 1"   --->   Operation 39 'alloca' 'sum_loc' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 40 [1/1] (0.00ns)   --->   "%sum_1_loc = alloca i64 1"   --->   Operation 40 'alloca' 'sum_1_loc' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 41 [1/1] (0.00ns)   --->   "%sum_2_loc = alloca i64 1"   --->   Operation 41 'alloca' 'sum_2_loc' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 42 [1/1] (0.00ns)   --->   "%sum_3_loc = alloca i64 1"   --->   Operation 42 'alloca' 'sum_3_loc' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 43 [1/1] (0.00ns)   --->   "%sum_4_loc = alloca i64 1"   --->   Operation 43 'alloca' 'sum_4_loc' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 44 [1/1] (0.00ns)   --->   "%sum_5_loc = alloca i64 1"   --->   Operation 44 'alloca' 'sum_5_loc' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 45 [1/1] (0.00ns)   --->   "%sum_6_loc = alloca i64 1"   --->   Operation 45 'alloca' 'sum_6_loc' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 46 [1/1] (0.00ns)   --->   "%sum_7_loc = alloca i64 1"   --->   Operation 46 'alloca' 'sum_7_loc' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 47 [1/1] (0.00ns)   --->   "%sum_8_loc = alloca i64 1"   --->   Operation 47 'alloca' 'sum_8_loc' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 48 [1/1] (0.00ns)   --->   "%sum_9_loc = alloca i64 1"   --->   Operation 48 'alloca' 'sum_9_loc' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 49 [2/2] (0.00ns)   --->   "%call_ln0 = call void @softmax<10u, 128u>_Pipeline_VITIS_LOOP_463_1, i32 %biases, i32 %sum_9_loc, i32 %sum_8_loc, i32 %sum_7_loc, i32 %sum_6_loc, i32 %sum_5_loc, i32 %sum_4_loc, i32 %sum_3_loc, i32 %sum_2_loc, i32 %sum_1_loc, i32 %sum_loc"   --->   Operation 49 'call' 'call_ln0' <Predicate = true> <Delay = 0.00> <CoreType = "Generic">   --->   Core 0 '' <Latency = 0> <II = 1> <Delay = 1.00> <Generic> <Opcode : >
+
+State 2 <SV = 1> <Delay = 1.18>
+ST_2 : Operation 50 [1/2] (1.18ns)   --->   "%call_ln0 = call void @softmax<10u, 128u>_Pipeline_VITIS_LOOP_463_1, i32 %biases, i32 %sum_9_loc, i32 %sum_8_loc, i32 %sum_7_loc, i32 %sum_6_loc, i32 %sum_5_loc, i32 %sum_4_loc, i32 %sum_3_loc, i32 %sum_2_loc, i32 %sum_1_loc, i32 %sum_loc"   --->   Operation 50 'call' 'call_ln0' <Predicate = true> <Delay = 1.18> <CoreType = "Generic">   --->   Core 0 '' <Latency = 0> <II = 1> <Delay = 1.00> <Generic> <Opcode : >
+
+State 3 <SV = 2> <Delay = 0.46>
+ST_3 : Operation 51 [1/1] (0.00ns)   --->   "%sum_9_loc_load = load i32 %sum_9_loc"   --->   Operation 51 'load' 'sum_9_loc_load' <Predicate = true> <Delay = 0.00>
+ST_3 : Operation 52 [1/1] (0.00ns)   --->   "%sum_8_loc_load = load i32 %sum_8_loc"   --->   Operation 52 'load' 'sum_8_loc_load' <Predicate = true> <Delay = 0.00>
+ST_3 : Operation 53 [1/1] (0.00ns)   --->   "%sum_7_loc_load = load i32 %sum_7_loc"   --->   Operation 53 'load' 'sum_7_loc_load' <Predicate = true> <Delay = 0.00>
+ST_3 : Operation 54 [1/1] (0.00ns)   --->   "%sum_6_loc_load = load i32 %sum_6_loc"   --->   Operation 54 'load' 'sum_6_loc_load' <Predicate = true> <Delay = 0.00>
+ST_3 : Operation 55 [1/1] (0.00ns)   --->   "%sum_5_loc_load = load i32 %sum_5_loc"   --->   Operation 55 'load' 'sum_5_loc_load' <Predicate = true> <Delay = 0.00>
+ST_3 : Operation 56 [1/1] (0.00ns)   --->   "%sum_4_loc_load = load i32 %sum_4_loc"   --->   Operation 56 'load' 'sum_4_loc_load' <Predicate = true> <Delay = 0.00>
+ST_3 : Operation 57 [1/1] (0.00ns)   --->   "%sum_3_loc_load = load i32 %sum_3_loc"   --->   Operation 57 'load' 'sum_3_loc_load' <Predicate = true> <Delay = 0.00>
+ST_3 : Operation 58 [1/1] (0.00ns)   --->   "%sum_2_loc_load = load i32 %sum_2_loc"   --->   Operation 58 'load' 'sum_2_loc_load' <Predicate = true> <Delay = 0.00>
+ST_3 : Operation 59 [1/1] (0.00ns)   --->   "%sum_1_loc_load = load i32 %sum_1_loc"   --->   Operation 59 'load' 'sum_1_loc_load' <Predicate = true> <Delay = 0.00>
+ST_3 : Operation 60 [1/1] (0.00ns)   --->   "%sum_loc_load = load i32 %sum_loc"   --->   Operation 60 'load' 'sum_loc_load' <Predicate = true> <Delay = 0.00>
+ST_3 : Operation 61 [1/1] (0.00ns)   --->   "%empty = wait i32 @_ssdm_op_Wait"   --->   Operation 61 'wait' 'empty' <Predicate = true> <Delay = 0.00>
+ST_3 : Operation 62 [2/2] (0.46ns)   --->   "%call_ln0 = call void @softmax<10u, 128u>_Pipeline_calc_sums_and_max, i32 %sum_9_loc_load, i32 %sum_8_loc_load, i32 %sum_7_loc_load, i32 %sum_6_loc_load, i32 %sum_5_loc_load, i32 %sum_4_loc_load, i32 %sum_3_loc_load, i32 %sum_2_loc_load, i32 %sum_1_loc_load, i32 %sum_loc_load, i32 %dense_feature_map_stream128, i32 %weights_0, i32 %weights_1, i32 %weights_2, i32 %add18_945_loc, i32 %add18_843_loc, i32 %add18_741_loc, i32 %add18_639_loc, i32 %add18_537_loc, i32 %add18_435_loc, i32 %add18_333_loc, i32 %add18_231_loc, i32 %add18_129_loc, i32 %add1827_loc"   --->   Operation 62 'call' 'call_ln0' <Predicate = true> <Delay = 0.46> <CoreType = "Generic">   --->   Core 0 '' <Latency = 0> <II = 1> <Delay = 1.00> <Generic> <Opcode : >
+
+State 4 <SV = 3> <Delay = 0.00>
+ST_4 : Operation 63 [1/2] (0.00ns)   --->   "%call_ln0 = call void @softmax<10u, 128u>_Pipeline_calc_sums_and_max, i32 %sum_9_loc_load, i32 %sum_8_loc_load, i32 %sum_7_loc_load, i32 %sum_6_loc_load, i32 %sum_5_loc_load, i32 %sum_4_loc_load, i32 %sum_3_loc_load, i32 %sum_2_loc_load, i32 %sum_1_loc_load, i32 %sum_loc_load, i32 %dense_feature_map_stream128, i32 %weights_0, i32 %weights_1, i32 %weights_2, i32 %add18_945_loc, i32 %add18_843_loc, i32 %add18_741_loc, i32 %add18_639_loc, i32 %add18_537_loc, i32 %add18_435_loc, i32 %add18_333_loc, i32 %add18_231_loc, i32 %add18_129_loc, i32 %add1827_loc"   --->   Operation 63 'call' 'call_ln0' <Predicate = true> <Delay = 0.00> <CoreType = "Generic">   --->   Core 0 '' <Latency = 0> <II = 1> <Delay = 1.00> <Generic> <Opcode : >
+
+State 5 <SV = 4> <Delay = 1.91>
+ST_5 : Operation 64 [1/1] (0.00ns)   --->   "%add1827_loc_load = load i32 %add1827_loc"   --->   Operation 64 'load' 'add1827_loc_load' <Predicate = true> <Delay = 0.00>
+ST_5 : Operation 65 [1/1] (0.00ns)   --->   "%empty_127 = wait i32 @_ssdm_op_Wait"   --->   Operation 65 'wait' 'empty_127' <Predicate = true> <Delay = 0.00>
+ST_5 : Operation 66 [2/2] (1.91ns)   --->   "%cmp21_le = fcmp_ogt  i32 %add1827_loc_load, i32 -inf" [forward_prop/src/forward_prop.cpp:478]   --->   Operation 66 'fcmp' 'cmp21_le' <Predicate = true> <Delay = 1.91> <CoreInst = "FCompare">   --->   Core 19 'FCompare' <Latency = 1> <II = 1> <Delay = 1.91> <FuncUnit> <Opcode : 'fcmp'> <InPorts = 2> <OutPorts = 1>
+
+State 6 <SV = 5> <Delay = 4.11>
+ST_6 : Operation 67 [1/1] (0.00ns)   --->   "%add18_129_loc_load = load i32 %add18_129_loc"   --->   Operation 67 'load' 'add18_129_loc_load' <Predicate = true> <Delay = 0.00>
+ST_6 : Operation 68 [1/2] (1.91ns)   --->   "%cmp21_le = fcmp_ogt  i32 %add1827_loc_load, i32 -inf" [forward_prop/src/forward_prop.cpp:478]   --->   Operation 68 'fcmp' 'cmp21_le' <Predicate = true> <Delay = 1.91> <CoreInst = "FCompare">   --->   Core 19 'FCompare' <Latency = 1> <II = 1> <Delay = 1.91> <FuncUnit> <Opcode : 'fcmp'> <InPorts = 2> <OutPorts = 1>
+ST_6 : Operation 69 [1/1] (0.28ns)   --->   "%select_ln478 = select i1 %cmp21_le, i32 %add1827_loc_load, i32 -inf" [forward_prop/src/forward_prop.cpp:478]   --->   Operation 69 'select' 'select_ln478' <Predicate = true> <Delay = 0.28> <CoreInst = "Sel">   --->   Core 73 'Sel' <Latency = 0> <II = 1> <Delay = 0.28> <FuncUnit> <Opcode : 'select'> <InPorts = 3> <OutPorts = 1>
+ST_6 : Operation 70 [2/2] (1.91ns)   --->   "%cmp21_1_le = fcmp_ogt  i32 %add18_129_loc_load, i32 %select_ln478" [forward_prop/src/forward_prop.cpp:478]   --->   Operation 70 'fcmp' 'cmp21_1_le' <Predicate = true> <Delay = 1.91> <CoreInst = "FCompare">   --->   Core 19 'FCompare' <Latency = 1> <II = 1> <Delay = 1.91> <FuncUnit> <Opcode : 'fcmp'> <InPorts = 2> <OutPorts = 1>
+ST_6 : Operation 71 [1/1] (0.00ns)   --->   "%empty_128 = wait i32 @_ssdm_op_Wait"   --->   Operation 71 'wait' 'empty_128' <Predicate = true> <Delay = 0.00>
+
+State 7 <SV = 6> <Delay = 4.11>
+ST_7 : Operation 72 [1/1] (0.00ns)   --->   "%add18_231_loc_load = load i32 %add18_231_loc"   --->   Operation 72 'load' 'add18_231_loc_load' <Predicate = true> <Delay = 0.00>
+ST_7 : Operation 73 [1/2] (1.91ns)   --->   "%cmp21_1_le = fcmp_ogt  i32 %add18_129_loc_load, i32 %select_ln478" [forward_prop/src/forward_prop.cpp:478]   --->   Operation 73 'fcmp' 'cmp21_1_le' <Predicate = true> <Delay = 1.91> <CoreInst = "FCompare">   --->   Core 19 'FCompare' <Latency = 1> <II = 1> <Delay = 1.91> <FuncUnit> <Opcode : 'fcmp'> <InPorts = 2> <OutPorts = 1>
+ST_7 : Operation 74 [1/1] (0.28ns)   --->   "%select_ln478_1 = select i1 %cmp21_1_le, i32 %add18_129_loc_load, i32 %select_ln478" [forward_prop/src/forward_prop.cpp:478]   --->   Operation 74 'select' 'select_ln478_1' <Predicate = true> <Delay = 0.28> <CoreInst = "Sel">   --->   Core 73 'Sel' <Latency = 0> <II = 1> <Delay = 0.28> <FuncUnit> <Opcode : 'select'> <InPorts = 3> <OutPorts = 1>
+ST_7 : Operation 75 [2/2] (1.91ns)   --->   "%cmp21_2_le = fcmp_ogt  i32 %add18_231_loc_load, i32 %select_ln478_1" [forward_prop/src/forward_prop.cpp:478]   --->   Operation 75 'fcmp' 'cmp21_2_le' <Predicate = true> <Delay = 1.91> <CoreInst = "FCompare">   --->   Core 19 'FCompare' <Latency = 1> <II = 1> <Delay = 1.91> <FuncUnit> <Opcode : 'fcmp'> <InPorts = 2> <OutPorts = 1>
+
+State 8 <SV = 7> <Delay = 4.11>
+ST_8 : Operation 76 [1/1] (0.00ns)   --->   "%add18_333_loc_load = load i32 %add18_333_loc"   --->   Operation 76 'load' 'add18_333_loc_load' <Predicate = true> <Delay = 0.00>
+ST_8 : Operation 77 [1/2] (1.91ns)   --->   "%cmp21_2_le = fcmp_ogt  i32 %add18_231_loc_load, i32 %select_ln478_1" [forward_prop/src/forward_prop.cpp:478]   --->   Operation 77 'fcmp' 'cmp21_2_le' <Predicate = true> <Delay = 1.91> <CoreInst = "FCompare">   --->   Core 19 'FCompare' <Latency = 1> <II = 1> <Delay = 1.91> <FuncUnit> <Opcode : 'fcmp'> <InPorts = 2> <OutPorts = 1>
+ST_8 : Operation 78 [1/1] (0.28ns)   --->   "%select_ln478_2 = select i1 %cmp21_2_le, i32 %add18_231_loc_load, i32 %select_ln478_1" [forward_prop/src/forward_prop.cpp:478]   --->   Operation 78 'select' 'select_ln478_2' <Predicate = true> <Delay = 0.28> <CoreInst = "Sel">   --->   Core 73 'Sel' <Latency = 0> <II = 1> <Delay = 0.28> <FuncUnit> <Opcode : 'select'> <InPorts = 3> <OutPorts = 1>
+ST_8 : Operation 79 [2/2] (1.91ns)   --->   "%cmp21_3_le = fcmp_ogt  i32 %add18_333_loc_load, i32 %select_ln478_2" [forward_prop/src/forward_prop.cpp:478]   --->   Operation 79 'fcmp' 'cmp21_3_le' <Predicate = true> <Delay = 1.91> <CoreInst = "FCompare">   --->   Core 19 'FCompare' <Latency = 1> <II = 1> <Delay = 1.91> <FuncUnit> <Opcode : 'fcmp'> <InPorts = 2> <OutPorts = 1>
+
+State 9 <SV = 8> <Delay = 4.11>
+ST_9 : Operation 80 [1/1] (0.00ns)   --->   "%add18_435_loc_load = load i32 %add18_435_loc"   --->   Operation 80 'load' 'add18_435_loc_load' <Predicate = true> <Delay = 0.00>
+ST_9 : Operation 81 [1/2] (1.91ns)   --->   "%cmp21_3_le = fcmp_ogt  i32 %add18_333_loc_load, i32 %select_ln478_2" [forward_prop/src/forward_prop.cpp:478]   --->   Operation 81 'fcmp' 'cmp21_3_le' <Predicate = true> <Delay = 1.91> <CoreInst = "FCompare">   --->   Core 19 'FCompare' <Latency = 1> <II = 1> <Delay = 1.91> <FuncUnit> <Opcode : 'fcmp'> <InPorts = 2> <OutPorts = 1>
+ST_9 : Operation 82 [1/1] (0.28ns)   --->   "%select_ln478_3 = select i1 %cmp21_3_le, i32 %add18_333_loc_load, i32 %select_ln478_2" [forward_prop/src/forward_prop.cpp:478]   --->   Operation 82 'select' 'select_ln478_3' <Predicate = true> <Delay = 0.28> <CoreInst = "Sel">   --->   Core 73 'Sel' <Latency = 0> <II = 1> <Delay = 0.28> <FuncUnit> <Opcode : 'select'> <InPorts = 3> <OutPorts = 1>
+ST_9 : Operation 83 [2/2] (1.91ns)   --->   "%cmp21_4_le = fcmp_ogt  i32 %add18_435_loc_load, i32 %select_ln478_3" [forward_prop/src/forward_prop.cpp:478]   --->   Operation 83 'fcmp' 'cmp21_4_le' <Predicate = true> <Delay = 1.91> <CoreInst = "FCompare">   --->   Core 19 'FCompare' <Latency = 1> <II = 1> <Delay = 1.91> <FuncUnit> <Opcode : 'fcmp'> <InPorts = 2> <OutPorts = 1>
+
+State 10 <SV = 9> <Delay = 4.11>
+ST_10 : Operation 84 [1/1] (0.00ns)   --->   "%add18_537_loc_load = load i32 %add18_537_loc"   --->   Operation 84 'load' 'add18_537_loc_load' <Predicate = true> <Delay = 0.00>
+ST_10 : Operation 85 [1/2] (1.91ns)   --->   "%cmp21_4_le = fcmp_ogt  i32 %add18_435_loc_load, i32 %select_ln478_3" [forward_prop/src/forward_prop.cpp:478]   --->   Operation 85 'fcmp' 'cmp21_4_le' <Predicate = true> <Delay = 1.91> <CoreInst = "FCompare">   --->   Core 19 'FCompare' <Latency = 1> <II = 1> <Delay = 1.91> <FuncUnit> <Opcode : 'fcmp'> <InPorts = 2> <OutPorts = 1>
+ST_10 : Operation 86 [1/1] (0.28ns)   --->   "%select_ln478_4 = select i1 %cmp21_4_le, i32 %add18_435_loc_load, i32 %select_ln478_3" [forward_prop/src/forward_prop.cpp:478]   --->   Operation 86 'select' 'select_ln478_4' <Predicate = true> <Delay = 0.28> <CoreInst = "Sel">   --->   Core 73 'Sel' <Latency = 0> <II = 1> <Delay = 0.28> <FuncUnit> <Opcode : 'select'> <InPorts = 3> <OutPorts = 1>
+ST_10 : Operation 87 [2/2] (1.91ns)   --->   "%cmp21_5_le = fcmp_ogt  i32 %add18_537_loc_load, i32 %select_ln478_4" [forward_prop/src/forward_prop.cpp:478]   --->   Operation 87 'fcmp' 'cmp21_5_le' <Predicate = true> <Delay = 1.91> <CoreInst = "FCompare">   --->   Core 19 'FCompare' <Latency = 1> <II = 1> <Delay = 1.91> <FuncUnit> <Opcode : 'fcmp'> <InPorts = 2> <OutPorts = 1>
+
+State 11 <SV = 10> <Delay = 4.11>
+ST_11 : Operation 88 [1/1] (0.00ns)   --->   "%add18_639_loc_load = load i32 %add18_639_loc"   --->   Operation 88 'load' 'add18_639_loc_load' <Predicate = true> <Delay = 0.00>
+ST_11 : Operation 89 [1/2] (1.91ns)   --->   "%cmp21_5_le = fcmp_ogt  i32 %add18_537_loc_load, i32 %select_ln478_4" [forward_prop/src/forward_prop.cpp:478]   --->   Operation 89 'fcmp' 'cmp21_5_le' <Predicate = true> <Delay = 1.91> <CoreInst = "FCompare">   --->   Core 19 'FCompare' <Latency = 1> <II = 1> <Delay = 1.91> <FuncUnit> <Opcode : 'fcmp'> <InPorts = 2> <OutPorts = 1>
+ST_11 : Operation 90 [1/1] (0.28ns)   --->   "%select_ln478_5 = select i1 %cmp21_5_le, i32 %add18_537_loc_load, i32 %select_ln478_4" [forward_prop/src/forward_prop.cpp:478]   --->   Operation 90 'select' 'select_ln478_5' <Predicate = true> <Delay = 0.28> <CoreInst = "Sel">   --->   Core 73 'Sel' <Latency = 0> <II = 1> <Delay = 0.28> <FuncUnit> <Opcode : 'select'> <InPorts = 3> <OutPorts = 1>
+ST_11 : Operation 91 [2/2] (1.91ns)   --->   "%cmp21_6_le = fcmp_ogt  i32 %add18_639_loc_load, i32 %select_ln478_5" [forward_prop/src/forward_prop.cpp:478]   --->   Operation 91 'fcmp' 'cmp21_6_le' <Predicate = true> <Delay = 1.91> <CoreInst = "FCompare">   --->   Core 19 'FCompare' <Latency = 1> <II = 1> <Delay = 1.91> <FuncUnit> <Opcode : 'fcmp'> <InPorts = 2> <OutPorts = 1>
+
+State 12 <SV = 11> <Delay = 4.11>
+ST_12 : Operation 92 [1/1] (0.00ns)   --->   "%add18_741_loc_load = load i32 %add18_741_loc"   --->   Operation 92 'load' 'add18_741_loc_load' <Predicate = true> <Delay = 0.00>
+ST_12 : Operation 93 [1/2] (1.91ns)   --->   "%cmp21_6_le = fcmp_ogt  i32 %add18_639_loc_load, i32 %select_ln478_5" [forward_prop/src/forward_prop.cpp:478]   --->   Operation 93 'fcmp' 'cmp21_6_le' <Predicate = true> <Delay = 1.91> <CoreInst = "FCompare">   --->   Core 19 'FCompare' <Latency = 1> <II = 1> <Delay = 1.91> <FuncUnit> <Opcode : 'fcmp'> <InPorts = 2> <OutPorts = 1>
+ST_12 : Operation 94 [1/1] (0.28ns)   --->   "%select_ln478_6 = select i1 %cmp21_6_le, i32 %add18_639_loc_load, i32 %select_ln478_5" [forward_prop/src/forward_prop.cpp:478]   --->   Operation 94 'select' 'select_ln478_6' <Predicate = true> <Delay = 0.28> <CoreInst = "Sel">   --->   Core 73 'Sel' <Latency = 0> <II = 1> <Delay = 0.28> <FuncUnit> <Opcode : 'select'> <InPorts = 3> <OutPorts = 1>
+ST_12 : Operation 95 [2/2] (1.91ns)   --->   "%cmp21_7_le = fcmp_ogt  i32 %add18_741_loc_load, i32 %select_ln478_6" [forward_prop/src/forward_prop.cpp:478]   --->   Operation 95 'fcmp' 'cmp21_7_le' <Predicate = true> <Delay = 1.91> <CoreInst = "FCompare">   --->   Core 19 'FCompare' <Latency = 1> <II = 1> <Delay = 1.91> <FuncUnit> <Opcode : 'fcmp'> <InPorts = 2> <OutPorts = 1>
+
+State 13 <SV = 12> <Delay = 4.11>
+ST_13 : Operation 96 [1/1] (0.00ns)   --->   "%add18_843_loc_load = load i32 %add18_843_loc"   --->   Operation 96 'load' 'add18_843_loc_load' <Predicate = true> <Delay = 0.00>
+ST_13 : Operation 97 [1/2] (1.91ns)   --->   "%cmp21_7_le = fcmp_ogt  i32 %add18_741_loc_load, i32 %select_ln478_6" [forward_prop/src/forward_prop.cpp:478]   --->   Operation 97 'fcmp' 'cmp21_7_le' <Predicate = true> <Delay = 1.91> <CoreInst = "FCompare">   --->   Core 19 'FCompare' <Latency = 1> <II = 1> <Delay = 1.91> <FuncUnit> <Opcode : 'fcmp'> <InPorts = 2> <OutPorts = 1>
+ST_13 : Operation 98 [1/1] (0.28ns)   --->   "%select_ln478_7 = select i1 %cmp21_7_le, i32 %add18_741_loc_load, i32 %select_ln478_6" [forward_prop/src/forward_prop.cpp:478]   --->   Operation 98 'select' 'select_ln478_7' <Predicate = true> <Delay = 0.28> <CoreInst = "Sel">   --->   Core 73 'Sel' <Latency = 0> <II = 1> <Delay = 0.28> <FuncUnit> <Opcode : 'select'> <InPorts = 3> <OutPorts = 1>
+ST_13 : Operation 99 [2/2] (1.91ns)   --->   "%cmp21_8_le = fcmp_ogt  i32 %add18_843_loc_load, i32 %select_ln478_7" [forward_prop/src/forward_prop.cpp:478]   --->   Operation 99 'fcmp' 'cmp21_8_le' <Predicate = true> <Delay = 1.91> <CoreInst = "FCompare">   --->   Core 19 'FCompare' <Latency = 1> <II = 1> <Delay = 1.91> <FuncUnit> <Opcode : 'fcmp'> <InPorts = 2> <OutPorts = 1>
+
+State 14 <SV = 13> <Delay = 4.11>
+ST_14 : Operation 100 [1/1] (0.00ns)   --->   "%add18_945_loc_load = load i32 %add18_945_loc"   --->   Operation 100 'load' 'add18_945_loc_load' <Predicate = true> <Delay = 0.00>
+ST_14 : Operation 101 [1/2] (1.91ns)   --->   "%cmp21_8_le = fcmp_ogt  i32 %add18_843_loc_load, i32 %select_ln478_7" [forward_prop/src/forward_prop.cpp:478]   --->   Operation 101 'fcmp' 'cmp21_8_le' <Predicate = true> <Delay = 1.91> <CoreInst = "FCompare">   --->   Core 19 'FCompare' <Latency = 1> <II = 1> <Delay = 1.91> <FuncUnit> <Opcode : 'fcmp'> <InPorts = 2> <OutPorts = 1>
+ST_14 : Operation 102 [1/1] (0.28ns)   --->   "%select_ln478_8 = select i1 %cmp21_8_le, i32 %add18_843_loc_load, i32 %select_ln478_7" [forward_prop/src/forward_prop.cpp:478]   --->   Operation 102 'select' 'select_ln478_8' <Predicate = true> <Delay = 0.28> <CoreInst = "Sel">   --->   Core 73 'Sel' <Latency = 0> <II = 1> <Delay = 0.28> <FuncUnit> <Opcode : 'select'> <InPorts = 3> <OutPorts = 1>
+ST_14 : Operation 103 [2/2] (1.91ns)   --->   "%cmp21_9_le = fcmp_ogt  i32 %add18_945_loc_load, i32 %select_ln478_8" [forward_prop/src/forward_prop.cpp:478]   --->   Operation 103 'fcmp' 'cmp21_9_le' <Predicate = true> <Delay = 1.91> <CoreInst = "FCompare">   --->   Core 19 'FCompare' <Latency = 1> <II = 1> <Delay = 1.91> <FuncUnit> <Opcode : 'fcmp'> <InPorts = 2> <OutPorts = 1>
+
+State 15 <SV = 14> <Delay = 2.95>
+ST_15 : Operation 104 [1/2] (1.91ns)   --->   "%cmp21_9_le = fcmp_ogt  i32 %add18_945_loc_load, i32 %select_ln478_8" [forward_prop/src/forward_prop.cpp:478]   --->   Operation 104 'fcmp' 'cmp21_9_le' <Predicate = true> <Delay = 1.91> <CoreInst = "FCompare">   --->   Core 19 'FCompare' <Latency = 1> <II = 1> <Delay = 1.91> <FuncUnit> <Opcode : 'fcmp'> <InPorts = 2> <OutPorts = 1>
+ST_15 : Operation 105 [1/1] (0.28ns)   --->   "%select_ln478_9 = select i1 %cmp21_9_le, i32 %add18_945_loc_load, i32 %select_ln478_8" [forward_prop/src/forward_prop.cpp:478]   --->   Operation 105 'select' 'select_ln478_9' <Predicate = true> <Delay = 0.28> <CoreInst = "Sel">   --->   Core 73 'Sel' <Latency = 0> <II = 1> <Delay = 0.28> <FuncUnit> <Opcode : 'select'> <InPorts = 3> <OutPorts = 1>
+ST_15 : Operation 106 [2/2] (0.75ns)   --->   "%call_ln478 = call void @softmax<10u, 128u>_Pipeline_calc_exp_sum, i32 %add1827_loc_load, i32 %add18_129_loc_load, i32 %add18_231_loc_load, i32 %add18_333_loc_load, i32 %add18_435_loc_load, i32 %add18_537_loc_load, i32 %add18_639_loc_load, i32 %add18_741_loc_load, i32 %add18_843_loc_load, i32 %add18_945_loc_load, i32 %select_ln478_9, i32 %softmax_sum_loc" [forward_prop/src/forward_prop.cpp:478]   --->   Operation 106 'call' 'call_ln478' <Predicate = true> <Delay = 0.75> <CoreType = "Generic">   --->   Core 0 '' <Latency = 0> <II = 1> <Delay = 1.00> <Generic> <Opcode : >
+
+State 16 <SV = 15> <Delay = 0.00>
+ST_16 : Operation 107 [1/2] (0.00ns)   --->   "%call_ln478 = call void @softmax<10u, 128u>_Pipeline_calc_exp_sum, i32 %add1827_loc_load, i32 %add18_129_loc_load, i32 %add18_231_loc_load, i32 %add18_333_loc_load, i32 %add18_435_loc_load, i32 %add18_537_loc_load, i32 %add18_639_loc_load, i32 %add18_741_loc_load, i32 %add18_843_loc_load, i32 %add18_945_loc_load, i32 %select_ln478_9, i32 %softmax_sum_loc" [forward_prop/src/forward_prop.cpp:478]   --->   Operation 107 'call' 'call_ln478' <Predicate = true> <Delay = 0.00> <CoreType = "Generic">   --->   Core 0 '' <Latency = 0> <II = 1> <Delay = 1.00> <Generic> <Opcode : >
+
+State 17 <SV = 16> <Delay = 6.23>
+ST_17 : Operation 108 [1/1] (0.00ns)   --->   "%softmax_sum_loc_load = load i32 %softmax_sum_loc"   --->   Operation 108 'load' 'softmax_sum_loc_load' <Predicate = true> <Delay = 0.00>
+ST_17 : Operation 109 [6/6] (6.23ns)   --->   "%tmp_5 = flog i32 @llvm.log.f32, i32 %softmax_sum_loc_load" [/wrk/ci/prod/2022.1/rdi_builds/continuous/2022_04_18_3526262/src/shared/hls/clib/hlsmath/src/common/hls_log_float.cpp:9]   --->   Operation 109 'flog' 'tmp_5' <Predicate = true> <Delay = 6.23> <CoreInst = "FLog_fulldsp">   --->   Core 26 'FLog_fulldsp' <Latency = 5> <II = 1> <Delay = 6.23> <FuncUnit> <Opcode : 'flog'> <InPorts = 1> <OutPorts = 1>
+
+State 18 <SV = 17> <Delay = 6.23>
+ST_18 : Operation 110 [5/6] (6.23ns)   --->   "%tmp_5 = flog i32 @llvm.log.f32, i32 %softmax_sum_loc_load" [/wrk/ci/prod/2022.1/rdi_builds/continuous/2022_04_18_3526262/src/shared/hls/clib/hlsmath/src/common/hls_log_float.cpp:9]   --->   Operation 110 'flog' 'tmp_5' <Predicate = true> <Delay = 6.23> <CoreInst = "FLog_fulldsp">   --->   Core 26 'FLog_fulldsp' <Latency = 5> <II = 1> <Delay = 6.23> <FuncUnit> <Opcode : 'flog'> <InPorts = 1> <OutPorts = 1>
+
+State 19 <SV = 18> <Delay = 6.23>
+ST_19 : Operation 111 [4/6] (6.23ns)   --->   "%tmp_5 = flog i32 @llvm.log.f32, i32 %softmax_sum_loc_load" [/wrk/ci/prod/2022.1/rdi_builds/continuous/2022_04_18_3526262/src/shared/hls/clib/hlsmath/src/common/hls_log_float.cpp:9]   --->   Operation 111 'flog' 'tmp_5' <Predicate = true> <Delay = 6.23> <CoreInst = "FLog_fulldsp">   --->   Core 26 'FLog_fulldsp' <Latency = 5> <II = 1> <Delay = 6.23> <FuncUnit> <Opcode : 'flog'> <InPorts = 1> <OutPorts = 1>
+
+State 20 <SV = 19> <Delay = 6.23>
+ST_20 : Operation 112 [3/6] (6.23ns)   --->   "%tmp_5 = flog i32 @llvm.log.f32, i32 %softmax_sum_loc_load" [/wrk/ci/prod/2022.1/rdi_builds/continuous/2022_04_18_3526262/src/shared/hls/clib/hlsmath/src/common/hls_log_float.cpp:9]   --->   Operation 112 'flog' 'tmp_5' <Predicate = true> <Delay = 6.23> <CoreInst = "FLog_fulldsp">   --->   Core 26 'FLog_fulldsp' <Latency = 5> <II = 1> <Delay = 6.23> <FuncUnit> <Opcode : 'flog'> <InPorts = 1> <OutPorts = 1>
+
+State 21 <SV = 20> <Delay = 6.23>
+ST_21 : Operation 113 [2/6] (6.23ns)   --->   "%tmp_5 = flog i32 @llvm.log.f32, i32 %softmax_sum_loc_load" [/wrk/ci/prod/2022.1/rdi_builds/continuous/2022_04_18_3526262/src/shared/hls/clib/hlsmath/src/common/hls_log_float.cpp:9]   --->   Operation 113 'flog' 'tmp_5' <Predicate = true> <Delay = 6.23> <CoreInst = "FLog_fulldsp">   --->   Core 26 'FLog_fulldsp' <Latency = 5> <II = 1> <Delay = 6.23> <FuncUnit> <Opcode : 'flog'> <InPorts = 1> <OutPorts = 1>
+
+State 22 <SV = 21> <Delay = 6.23>
+ST_22 : Operation 114 [1/6] (6.23ns)   --->   "%tmp_5 = flog i32 @llvm.log.f32, i32 %softmax_sum_loc_load" [/wrk/ci/prod/2022.1/rdi_builds/continuous/2022_04_18_3526262/src/shared/hls/clib/hlsmath/src/common/hls_log_float.cpp:9]   --->   Operation 114 'flog' 'tmp_5' <Predicate = true> <Delay = 6.23> <CoreInst = "FLog_fulldsp">   --->   Core 26 'FLog_fulldsp' <Latency = 5> <II = 1> <Delay = 6.23> <FuncUnit> <Opcode : 'flog'> <InPorts = 1> <OutPorts = 1>
+
+State 23 <SV = 22> <Delay = 7.29>
+ST_23 : Operation 115 [3/3] (7.29ns)   --->   "%constant = fadd i32 %select_ln478_9, i32 %tmp_5" [forward_prop/src/forward_prop.cpp:488]   --->   Operation 115 'fadd' 'constant' <Predicate = true> <Delay = 7.29> <CoreInst = "FAddSub_fulldsp">   --->   Core 18 'FAddSub_fulldsp' <Latency = 2> <II = 1> <Delay = 7.29> <FuncUnit> <Opcode : 'fadd' 'fsub'> <InPorts = 2> <OutPorts = 1>
+
+State 24 <SV = 23> <Delay = 7.29>
+ST_24 : Operation 116 [2/3] (7.29ns)   --->   "%constant = fadd i32 %select_ln478_9, i32 %tmp_5" [forward_prop/src/forward_prop.cpp:488]   --->   Operation 116 'fadd' 'constant' <Predicate = true> <Delay = 7.29> <CoreInst = "FAddSub_fulldsp">   --->   Core 18 'FAddSub_fulldsp' <Latency = 2> <II = 1> <Delay = 7.29> <FuncUnit> <Opcode : 'fadd' 'fsub'> <InPorts = 2> <OutPorts = 1>
+
+State 25 <SV = 24> <Delay = 7.29>
+ST_25 : Operation 117 [1/3] (7.29ns)   --->   "%constant = fadd i32 %select_ln478_9, i32 %tmp_5" [forward_prop/src/forward_prop.cpp:488]   --->   Operation 117 'fadd' 'constant' <Predicate = true> <Delay = 7.29> <CoreInst = "FAddSub_fulldsp">   --->   Core 18 'FAddSub_fulldsp' <Latency = 2> <II = 1> <Delay = 7.29> <FuncUnit> <Opcode : 'fadd' 'fsub'> <InPorts = 2> <OutPorts = 1>
+
+State 26 <SV = 25> <Delay = 0.75>
+ST_26 : Operation 118 [2/2] (0.75ns)   --->   "%call_ln488 = call void @softmax<10u, 128u>_Pipeline_feature_map, i32 %add1827_loc_load, i32 %add18_129_loc_load, i32 %add18_231_loc_load, i32 %add18_333_loc_load, i32 %add18_435_loc_load, i32 %add18_537_loc_load, i32 %add18_639_loc_load, i32 %add18_741_loc_load, i32 %add18_843_loc_load, i32 %add18_945_loc_load, i32 %constant, i32 %softmax_f_map_out135" [forward_prop/src/forward_prop.cpp:488]   --->   Operation 118 'call' 'call_ln488' <Predicate = true> <Delay = 0.75> <CoreType = "Generic">   --->   Core 0 '' <Latency = 0> <II = 1> <Delay = 1.00> <Generic> <Opcode : >
+
+State 27 <SV = 26> <Delay = 0.00>
+ST_27 : Operation 119 [1/1] (0.00ns)   --->   "%specinterface_ln0 = specinterface void @_ssdm_op_SpecInterface, i32 %softmax_f_map_out135, void @empty_39, i32 0, i32 0, void @empty_30, i32 0, i32 0, void @empty_30, void @empty_30, void @empty_30, i32 0, i32 0, i32 0, i32 0, void @empty_30, void @empty_30, i32 4294967295, i32 0"   --->   Operation 119 'specinterface' 'specinterface_ln0' <Predicate = true> <Delay = 0.00>
+ST_27 : Operation 120 [1/1] (0.00ns)   --->   "%specinterface_ln0 = specinterface void @_ssdm_op_SpecInterface, i32 %dense_feature_map_stream128, void @empty_39, i32 0, i32 0, void @empty_30, i32 0, i32 0, void @empty_30, void @empty_30, void @empty_30, i32 0, i32 0, i32 0, i32 0, void @empty_30, void @empty_30, i32 4294967295, i32 0"   --->   Operation 120 'specinterface' 'specinterface_ln0' <Predicate = true> <Delay = 0.00>
+ST_27 : Operation 121 [1/2] (0.00ns)   --->   "%call_ln488 = call void @softmax<10u, 128u>_Pipeline_feature_map, i32 %add1827_loc_load, i32 %add18_129_loc_load, i32 %add18_231_loc_load, i32 %add18_333_loc_load, i32 %add18_435_loc_load, i32 %add18_537_loc_load, i32 %add18_639_loc_load, i32 %add18_741_loc_load, i32 %add18_843_loc_load, i32 %add18_945_loc_load, i32 %constant, i32 %softmax_f_map_out135" [forward_prop/src/forward_prop.cpp:488]   --->   Operation 121 'call' 'call_ln488' <Predicate = true> <Delay = 0.00> <CoreType = "Generic">   --->   Core 0 '' <Latency = 0> <II = 1> <Delay = 1.00> <Generic> <Opcode : >
+ST_27 : Operation 122 [1/1] (0.00ns)   --->   "%ret_ln494 = ret" [forward_prop/src/forward_prop.cpp:494]   --->   Operation 122 'ret' 'ret_ln494' <Predicate = true> <Delay = 0.00>
+
+
+============================================================
++ Verbose Summary: Timing violations
+============================================================
+Target clock period: 10ns, clock uncertainty: 2.7ns.
+
+ <State 1>: 0ns
+The critical path consists of the following:
+
+ <State 2>: 1.18ns
+The critical path consists of the following:
+	'call' operation ('call_ln0') to 'softmax<10u, 128u>_Pipeline_VITIS_LOOP_463_1' [30]  (1.18 ns)
+
+ <State 3>: 0.46ns
+The critical path consists of the following:
+	'load' operation ('sum_9_loc_load') on local variable 'sum_9_loc' [31]  (0 ns)
+	'call' operation ('call_ln0') to 'softmax<10u, 128u>_Pipeline_calc_sums_and_max' [42]  (0.46 ns)
+
+ <State 4>: 0ns
+The critical path consists of the following:
+
+ <State 5>: 1.91ns
+The critical path consists of the following:
+	'load' operation ('add1827_loc_load') on local variable 'add1827_loc' [52]  (0 ns)
+	'fcmp' operation ('cmp21_le', forward_prop/src/forward_prop.cpp:478) [54]  (1.91 ns)
+
+ <State 6>: 4.11ns
+The critical path consists of the following:
+	'fcmp' operation ('cmp21_le', forward_prop/src/forward_prop.cpp:478) [54]  (1.91 ns)
+	'select' operation ('select_ln478', forward_prop/src/forward_prop.cpp:478) [55]  (0.286 ns)
+	'fcmp' operation ('cmp21_1_le', forward_prop/src/forward_prop.cpp:478) [56]  (1.91 ns)
+
+ <State 7>: 4.11ns
+The critical path consists of the following:
+	'fcmp' operation ('cmp21_1_le', forward_prop/src/forward_prop.cpp:478) [56]  (1.91 ns)
+	'select' operation ('select_ln478_1', forward_prop/src/forward_prop.cpp:478) [57]  (0.286 ns)
+	'fcmp' operation ('cmp21_2_le', forward_prop/src/forward_prop.cpp:478) [58]  (1.91 ns)
+
+ <State 8>: 4.11ns
+The critical path consists of the following:
+	'fcmp' operation ('cmp21_2_le', forward_prop/src/forward_prop.cpp:478) [58]  (1.91 ns)
+	'select' operation ('select_ln478_2', forward_prop/src/forward_prop.cpp:478) [59]  (0.286 ns)
+	'fcmp' operation ('cmp21_3_le', forward_prop/src/forward_prop.cpp:478) [60]  (1.91 ns)
+
+ <State 9>: 4.11ns
+The critical path consists of the following:
+	'fcmp' operation ('cmp21_3_le', forward_prop/src/forward_prop.cpp:478) [60]  (1.91 ns)
+	'select' operation ('select_ln478_3', forward_prop/src/forward_prop.cpp:478) [61]  (0.286 ns)
+	'fcmp' operation ('cmp21_4_le', forward_prop/src/forward_prop.cpp:478) [62]  (1.91 ns)
+
+ <State 10>: 4.11ns
+The critical path consists of the following:
+	'fcmp' operation ('cmp21_4_le', forward_prop/src/forward_prop.cpp:478) [62]  (1.91 ns)
+	'select' operation ('select_ln478_4', forward_prop/src/forward_prop.cpp:478) [63]  (0.286 ns)
+	'fcmp' operation ('cmp21_5_le', forward_prop/src/forward_prop.cpp:478) [64]  (1.91 ns)
+
+ <State 11>: 4.11ns
+The critical path consists of the following:
+	'fcmp' operation ('cmp21_5_le', forward_prop/src/forward_prop.cpp:478) [64]  (1.91 ns)
+	'select' operation ('select_ln478_5', forward_prop/src/forward_prop.cpp:478) [65]  (0.286 ns)
+	'fcmp' operation ('cmp21_6_le', forward_prop/src/forward_prop.cpp:478) [66]  (1.91 ns)
+
+ <State 12>: 4.11ns
+The critical path consists of the following:
+	'fcmp' operation ('cmp21_6_le', forward_prop/src/forward_prop.cpp:478) [66]  (1.91 ns)
+	'select' operation ('select_ln478_6', forward_prop/src/forward_prop.cpp:478) [67]  (0.286 ns)
+	'fcmp' operation ('cmp21_7_le', forward_prop/src/forward_prop.cpp:478) [68]  (1.91 ns)
+
+ <State 13>: 4.11ns
+The critical path consists of the following:
+	'fcmp' operation ('cmp21_7_le', forward_prop/src/forward_prop.cpp:478) [68]  (1.91 ns)
+	'select' operation ('select_ln478_7', forward_prop/src/forward_prop.cpp:478) [69]  (0.286 ns)
+	'fcmp' operation ('cmp21_8_le', forward_prop/src/forward_prop.cpp:478) [70]  (1.91 ns)
+
+ <State 14>: 4.11ns
+The critical path consists of the following:
+	'fcmp' operation ('cmp21_8_le', forward_prop/src/forward_prop.cpp:478) [70]  (1.91 ns)
+	'select' operation ('select_ln478_8', forward_prop/src/forward_prop.cpp:478) [71]  (0.286 ns)
+	'fcmp' operation ('cmp21_9_le', forward_prop/src/forward_prop.cpp:478) [72]  (1.91 ns)
+
+ <State 15>: 2.95ns
+The critical path consists of the following:
+	'fcmp' operation ('cmp21_9_le', forward_prop/src/forward_prop.cpp:478) [72]  (1.91 ns)
+	'select' operation ('select_ln478_9', forward_prop/src/forward_prop.cpp:478) [73]  (0.286 ns)
+	'call' operation ('call_ln478', forward_prop/src/forward_prop.cpp:478) to 'softmax<10u, 128u>_Pipeline_calc_exp_sum' [74]  (0.755 ns)
+
+ <State 16>: 0ns
+The critical path consists of the following:
+
+ <State 17>: 6.23ns
+The critical path consists of the following:
+	'load' operation ('softmax_sum_loc_load') on local variable 'softmax_sum_loc' [75]  (0 ns)
+	'flog' operation ('tmp_5', /wrk/ci/prod/2022.1/rdi_builds/continuous/2022_04_18_3526262/src/shared/hls/clib/hlsmath/src/common/hls_log_float.cpp:9) [76]  (6.23 ns)
+
+ <State 18>: 6.23ns
+The critical path consists of the following:
+	'flog' operation ('tmp_5', /wrk/ci/prod/2022.1/rdi_builds/continuous/2022_04_18_3526262/src/shared/hls/clib/hlsmath/src/common/hls_log_float.cpp:9) [76]  (6.23 ns)
+
+ <State 19>: 6.23ns
+The critical path consists of the following:
+	'flog' operation ('tmp_5', /wrk/ci/prod/2022.1/rdi_builds/continuous/2022_04_18_3526262/src/shared/hls/clib/hlsmath/src/common/hls_log_float.cpp:9) [76]  (6.23 ns)
+
+ <State 20>: 6.23ns
+The critical path consists of the following:
+	'flog' operation ('tmp_5', /wrk/ci/prod/2022.1/rdi_builds/continuous/2022_04_18_3526262/src/shared/hls/clib/hlsmath/src/common/hls_log_float.cpp:9) [76]  (6.23 ns)
+
+ <State 21>: 6.23ns
+The critical path consists of the following:
+	'flog' operation ('tmp_5', /wrk/ci/prod/2022.1/rdi_builds/continuous/2022_04_18_3526262/src/shared/hls/clib/hlsmath/src/common/hls_log_float.cpp:9) [76]  (6.23 ns)
+
+ <State 22>: 6.23ns
+The critical path consists of the following:
+	'flog' operation ('tmp_5', /wrk/ci/prod/2022.1/rdi_builds/continuous/2022_04_18_3526262/src/shared/hls/clib/hlsmath/src/common/hls_log_float.cpp:9) [76]  (6.23 ns)
+
+ <State 23>: 7.3ns
+The critical path consists of the following:
+	'fadd' operation ('constant', forward_prop/src/forward_prop.cpp:488) [77]  (7.3 ns)
+
+ <State 24>: 7.3ns
+The critical path consists of the following:
+	'fadd' operation ('constant', forward_prop/src/forward_prop.cpp:488) [77]  (7.3 ns)
+
+ <State 25>: 7.3ns
+The critical path consists of the following:
+	'fadd' operation ('constant', forward_prop/src/forward_prop.cpp:488) [77]  (7.3 ns)
+
+ <State 26>: 0.755ns
+The critical path consists of the following:
+	'call' operation ('call_ln488', forward_prop/src/forward_prop.cpp:488) to 'softmax<10u, 128u>_Pipeline_feature_map' [79]  (0.755 ns)
+
+ <State 27>: 0ns
+The critical path consists of the following:
+
+
+============================================================
++ Verbose Summary: Binding
+============================================================
+N/A
+* FSMD analyzer results:
+  - Output states:
+ - Input state : 
+  - Chain level:
+	State 1
+	State 2
+	State 3
+	State 4
+	State 5
+	State 6
+	State 7
+	State 8
+	State 9
+	State 10
+	State 11
+	State 12
+	State 13
+	State 14
+	State 15
+	State 16
+	State 17
+	State 18
+	State 19
+	State 20
+	State 21
+	State 22
+	State 23
+	State 24
+	State 25
+	State 26
+	State 27
+
+
+============================================================
++ Verbose Summary: Datapath Resource usage 
+============================================================
+N/A

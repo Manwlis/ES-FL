@@ -1,0 +1,218 @@
+
+
+================================================================
+== Vitis HLS Report for 'softmax_10u_128u_s'
+================================================================
+* Date:           Tue Oct 18 21:21:16 2022
+
+* Version:        2022.1 (Build 3526262 on Mon Apr 18 15:47:01 MDT 2022)
+* Project:        forward_prop
+* Solution:       solution1 (Vitis Kernel Flow Target)
+* Product family: virtexuplus
+* Target device:  xcvu5p-flva2104-1-e
+
+
+================================================================
+== Performance Estimates
+================================================================
++ Timing: 
+    * Summary: 
+    +--------+----------+----------+------------+
+    |  Clock |  Target  | Estimated| Uncertainty|
+    +--------+----------+----------+------------+
+    |ap_clk  |  10.00 ns|  7.297 ns|     2.70 ns|
+    +--------+----------+----------+------------+
+
++ Latency: 
+    * Summary: 
+    +---------+---------+----------+----------+-----+-----+---------+
+    |  Latency (cycles) |  Latency (absolute) |  Interval | Pipeline|
+    |   min   |   max   |    min   |    max   | min | max |   Type  |
+    +---------+---------+----------+----------+-----+-----+---------+
+    |      644|      644|  6.440 us|  6.440 us|  644|  644|       no|
+    +---------+---------+----------+----------+-----+-----+---------+
+
+    + Detail: 
+        * Instance: 
+        +--------------------------------------------------------+---------------------------------------------+---------+---------+----------+----------+-----+-----+---------+
+        |                                                        |                                             |  Latency (cycles) |  Latency (absolute) |  Interval | Pipeline|
+        |                        Instance                        |                    Module                   |   min   |   max   |    min   |    max   | min | max |   Type  |
+        +--------------------------------------------------------+---------------------------------------------+---------+---------+----------+----------+-----+-----+---------+
+        |grp_softmax_10u_128u_Pipeline_VITIS_LOOP_463_1_fu_122   |softmax_10u_128u_Pipeline_VITIS_LOOP_463_1   |       12|       12|  0.120 us|  0.120 us|   12|   12|       no|
+        |grp_softmax_10u_128u_Pipeline_calc_sums_and_max_fu_138  |softmax_10u_128u_Pipeline_calc_sums_and_max  |      535|      535|  5.350 us|  5.350 us|  535|  535|       no|
+        |grp_softmax_10u_128u_Pipeline_calc_exp_sum_fu_170       |softmax_10u_128u_Pipeline_calc_exp_sum       |       51|       51|  0.510 us|  0.510 us|   51|   51|       no|
+        |grp_softmax_10u_128u_Pipeline_feature_map_fu_186        |softmax_10u_128u_Pipeline_feature_map        |       20|       20|  0.200 us|  0.200 us|   20|   20|       no|
+        +--------------------------------------------------------+---------------------------------------------+---------+---------+----------+----------+-----+-----+---------+
+
+        * Loop: 
+        N/A
+
+
+
+================================================================
+== Utilization Estimates
+================================================================
+* Summary: 
++---------------------+---------+------+---------+--------+-----+
+|         Name        | BRAM_18K|  DSP |    FF   |   LUT  | URAM|
++---------------------+---------+------+---------+--------+-----+
+|DSP                  |        -|     -|        -|       -|    -|
+|Expression           |        -|     -|        0|     322|    -|
+|FIFO                 |        -|     -|        -|       -|    -|
+|Instance             |        -|    42|     3853|    3751|    -|
+|Memory               |        -|     -|        -|       -|    -|
+|Multiplexer          |        -|     -|        -|     416|    -|
+|Register             |        -|     -|      416|       -|    -|
++---------------------+---------+------+---------+--------+-----+
+|Total                |        0|    42|     4269|    4489|    0|
++---------------------+---------+------+---------+--------+-----+
+|Available SLR        |     1024|  1737|   600577|  300288|  235|
++---------------------+---------+------+---------+--------+-----+
+|Utilization SLR (%)  |        0|     2|       ~0|       1|    0|
++---------------------+---------+------+---------+--------+-----+
+|Available            |     2048|  3474|  1201154|  600577|  470|
++---------------------+---------+------+---------+--------+-----+
+|Utilization (%)      |        0|     1|       ~0|      ~0|    0|
++---------------------+---------+------+---------+--------+-----+
+
++ Detail: 
+    * Instance: 
+    +--------------------------------------------------------+---------------------------------------------+---------+----+------+------+-----+
+    |                        Instance                        |                    Module                   | BRAM_18K| DSP|  FF  |  LUT | URAM|
+    +--------------------------------------------------------+---------------------------------------------+---------+----+------+------+-----+
+    |faddfsub_32ns_32ns_32_3_full_dsp_1_U20437               |faddfsub_32ns_32ns_32_3_full_dsp_1           |        0|   2|   177|   229|    0|
+    |fcmp_32ns_32ns_1_2_no_dsp_1_U20438                      |fcmp_32ns_32ns_1_2_no_dsp_1                  |        0|   0|     0|     0|    0|
+    |fexp_32ns_32ns_32_5_full_dsp_1_U20440                   |fexp_32ns_32ns_32_5_full_dsp_1               |        0|   7|   195|   731|    0|
+    |flog_32ns_32ns_32_6_full_dsp_1_U20439                   |flog_32ns_32ns_32_6_full_dsp_1               |        0|  13|   389|   426|    0|
+    |grp_softmax_10u_128u_Pipeline_VITIS_LOOP_463_1_fu_122   |softmax_10u_128u_Pipeline_VITIS_LOOP_463_1   |        0|   0|   331|    59|    0|
+    |grp_softmax_10u_128u_Pipeline_calc_exp_sum_fu_170       |softmax_10u_128u_Pipeline_calc_exp_sum       |        0|   0|   240|   258|    0|
+    |grp_softmax_10u_128u_Pipeline_calc_sums_and_max_fu_138  |softmax_10u_128u_Pipeline_calc_sums_and_max  |        0|  20|  2402|  1924|    0|
+    |grp_softmax_10u_128u_Pipeline_feature_map_fu_186        |softmax_10u_128u_Pipeline_feature_map        |        0|   0|   119|   124|    0|
+    +--------------------------------------------------------+---------------------------------------------+---------+----+------+------+-----+
+    |Total                                                   |                                             |        0|  42|  3853|  3751|    0|
+    +--------------------------------------------------------+---------------------------------------------+---------+----+------+------+-----+
+
+    * DSP: 
+    N/A
+
+    * Memory: 
+    N/A
+
+    * FIFO: 
+    N/A
+
+    * Expression: 
+    +--------------------------+----------+----+---+----+------------+------------+
+    |       Variable Name      | Operation| DSP| FF| LUT| Bitwidth P0| Bitwidth P1|
+    +--------------------------+----------+----+---+----+------------+------------+
+    |ap_block_state1           |        or|   0|  0|   2|           1|           1|
+    |select_ln478_1_fu_277_p3  |    select|   0|  0|  32|           1|          32|
+    |select_ln478_2_fu_288_p3  |    select|   0|  0|  32|           1|          32|
+    |select_ln478_3_fu_299_p3  |    select|   0|  0|  32|           1|          32|
+    |select_ln478_4_fu_310_p3  |    select|   0|  0|  32|           1|          32|
+    |select_ln478_5_fu_321_p3  |    select|   0|  0|  32|           1|          32|
+    |select_ln478_6_fu_332_p3  |    select|   0|  0|  32|           1|          32|
+    |select_ln478_7_fu_343_p3  |    select|   0|  0|  32|           1|          32|
+    |select_ln478_8_fu_354_p3  |    select|   0|  0|  32|           1|          32|
+    |select_ln478_9_fu_361_p3  |    select|   0|  0|  32|           1|          32|
+    |select_ln478_fu_265_p3    |    select|   0|  0|  32|           1|          32|
+    +--------------------------+----------+----+---+----+------------+------------+
+    |Total                     |          |   0|  0| 322|          11|         321|
+    +--------------------------+----------+----+---+----+------------+------------+
+
+    * Multiplexer: 
+    +----------------------------------+-----+-----------+-----+-----------+
+    |               Name               | LUT | Input Size| Bits| Total Bits|
+    +----------------------------------+-----+-----------+-----+-----------+
+    |ap_NS_fsm                         |  131|         28|    1|         28|
+    |ap_done                           |    9|          2|    1|          2|
+    |dense_feature_map_stream128_read  |    9|          2|    1|          2|
+    |grp_fu_203_ce                     |   20|          4|    1|          4|
+    |grp_fu_203_opcode                 |   26|          5|    2|         10|
+    |grp_fu_203_p0                     |   26|          5|   32|        160|
+    |grp_fu_203_p1                     |   26|          5|   32|        160|
+    |grp_fu_207_p0                     |   59|         11|   32|        352|
+    |grp_fu_207_p1                     |   59|         11|   32|        352|
+    |grp_fu_631_ce                     |   14|          3|    1|          3|
+    |grp_fu_631_p0                     |   14|          3|   32|         96|
+    |grp_fu_631_p1                     |   14|          3|   32|         96|
+    |softmax_f_map_out135_write        |    9|          2|    1|          2|
+    +----------------------------------+-----+-----------+-----+-----------+
+    |Total                             |  416|         84|  200|       1267|
+    +----------------------------------+-----+-----------+-----+-----------+
+
+    * Register: 
+    +---------------------------------------------------------------------+----+----+-----+-----------+
+    |                                 Name                                | FF | LUT| Bits| Const Bits|
+    +---------------------------------------------------------------------+----+----+-----+-----------+
+    |ap_CS_fsm                                                            |  27|   0|   27|          0|
+    |ap_done_reg                                                          |   1|   0|    1|          0|
+    |constant_reg_626                                                     |  32|   0|   32|          0|
+    |grp_softmax_10u_128u_Pipeline_VITIS_LOOP_463_1_fu_122_ap_start_reg   |   1|   0|    1|          0|
+    |grp_softmax_10u_128u_Pipeline_calc_exp_sum_fu_170_ap_start_reg       |   1|   0|    1|          0|
+    |grp_softmax_10u_128u_Pipeline_calc_sums_and_max_fu_138_ap_start_reg  |   1|   0|    1|          0|
+    |grp_softmax_10u_128u_Pipeline_feature_map_fu_186_ap_start_reg        |   1|   0|    1|          0|
+    |select_ln478_1_reg_543                                               |  32|   0|   32|          0|
+    |select_ln478_2_reg_552                                               |  32|   0|   32|          0|
+    |select_ln478_3_reg_561                                               |  32|   0|   32|          0|
+    |select_ln478_4_reg_570                                               |  32|   0|   32|          0|
+    |select_ln478_5_reg_579                                               |  32|   0|   32|          0|
+    |select_ln478_6_reg_588                                               |  32|   0|   32|          0|
+    |select_ln478_7_reg_597                                               |  32|   0|   32|          0|
+    |select_ln478_8_reg_606                                               |  32|   0|   32|          0|
+    |select_ln478_9_reg_612                                               |  32|   0|   32|          0|
+    |select_ln478_reg_534                                                 |  32|   0|   32|          0|
+    |tmp_5_reg_621                                                        |  32|   0|   32|          0|
+    +---------------------------------------------------------------------+----+----+-----+-----------+
+    |Total                                                                | 416|   0|  416|          0|
+    +---------------------------------------------------------------------+----+----+-----+-----------+
+
+
+
+================================================================
+== Interface
+================================================================
+* Summary: 
++--------------------------------------------+-----+-----+------------+-----------------------------+--------------+
+|                  RTL Ports                 | Dir | Bits|  Protocol  |        Source Object        |    C Type    |
++--------------------------------------------+-----+-----+------------+-----------------------------+--------------+
+|ap_clk                                      |   in|    1|  ap_ctrl_hs|           softmax<10u, 128u>|  return value|
+|ap_rst                                      |   in|    1|  ap_ctrl_hs|           softmax<10u, 128u>|  return value|
+|ap_start                                    |   in|    1|  ap_ctrl_hs|           softmax<10u, 128u>|  return value|
+|ap_done                                     |  out|    1|  ap_ctrl_hs|           softmax<10u, 128u>|  return value|
+|ap_continue                                 |   in|    1|  ap_ctrl_hs|           softmax<10u, 128u>|  return value|
+|ap_idle                                     |  out|    1|  ap_ctrl_hs|           softmax<10u, 128u>|  return value|
+|ap_ready                                    |  out|    1|  ap_ctrl_hs|           softmax<10u, 128u>|  return value|
+|dense_feature_map_stream128_dout            |   in|   32|     ap_fifo|  dense_feature_map_stream128|       pointer|
+|dense_feature_map_stream128_num_data_valid  |   in|    3|     ap_fifo|  dense_feature_map_stream128|       pointer|
+|dense_feature_map_stream128_fifo_cap        |   in|    3|     ap_fifo|  dense_feature_map_stream128|       pointer|
+|dense_feature_map_stream128_empty_n         |   in|    1|     ap_fifo|  dense_feature_map_stream128|       pointer|
+|dense_feature_map_stream128_read            |  out|    1|     ap_fifo|  dense_feature_map_stream128|       pointer|
+|weights_0_address0                          |  out|    9|   ap_memory|                    weights_0|         array|
+|weights_0_ce0                               |  out|    1|   ap_memory|                    weights_0|         array|
+|weights_0_q0                                |   in|   32|   ap_memory|                    weights_0|         array|
+|weights_0_address1                          |  out|    9|   ap_memory|                    weights_0|         array|
+|weights_0_ce1                               |  out|    1|   ap_memory|                    weights_0|         array|
+|weights_0_q1                                |   in|   32|   ap_memory|                    weights_0|         array|
+|weights_1_address0                          |  out|    9|   ap_memory|                    weights_1|         array|
+|weights_1_ce0                               |  out|    1|   ap_memory|                    weights_1|         array|
+|weights_1_q0                                |   in|   32|   ap_memory|                    weights_1|         array|
+|weights_1_address1                          |  out|    9|   ap_memory|                    weights_1|         array|
+|weights_1_ce1                               |  out|    1|   ap_memory|                    weights_1|         array|
+|weights_1_q1                                |   in|   32|   ap_memory|                    weights_1|         array|
+|weights_2_address0                          |  out|    9|   ap_memory|                    weights_2|         array|
+|weights_2_ce0                               |  out|    1|   ap_memory|                    weights_2|         array|
+|weights_2_q0                                |   in|   32|   ap_memory|                    weights_2|         array|
+|weights_2_address1                          |  out|    9|   ap_memory|                    weights_2|         array|
+|weights_2_ce1                               |  out|    1|   ap_memory|                    weights_2|         array|
+|weights_2_q1                                |   in|   32|   ap_memory|                    weights_2|         array|
+|biases_address0                             |  out|    4|   ap_memory|                       biases|         array|
+|biases_ce0                                  |  out|    1|   ap_memory|                       biases|         array|
+|biases_q0                                   |   in|   32|   ap_memory|                       biases|         array|
+|softmax_f_map_out135_din                    |  out|   32|     ap_fifo|         softmax_f_map_out135|       pointer|
+|softmax_f_map_out135_num_data_valid         |   in|    5|     ap_fifo|         softmax_f_map_out135|       pointer|
+|softmax_f_map_out135_fifo_cap               |   in|    5|     ap_fifo|         softmax_f_map_out135|       pointer|
+|softmax_f_map_out135_full_n                 |   in|    1|     ap_fifo|         softmax_f_map_out135|       pointer|
+|softmax_f_map_out135_write                  |  out|    1|     ap_fifo|         softmax_f_map_out135|       pointer|
++--------------------------------------------+-----+-----+------------+-----------------------------+--------------+
+

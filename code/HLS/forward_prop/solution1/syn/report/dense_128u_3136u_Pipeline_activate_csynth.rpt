@@ -1,0 +1,296 @@
+
+
+================================================================
+== Vitis HLS Report for 'dense_128u_3136u_Pipeline_activate'
+================================================================
+* Date:           Tue Oct 18 21:21:10 2022
+
+* Version:        2022.1 (Build 3526262 on Mon Apr 18 15:47:01 MDT 2022)
+* Project:        forward_prop
+* Solution:       solution1 (Vitis Kernel Flow Target)
+* Product family: virtexuplus
+* Target device:  xcvu5p-flva2104-1-e
+
+
+================================================================
+== Performance Estimates
+================================================================
++ Timing: 
+    * Summary: 
+    +--------+----------+----------+------------+
+    |  Clock |  Target  | Estimated| Uncertainty|
+    +--------+----------+----------+------------+
+    |ap_clk  |  10.00 ns|  4.301 ns|     2.70 ns|
+    +--------+----------+----------+------------+
+
++ Latency: 
+    * Summary: 
+    +---------+---------+----------+----------+-----+-----+---------+
+    |  Latency (cycles) |  Latency (absolute) |  Interval | Pipeline|
+    |   min   |   max   |    min   |    max   | min | max |   Type  |
+    +---------+---------+----------+----------+-----+-----+---------+
+    |      130|      130|  1.300 us|  1.300 us|  130|  130|       no|
+    +---------+---------+----------+----------+-----+-----+---------+
+
+    + Detail: 
+        * Instance: 
+        N/A
+
+        * Loop: 
+        +------------+---------+---------+----------+-----------+-----------+------+----------+
+        |            |  Latency (cycles) | Iteration|  Initiation Interval  | Trip |          |
+        |  Loop Name |   min   |   max   |  Latency |  achieved |   target  | Count| Pipelined|
+        +------------+---------+---------+----------+-----------+-----------+------+----------+
+        |- activate  |      128|      128|         2|          1|          1|   128|       yes|
+        +------------+---------+---------+----------+-----------+-----------+------+----------+
+
+
+
+================================================================
+== Utilization Estimates
+================================================================
+* Summary: 
++---------------------+---------+------+---------+--------+-----+
+|         Name        | BRAM_18K|  DSP |    FF   |   LUT  | URAM|
++---------------------+---------+------+---------+--------+-----+
+|DSP                  |        -|     -|        -|       -|    -|
+|Expression           |        -|     -|        0|      64|    -|
+|FIFO                 |        -|     -|        -|       -|    -|
+|Instance             |        -|     -|        0|     673|    -|
+|Memory               |        -|     -|        -|       -|    -|
+|Multiplexer          |        -|     -|        -|      63|    -|
+|Register             |        -|     -|       43|       -|    -|
++---------------------+---------+------+---------+--------+-----+
+|Total                |        0|     0|       43|     800|    0|
++---------------------+---------+------+---------+--------+-----+
+|Available SLR        |     1024|  1737|   600577|  300288|  235|
++---------------------+---------+------+---------+--------+-----+
+|Utilization SLR (%)  |        0|     0|       ~0|      ~0|    0|
++---------------------+---------+------+---------+--------+-----+
+|Available            |     2048|  3474|  1201154|  600577|  470|
++---------------------+---------+------+---------+--------+-----+
+|Utilization (%)      |        0|     0|       ~0|      ~0|    0|
++---------------------+---------+------+---------+--------+-----+
+
++ Detail: 
+    * Instance: 
+    +------------------------------------+-----------------------------+---------+----+---+-----+-----+
+    |              Instance              |            Module           | BRAM_18K| DSP| FF| LUT | URAM|
+    +------------------------------------+-----------------------------+---------+----+---+-----+-----+
+    |fcmp_32ns_32ns_1_2_no_dsp_1_U20201  |fcmp_32ns_32ns_1_2_no_dsp_1  |        0|   0|  0|    0|    0|
+    |mux_1288_32_1_1_U20202              |mux_1288_32_1_1              |        0|   0|  0|  673|    0|
+    +------------------------------------+-----------------------------+---------+----+---+-----+-----+
+    |Total                               |                             |        0|   0|  0|  673|    0|
+    +------------------------------------+-----------------------------+---------+----+---+-----+-----+
+
+    * DSP: 
+    N/A
+
+    * Memory: 
+    N/A
+
+    * FIFO: 
+    N/A
+
+    * Expression: 
+    +----------------------------------+----------+----+---+----+------------+------------+
+    |           Variable Name          | Operation| DSP| FF| LUT| Bitwidth P0| Bitwidth P1|
+    +----------------------------------+----------+----+---+----+------------+------------+
+    |add_ln441_fu_1113_p2              |         +|   0|  0|  15|           8|           1|
+    |ap_block_pp0_stage0_00001         |       and|   0|  0|   2|           1|           1|
+    |icmp_ln441_fu_1107_p2             |      icmp|   0|  0|  11|           8|           9|
+    |ap_block_state2_pp0_stage0_iter1  |        or|   0|  0|   2|           1|           1|
+    |select_ln174_fu_1390_p3           |    select|   0|  0|  32|           1|          32|
+    |ap_enable_pp0                     |       xor|   0|  0|   2|           1|           2|
+    +----------------------------------+----------+----+---+----+------------+------------+
+    |Total                             |          |   0|  0|  64|          20|          46|
+    +----------------------------------+----------+----+---+----+------------+------------+
+
+    * Multiplexer: 
+    +-----------------------------------+----+-----------+-----+-----------+
+    |                Name               | LUT| Input Size| Bits| Total Bits|
+    +-----------------------------------+----+-----------+-----+-----------+
+    |ap_done_int                        |   9|          2|    1|          2|
+    |ap_enable_reg_pp0_iter1            |   9|          2|    1|          2|
+    |ap_sig_allocacmp_k                 |   9|          2|    8|         16|
+    |dense_activations_stream129_blk_n  |   9|          2|    1|          2|
+    |dense_f_map_out134_blk_n           |   9|          2|    1|          2|
+    |dense_feature_map_stream128_blk_n  |   9|          2|    1|          2|
+    |k_1_fu_300                         |   9|          2|    8|         16|
+    +-----------------------------------+----+-----------+-----+-----------+
+    |Total                              |  63|         14|   21|         42|
+    +-----------------------------------+----+-----------+-----+-----------+
+
+    * Register: 
+    +-------------------------+----+----+-----+-----------+
+    |           Name          | FF | LUT| Bits| Const Bits|
+    +-------------------------+----+----+-----+-----------+
+    |ap_CS_fsm                |   1|   0|    1|          0|
+    |ap_done_reg              |   1|   0|    1|          0|
+    |ap_enable_reg_pp0_iter1  |   1|   0|    1|          0|
+    |k_1_fu_300               |   8|   0|    8|          0|
+    |tmp_s_reg_1410           |  32|   0|   32|          0|
+    +-------------------------+----+----+-----+-----------+
+    |Total                    |  43|   0|   43|          0|
+    +-------------------------+----+----+-----+-----------+
+
+
+
+================================================================
+== Interface
+================================================================
+* Summary: 
++--------------------------------------------+-----+-----+------------+--------------------------------------+--------------+
+|                  RTL Ports                 | Dir | Bits|  Protocol  |             Source Object            |    C Type    |
++--------------------------------------------+-----+-----+------------+--------------------------------------+--------------+
+|ap_clk                                      |   in|    1|  ap_ctrl_hs|  dense<128u, 3136u>_Pipeline_activate|  return value|
+|ap_rst                                      |   in|    1|  ap_ctrl_hs|  dense<128u, 3136u>_Pipeline_activate|  return value|
+|ap_start                                    |   in|    1|  ap_ctrl_hs|  dense<128u, 3136u>_Pipeline_activate|  return value|
+|ap_done                                     |  out|    1|  ap_ctrl_hs|  dense<128u, 3136u>_Pipeline_activate|  return value|
+|ap_idle                                     |  out|    1|  ap_ctrl_hs|  dense<128u, 3136u>_Pipeline_activate|  return value|
+|ap_ready                                    |  out|    1|  ap_ctrl_hs|  dense<128u, 3136u>_Pipeline_activate|  return value|
+|dense_feature_map_stream128_din             |  out|   32|     ap_fifo|           dense_feature_map_stream128|       pointer|
+|dense_feature_map_stream128_num_data_valid  |   in|    3|     ap_fifo|           dense_feature_map_stream128|       pointer|
+|dense_feature_map_stream128_fifo_cap        |   in|    3|     ap_fifo|           dense_feature_map_stream128|       pointer|
+|dense_feature_map_stream128_full_n          |   in|    1|     ap_fifo|           dense_feature_map_stream128|       pointer|
+|dense_feature_map_stream128_write           |  out|    1|     ap_fifo|           dense_feature_map_stream128|       pointer|
+|dense_activations_stream129_din             |  out|    1|     ap_fifo|           dense_activations_stream129|       pointer|
+|dense_activations_stream129_num_data_valid  |   in|    8|     ap_fifo|           dense_activations_stream129|       pointer|
+|dense_activations_stream129_fifo_cap        |   in|    8|     ap_fifo|           dense_activations_stream129|       pointer|
+|dense_activations_stream129_full_n          |   in|    1|     ap_fifo|           dense_activations_stream129|       pointer|
+|dense_activations_stream129_write           |  out|    1|     ap_fifo|           dense_activations_stream129|       pointer|
+|dense_f_map_out134_din                      |  out|   32|     ap_fifo|                    dense_f_map_out134|       pointer|
+|dense_f_map_out134_num_data_valid           |   in|    8|     ap_fifo|                    dense_f_map_out134|       pointer|
+|dense_f_map_out134_fifo_cap                 |   in|    8|     ap_fifo|                    dense_f_map_out134|       pointer|
+|dense_f_map_out134_full_n                   |   in|    1|     ap_fifo|                    dense_f_map_out134|       pointer|
+|dense_f_map_out134_write                    |  out|    1|     ap_fifo|                    dense_f_map_out134|       pointer|
+|add177_reload                               |   in|   32|     ap_none|                         add177_reload|        scalar|
+|add17_128_reload                            |   in|   32|     ap_none|                      add17_128_reload|        scalar|
+|add17_229_reload                            |   in|   32|     ap_none|                      add17_229_reload|        scalar|
+|add17_330_reload                            |   in|   32|     ap_none|                      add17_330_reload|        scalar|
+|add17_431_reload                            |   in|   32|     ap_none|                      add17_431_reload|        scalar|
+|add17_532_reload                            |   in|   32|     ap_none|                      add17_532_reload|        scalar|
+|add17_633_reload                            |   in|   32|     ap_none|                      add17_633_reload|        scalar|
+|add17_734_reload                            |   in|   32|     ap_none|                      add17_734_reload|        scalar|
+|add17_835_reload                            |   in|   32|     ap_none|                      add17_835_reload|        scalar|
+|add17_936_reload                            |   in|   32|     ap_none|                      add17_936_reload|        scalar|
+|add17_1037_reload                           |   in|   32|     ap_none|                     add17_1037_reload|        scalar|
+|add17_1138_reload                           |   in|   32|     ap_none|                     add17_1138_reload|        scalar|
+|add17_1239_reload                           |   in|   32|     ap_none|                     add17_1239_reload|        scalar|
+|add17_1340_reload                           |   in|   32|     ap_none|                     add17_1340_reload|        scalar|
+|add17_1441_reload                           |   in|   32|     ap_none|                     add17_1441_reload|        scalar|
+|add17_1542_reload                           |   in|   32|     ap_none|                     add17_1542_reload|        scalar|
+|add17_1643_reload                           |   in|   32|     ap_none|                     add17_1643_reload|        scalar|
+|add17_1744_reload                           |   in|   32|     ap_none|                     add17_1744_reload|        scalar|
+|add17_1845_reload                           |   in|   32|     ap_none|                     add17_1845_reload|        scalar|
+|add17_1946_reload                           |   in|   32|     ap_none|                     add17_1946_reload|        scalar|
+|add17_2047_reload                           |   in|   32|     ap_none|                     add17_2047_reload|        scalar|
+|add17_2148_reload                           |   in|   32|     ap_none|                     add17_2148_reload|        scalar|
+|add17_2249_reload                           |   in|   32|     ap_none|                     add17_2249_reload|        scalar|
+|add17_2350_reload                           |   in|   32|     ap_none|                     add17_2350_reload|        scalar|
+|add17_2451_reload                           |   in|   32|     ap_none|                     add17_2451_reload|        scalar|
+|add17_2552_reload                           |   in|   32|     ap_none|                     add17_2552_reload|        scalar|
+|add17_2653_reload                           |   in|   32|     ap_none|                     add17_2653_reload|        scalar|
+|add17_2754_reload                           |   in|   32|     ap_none|                     add17_2754_reload|        scalar|
+|add17_2855_reload                           |   in|   32|     ap_none|                     add17_2855_reload|        scalar|
+|add17_2956_reload                           |   in|   32|     ap_none|                     add17_2956_reload|        scalar|
+|add17_3057_reload                           |   in|   32|     ap_none|                     add17_3057_reload|        scalar|
+|add17_3158_reload                           |   in|   32|     ap_none|                     add17_3158_reload|        scalar|
+|add17_3259_reload                           |   in|   32|     ap_none|                     add17_3259_reload|        scalar|
+|add17_3360_reload                           |   in|   32|     ap_none|                     add17_3360_reload|        scalar|
+|add17_3461_reload                           |   in|   32|     ap_none|                     add17_3461_reload|        scalar|
+|add17_3562_reload                           |   in|   32|     ap_none|                     add17_3562_reload|        scalar|
+|add17_3663_reload                           |   in|   32|     ap_none|                     add17_3663_reload|        scalar|
+|add17_3764_reload                           |   in|   32|     ap_none|                     add17_3764_reload|        scalar|
+|add17_3865_reload                           |   in|   32|     ap_none|                     add17_3865_reload|        scalar|
+|add17_3966_reload                           |   in|   32|     ap_none|                     add17_3966_reload|        scalar|
+|add17_4067_reload                           |   in|   32|     ap_none|                     add17_4067_reload|        scalar|
+|add17_4168_reload                           |   in|   32|     ap_none|                     add17_4168_reload|        scalar|
+|add17_4269_reload                           |   in|   32|     ap_none|                     add17_4269_reload|        scalar|
+|add17_4370_reload                           |   in|   32|     ap_none|                     add17_4370_reload|        scalar|
+|add17_4471_reload                           |   in|   32|     ap_none|                     add17_4471_reload|        scalar|
+|add17_4572_reload                           |   in|   32|     ap_none|                     add17_4572_reload|        scalar|
+|add17_4673_reload                           |   in|   32|     ap_none|                     add17_4673_reload|        scalar|
+|add17_4774_reload                           |   in|   32|     ap_none|                     add17_4774_reload|        scalar|
+|add17_4875_reload                           |   in|   32|     ap_none|                     add17_4875_reload|        scalar|
+|add17_4976_reload                           |   in|   32|     ap_none|                     add17_4976_reload|        scalar|
+|add17_5077_reload                           |   in|   32|     ap_none|                     add17_5077_reload|        scalar|
+|add17_5178_reload                           |   in|   32|     ap_none|                     add17_5178_reload|        scalar|
+|add17_5279_reload                           |   in|   32|     ap_none|                     add17_5279_reload|        scalar|
+|add17_5380_reload                           |   in|   32|     ap_none|                     add17_5380_reload|        scalar|
+|add17_5481_reload                           |   in|   32|     ap_none|                     add17_5481_reload|        scalar|
+|add17_5582_reload                           |   in|   32|     ap_none|                     add17_5582_reload|        scalar|
+|add17_5683_reload                           |   in|   32|     ap_none|                     add17_5683_reload|        scalar|
+|add17_5784_reload                           |   in|   32|     ap_none|                     add17_5784_reload|        scalar|
+|add17_5885_reload                           |   in|   32|     ap_none|                     add17_5885_reload|        scalar|
+|add17_5986_reload                           |   in|   32|     ap_none|                     add17_5986_reload|        scalar|
+|add17_6087_reload                           |   in|   32|     ap_none|                     add17_6087_reload|        scalar|
+|add17_6188_reload                           |   in|   32|     ap_none|                     add17_6188_reload|        scalar|
+|add17_6289_reload                           |   in|   32|     ap_none|                     add17_6289_reload|        scalar|
+|add17_6390_reload                           |   in|   32|     ap_none|                     add17_6390_reload|        scalar|
+|add17_6491_reload                           |   in|   32|     ap_none|                     add17_6491_reload|        scalar|
+|add17_6592_reload                           |   in|   32|     ap_none|                     add17_6592_reload|        scalar|
+|add17_6693_reload                           |   in|   32|     ap_none|                     add17_6693_reload|        scalar|
+|add17_6794_reload                           |   in|   32|     ap_none|                     add17_6794_reload|        scalar|
+|add17_6895_reload                           |   in|   32|     ap_none|                     add17_6895_reload|        scalar|
+|add17_6996_reload                           |   in|   32|     ap_none|                     add17_6996_reload|        scalar|
+|add17_7097_reload                           |   in|   32|     ap_none|                     add17_7097_reload|        scalar|
+|add17_7198_reload                           |   in|   32|     ap_none|                     add17_7198_reload|        scalar|
+|add17_7299_reload                           |   in|   32|     ap_none|                     add17_7299_reload|        scalar|
+|add17_73100_reload                          |   in|   32|     ap_none|                    add17_73100_reload|        scalar|
+|add17_74101_reload                          |   in|   32|     ap_none|                    add17_74101_reload|        scalar|
+|add17_75102_reload                          |   in|   32|     ap_none|                    add17_75102_reload|        scalar|
+|add17_76103_reload                          |   in|   32|     ap_none|                    add17_76103_reload|        scalar|
+|add17_77104_reload                          |   in|   32|     ap_none|                    add17_77104_reload|        scalar|
+|add17_78105_reload                          |   in|   32|     ap_none|                    add17_78105_reload|        scalar|
+|add17_79106_reload                          |   in|   32|     ap_none|                    add17_79106_reload|        scalar|
+|add17_80107_reload                          |   in|   32|     ap_none|                    add17_80107_reload|        scalar|
+|add17_81108_reload                          |   in|   32|     ap_none|                    add17_81108_reload|        scalar|
+|add17_82109_reload                          |   in|   32|     ap_none|                    add17_82109_reload|        scalar|
+|add17_83110_reload                          |   in|   32|     ap_none|                    add17_83110_reload|        scalar|
+|add17_84111_reload                          |   in|   32|     ap_none|                    add17_84111_reload|        scalar|
+|add17_85112_reload                          |   in|   32|     ap_none|                    add17_85112_reload|        scalar|
+|add17_86113_reload                          |   in|   32|     ap_none|                    add17_86113_reload|        scalar|
+|add17_87114_reload                          |   in|   32|     ap_none|                    add17_87114_reload|        scalar|
+|add17_88115_reload                          |   in|   32|     ap_none|                    add17_88115_reload|        scalar|
+|add17_89116_reload                          |   in|   32|     ap_none|                    add17_89116_reload|        scalar|
+|add17_90117_reload                          |   in|   32|     ap_none|                    add17_90117_reload|        scalar|
+|add17_91118_reload                          |   in|   32|     ap_none|                    add17_91118_reload|        scalar|
+|add17_92119_reload                          |   in|   32|     ap_none|                    add17_92119_reload|        scalar|
+|add17_93120_reload                          |   in|   32|     ap_none|                    add17_93120_reload|        scalar|
+|add17_94121_reload                          |   in|   32|     ap_none|                    add17_94121_reload|        scalar|
+|add17_95122_reload                          |   in|   32|     ap_none|                    add17_95122_reload|        scalar|
+|add17_96123_reload                          |   in|   32|     ap_none|                    add17_96123_reload|        scalar|
+|add17_97124_reload                          |   in|   32|     ap_none|                    add17_97124_reload|        scalar|
+|add17_98125_reload                          |   in|   32|     ap_none|                    add17_98125_reload|        scalar|
+|add17_99126_reload                          |   in|   32|     ap_none|                    add17_99126_reload|        scalar|
+|add17_100127_reload                         |   in|   32|     ap_none|                   add17_100127_reload|        scalar|
+|add17_101128_reload                         |   in|   32|     ap_none|                   add17_101128_reload|        scalar|
+|add17_102129_reload                         |   in|   32|     ap_none|                   add17_102129_reload|        scalar|
+|add17_103130_reload                         |   in|   32|     ap_none|                   add17_103130_reload|        scalar|
+|add17_104131_reload                         |   in|   32|     ap_none|                   add17_104131_reload|        scalar|
+|add17_105132_reload                         |   in|   32|     ap_none|                   add17_105132_reload|        scalar|
+|add17_106133_reload                         |   in|   32|     ap_none|                   add17_106133_reload|        scalar|
+|add17_107134_reload                         |   in|   32|     ap_none|                   add17_107134_reload|        scalar|
+|add17_108135_reload                         |   in|   32|     ap_none|                   add17_108135_reload|        scalar|
+|add17_109136_reload                         |   in|   32|     ap_none|                   add17_109136_reload|        scalar|
+|add17_110137_reload                         |   in|   32|     ap_none|                   add17_110137_reload|        scalar|
+|add17_111138_reload                         |   in|   32|     ap_none|                   add17_111138_reload|        scalar|
+|add17_112139_reload                         |   in|   32|     ap_none|                   add17_112139_reload|        scalar|
+|add17_113140_reload                         |   in|   32|     ap_none|                   add17_113140_reload|        scalar|
+|add17_114141_reload                         |   in|   32|     ap_none|                   add17_114141_reload|        scalar|
+|add17_115142_reload                         |   in|   32|     ap_none|                   add17_115142_reload|        scalar|
+|add17_116143_reload                         |   in|   32|     ap_none|                   add17_116143_reload|        scalar|
+|add17_117144_reload                         |   in|   32|     ap_none|                   add17_117144_reload|        scalar|
+|add17_118145_reload                         |   in|   32|     ap_none|                   add17_118145_reload|        scalar|
+|add17_119146_reload                         |   in|   32|     ap_none|                   add17_119146_reload|        scalar|
+|add17_120147_reload                         |   in|   32|     ap_none|                   add17_120147_reload|        scalar|
+|add17_121148_reload                         |   in|   32|     ap_none|                   add17_121148_reload|        scalar|
+|add17_122149_reload                         |   in|   32|     ap_none|                   add17_122149_reload|        scalar|
+|add17_123150_reload                         |   in|   32|     ap_none|                   add17_123150_reload|        scalar|
+|add17_124151_reload                         |   in|   32|     ap_none|                   add17_124151_reload|        scalar|
+|add17_125152_reload                         |   in|   32|     ap_none|                   add17_125152_reload|        scalar|
+|add17_126153_reload                         |   in|   32|     ap_none|                   add17_126153_reload|        scalar|
+|add17_127154_reload                         |   in|   32|     ap_none|                   add17_127154_reload|        scalar|
++--------------------------------------------+-----+-----+------------+--------------------------------------+--------------+
+

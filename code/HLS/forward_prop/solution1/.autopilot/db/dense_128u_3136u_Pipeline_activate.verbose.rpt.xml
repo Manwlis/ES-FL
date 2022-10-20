@@ -1,0 +1,272 @@
+<profile>
+
+<section name = "Vitis HLS Report for 'dense_128u_3136u_Pipeline_activate'" level="0">
+<item name = "Date">Tue Oct 18 21:21:10 2022
+</item>
+<item name = "Version">2022.1 (Build 3526262 on Mon Apr 18 15:47:01 MDT 2022)</item>
+<item name = "Project">forward_prop</item>
+<item name = "Solution">solution1 (Vitis Kernel Flow Target)</item>
+<item name = "Product family">virtexuplus</item>
+<item name = "Target device">xcvu5p-flva2104-1-e</item>
+</section>
+
+<section name = "Performance Estimates" level="0">
+<item name = "Timing">
+<section name = "" level="1">
+<item name = "Summary"><table name="" hasTotal="0">
+<keys size="4">Clock, Target, Estimated, Uncertainty</keys>
+<column name="ap_clk">10.00 ns, 4.301 ns, 2.70 ns</column>
+</table>
+</item>
+</section>
+</item>
+<item name = "Latency">
+<section name = "" level="1">
+<item name = "Summary"><table name="" hasTotal="0">
+<keys size="8">, min, max, min, max, min, max, Type</keys>
+<column name="">130, 130, 1.300 us, 1.300 us, 130, 130, no</column>
+</table>
+</item>
+<item name = "Detail">
+<section name = "" level="1">
+<item name = "Instance"><table name="" hasTotal="0">
+<keys size="9">Instance, Module, min, max, min, max, min, max, Type</keys>
+</table>
+</item>
+<item name = "Loop"><table name="" hasTotal="0">
+<keys size="8">Loop Name, min, max, Latency, achieved, target, Count, Pipelined</keys>
+<column name="- activate">128, 128, 2, 1, 1, 128, yes</column>
+</table>
+</item>
+</section>
+</item>
+</section>
+</item>
+</section>
+
+<section name = "Utilization Estimates" level="0">
+<item name = "Summary"><table name="" hasTotal="1">
+<keys size="6">Name, BRAM_18K, DSP, FF, LUT, URAM</keys>
+<column name="DSP">-, -, -, -, -</column>
+<column name="Expression">-, -, 0, 64, -</column>
+<column name="FIFO">-, -, -, -, -</column>
+<column name="Instance">-, -, 0, 673, -</column>
+<column name="Memory">-, -, -, -, -</column>
+<column name="Multiplexer">-, -, -, 63, -</column>
+<column name="Register">-, -, 43, -, -</column>
+<specialColumn name="Available SLR">1024, 1737, 600577, 300288, 235</specialColumn>
+<specialColumn name="Utilization SLR (%)">0, 0, ~0, ~0, 0</specialColumn>
+<specialColumn name="Available">2048, 3474, 1201154, 600577, 470</specialColumn>
+<specialColumn name="Utilization (%)">0, 0, ~0, ~0, 0</specialColumn>
+</table>
+</item>
+<item name = "Detail">
+<section name = "" level="1">
+<item name = "Instance"><table name="" hasTotal="1">
+<keys size="7">Instance, Module, BRAM_18K, DSP, FF, LUT, URAM</keys>
+<column name="fcmp_32ns_32ns_1_2_no_dsp_1_U20201">fcmp_32ns_32ns_1_2_no_dsp_1, 0, 0, 0, 0, 0</column>
+<column name="mux_1288_32_1_1_U20202">mux_1288_32_1_1, 0, 0, 0, 673, 0</column>
+</table>
+</item>
+<item name = "DSP"><table name="" hasTotal="0">
+<keys size="3">Instance, Module, Expression</keys>
+</table>
+</item>
+<item name = "Memory"><table name="" hasTotal="1">
+<keys size="10">Memory, Module, BRAM_18K, FF, LUT, URAM, Words, Bits, Banks, W*Bits*Banks</keys>
+</table>
+</item>
+<item name = "FIFO"><table name="" hasTotal="1">
+<keys size="8">Name, BRAM_18K, FF, LUT, URAM, Depth, Bits, Size:D*B</keys>
+</table>
+</item>
+<item name = "Expression"><table name="" hasTotal="1">
+<keys size="7">Variable Name, Operation, DSP, FF, LUT, Bitwidth P0, Bitwidth P1</keys>
+<column name="add_ln441_fu_1113_p2">+, 0, 0, 15, 8, 1</column>
+<column name="ap_block_pp0_stage0_00001">and, 0, 0, 2, 1, 1</column>
+<column name="icmp_ln441_fu_1107_p2">icmp, 0, 0, 11, 8, 9</column>
+<column name="ap_block_state2_pp0_stage0_iter1">or, 0, 0, 2, 1, 1</column>
+<column name="select_ln174_fu_1390_p3">select, 0, 0, 32, 1, 32</column>
+<column name="ap_enable_pp0">xor, 0, 0, 2, 1, 2</column>
+</table>
+</item>
+<item name = "Multiplexer"><table name="" hasTotal="1">
+<keys size="5">Name, LUT, Input Size, Bits, Total Bits</keys>
+<column name="ap_done_int">9, 2, 1, 2</column>
+<column name="ap_enable_reg_pp0_iter1">9, 2, 1, 2</column>
+<column name="ap_sig_allocacmp_k">9, 2, 8, 16</column>
+<column name="dense_activations_stream129_blk_n">9, 2, 1, 2</column>
+<column name="dense_f_map_out134_blk_n">9, 2, 1, 2</column>
+<column name="dense_feature_map_stream128_blk_n">9, 2, 1, 2</column>
+<column name="k_1_fu_300">9, 2, 8, 16</column>
+</table>
+</item>
+<item name = "Register"><table name="" hasTotal="1">
+<keys size="5">Name, FF, LUT, Bits, Const Bits</keys>
+<column name="ap_CS_fsm">1, 0, 1, 0</column>
+<column name="ap_done_reg">1, 0, 1, 0</column>
+<column name="ap_enable_reg_pp0_iter1">1, 0, 1, 0</column>
+<column name="k_1_fu_300">8, 0, 8, 0</column>
+<column name="tmp_s_reg_1410">32, 0, 32, 0</column>
+</table>
+</item>
+</section>
+</item>
+</section>
+
+<section name = "Interface" level="0">
+<item name = "Summary"><table name="" hasTotal="0">
+<keys size="6">RTL Ports, Dir, Bits, Protocol, Source Object, C Type</keys>
+<column name="ap_clk">in, 1, ap_ctrl_hs, dense&lt;128u, 3136u&gt;_Pipeline_activate, return value</column>
+<column name="ap_rst">in, 1, ap_ctrl_hs, dense&lt;128u, 3136u&gt;_Pipeline_activate, return value</column>
+<column name="ap_start">in, 1, ap_ctrl_hs, dense&lt;128u, 3136u&gt;_Pipeline_activate, return value</column>
+<column name="ap_done">out, 1, ap_ctrl_hs, dense&lt;128u, 3136u&gt;_Pipeline_activate, return value</column>
+<column name="ap_idle">out, 1, ap_ctrl_hs, dense&lt;128u, 3136u&gt;_Pipeline_activate, return value</column>
+<column name="ap_ready">out, 1, ap_ctrl_hs, dense&lt;128u, 3136u&gt;_Pipeline_activate, return value</column>
+<column name="dense_feature_map_stream128_din">out, 32, ap_fifo, dense_feature_map_stream128, pointer</column>
+<column name="dense_feature_map_stream128_num_data_valid">in, 3, ap_fifo, dense_feature_map_stream128, pointer</column>
+<column name="dense_feature_map_stream128_fifo_cap">in, 3, ap_fifo, dense_feature_map_stream128, pointer</column>
+<column name="dense_feature_map_stream128_full_n">in, 1, ap_fifo, dense_feature_map_stream128, pointer</column>
+<column name="dense_feature_map_stream128_write">out, 1, ap_fifo, dense_feature_map_stream128, pointer</column>
+<column name="dense_activations_stream129_din">out, 1, ap_fifo, dense_activations_stream129, pointer</column>
+<column name="dense_activations_stream129_num_data_valid">in, 8, ap_fifo, dense_activations_stream129, pointer</column>
+<column name="dense_activations_stream129_fifo_cap">in, 8, ap_fifo, dense_activations_stream129, pointer</column>
+<column name="dense_activations_stream129_full_n">in, 1, ap_fifo, dense_activations_stream129, pointer</column>
+<column name="dense_activations_stream129_write">out, 1, ap_fifo, dense_activations_stream129, pointer</column>
+<column name="dense_f_map_out134_din">out, 32, ap_fifo, dense_f_map_out134, pointer</column>
+<column name="dense_f_map_out134_num_data_valid">in, 8, ap_fifo, dense_f_map_out134, pointer</column>
+<column name="dense_f_map_out134_fifo_cap">in, 8, ap_fifo, dense_f_map_out134, pointer</column>
+<column name="dense_f_map_out134_full_n">in, 1, ap_fifo, dense_f_map_out134, pointer</column>
+<column name="dense_f_map_out134_write">out, 1, ap_fifo, dense_f_map_out134, pointer</column>
+<column name="add177_reload">in, 32, ap_none, add177_reload, scalar</column>
+<column name="add17_128_reload">in, 32, ap_none, add17_128_reload, scalar</column>
+<column name="add17_229_reload">in, 32, ap_none, add17_229_reload, scalar</column>
+<column name="add17_330_reload">in, 32, ap_none, add17_330_reload, scalar</column>
+<column name="add17_431_reload">in, 32, ap_none, add17_431_reload, scalar</column>
+<column name="add17_532_reload">in, 32, ap_none, add17_532_reload, scalar</column>
+<column name="add17_633_reload">in, 32, ap_none, add17_633_reload, scalar</column>
+<column name="add17_734_reload">in, 32, ap_none, add17_734_reload, scalar</column>
+<column name="add17_835_reload">in, 32, ap_none, add17_835_reload, scalar</column>
+<column name="add17_936_reload">in, 32, ap_none, add17_936_reload, scalar</column>
+<column name="add17_1037_reload">in, 32, ap_none, add17_1037_reload, scalar</column>
+<column name="add17_1138_reload">in, 32, ap_none, add17_1138_reload, scalar</column>
+<column name="add17_1239_reload">in, 32, ap_none, add17_1239_reload, scalar</column>
+<column name="add17_1340_reload">in, 32, ap_none, add17_1340_reload, scalar</column>
+<column name="add17_1441_reload">in, 32, ap_none, add17_1441_reload, scalar</column>
+<column name="add17_1542_reload">in, 32, ap_none, add17_1542_reload, scalar</column>
+<column name="add17_1643_reload">in, 32, ap_none, add17_1643_reload, scalar</column>
+<column name="add17_1744_reload">in, 32, ap_none, add17_1744_reload, scalar</column>
+<column name="add17_1845_reload">in, 32, ap_none, add17_1845_reload, scalar</column>
+<column name="add17_1946_reload">in, 32, ap_none, add17_1946_reload, scalar</column>
+<column name="add17_2047_reload">in, 32, ap_none, add17_2047_reload, scalar</column>
+<column name="add17_2148_reload">in, 32, ap_none, add17_2148_reload, scalar</column>
+<column name="add17_2249_reload">in, 32, ap_none, add17_2249_reload, scalar</column>
+<column name="add17_2350_reload">in, 32, ap_none, add17_2350_reload, scalar</column>
+<column name="add17_2451_reload">in, 32, ap_none, add17_2451_reload, scalar</column>
+<column name="add17_2552_reload">in, 32, ap_none, add17_2552_reload, scalar</column>
+<column name="add17_2653_reload">in, 32, ap_none, add17_2653_reload, scalar</column>
+<column name="add17_2754_reload">in, 32, ap_none, add17_2754_reload, scalar</column>
+<column name="add17_2855_reload">in, 32, ap_none, add17_2855_reload, scalar</column>
+<column name="add17_2956_reload">in, 32, ap_none, add17_2956_reload, scalar</column>
+<column name="add17_3057_reload">in, 32, ap_none, add17_3057_reload, scalar</column>
+<column name="add17_3158_reload">in, 32, ap_none, add17_3158_reload, scalar</column>
+<column name="add17_3259_reload">in, 32, ap_none, add17_3259_reload, scalar</column>
+<column name="add17_3360_reload">in, 32, ap_none, add17_3360_reload, scalar</column>
+<column name="add17_3461_reload">in, 32, ap_none, add17_3461_reload, scalar</column>
+<column name="add17_3562_reload">in, 32, ap_none, add17_3562_reload, scalar</column>
+<column name="add17_3663_reload">in, 32, ap_none, add17_3663_reload, scalar</column>
+<column name="add17_3764_reload">in, 32, ap_none, add17_3764_reload, scalar</column>
+<column name="add17_3865_reload">in, 32, ap_none, add17_3865_reload, scalar</column>
+<column name="add17_3966_reload">in, 32, ap_none, add17_3966_reload, scalar</column>
+<column name="add17_4067_reload">in, 32, ap_none, add17_4067_reload, scalar</column>
+<column name="add17_4168_reload">in, 32, ap_none, add17_4168_reload, scalar</column>
+<column name="add17_4269_reload">in, 32, ap_none, add17_4269_reload, scalar</column>
+<column name="add17_4370_reload">in, 32, ap_none, add17_4370_reload, scalar</column>
+<column name="add17_4471_reload">in, 32, ap_none, add17_4471_reload, scalar</column>
+<column name="add17_4572_reload">in, 32, ap_none, add17_4572_reload, scalar</column>
+<column name="add17_4673_reload">in, 32, ap_none, add17_4673_reload, scalar</column>
+<column name="add17_4774_reload">in, 32, ap_none, add17_4774_reload, scalar</column>
+<column name="add17_4875_reload">in, 32, ap_none, add17_4875_reload, scalar</column>
+<column name="add17_4976_reload">in, 32, ap_none, add17_4976_reload, scalar</column>
+<column name="add17_5077_reload">in, 32, ap_none, add17_5077_reload, scalar</column>
+<column name="add17_5178_reload">in, 32, ap_none, add17_5178_reload, scalar</column>
+<column name="add17_5279_reload">in, 32, ap_none, add17_5279_reload, scalar</column>
+<column name="add17_5380_reload">in, 32, ap_none, add17_5380_reload, scalar</column>
+<column name="add17_5481_reload">in, 32, ap_none, add17_5481_reload, scalar</column>
+<column name="add17_5582_reload">in, 32, ap_none, add17_5582_reload, scalar</column>
+<column name="add17_5683_reload">in, 32, ap_none, add17_5683_reload, scalar</column>
+<column name="add17_5784_reload">in, 32, ap_none, add17_5784_reload, scalar</column>
+<column name="add17_5885_reload">in, 32, ap_none, add17_5885_reload, scalar</column>
+<column name="add17_5986_reload">in, 32, ap_none, add17_5986_reload, scalar</column>
+<column name="add17_6087_reload">in, 32, ap_none, add17_6087_reload, scalar</column>
+<column name="add17_6188_reload">in, 32, ap_none, add17_6188_reload, scalar</column>
+<column name="add17_6289_reload">in, 32, ap_none, add17_6289_reload, scalar</column>
+<column name="add17_6390_reload">in, 32, ap_none, add17_6390_reload, scalar</column>
+<column name="add17_6491_reload">in, 32, ap_none, add17_6491_reload, scalar</column>
+<column name="add17_6592_reload">in, 32, ap_none, add17_6592_reload, scalar</column>
+<column name="add17_6693_reload">in, 32, ap_none, add17_6693_reload, scalar</column>
+<column name="add17_6794_reload">in, 32, ap_none, add17_6794_reload, scalar</column>
+<column name="add17_6895_reload">in, 32, ap_none, add17_6895_reload, scalar</column>
+<column name="add17_6996_reload">in, 32, ap_none, add17_6996_reload, scalar</column>
+<column name="add17_7097_reload">in, 32, ap_none, add17_7097_reload, scalar</column>
+<column name="add17_7198_reload">in, 32, ap_none, add17_7198_reload, scalar</column>
+<column name="add17_7299_reload">in, 32, ap_none, add17_7299_reload, scalar</column>
+<column name="add17_73100_reload">in, 32, ap_none, add17_73100_reload, scalar</column>
+<column name="add17_74101_reload">in, 32, ap_none, add17_74101_reload, scalar</column>
+<column name="add17_75102_reload">in, 32, ap_none, add17_75102_reload, scalar</column>
+<column name="add17_76103_reload">in, 32, ap_none, add17_76103_reload, scalar</column>
+<column name="add17_77104_reload">in, 32, ap_none, add17_77104_reload, scalar</column>
+<column name="add17_78105_reload">in, 32, ap_none, add17_78105_reload, scalar</column>
+<column name="add17_79106_reload">in, 32, ap_none, add17_79106_reload, scalar</column>
+<column name="add17_80107_reload">in, 32, ap_none, add17_80107_reload, scalar</column>
+<column name="add17_81108_reload">in, 32, ap_none, add17_81108_reload, scalar</column>
+<column name="add17_82109_reload">in, 32, ap_none, add17_82109_reload, scalar</column>
+<column name="add17_83110_reload">in, 32, ap_none, add17_83110_reload, scalar</column>
+<column name="add17_84111_reload">in, 32, ap_none, add17_84111_reload, scalar</column>
+<column name="add17_85112_reload">in, 32, ap_none, add17_85112_reload, scalar</column>
+<column name="add17_86113_reload">in, 32, ap_none, add17_86113_reload, scalar</column>
+<column name="add17_87114_reload">in, 32, ap_none, add17_87114_reload, scalar</column>
+<column name="add17_88115_reload">in, 32, ap_none, add17_88115_reload, scalar</column>
+<column name="add17_89116_reload">in, 32, ap_none, add17_89116_reload, scalar</column>
+<column name="add17_90117_reload">in, 32, ap_none, add17_90117_reload, scalar</column>
+<column name="add17_91118_reload">in, 32, ap_none, add17_91118_reload, scalar</column>
+<column name="add17_92119_reload">in, 32, ap_none, add17_92119_reload, scalar</column>
+<column name="add17_93120_reload">in, 32, ap_none, add17_93120_reload, scalar</column>
+<column name="add17_94121_reload">in, 32, ap_none, add17_94121_reload, scalar</column>
+<column name="add17_95122_reload">in, 32, ap_none, add17_95122_reload, scalar</column>
+<column name="add17_96123_reload">in, 32, ap_none, add17_96123_reload, scalar</column>
+<column name="add17_97124_reload">in, 32, ap_none, add17_97124_reload, scalar</column>
+<column name="add17_98125_reload">in, 32, ap_none, add17_98125_reload, scalar</column>
+<column name="add17_99126_reload">in, 32, ap_none, add17_99126_reload, scalar</column>
+<column name="add17_100127_reload">in, 32, ap_none, add17_100127_reload, scalar</column>
+<column name="add17_101128_reload">in, 32, ap_none, add17_101128_reload, scalar</column>
+<column name="add17_102129_reload">in, 32, ap_none, add17_102129_reload, scalar</column>
+<column name="add17_103130_reload">in, 32, ap_none, add17_103130_reload, scalar</column>
+<column name="add17_104131_reload">in, 32, ap_none, add17_104131_reload, scalar</column>
+<column name="add17_105132_reload">in, 32, ap_none, add17_105132_reload, scalar</column>
+<column name="add17_106133_reload">in, 32, ap_none, add17_106133_reload, scalar</column>
+<column name="add17_107134_reload">in, 32, ap_none, add17_107134_reload, scalar</column>
+<column name="add17_108135_reload">in, 32, ap_none, add17_108135_reload, scalar</column>
+<column name="add17_109136_reload">in, 32, ap_none, add17_109136_reload, scalar</column>
+<column name="add17_110137_reload">in, 32, ap_none, add17_110137_reload, scalar</column>
+<column name="add17_111138_reload">in, 32, ap_none, add17_111138_reload, scalar</column>
+<column name="add17_112139_reload">in, 32, ap_none, add17_112139_reload, scalar</column>
+<column name="add17_113140_reload">in, 32, ap_none, add17_113140_reload, scalar</column>
+<column name="add17_114141_reload">in, 32, ap_none, add17_114141_reload, scalar</column>
+<column name="add17_115142_reload">in, 32, ap_none, add17_115142_reload, scalar</column>
+<column name="add17_116143_reload">in, 32, ap_none, add17_116143_reload, scalar</column>
+<column name="add17_117144_reload">in, 32, ap_none, add17_117144_reload, scalar</column>
+<column name="add17_118145_reload">in, 32, ap_none, add17_118145_reload, scalar</column>
+<column name="add17_119146_reload">in, 32, ap_none, add17_119146_reload, scalar</column>
+<column name="add17_120147_reload">in, 32, ap_none, add17_120147_reload, scalar</column>
+<column name="add17_121148_reload">in, 32, ap_none, add17_121148_reload, scalar</column>
+<column name="add17_122149_reload">in, 32, ap_none, add17_122149_reload, scalar</column>
+<column name="add17_123150_reload">in, 32, ap_none, add17_123150_reload, scalar</column>
+<column name="add17_124151_reload">in, 32, ap_none, add17_124151_reload, scalar</column>
+<column name="add17_125152_reload">in, 32, ap_none, add17_125152_reload, scalar</column>
+<column name="add17_126153_reload">in, 32, ap_none, add17_126153_reload, scalar</column>
+<column name="add17_127154_reload">in, 32, ap_none, add17_127154_reload, scalar</column>
+</table>
+</item>
+</section>
+</profile>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<autopilotfilemapping:AutoPilotFileMapping xmlns:autopilotfilemapping="www.autoesl.com/autopilotfilemapping">
+  <source>
+    <originFiles name="softmax_10_fwp.hpp" path="/home/msi/ES-FL/code/HLS/softmax_10_fwp/src/softmax_10_fwp.hpp"/>
+    <originFiles name="softmax_10_fwp.cpp" path="/home/msi/ES-FL/code/HLS/softmax_10_fwp/src/softmax_10_fwp.cpp"/>
+  </source>
+  <testbench>
+    <originFiles name="testbench.cpp" path="/home/msi/ES-FL/code/HLS/softmax_10_fwp/src/testbench.cpp"/>
+  </testbench>
+</autopilotfilemapping:AutoPilotFileMapping>

@@ -277,9 +277,9 @@ int main ( int argc , char** argv )
 	save_array < maxp2d_64_out_height * maxp2d_64_out_width * maxp2d_64_out_channels >
 		( reinterpret_cast<float*>(maxp2d_64_feature_map) , "activations/l3_maxp64_cpp.txt" , 4 );
 
-	save_array < dense_num_out > ( dense_map , "activations/l4_dense_cpp.txt" , 4 );
+	save_array < dense_num_out > ( dense_map , "activations/l4_dense_cpp.txt" , 30 );
 
-	save_array < softmax_num_out > ( softmax_output , "activations/l5_softmax_cpp.txt" , 4 );
+	save_array < softmax_num_out > ( softmax_output , "activations/l5_softmax_cpp.txt" , 30 );
 #pragma endregion
 #pragma region // output gradients
 	std::cout << "C++ entropy: " << std::setprecision(8) << entropy << "\n";
@@ -605,7 +605,7 @@ void window_input_maxp2d (
 			for ( uint filter_x = 0 ; filter_x < filter_width ; filter_x++ )
 				for ( uint channel = 0 ; channel < in_channels ; channel++ ) // channel loop
 					// check if enough data to fill window, y axis && x axis
-					if( col_insert_ptr == filter_height - 1 && row_insert_ptr % filter_width == 1 ) // this if can go before the filter loops if needed
+					if ( col_insert_ptr == filter_height - 1 && row_insert_ptr % filter_width == 1 ) // this if can go before the filter loops if needed
 					{
 						temp_windows[channel].elements[filter_y][filter_x] =
 							line_buffer[ col_insert_ptr - 1 + filter_y ][ row_insert_ptr - 1 + filter_x ][channel];
@@ -620,7 +620,7 @@ void window_input_maxp2d (
 		{
 			row_insert_ptr = 0;
 			col_insert_ptr++;
-			if( col_insert_ptr == filter_height )
+			if ( col_insert_ptr == filter_height )
 				col_insert_ptr = 0;
 		}
 	}
@@ -711,7 +711,7 @@ void maxp2d_window_integrated (
 	in_type line_buffer[filter_height][in_width][in_channels];
 	window < bool , filter_height , filter_width > activation_window[in_channels];
 
-	uint num_pixels = in_width * in_height;
+	const uint num_pixels = in_width * in_height; // TODO: check const
 	uint col_insert_ptr = 0;
 	uint row_insert_ptr = 0;
 

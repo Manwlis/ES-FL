@@ -1,0 +1,733 @@
+
+
+================================================================
+== Vitis HLS Report for 'conv2d_sum_mc_float_14u_14u_3u_3u_64u_20'
+================================================================
+* Date:           Tue Oct 18 21:19:09 2022
+
+* Version:        2022.1 (Build 3526262 on Mon Apr 18 15:47:01 MDT 2022)
+* Project:        forward_prop
+* Solution:       solution1 (Vitis Kernel Flow Target)
+* Product family: virtexuplus
+* Target device:  xcvu5p-flva2104-1-e
+
+
+================================================================
+== Performance Estimates
+================================================================
++ Timing: 
+    * Summary: 
+    +--------+----------+----------+------------+
+    |  Clock |  Target  | Estimated| Uncertainty|
+    +--------+----------+----------+------------+
+    |ap_clk  |  10.00 ns|  7.725 ns|     2.70 ns|
+    +--------+----------+----------+------------+
+
++ Latency: 
+    * Summary: 
+    +---------+---------+----------+----------+-------+-------+---------+
+    |  Latency (cycles) |  Latency (absolute) |    Interval   | Pipeline|
+    |   min   |   max   |    min   |    max   |  min  |  max  |   Type  |
+    +---------+---------+----------+----------+-------+-------+---------+
+    |    13138|    13138|  0.131 ms|  0.131 ms|  13138|  13138|       no|
+    +---------+---------+----------+----------+-------+-------+---------+
+
+    + Detail: 
+        * Instance: 
+        +----------------------------------------------------------------------+----------------------------------------------------------+---------+---------+----------+----------+-------+-------+---------+
+        |                                                                      |                                                          |  Latency (cycles) |  Latency (absolute) |    Interval   | Pipeline|
+        |                               Instance                               |                          Module                          |   min   |   max   |    min   |    max   |  min  |  max  |   Type  |
+        +----------------------------------------------------------------------+----------------------------------------------------------+---------+---------+----------+----------+-------+-------+---------+
+        |grp_conv2d_sum_mc_float_14u_14u_3u_3u_64u_20_Pipeline_inputs_fu_6371  |conv2d_sum_mc_float_14u_14u_3u_3u_64u_20_Pipeline_inputs  |    12561|    12561|  0.126 ms|  0.126 ms|  12561|  12561|       no|
+        +----------------------------------------------------------------------+----------------------------------------------------------+---------+---------+----------+----------+-------+-------+---------+
+
+        * Loop: 
+        N/A
+
+
+
+================================================================
+== Utilization Estimates
+================================================================
+* Summary: 
++---------------------+---------+------+---------+--------+-----+
+|         Name        | BRAM_18K|  DSP |    FF   |   LUT  | URAM|
++---------------------+---------+------+---------+--------+-----+
+|DSP                  |        -|     -|        -|       -|    -|
+|Expression           |        -|     -|        0|       2|    -|
+|FIFO                 |        -|     -|        -|       -|    -|
+|Instance             |        -|    43|     5780|    7090|    -|
+|Memory               |        -|     -|        -|       -|    -|
+|Multiplexer          |        -|     -|        -|    5413|    -|
+|Register             |        -|     -|    19012|       -|    -|
++---------------------+---------+------+---------+--------+-----+
+|Total                |        0|    43|    24792|   12505|    0|
++---------------------+---------+------+---------+--------+-----+
+|Available SLR        |     1024|  1737|   600577|  300288|  235|
++---------------------+---------+------+---------+--------+-----+
+|Utilization SLR (%)  |        0|     2|        4|       4|    0|
++---------------------+---------+------+---------+--------+-----+
+|Available            |     2048|  3474|  1201154|  600577|  470|
++---------------------+---------+------+---------+--------+-----+
+|Utilization (%)      |        0|     1|        2|       2|    0|
++---------------------+---------+------+---------+--------+-----+
+
++ Detail: 
+    * Instance: 
+    +----------------------------------------------------------------------+----------------------------------------------------------+---------+----+------+------+-----+
+    |                               Instance                               |                          Module                          | BRAM_18K| DSP|  FF  |  LUT | URAM|
+    +----------------------------------------------------------------------+----------------------------------------------------------+---------+----+------+------+-----+
+    |grp_conv2d_sum_mc_float_14u_14u_3u_3u_64u_20_Pipeline_inputs_fu_6371  |conv2d_sum_mc_float_14u_14u_3u_3u_64u_20_Pipeline_inputs  |        0|  43|  5780|  7090|    0|
+    +----------------------------------------------------------------------+----------------------------------------------------------+---------+----+------+------+-----+
+    |Total                                                                 |                                                          |        0|  43|  5780|  7090|    0|
+    +----------------------------------------------------------------------+----------------------------------------------------------+---------+----+------+------+-----+
+
+    * DSP: 
+    N/A
+
+    * Memory: 
+    N/A
+
+    * FIFO: 
+    N/A
+
+    * Expression: 
+    +-----------------+----------+----+---+----+------------+------------+
+    |  Variable Name  | Operation| DSP| FF| LUT| Bitwidth P0| Bitwidth P1|
+    +-----------------+----------+----+---+----+------------+------------+
+    |ap_block_state1  |        or|   0|  0|   2|           1|           1|
+    +-----------------+----------+----+---+----+------------+------------+
+    |Total            |          |   0|  0|   2|           1|           1|
+    +-----------------+----------+----+---+----+------------+------------+
+
+    * Multiplexer: 
+    +----------------------------------------+------+-----------+-----+-----------+
+    |                  Name                  |  LUT | Input Size| Bits| Total Bits|
+    +----------------------------------------+------+-----------+-----+-----------+
+    |ap_NS_fsm                               |  2693|        579|    1|        579|
+    |ap_done                                 |     9|          2|    1|          2|
+    |conv2d_64_padded_window_stream_20_read  |     9|          2|    1|          2|
+    |in_channel_map_stream_20_write          |     9|          2|    1|          2|
+    |weights_address0                        |  2693|        577|   10|       5770|
+    +----------------------------------------+------+-----------+-----+-----------+
+    |Total                                   |  5413|       1162|   14|       6355|
+    +----------------------------------------+------+-----------+-----+-----------+
+
+    * Register: 
+    +-----------------------------------------------------------------------------------+-----+----+-----+-----------+
+    |                                        Name                                       |  FF | LUT| Bits| Const Bits|
+    +-----------------------------------------------------------------------------------+-----+----+-----+-----------+
+    |ap_CS_fsm                                                                          |  578|   0|  578|          0|
+    |ap_done_reg                                                                        |    1|   0|    1|          0|
+    |grp_conv2d_sum_mc_float_14u_14u_3u_3u_64u_20_Pipeline_inputs_fu_6371_ap_start_reg  |    1|   0|    1|          0|
+    |weights_load_10351_reg_6976                                                        |   32|   0|   32|          0|
+    |weights_load_10352_reg_6986                                                        |   32|   0|   32|          0|
+    |weights_load_10353_reg_6996                                                        |   32|   0|   32|          0|
+    |weights_load_10354_reg_7006                                                        |   32|   0|   32|          0|
+    |weights_load_10355_reg_7016                                                        |   32|   0|   32|          0|
+    |weights_load_10356_reg_7026                                                        |   32|   0|   32|          0|
+    |weights_load_10357_reg_7036                                                        |   32|   0|   32|          0|
+    |weights_load_10358_reg_7046                                                        |   32|   0|   32|          0|
+    |weights_load_10359_reg_7056                                                        |   32|   0|   32|          0|
+    |weights_load_10360_reg_7066                                                        |   32|   0|   32|          0|
+    |weights_load_10361_reg_7076                                                        |   32|   0|   32|          0|
+    |weights_load_10362_reg_7086                                                        |   32|   0|   32|          0|
+    |weights_load_10363_reg_7096                                                        |   32|   0|   32|          0|
+    |weights_load_10364_reg_7106                                                        |   32|   0|   32|          0|
+    |weights_load_10365_reg_7116                                                        |   32|   0|   32|          0|
+    |weights_load_10366_reg_7126                                                        |   32|   0|   32|          0|
+    |weights_load_10367_reg_7136                                                        |   32|   0|   32|          0|
+    |weights_load_10368_reg_7146                                                        |   32|   0|   32|          0|
+    |weights_load_10369_reg_7156                                                        |   32|   0|   32|          0|
+    |weights_load_10370_reg_7166                                                        |   32|   0|   32|          0|
+    |weights_load_10371_reg_7176                                                        |   32|   0|   32|          0|
+    |weights_load_10372_reg_7186                                                        |   32|   0|   32|          0|
+    |weights_load_10373_reg_7196                                                        |   32|   0|   32|          0|
+    |weights_load_10374_reg_7206                                                        |   32|   0|   32|          0|
+    |weights_load_10375_reg_7216                                                        |   32|   0|   32|          0|
+    |weights_load_10376_reg_7226                                                        |   32|   0|   32|          0|
+    |weights_load_10377_reg_7236                                                        |   32|   0|   32|          0|
+    |weights_load_10378_reg_7246                                                        |   32|   0|   32|          0|
+    |weights_load_10379_reg_7256                                                        |   32|   0|   32|          0|
+    |weights_load_10380_reg_7266                                                        |   32|   0|   32|          0|
+    |weights_load_10381_reg_7276                                                        |   32|   0|   32|          0|
+    |weights_load_10382_reg_7286                                                        |   32|   0|   32|          0|
+    |weights_load_10383_reg_7296                                                        |   32|   0|   32|          0|
+    |weights_load_10384_reg_7306                                                        |   32|   0|   32|          0|
+    |weights_load_10385_reg_7316                                                        |   32|   0|   32|          0|
+    |weights_load_10386_reg_7326                                                        |   32|   0|   32|          0|
+    |weights_load_10387_reg_7336                                                        |   32|   0|   32|          0|
+    |weights_load_10388_reg_7346                                                        |   32|   0|   32|          0|
+    |weights_load_10389_reg_7356                                                        |   32|   0|   32|          0|
+    |weights_load_10390_reg_7366                                                        |   32|   0|   32|          0|
+    |weights_load_10391_reg_7376                                                        |   32|   0|   32|          0|
+    |weights_load_10392_reg_7386                                                        |   32|   0|   32|          0|
+    |weights_load_10393_reg_7396                                                        |   32|   0|   32|          0|
+    |weights_load_10394_reg_7406                                                        |   32|   0|   32|          0|
+    |weights_load_10395_reg_7416                                                        |   32|   0|   32|          0|
+    |weights_load_10396_reg_7426                                                        |   32|   0|   32|          0|
+    |weights_load_10397_reg_7436                                                        |   32|   0|   32|          0|
+    |weights_load_10398_reg_7446                                                        |   32|   0|   32|          0|
+    |weights_load_10399_reg_7456                                                        |   32|   0|   32|          0|
+    |weights_load_10400_reg_7466                                                        |   32|   0|   32|          0|
+    |weights_load_10401_reg_7476                                                        |   32|   0|   32|          0|
+    |weights_load_10402_reg_7486                                                        |   32|   0|   32|          0|
+    |weights_load_10403_reg_7496                                                        |   32|   0|   32|          0|
+    |weights_load_10404_reg_7506                                                        |   32|   0|   32|          0|
+    |weights_load_10405_reg_7516                                                        |   32|   0|   32|          0|
+    |weights_load_10406_reg_7526                                                        |   32|   0|   32|          0|
+    |weights_load_10407_reg_7536                                                        |   32|   0|   32|          0|
+    |weights_load_10408_reg_7546                                                        |   32|   0|   32|          0|
+    |weights_load_10409_reg_7556                                                        |   32|   0|   32|          0|
+    |weights_load_10410_reg_7566                                                        |   32|   0|   32|          0|
+    |weights_load_10411_reg_7576                                                        |   32|   0|   32|          0|
+    |weights_load_10412_reg_7586                                                        |   32|   0|   32|          0|
+    |weights_load_10413_reg_7596                                                        |   32|   0|   32|          0|
+    |weights_load_10414_reg_7606                                                        |   32|   0|   32|          0|
+    |weights_load_10415_reg_7616                                                        |   32|   0|   32|          0|
+    |weights_load_10416_reg_7626                                                        |   32|   0|   32|          0|
+    |weights_load_10417_reg_7636                                                        |   32|   0|   32|          0|
+    |weights_load_10418_reg_7646                                                        |   32|   0|   32|          0|
+    |weights_load_10419_reg_7656                                                        |   32|   0|   32|          0|
+    |weights_load_10420_reg_7666                                                        |   32|   0|   32|          0|
+    |weights_load_10421_reg_7676                                                        |   32|   0|   32|          0|
+    |weights_load_10422_reg_7686                                                        |   32|   0|   32|          0|
+    |weights_load_10423_reg_7696                                                        |   32|   0|   32|          0|
+    |weights_load_10424_reg_7706                                                        |   32|   0|   32|          0|
+    |weights_load_10425_reg_7716                                                        |   32|   0|   32|          0|
+    |weights_load_10426_reg_7726                                                        |   32|   0|   32|          0|
+    |weights_load_10427_reg_7736                                                        |   32|   0|   32|          0|
+    |weights_load_10428_reg_7746                                                        |   32|   0|   32|          0|
+    |weights_load_10429_reg_7756                                                        |   32|   0|   32|          0|
+    |weights_load_10430_reg_7766                                                        |   32|   0|   32|          0|
+    |weights_load_10431_reg_7776                                                        |   32|   0|   32|          0|
+    |weights_load_10432_reg_7786                                                        |   32|   0|   32|          0|
+    |weights_load_10433_reg_7796                                                        |   32|   0|   32|          0|
+    |weights_load_10434_reg_7806                                                        |   32|   0|   32|          0|
+    |weights_load_10435_reg_7816                                                        |   32|   0|   32|          0|
+    |weights_load_10436_reg_7826                                                        |   32|   0|   32|          0|
+    |weights_load_10437_reg_7836                                                        |   32|   0|   32|          0|
+    |weights_load_10438_reg_7846                                                        |   32|   0|   32|          0|
+    |weights_load_10439_reg_7856                                                        |   32|   0|   32|          0|
+    |weights_load_10440_reg_7866                                                        |   32|   0|   32|          0|
+    |weights_load_10441_reg_7876                                                        |   32|   0|   32|          0|
+    |weights_load_10442_reg_7886                                                        |   32|   0|   32|          0|
+    |weights_load_10443_reg_7896                                                        |   32|   0|   32|          0|
+    |weights_load_10444_reg_7906                                                        |   32|   0|   32|          0|
+    |weights_load_10445_reg_7916                                                        |   32|   0|   32|          0|
+    |weights_load_10446_reg_7926                                                        |   32|   0|   32|          0|
+    |weights_load_10447_reg_7936                                                        |   32|   0|   32|          0|
+    |weights_load_10448_reg_7946                                                        |   32|   0|   32|          0|
+    |weights_load_10449_reg_7956                                                        |   32|   0|   32|          0|
+    |weights_load_10450_reg_7966                                                        |   32|   0|   32|          0|
+    |weights_load_10451_reg_7976                                                        |   32|   0|   32|          0|
+    |weights_load_10452_reg_7986                                                        |   32|   0|   32|          0|
+    |weights_load_10453_reg_7996                                                        |   32|   0|   32|          0|
+    |weights_load_10454_reg_8006                                                        |   32|   0|   32|          0|
+    |weights_load_10455_reg_8016                                                        |   32|   0|   32|          0|
+    |weights_load_10456_reg_8026                                                        |   32|   0|   32|          0|
+    |weights_load_10457_reg_8036                                                        |   32|   0|   32|          0|
+    |weights_load_10458_reg_8046                                                        |   32|   0|   32|          0|
+    |weights_load_10459_reg_8056                                                        |   32|   0|   32|          0|
+    |weights_load_10460_reg_8066                                                        |   32|   0|   32|          0|
+    |weights_load_10461_reg_8076                                                        |   32|   0|   32|          0|
+    |weights_load_10462_reg_8086                                                        |   32|   0|   32|          0|
+    |weights_load_10463_reg_8096                                                        |   32|   0|   32|          0|
+    |weights_load_10464_reg_8106                                                        |   32|   0|   32|          0|
+    |weights_load_10465_reg_8116                                                        |   32|   0|   32|          0|
+    |weights_load_10466_reg_8126                                                        |   32|   0|   32|          0|
+    |weights_load_10467_reg_8136                                                        |   32|   0|   32|          0|
+    |weights_load_10468_reg_8146                                                        |   32|   0|   32|          0|
+    |weights_load_10469_reg_8156                                                        |   32|   0|   32|          0|
+    |weights_load_10470_reg_8166                                                        |   32|   0|   32|          0|
+    |weights_load_10471_reg_8176                                                        |   32|   0|   32|          0|
+    |weights_load_10472_reg_8186                                                        |   32|   0|   32|          0|
+    |weights_load_10473_reg_8196                                                        |   32|   0|   32|          0|
+    |weights_load_10474_reg_8206                                                        |   32|   0|   32|          0|
+    |weights_load_10475_reg_8216                                                        |   32|   0|   32|          0|
+    |weights_load_10476_reg_8226                                                        |   32|   0|   32|          0|
+    |weights_load_10477_reg_8236                                                        |   32|   0|   32|          0|
+    |weights_load_10478_reg_8246                                                        |   32|   0|   32|          0|
+    |weights_load_10479_reg_8256                                                        |   32|   0|   32|          0|
+    |weights_load_10480_reg_8266                                                        |   32|   0|   32|          0|
+    |weights_load_10481_reg_8276                                                        |   32|   0|   32|          0|
+    |weights_load_10482_reg_8286                                                        |   32|   0|   32|          0|
+    |weights_load_10483_reg_8296                                                        |   32|   0|   32|          0|
+    |weights_load_10484_reg_8306                                                        |   32|   0|   32|          0|
+    |weights_load_10485_reg_8316                                                        |   32|   0|   32|          0|
+    |weights_load_10486_reg_8326                                                        |   32|   0|   32|          0|
+    |weights_load_10487_reg_8336                                                        |   32|   0|   32|          0|
+    |weights_load_10488_reg_8346                                                        |   32|   0|   32|          0|
+    |weights_load_10489_reg_8356                                                        |   32|   0|   32|          0|
+    |weights_load_10490_reg_8366                                                        |   32|   0|   32|          0|
+    |weights_load_10491_reg_8376                                                        |   32|   0|   32|          0|
+    |weights_load_10492_reg_8386                                                        |   32|   0|   32|          0|
+    |weights_load_10493_reg_8396                                                        |   32|   0|   32|          0|
+    |weights_load_10494_reg_8406                                                        |   32|   0|   32|          0|
+    |weights_load_10495_reg_8416                                                        |   32|   0|   32|          0|
+    |weights_load_10496_reg_8426                                                        |   32|   0|   32|          0|
+    |weights_load_10497_reg_8436                                                        |   32|   0|   32|          0|
+    |weights_load_10498_reg_8446                                                        |   32|   0|   32|          0|
+    |weights_load_10499_reg_8456                                                        |   32|   0|   32|          0|
+    |weights_load_10500_reg_8466                                                        |   32|   0|   32|          0|
+    |weights_load_10501_reg_8476                                                        |   32|   0|   32|          0|
+    |weights_load_10502_reg_8486                                                        |   32|   0|   32|          0|
+    |weights_load_10503_reg_8496                                                        |   32|   0|   32|          0|
+    |weights_load_10504_reg_8506                                                        |   32|   0|   32|          0|
+    |weights_load_10505_reg_8516                                                        |   32|   0|   32|          0|
+    |weights_load_10506_reg_8526                                                        |   32|   0|   32|          0|
+    |weights_load_10507_reg_8536                                                        |   32|   0|   32|          0|
+    |weights_load_10508_reg_8546                                                        |   32|   0|   32|          0|
+    |weights_load_10509_reg_8556                                                        |   32|   0|   32|          0|
+    |weights_load_10510_reg_8566                                                        |   32|   0|   32|          0|
+    |weights_load_10511_reg_8576                                                        |   32|   0|   32|          0|
+    |weights_load_10512_reg_8586                                                        |   32|   0|   32|          0|
+    |weights_load_10513_reg_8596                                                        |   32|   0|   32|          0|
+    |weights_load_10514_reg_8606                                                        |   32|   0|   32|          0|
+    |weights_load_10515_reg_8616                                                        |   32|   0|   32|          0|
+    |weights_load_10516_reg_8626                                                        |   32|   0|   32|          0|
+    |weights_load_10517_reg_8636                                                        |   32|   0|   32|          0|
+    |weights_load_10518_reg_8646                                                        |   32|   0|   32|          0|
+    |weights_load_10519_reg_8656                                                        |   32|   0|   32|          0|
+    |weights_load_10520_reg_8666                                                        |   32|   0|   32|          0|
+    |weights_load_10521_reg_8676                                                        |   32|   0|   32|          0|
+    |weights_load_10522_reg_8686                                                        |   32|   0|   32|          0|
+    |weights_load_10523_reg_8696                                                        |   32|   0|   32|          0|
+    |weights_load_10524_reg_8706                                                        |   32|   0|   32|          0|
+    |weights_load_10525_reg_8716                                                        |   32|   0|   32|          0|
+    |weights_load_10526_reg_8726                                                        |   32|   0|   32|          0|
+    |weights_load_10527_reg_8736                                                        |   32|   0|   32|          0|
+    |weights_load_10528_reg_8746                                                        |   32|   0|   32|          0|
+    |weights_load_10529_reg_8756                                                        |   32|   0|   32|          0|
+    |weights_load_10530_reg_8766                                                        |   32|   0|   32|          0|
+    |weights_load_10531_reg_8776                                                        |   32|   0|   32|          0|
+    |weights_load_10532_reg_8786                                                        |   32|   0|   32|          0|
+    |weights_load_10533_reg_8796                                                        |   32|   0|   32|          0|
+    |weights_load_10534_reg_8806                                                        |   32|   0|   32|          0|
+    |weights_load_10535_reg_8816                                                        |   32|   0|   32|          0|
+    |weights_load_10536_reg_8826                                                        |   32|   0|   32|          0|
+    |weights_load_10537_reg_8836                                                        |   32|   0|   32|          0|
+    |weights_load_10538_reg_8846                                                        |   32|   0|   32|          0|
+    |weights_load_10539_reg_8856                                                        |   32|   0|   32|          0|
+    |weights_load_10540_reg_8866                                                        |   32|   0|   32|          0|
+    |weights_load_10541_reg_8876                                                        |   32|   0|   32|          0|
+    |weights_load_10542_reg_8886                                                        |   32|   0|   32|          0|
+    |weights_load_10543_reg_8896                                                        |   32|   0|   32|          0|
+    |weights_load_10544_reg_8906                                                        |   32|   0|   32|          0|
+    |weights_load_10545_reg_8916                                                        |   32|   0|   32|          0|
+    |weights_load_10546_reg_8926                                                        |   32|   0|   32|          0|
+    |weights_load_10547_reg_8936                                                        |   32|   0|   32|          0|
+    |weights_load_10548_reg_8946                                                        |   32|   0|   32|          0|
+    |weights_load_10549_reg_8956                                                        |   32|   0|   32|          0|
+    |weights_load_10550_reg_8966                                                        |   32|   0|   32|          0|
+    |weights_load_10551_reg_8976                                                        |   32|   0|   32|          0|
+    |weights_load_10552_reg_8986                                                        |   32|   0|   32|          0|
+    |weights_load_10553_reg_8996                                                        |   32|   0|   32|          0|
+    |weights_load_10554_reg_9006                                                        |   32|   0|   32|          0|
+    |weights_load_10555_reg_9016                                                        |   32|   0|   32|          0|
+    |weights_load_10556_reg_9026                                                        |   32|   0|   32|          0|
+    |weights_load_10557_reg_9036                                                        |   32|   0|   32|          0|
+    |weights_load_10558_reg_9046                                                        |   32|   0|   32|          0|
+    |weights_load_10559_reg_9056                                                        |   32|   0|   32|          0|
+    |weights_load_10560_reg_9066                                                        |   32|   0|   32|          0|
+    |weights_load_10561_reg_9076                                                        |   32|   0|   32|          0|
+    |weights_load_10562_reg_9086                                                        |   32|   0|   32|          0|
+    |weights_load_10563_reg_9096                                                        |   32|   0|   32|          0|
+    |weights_load_10564_reg_9106                                                        |   32|   0|   32|          0|
+    |weights_load_10565_reg_9116                                                        |   32|   0|   32|          0|
+    |weights_load_10566_reg_9126                                                        |   32|   0|   32|          0|
+    |weights_load_10567_reg_9136                                                        |   32|   0|   32|          0|
+    |weights_load_10568_reg_9146                                                        |   32|   0|   32|          0|
+    |weights_load_10569_reg_9156                                                        |   32|   0|   32|          0|
+    |weights_load_10570_reg_9166                                                        |   32|   0|   32|          0|
+    |weights_load_10571_reg_9176                                                        |   32|   0|   32|          0|
+    |weights_load_10572_reg_9186                                                        |   32|   0|   32|          0|
+    |weights_load_10573_reg_9196                                                        |   32|   0|   32|          0|
+    |weights_load_10574_reg_9206                                                        |   32|   0|   32|          0|
+    |weights_load_10575_reg_9216                                                        |   32|   0|   32|          0|
+    |weights_load_10576_reg_9226                                                        |   32|   0|   32|          0|
+    |weights_load_10577_reg_9236                                                        |   32|   0|   32|          0|
+    |weights_load_10578_reg_9246                                                        |   32|   0|   32|          0|
+    |weights_load_10579_reg_9256                                                        |   32|   0|   32|          0|
+    |weights_load_10580_reg_9266                                                        |   32|   0|   32|          0|
+    |weights_load_10581_reg_9276                                                        |   32|   0|   32|          0|
+    |weights_load_10582_reg_9286                                                        |   32|   0|   32|          0|
+    |weights_load_10583_reg_9296                                                        |   32|   0|   32|          0|
+    |weights_load_10584_reg_9306                                                        |   32|   0|   32|          0|
+    |weights_load_10585_reg_9316                                                        |   32|   0|   32|          0|
+    |weights_load_10586_reg_9326                                                        |   32|   0|   32|          0|
+    |weights_load_10587_reg_9336                                                        |   32|   0|   32|          0|
+    |weights_load_10588_reg_9346                                                        |   32|   0|   32|          0|
+    |weights_load_10589_reg_9356                                                        |   32|   0|   32|          0|
+    |weights_load_10590_reg_9366                                                        |   32|   0|   32|          0|
+    |weights_load_10591_reg_9376                                                        |   32|   0|   32|          0|
+    |weights_load_10592_reg_9386                                                        |   32|   0|   32|          0|
+    |weights_load_10593_reg_9396                                                        |   32|   0|   32|          0|
+    |weights_load_10594_reg_9406                                                        |   32|   0|   32|          0|
+    |weights_load_10595_reg_9416                                                        |   32|   0|   32|          0|
+    |weights_load_10596_reg_9426                                                        |   32|   0|   32|          0|
+    |weights_load_10597_reg_9436                                                        |   32|   0|   32|          0|
+    |weights_load_10598_reg_9446                                                        |   32|   0|   32|          0|
+    |weights_load_10599_reg_9456                                                        |   32|   0|   32|          0|
+    |weights_load_10600_reg_9466                                                        |   32|   0|   32|          0|
+    |weights_load_10601_reg_9476                                                        |   32|   0|   32|          0|
+    |weights_load_10602_reg_9486                                                        |   32|   0|   32|          0|
+    |weights_load_10603_reg_9496                                                        |   32|   0|   32|          0|
+    |weights_load_10604_reg_9506                                                        |   32|   0|   32|          0|
+    |weights_load_10605_reg_9516                                                        |   32|   0|   32|          0|
+    |weights_load_10606_reg_9526                                                        |   32|   0|   32|          0|
+    |weights_load_10607_reg_9536                                                        |   32|   0|   32|          0|
+    |weights_load_10608_reg_9546                                                        |   32|   0|   32|          0|
+    |weights_load_10609_reg_9556                                                        |   32|   0|   32|          0|
+    |weights_load_10610_reg_9566                                                        |   32|   0|   32|          0|
+    |weights_load_10611_reg_9576                                                        |   32|   0|   32|          0|
+    |weights_load_10612_reg_9586                                                        |   32|   0|   32|          0|
+    |weights_load_10613_reg_9596                                                        |   32|   0|   32|          0|
+    |weights_load_10614_reg_9606                                                        |   32|   0|   32|          0|
+    |weights_load_10615_reg_9616                                                        |   32|   0|   32|          0|
+    |weights_load_10616_reg_9626                                                        |   32|   0|   32|          0|
+    |weights_load_10617_reg_9636                                                        |   32|   0|   32|          0|
+    |weights_load_10618_reg_9646                                                        |   32|   0|   32|          0|
+    |weights_load_10619_reg_9656                                                        |   32|   0|   32|          0|
+    |weights_load_10620_reg_9666                                                        |   32|   0|   32|          0|
+    |weights_load_10621_reg_9676                                                        |   32|   0|   32|          0|
+    |weights_load_10622_reg_9686                                                        |   32|   0|   32|          0|
+    |weights_load_10623_reg_9696                                                        |   32|   0|   32|          0|
+    |weights_load_10624_reg_9706                                                        |   32|   0|   32|          0|
+    |weights_load_10625_reg_9716                                                        |   32|   0|   32|          0|
+    |weights_load_10626_reg_9726                                                        |   32|   0|   32|          0|
+    |weights_load_10627_reg_9736                                                        |   32|   0|   32|          0|
+    |weights_load_10628_reg_9746                                                        |   32|   0|   32|          0|
+    |weights_load_10629_reg_9756                                                        |   32|   0|   32|          0|
+    |weights_load_10630_reg_9766                                                        |   32|   0|   32|          0|
+    |weights_load_10631_reg_9776                                                        |   32|   0|   32|          0|
+    |weights_load_10632_reg_9786                                                        |   32|   0|   32|          0|
+    |weights_load_10633_reg_9796                                                        |   32|   0|   32|          0|
+    |weights_load_10634_reg_9806                                                        |   32|   0|   32|          0|
+    |weights_load_10635_reg_9816                                                        |   32|   0|   32|          0|
+    |weights_load_10636_reg_9826                                                        |   32|   0|   32|          0|
+    |weights_load_10637_reg_9836                                                        |   32|   0|   32|          0|
+    |weights_load_10638_reg_9846                                                        |   32|   0|   32|          0|
+    |weights_load_10639_reg_9856                                                        |   32|   0|   32|          0|
+    |weights_load_10640_reg_9866                                                        |   32|   0|   32|          0|
+    |weights_load_10641_reg_9876                                                        |   32|   0|   32|          0|
+    |weights_load_10642_reg_9886                                                        |   32|   0|   32|          0|
+    |weights_load_10643_reg_9896                                                        |   32|   0|   32|          0|
+    |weights_load_10644_reg_9906                                                        |   32|   0|   32|          0|
+    |weights_load_10645_reg_9916                                                        |   32|   0|   32|          0|
+    |weights_load_10646_reg_9926                                                        |   32|   0|   32|          0|
+    |weights_load_10647_reg_9936                                                        |   32|   0|   32|          0|
+    |weights_load_10648_reg_9946                                                        |   32|   0|   32|          0|
+    |weights_load_10649_reg_9956                                                        |   32|   0|   32|          0|
+    |weights_load_10650_reg_9966                                                        |   32|   0|   32|          0|
+    |weights_load_10651_reg_9976                                                        |   32|   0|   32|          0|
+    |weights_load_10652_reg_9986                                                        |   32|   0|   32|          0|
+    |weights_load_10653_reg_9996                                                        |   32|   0|   32|          0|
+    |weights_load_10654_reg_10006                                                       |   32|   0|   32|          0|
+    |weights_load_10655_reg_10016                                                       |   32|   0|   32|          0|
+    |weights_load_10656_reg_10026                                                       |   32|   0|   32|          0|
+    |weights_load_10657_reg_10036                                                       |   32|   0|   32|          0|
+    |weights_load_10658_reg_10046                                                       |   32|   0|   32|          0|
+    |weights_load_10659_reg_10056                                                       |   32|   0|   32|          0|
+    |weights_load_10660_reg_10066                                                       |   32|   0|   32|          0|
+    |weights_load_10661_reg_10076                                                       |   32|   0|   32|          0|
+    |weights_load_10662_reg_10086                                                       |   32|   0|   32|          0|
+    |weights_load_10663_reg_10096                                                       |   32|   0|   32|          0|
+    |weights_load_10664_reg_10106                                                       |   32|   0|   32|          0|
+    |weights_load_10665_reg_10116                                                       |   32|   0|   32|          0|
+    |weights_load_10666_reg_10126                                                       |   32|   0|   32|          0|
+    |weights_load_10667_reg_10136                                                       |   32|   0|   32|          0|
+    |weights_load_10668_reg_10146                                                       |   32|   0|   32|          0|
+    |weights_load_10669_reg_10156                                                       |   32|   0|   32|          0|
+    |weights_load_10670_reg_10166                                                       |   32|   0|   32|          0|
+    |weights_load_10671_reg_10176                                                       |   32|   0|   32|          0|
+    |weights_load_10672_reg_10186                                                       |   32|   0|   32|          0|
+    |weights_load_10673_reg_10196                                                       |   32|   0|   32|          0|
+    |weights_load_10674_reg_10206                                                       |   32|   0|   32|          0|
+    |weights_load_10675_reg_10216                                                       |   32|   0|   32|          0|
+    |weights_load_10676_reg_10226                                                       |   32|   0|   32|          0|
+    |weights_load_10677_reg_10236                                                       |   32|   0|   32|          0|
+    |weights_load_10678_reg_10246                                                       |   32|   0|   32|          0|
+    |weights_load_10679_reg_10256                                                       |   32|   0|   32|          0|
+    |weights_load_10680_reg_10266                                                       |   32|   0|   32|          0|
+    |weights_load_10681_reg_10276                                                       |   32|   0|   32|          0|
+    |weights_load_10682_reg_10286                                                       |   32|   0|   32|          0|
+    |weights_load_10683_reg_10296                                                       |   32|   0|   32|          0|
+    |weights_load_10684_reg_10306                                                       |   32|   0|   32|          0|
+    |weights_load_10685_reg_10316                                                       |   32|   0|   32|          0|
+    |weights_load_10686_reg_10326                                                       |   32|   0|   32|          0|
+    |weights_load_10687_reg_10336                                                       |   32|   0|   32|          0|
+    |weights_load_10688_reg_10346                                                       |   32|   0|   32|          0|
+    |weights_load_10689_reg_10356                                                       |   32|   0|   32|          0|
+    |weights_load_10690_reg_10366                                                       |   32|   0|   32|          0|
+    |weights_load_10691_reg_10376                                                       |   32|   0|   32|          0|
+    |weights_load_10692_reg_10386                                                       |   32|   0|   32|          0|
+    |weights_load_10693_reg_10396                                                       |   32|   0|   32|          0|
+    |weights_load_10694_reg_10406                                                       |   32|   0|   32|          0|
+    |weights_load_10695_reg_10416                                                       |   32|   0|   32|          0|
+    |weights_load_10696_reg_10426                                                       |   32|   0|   32|          0|
+    |weights_load_10697_reg_10436                                                       |   32|   0|   32|          0|
+    |weights_load_10698_reg_10446                                                       |   32|   0|   32|          0|
+    |weights_load_10699_reg_10456                                                       |   32|   0|   32|          0|
+    |weights_load_10700_reg_10466                                                       |   32|   0|   32|          0|
+    |weights_load_10701_reg_10476                                                       |   32|   0|   32|          0|
+    |weights_load_10702_reg_10486                                                       |   32|   0|   32|          0|
+    |weights_load_10703_reg_10496                                                       |   32|   0|   32|          0|
+    |weights_load_10704_reg_10506                                                       |   32|   0|   32|          0|
+    |weights_load_10705_reg_10516                                                       |   32|   0|   32|          0|
+    |weights_load_10706_reg_10526                                                       |   32|   0|   32|          0|
+    |weights_load_10707_reg_10536                                                       |   32|   0|   32|          0|
+    |weights_load_10708_reg_10546                                                       |   32|   0|   32|          0|
+    |weights_load_10709_reg_10556                                                       |   32|   0|   32|          0|
+    |weights_load_10710_reg_10566                                                       |   32|   0|   32|          0|
+    |weights_load_10711_reg_10576                                                       |   32|   0|   32|          0|
+    |weights_load_10712_reg_10586                                                       |   32|   0|   32|          0|
+    |weights_load_10713_reg_10596                                                       |   32|   0|   32|          0|
+    |weights_load_10714_reg_10606                                                       |   32|   0|   32|          0|
+    |weights_load_10715_reg_10616                                                       |   32|   0|   32|          0|
+    |weights_load_10716_reg_10626                                                       |   32|   0|   32|          0|
+    |weights_load_10717_reg_10636                                                       |   32|   0|   32|          0|
+    |weights_load_10718_reg_10646                                                       |   32|   0|   32|          0|
+    |weights_load_10719_reg_10656                                                       |   32|   0|   32|          0|
+    |weights_load_10720_reg_10666                                                       |   32|   0|   32|          0|
+    |weights_load_10721_reg_10676                                                       |   32|   0|   32|          0|
+    |weights_load_10722_reg_10686                                                       |   32|   0|   32|          0|
+    |weights_load_10723_reg_10696                                                       |   32|   0|   32|          0|
+    |weights_load_10724_reg_10706                                                       |   32|   0|   32|          0|
+    |weights_load_10725_reg_10716                                                       |   32|   0|   32|          0|
+    |weights_load_10726_reg_10726                                                       |   32|   0|   32|          0|
+    |weights_load_10727_reg_10736                                                       |   32|   0|   32|          0|
+    |weights_load_10728_reg_10746                                                       |   32|   0|   32|          0|
+    |weights_load_10729_reg_10756                                                       |   32|   0|   32|          0|
+    |weights_load_10730_reg_10766                                                       |   32|   0|   32|          0|
+    |weights_load_10731_reg_10776                                                       |   32|   0|   32|          0|
+    |weights_load_10732_reg_10786                                                       |   32|   0|   32|          0|
+    |weights_load_10733_reg_10796                                                       |   32|   0|   32|          0|
+    |weights_load_10734_reg_10806                                                       |   32|   0|   32|          0|
+    |weights_load_10735_reg_10816                                                       |   32|   0|   32|          0|
+    |weights_load_10736_reg_10826                                                       |   32|   0|   32|          0|
+    |weights_load_10737_reg_10836                                                       |   32|   0|   32|          0|
+    |weights_load_10738_reg_10846                                                       |   32|   0|   32|          0|
+    |weights_load_10739_reg_10856                                                       |   32|   0|   32|          0|
+    |weights_load_10740_reg_10866                                                       |   32|   0|   32|          0|
+    |weights_load_10741_reg_10876                                                       |   32|   0|   32|          0|
+    |weights_load_10742_reg_10886                                                       |   32|   0|   32|          0|
+    |weights_load_10743_reg_10896                                                       |   32|   0|   32|          0|
+    |weights_load_10744_reg_10906                                                       |   32|   0|   32|          0|
+    |weights_load_10745_reg_10916                                                       |   32|   0|   32|          0|
+    |weights_load_10746_reg_10926                                                       |   32|   0|   32|          0|
+    |weights_load_10747_reg_10936                                                       |   32|   0|   32|          0|
+    |weights_load_10748_reg_10946                                                       |   32|   0|   32|          0|
+    |weights_load_10749_reg_10956                                                       |   32|   0|   32|          0|
+    |weights_load_10750_reg_10966                                                       |   32|   0|   32|          0|
+    |weights_load_10751_reg_10976                                                       |   32|   0|   32|          0|
+    |weights_load_10752_reg_10986                                                       |   32|   0|   32|          0|
+    |weights_load_10753_reg_10996                                                       |   32|   0|   32|          0|
+    |weights_load_10754_reg_11006                                                       |   32|   0|   32|          0|
+    |weights_load_10755_reg_11016                                                       |   32|   0|   32|          0|
+    |weights_load_10756_reg_11026                                                       |   32|   0|   32|          0|
+    |weights_load_10757_reg_11036                                                       |   32|   0|   32|          0|
+    |weights_load_10758_reg_11046                                                       |   32|   0|   32|          0|
+    |weights_load_10759_reg_11056                                                       |   32|   0|   32|          0|
+    |weights_load_10760_reg_11066                                                       |   32|   0|   32|          0|
+    |weights_load_10761_reg_11076                                                       |   32|   0|   32|          0|
+    |weights_load_10762_reg_11086                                                       |   32|   0|   32|          0|
+    |weights_load_10763_reg_11096                                                       |   32|   0|   32|          0|
+    |weights_load_10764_reg_11106                                                       |   32|   0|   32|          0|
+    |weights_load_10765_reg_11116                                                       |   32|   0|   32|          0|
+    |weights_load_10766_reg_11126                                                       |   32|   0|   32|          0|
+    |weights_load_10767_reg_11136                                                       |   32|   0|   32|          0|
+    |weights_load_10768_reg_11146                                                       |   32|   0|   32|          0|
+    |weights_load_10769_reg_11156                                                       |   32|   0|   32|          0|
+    |weights_load_10770_reg_11166                                                       |   32|   0|   32|          0|
+    |weights_load_10771_reg_11176                                                       |   32|   0|   32|          0|
+    |weights_load_10772_reg_11186                                                       |   32|   0|   32|          0|
+    |weights_load_10773_reg_11196                                                       |   32|   0|   32|          0|
+    |weights_load_10774_reg_11206                                                       |   32|   0|   32|          0|
+    |weights_load_10775_reg_11216                                                       |   32|   0|   32|          0|
+    |weights_load_10776_reg_11226                                                       |   32|   0|   32|          0|
+    |weights_load_10777_reg_11236                                                       |   32|   0|   32|          0|
+    |weights_load_10778_reg_11246                                                       |   32|   0|   32|          0|
+    |weights_load_10779_reg_11256                                                       |   32|   0|   32|          0|
+    |weights_load_10780_reg_11266                                                       |   32|   0|   32|          0|
+    |weights_load_10781_reg_11276                                                       |   32|   0|   32|          0|
+    |weights_load_10782_reg_11286                                                       |   32|   0|   32|          0|
+    |weights_load_10783_reg_11296                                                       |   32|   0|   32|          0|
+    |weights_load_10784_reg_11306                                                       |   32|   0|   32|          0|
+    |weights_load_10785_reg_11316                                                       |   32|   0|   32|          0|
+    |weights_load_10786_reg_11326                                                       |   32|   0|   32|          0|
+    |weights_load_10787_reg_11336                                                       |   32|   0|   32|          0|
+    |weights_load_10788_reg_11346                                                       |   32|   0|   32|          0|
+    |weights_load_10789_reg_11356                                                       |   32|   0|   32|          0|
+    |weights_load_10790_reg_11366                                                       |   32|   0|   32|          0|
+    |weights_load_10791_reg_11376                                                       |   32|   0|   32|          0|
+    |weights_load_10792_reg_11386                                                       |   32|   0|   32|          0|
+    |weights_load_10793_reg_11396                                                       |   32|   0|   32|          0|
+    |weights_load_10794_reg_11406                                                       |   32|   0|   32|          0|
+    |weights_load_10795_reg_11416                                                       |   32|   0|   32|          0|
+    |weights_load_10796_reg_11426                                                       |   32|   0|   32|          0|
+    |weights_load_10797_reg_11436                                                       |   32|   0|   32|          0|
+    |weights_load_10798_reg_11446                                                       |   32|   0|   32|          0|
+    |weights_load_10799_reg_11456                                                       |   32|   0|   32|          0|
+    |weights_load_10800_reg_11466                                                       |   32|   0|   32|          0|
+    |weights_load_10801_reg_11476                                                       |   32|   0|   32|          0|
+    |weights_load_10802_reg_11486                                                       |   32|   0|   32|          0|
+    |weights_load_10803_reg_11496                                                       |   32|   0|   32|          0|
+    |weights_load_10804_reg_11506                                                       |   32|   0|   32|          0|
+    |weights_load_10805_reg_11516                                                       |   32|   0|   32|          0|
+    |weights_load_10806_reg_11526                                                       |   32|   0|   32|          0|
+    |weights_load_10807_reg_11536                                                       |   32|   0|   32|          0|
+    |weights_load_10808_reg_11546                                                       |   32|   0|   32|          0|
+    |weights_load_10809_reg_11556                                                       |   32|   0|   32|          0|
+    |weights_load_10810_reg_11566                                                       |   32|   0|   32|          0|
+    |weights_load_10811_reg_11576                                                       |   32|   0|   32|          0|
+    |weights_load_10812_reg_11586                                                       |   32|   0|   32|          0|
+    |weights_load_10813_reg_11596                                                       |   32|   0|   32|          0|
+    |weights_load_10814_reg_11606                                                       |   32|   0|   32|          0|
+    |weights_load_10815_reg_11616                                                       |   32|   0|   32|          0|
+    |weights_load_10816_reg_11626                                                       |   32|   0|   32|          0|
+    |weights_load_10817_reg_11636                                                       |   32|   0|   32|          0|
+    |weights_load_10818_reg_11646                                                       |   32|   0|   32|          0|
+    |weights_load_10819_reg_11656                                                       |   32|   0|   32|          0|
+    |weights_load_10820_reg_11666                                                       |   32|   0|   32|          0|
+    |weights_load_10821_reg_11676                                                       |   32|   0|   32|          0|
+    |weights_load_10822_reg_11686                                                       |   32|   0|   32|          0|
+    |weights_load_10823_reg_11696                                                       |   32|   0|   32|          0|
+    |weights_load_10824_reg_11706                                                       |   32|   0|   32|          0|
+    |weights_load_10825_reg_11716                                                       |   32|   0|   32|          0|
+    |weights_load_10826_reg_11726                                                       |   32|   0|   32|          0|
+    |weights_load_10827_reg_11736                                                       |   32|   0|   32|          0|
+    |weights_load_10828_reg_11746                                                       |   32|   0|   32|          0|
+    |weights_load_10829_reg_11756                                                       |   32|   0|   32|          0|
+    |weights_load_10830_reg_11766                                                       |   32|   0|   32|          0|
+    |weights_load_10831_reg_11776                                                       |   32|   0|   32|          0|
+    |weights_load_10832_reg_11786                                                       |   32|   0|   32|          0|
+    |weights_load_10833_reg_11796                                                       |   32|   0|   32|          0|
+    |weights_load_10834_reg_11806                                                       |   32|   0|   32|          0|
+    |weights_load_10835_reg_11816                                                       |   32|   0|   32|          0|
+    |weights_load_10836_reg_11826                                                       |   32|   0|   32|          0|
+    |weights_load_10837_reg_11836                                                       |   32|   0|   32|          0|
+    |weights_load_10838_reg_11846                                                       |   32|   0|   32|          0|
+    |weights_load_10839_reg_11856                                                       |   32|   0|   32|          0|
+    |weights_load_10840_reg_11866                                                       |   32|   0|   32|          0|
+    |weights_load_10841_reg_11876                                                       |   32|   0|   32|          0|
+    |weights_load_10842_reg_11886                                                       |   32|   0|   32|          0|
+    |weights_load_10843_reg_11896                                                       |   32|   0|   32|          0|
+    |weights_load_10844_reg_11906                                                       |   32|   0|   32|          0|
+    |weights_load_10845_reg_11916                                                       |   32|   0|   32|          0|
+    |weights_load_10846_reg_11926                                                       |   32|   0|   32|          0|
+    |weights_load_10847_reg_11936                                                       |   32|   0|   32|          0|
+    |weights_load_10848_reg_11946                                                       |   32|   0|   32|          0|
+    |weights_load_10849_reg_11956                                                       |   32|   0|   32|          0|
+    |weights_load_10850_reg_11966                                                       |   32|   0|   32|          0|
+    |weights_load_10851_reg_11976                                                       |   32|   0|   32|          0|
+    |weights_load_10852_reg_11986                                                       |   32|   0|   32|          0|
+    |weights_load_10853_reg_11996                                                       |   32|   0|   32|          0|
+    |weights_load_10854_reg_12006                                                       |   32|   0|   32|          0|
+    |weights_load_10855_reg_12016                                                       |   32|   0|   32|          0|
+    |weights_load_10856_reg_12026                                                       |   32|   0|   32|          0|
+    |weights_load_10857_reg_12036                                                       |   32|   0|   32|          0|
+    |weights_load_10858_reg_12046                                                       |   32|   0|   32|          0|
+    |weights_load_10859_reg_12056                                                       |   32|   0|   32|          0|
+    |weights_load_10860_reg_12066                                                       |   32|   0|   32|          0|
+    |weights_load_10861_reg_12076                                                       |   32|   0|   32|          0|
+    |weights_load_10862_reg_12086                                                       |   32|   0|   32|          0|
+    |weights_load_10863_reg_12096                                                       |   32|   0|   32|          0|
+    |weights_load_10864_reg_12106                                                       |   32|   0|   32|          0|
+    |weights_load_10865_reg_12116                                                       |   32|   0|   32|          0|
+    |weights_load_10866_reg_12126                                                       |   32|   0|   32|          0|
+    |weights_load_10867_reg_12136                                                       |   32|   0|   32|          0|
+    |weights_load_10868_reg_12146                                                       |   32|   0|   32|          0|
+    |weights_load_10869_reg_12156                                                       |   32|   0|   32|          0|
+    |weights_load_10870_reg_12166                                                       |   32|   0|   32|          0|
+    |weights_load_10871_reg_12176                                                       |   32|   0|   32|          0|
+    |weights_load_10872_reg_12186                                                       |   32|   0|   32|          0|
+    |weights_load_10873_reg_12196                                                       |   32|   0|   32|          0|
+    |weights_load_10874_reg_12206                                                       |   32|   0|   32|          0|
+    |weights_load_10875_reg_12216                                                       |   32|   0|   32|          0|
+    |weights_load_10876_reg_12226                                                       |   32|   0|   32|          0|
+    |weights_load_10877_reg_12236                                                       |   32|   0|   32|          0|
+    |weights_load_10878_reg_12246                                                       |   32|   0|   32|          0|
+    |weights_load_10879_reg_12256                                                       |   32|   0|   32|          0|
+    |weights_load_10880_reg_12266                                                       |   32|   0|   32|          0|
+    |weights_load_10881_reg_12276                                                       |   32|   0|   32|          0|
+    |weights_load_10882_reg_12286                                                       |   32|   0|   32|          0|
+    |weights_load_10883_reg_12296                                                       |   32|   0|   32|          0|
+    |weights_load_10884_reg_12306                                                       |   32|   0|   32|          0|
+    |weights_load_10885_reg_12316                                                       |   32|   0|   32|          0|
+    |weights_load_10886_reg_12326                                                       |   32|   0|   32|          0|
+    |weights_load_10887_reg_12336                                                       |   32|   0|   32|          0|
+    |weights_load_10888_reg_12346                                                       |   32|   0|   32|          0|
+    |weights_load_10889_reg_12356                                                       |   32|   0|   32|          0|
+    |weights_load_10890_reg_12366                                                       |   32|   0|   32|          0|
+    |weights_load_10891_reg_12376                                                       |   32|   0|   32|          0|
+    |weights_load_10892_reg_12386                                                       |   32|   0|   32|          0|
+    |weights_load_10893_reg_12396                                                       |   32|   0|   32|          0|
+    |weights_load_10894_reg_12406                                                       |   32|   0|   32|          0|
+    |weights_load_10895_reg_12416                                                       |   32|   0|   32|          0|
+    |weights_load_10896_reg_12426                                                       |   32|   0|   32|          0|
+    |weights_load_10897_reg_12436                                                       |   32|   0|   32|          0|
+    |weights_load_10898_reg_12446                                                       |   32|   0|   32|          0|
+    |weights_load_10899_reg_12456                                                       |   32|   0|   32|          0|
+    |weights_load_10900_reg_12466                                                       |   32|   0|   32|          0|
+    |weights_load_10901_reg_12476                                                       |   32|   0|   32|          0|
+    |weights_load_10902_reg_12486                                                       |   32|   0|   32|          0|
+    |weights_load_10903_reg_12496                                                       |   32|   0|   32|          0|
+    |weights_load_10904_reg_12506                                                       |   32|   0|   32|          0|
+    |weights_load_10905_reg_12516                                                       |   32|   0|   32|          0|
+    |weights_load_10906_reg_12526                                                       |   32|   0|   32|          0|
+    |weights_load_10907_reg_12536                                                       |   32|   0|   32|          0|
+    |weights_load_10908_reg_12546                                                       |   32|   0|   32|          0|
+    |weights_load_10909_reg_12556                                                       |   32|   0|   32|          0|
+    |weights_load_10910_reg_12566                                                       |   32|   0|   32|          0|
+    |weights_load_10911_reg_12576                                                       |   32|   0|   32|          0|
+    |weights_load_10912_reg_12586                                                       |   32|   0|   32|          0|
+    |weights_load_10913_reg_12596                                                       |   32|   0|   32|          0|
+    |weights_load_10914_reg_12606                                                       |   32|   0|   32|          0|
+    |weights_load_10915_reg_12616                                                       |   32|   0|   32|          0|
+    |weights_load_10916_reg_12626                                                       |   32|   0|   32|          0|
+    |weights_load_10917_reg_12636                                                       |   32|   0|   32|          0|
+    |weights_load_10918_reg_12646                                                       |   32|   0|   32|          0|
+    |weights_load_10919_reg_12656                                                       |   32|   0|   32|          0|
+    |weights_load_10920_reg_12666                                                       |   32|   0|   32|          0|
+    |weights_load_10921_reg_12676                                                       |   32|   0|   32|          0|
+    |weights_load_10922_reg_12686                                                       |   32|   0|   32|          0|
+    |weights_load_10923_reg_12696                                                       |   32|   0|   32|          0|
+    |weights_load_10924_reg_12706                                                       |   32|   0|   32|          0|
+    |weights_load_10925_reg_12711                                                       |   32|   0|   32|          0|
+    |weights_load_reg_6966                                                              |   32|   0|   32|          0|
+    +-----------------------------------------------------------------------------------+-----+----+-----+-----------+
+    |Total                                                                              |19012|   0|19012|          0|
+    +-----------------------------------------------------------------------------------+-----+----+-----+-----------+
+
+
+
+================================================================
+== Interface
+================================================================
+* Summary: 
++--------------------------------------------------+-----+-----+------------+------------------------------------------------+--------------+
+|                     RTL Ports                    | Dir | Bits|  Protocol  |                  Source Object                 |    C Type    |
++--------------------------------------------------+-----+-----+------------+------------------------------------------------+--------------+
+|ap_clk                                            |   in|    1|  ap_ctrl_hs|  conv2d_sum_mc<float, 14u, 14u, 3u, 3u, 64u>.20|  return value|
+|ap_rst                                            |   in|    1|  ap_ctrl_hs|  conv2d_sum_mc<float, 14u, 14u, 3u, 3u, 64u>.20|  return value|
+|ap_start                                          |   in|    1|  ap_ctrl_hs|  conv2d_sum_mc<float, 14u, 14u, 3u, 3u, 64u>.20|  return value|
+|ap_done                                           |  out|    1|  ap_ctrl_hs|  conv2d_sum_mc<float, 14u, 14u, 3u, 3u, 64u>.20|  return value|
+|ap_continue                                       |   in|    1|  ap_ctrl_hs|  conv2d_sum_mc<float, 14u, 14u, 3u, 3u, 64u>.20|  return value|
+|ap_idle                                           |  out|    1|  ap_ctrl_hs|  conv2d_sum_mc<float, 14u, 14u, 3u, 3u, 64u>.20|  return value|
+|ap_ready                                          |  out|    1|  ap_ctrl_hs|  conv2d_sum_mc<float, 14u, 14u, 3u, 3u, 64u>.20|  return value|
+|conv2d_64_padded_window_stream_20_dout            |   in|  288|     ap_fifo|               conv2d_64_padded_window_stream_20|       pointer|
+|conv2d_64_padded_window_stream_20_num_data_valid  |   in|    3|     ap_fifo|               conv2d_64_padded_window_stream_20|       pointer|
+|conv2d_64_padded_window_stream_20_fifo_cap        |   in|    3|     ap_fifo|               conv2d_64_padded_window_stream_20|       pointer|
+|conv2d_64_padded_window_stream_20_empty_n         |   in|    1|     ap_fifo|               conv2d_64_padded_window_stream_20|       pointer|
+|conv2d_64_padded_window_stream_20_read            |  out|    1|     ap_fifo|               conv2d_64_padded_window_stream_20|       pointer|
+|weights_address0                                  |  out|   10|   ap_memory|                                         weights|         array|
+|weights_ce0                                       |  out|    1|   ap_memory|                                         weights|         array|
+|weights_q0                                        |   in|   32|   ap_memory|                                         weights|         array|
+|in_channel_map_stream_20_din                      |  out|   32|     ap_fifo|                        in_channel_map_stream_20|       pointer|
+|in_channel_map_stream_20_num_data_valid           |   in|    3|     ap_fifo|                        in_channel_map_stream_20|       pointer|
+|in_channel_map_stream_20_fifo_cap                 |   in|    3|     ap_fifo|                        in_channel_map_stream_20|       pointer|
+|in_channel_map_stream_20_full_n                   |   in|    1|     ap_fifo|                        in_channel_map_stream_20|       pointer|
+|in_channel_map_stream_20_write                    |  out|    1|     ap_fifo|                        in_channel_map_stream_20|       pointer|
++--------------------------------------------------+-----+-----+------------+------------------------------------------------+--------------+
+

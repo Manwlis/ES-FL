@@ -1,0 +1,902 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cdfg:DBCdfg xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cdfg="http://www.autoesl.com/DBCdfg" timeStamp="1666116944086">
+  <ports id="1" name="gmem" type="PortType" coreId="62" bitwidth="512" iftype="IfTypeFifo">
+    <dataOutputObjs>getelementptr</dataOutputObjs>
+  </ports>
+  <ports id="2" name="sext_ln35" type="PortType" coreId="3621216858" bitwidth="58">
+    <dataOutputObjs>read</dataOutputObjs>
+  </ports>
+  <ports id="3" name="dense_weights_0" type="PortType" coreName="RAM" coreId="997420912" bitwidth="32" direction="DirOut" iftype="IfTypeRegister" arraysize="50176">
+    <dataInputObjs>getelementptr</dataInputObjs>
+  </ports>
+  <ports id="4" name="dense_weights_1" type="PortType" coreName="RAM" coreId="1769414695" bitwidth="32" direction="DirOut" iftype="IfTypeRegister" arraysize="50176">
+    <dataInputObjs>getelementptr</dataInputObjs>
+  </ports>
+  <ports id="5" name="dense_weights_2" type="PortType" coreName="RAM" coreId="230596720" bitwidth="32" direction="DirOut" iftype="IfTypeRegister" arraysize="50176">
+    <dataInputObjs>getelementptr</dataInputObjs>
+  </ports>
+  <ports id="6" name="dense_weights_3" type="PortType" coreName="RAM" coreId="336" bitwidth="32" direction="DirOut" iftype="IfTypeRegister" arraysize="50176">
+    <dataInputObjs>getelementptr</dataInputObjs>
+  </ports>
+  <ports id="7" name="dense_weights_4" type="PortType" coreName="RAM" coreId="235036512" bitwidth="32" direction="DirOut" iftype="IfTypeRegister" arraysize="50176">
+    <dataInputObjs>getelementptr</dataInputObjs>
+  </ports>
+  <ports id="8" name="dense_weights_5" type="PortType" coreName="RAM" coreId="235620736" bitwidth="32" direction="DirOut" iftype="IfTypeRegister" arraysize="50176">
+    <dataInputObjs>getelementptr</dataInputObjs>
+  </ports>
+  <ports id="9" name="dense_weights_6" type="PortType" coreName="RAM" coreId="231332336" bitwidth="32" direction="DirOut" iftype="IfTypeRegister" arraysize="50176">
+    <dataInputObjs>getelementptr</dataInputObjs>
+  </ports>
+  <ports id="10" name="dense_weights_7" type="PortType" coreName="RAM" coreId="231805040" bitwidth="32" direction="DirOut" iftype="IfTypeRegister" arraysize="50176">
+    <dataInputObjs>getelementptr</dataInputObjs>
+  </ports>
+  <edges id="90" source_obj="//@ports.1" sink_obj="//@blocks.0/@node_objs.2"/>
+  <edges id="91" source_obj="//@blocks.0/@node_objs.2" sink_obj="//@blocks.0/@node_objs.3"/>
+  <edges id="94" source_obj="//@blocks.0/@node_objs.1" sink_obj="//@blocks.0/@node_objs.4"/>
+  <edges id="97" source_obj="//@blocks.0/@node_objs.0" sink_obj="//@blocks.0/@node_objs.5"/>
+  <edges id="98" edge_type="CtrlEdge" source_obj="//@regions.0/@basic_blocks.0" sink_obj="//@blocks.0/@node_objs.6"/>
+  <edges id="99" source_obj="//@blocks.0/@node_objs.1" sink_obj="//@regions.0/@basic_blocks.0/@node_objs.0"/>
+  <edges id="100" source_obj="//@ports.0" sink_obj="//@regions.0/@basic_blocks.0/@node_objs.1"/>
+  <edges id="101" source_obj="//@blocks.0/@node_objs.3" sink_obj="//@regions.0/@basic_blocks.0/@node_objs.1"/>
+  <edges id="102" source_obj="//@regions.0/@basic_blocks.0/@node_objs.0" sink_obj="//@regions.0/@basic_blocks.0/@node_objs.2"/>
+  <edges id="105" source_obj="//@regions.0/@basic_blocks.0/@node_objs.0" sink_obj="//@regions.0/@basic_blocks.0/@node_objs.3"/>
+  <edges id="108" source_obj="//@regions.0/@basic_blocks.0/@node_objs.2" sink_obj="//@regions.0/@basic_blocks.0/@node_objs.4"/>
+  <edges id="109" edge_type="CtrlEdge" source_obj="//@regions.0/@basic_blocks.1" sink_obj="//@regions.0/@basic_blocks.0/@node_objs.4"/>
+  <edges id="110" edge_type="CtrlEdge" source_obj="//@blocks.1" sink_obj="//@regions.0/@basic_blocks.0/@node_objs.4"/>
+  <edges id="111" source_obj="//@regions.0/@basic_blocks.0/@node_objs.3" sink_obj="//@regions.0/@basic_blocks.12/@node_objs.0"/>
+  <edges id="112" source_obj="//@blocks.0/@node_objs.1" sink_obj="//@regions.0/@basic_blocks.12/@node_objs.0"/>
+  <edges id="113" source_obj="//@regions.0/@basic_blocks.3/@node_objs.3" sink_obj="//@regions.0/@basic_blocks.12/@node_objs.1"/>
+  <edges id="114" source_obj="//@blocks.0/@node_objs.0" sink_obj="//@regions.0/@basic_blocks.12/@node_objs.1"/>
+  <edges id="115" edge_type="CtrlEdge" source_obj="//@regions.0/@basic_blocks.0" sink_obj="//@regions.0/@basic_blocks.12/@node_objs.2"/>
+  <edges id="116" source_obj="//@regions.0/@basic_blocks.3/@node_objs.2" sink_obj="//@regions.0/@basic_blocks.10/@node_objs.0"/>
+  <edges id="117" source_obj="//@regions.0/@basic_blocks.3/@node_objs.6" sink_obj="//@regions.0/@basic_blocks.10/@node_objs.0"/>
+  <edges id="118" edge_type="CtrlEdge" source_obj="//@regions.0/@basic_blocks.12" sink_obj="//@regions.0/@basic_blocks.10/@node_objs.1"/>
+  <edges id="119" source_obj="//@regions.0/@basic_blocks.2/@node_objs.0" sink_obj="//@regions.0/@basic_blocks.3/@node_objs.0"/>
+  <edges id="120" edge_type="CtrlEdge" source_obj="//@regions.0/@basic_blocks.2" sink_obj="//@regions.0/@basic_blocks.3/@node_objs.0"/>
+  <edges id="121" source_obj="//@regions.0/@basic_blocks.1/@node_objs.1" sink_obj="//@regions.0/@basic_blocks.3/@node_objs.0"/>
+  <edges id="122" edge_type="CtrlEdge" source_obj="//@regions.0/@basic_blocks.1" sink_obj="//@regions.0/@basic_blocks.3/@node_objs.0"/>
+  <edges id="123" source_obj="//@regions.0/@basic_blocks.3/@node_objs.0" sink_obj="//@regions.0/@basic_blocks.3/@node_objs.1"/>
+  <edges id="124" source_obj="//@regions.0/@basic_blocks.3/@node_objs.1" sink_obj="//@regions.0/@basic_blocks.3/@node_objs.2"/>
+  <edges id="127" source_obj="//@regions.0/@basic_blocks.3/@node_objs.0" sink_obj="//@regions.0/@basic_blocks.3/@node_objs.3"/>
+  <edges id="134" source_obj="//@regions.0/@basic_blocks.0/@node_objs.0" sink_obj="//@regions.0/@basic_blocks.3/@node_objs.4"/>
+  <edges id="139" source_obj="//@regions.0/@basic_blocks.3/@node_objs.4" sink_obj="//@regions.0/@basic_blocks.3/@node_objs.5"/>
+  <edges id="140" source_obj="//@regions.0/@basic_blocks.3/@node_objs.6" sink_obj="//@ports.2"/>
+  <edges id="143" source_obj="//@regions.0/@basic_blocks.3/@node_objs.5" sink_obj="//@regions.0/@basic_blocks.3/@node_objs.6"/>
+  <edges id="144" source_obj="//@regions.0/@basic_blocks.3/@node_objs.7" sink_obj="//@ports.3"/>
+  <edges id="146" source_obj="//@regions.0/@basic_blocks.3/@node_objs.5" sink_obj="//@regions.0/@basic_blocks.3/@node_objs.7"/>
+  <edges id="147" source_obj="//@regions.0/@basic_blocks.3/@node_objs.8" sink_obj="//@ports.4"/>
+  <edges id="149" source_obj="//@regions.0/@basic_blocks.3/@node_objs.5" sink_obj="//@regions.0/@basic_blocks.3/@node_objs.8"/>
+  <edges id="150" source_obj="//@regions.0/@basic_blocks.3/@node_objs.9" sink_obj="//@ports.5"/>
+  <edges id="152" source_obj="//@regions.0/@basic_blocks.3/@node_objs.5" sink_obj="//@regions.0/@basic_blocks.3/@node_objs.9"/>
+  <edges id="153" source_obj="//@regions.0/@basic_blocks.3/@node_objs.10" sink_obj="//@ports.6"/>
+  <edges id="155" source_obj="//@regions.0/@basic_blocks.3/@node_objs.5" sink_obj="//@regions.0/@basic_blocks.3/@node_objs.10"/>
+  <edges id="156" source_obj="//@regions.0/@basic_blocks.3/@node_objs.11" sink_obj="//@ports.7"/>
+  <edges id="158" source_obj="//@regions.0/@basic_blocks.3/@node_objs.5" sink_obj="//@regions.0/@basic_blocks.3/@node_objs.11"/>
+  <edges id="159" source_obj="//@regions.0/@basic_blocks.3/@node_objs.12" sink_obj="//@ports.8"/>
+  <edges id="161" source_obj="//@regions.0/@basic_blocks.3/@node_objs.5" sink_obj="//@regions.0/@basic_blocks.3/@node_objs.12"/>
+  <edges id="162" source_obj="//@regions.0/@basic_blocks.3/@node_objs.13" sink_obj="//@ports.9"/>
+  <edges id="164" source_obj="//@regions.0/@basic_blocks.3/@node_objs.5" sink_obj="//@regions.0/@basic_blocks.3/@node_objs.13"/>
+  <edges id="165" source_obj="//@regions.0/@basic_blocks.0/@node_objs.0" sink_obj="//@regions.0/@basic_blocks.3/@node_objs.14"/>
+  <edges id="166" source_obj="//@regions.0/@basic_blocks.3/@node_objs.14" sink_obj="//@regions.0/@basic_blocks.3/@node_objs.15"/>
+  <edges id="167" edge_type="CtrlEdge" source_obj="//@regions.0/@basic_blocks.11" sink_obj="//@regions.0/@basic_blocks.3/@node_objs.15"/>
+  <edges id="170" edge_type="CtrlEdge" source_obj="//@regions.0/@basic_blocks.10" sink_obj="//@regions.0/@basic_blocks.3/@node_objs.15"/>
+  <edges id="173" edge_type="CtrlEdge" source_obj="//@regions.0/@basic_blocks.9" sink_obj="//@regions.0/@basic_blocks.3/@node_objs.15"/>
+  <edges id="176" edge_type="CtrlEdge" source_obj="//@regions.0/@basic_blocks.8" sink_obj="//@regions.0/@basic_blocks.3/@node_objs.15"/>
+  <edges id="179" edge_type="CtrlEdge" source_obj="//@regions.0/@basic_blocks.7" sink_obj="//@regions.0/@basic_blocks.3/@node_objs.15"/>
+  <edges id="182" edge_type="CtrlEdge" source_obj="//@regions.0/@basic_blocks.6" sink_obj="//@regions.0/@basic_blocks.3/@node_objs.15"/>
+  <edges id="185" edge_type="CtrlEdge" source_obj="//@regions.0/@basic_blocks.5" sink_obj="//@regions.0/@basic_blocks.3/@node_objs.15"/>
+  <edges id="188" edge_type="CtrlEdge" source_obj="//@regions.0/@basic_blocks.4" sink_obj="//@regions.0/@basic_blocks.3/@node_objs.15"/>
+  <edges id="189" source_obj="//@blocks.0/@node_objs.0" sink_obj="//@regions.0/@basic_blocks.1/@node_objs.0"/>
+  <edges id="190" source_obj="//@regions.0/@basic_blocks.1/@node_objs.0" sink_obj="//@regions.0/@basic_blocks.1/@node_objs.1"/>
+  <edges id="191" source_obj="//@regions.0/@basic_blocks.0/@node_objs.0" sink_obj="//@regions.0/@basic_blocks.1/@node_objs.2"/>
+  <edges id="192" source_obj="//@regions.0/@basic_blocks.1/@node_objs.2" sink_obj="//@regions.0/@basic_blocks.1/@node_objs.3"/>
+  <edges id="195" source_obj="//@regions.0/@basic_blocks.1/@node_objs.3" sink_obj="//@regions.0/@basic_blocks.1/@node_objs.4"/>
+  <edges id="196" edge_type="CtrlEdge" source_obj="//@regions.0/@basic_blocks.3" sink_obj="//@regions.0/@basic_blocks.1/@node_objs.4"/>
+  <edges id="197" edge_type="CtrlEdge" source_obj="//@regions.0/@basic_blocks.2" sink_obj="//@regions.0/@basic_blocks.1/@node_objs.4"/>
+  <edges id="200" source_obj="//@regions.0/@basic_blocks.0/@node_objs.1" sink_obj="//@regions.0/@basic_blocks.2/@node_objs.0"/>
+  <edges id="201" edge_type="CtrlEdge" source_obj="//@regions.0/@basic_blocks.3" sink_obj="//@regions.0/@basic_blocks.2/@node_objs.1"/>
+  <edges id="202" source_obj="//@regions.0/@basic_blocks.3/@node_objs.2" sink_obj="//@regions.0/@basic_blocks.9/@node_objs.0"/>
+  <edges id="203" source_obj="//@regions.0/@basic_blocks.3/@node_objs.7" sink_obj="//@regions.0/@basic_blocks.9/@node_objs.0"/>
+  <edges id="204" edge_type="CtrlEdge" source_obj="//@regions.0/@basic_blocks.12" sink_obj="//@regions.0/@basic_blocks.9/@node_objs.1"/>
+  <edges id="205" source_obj="//@regions.0/@basic_blocks.3/@node_objs.2" sink_obj="//@regions.0/@basic_blocks.8/@node_objs.0"/>
+  <edges id="206" source_obj="//@regions.0/@basic_blocks.3/@node_objs.8" sink_obj="//@regions.0/@basic_blocks.8/@node_objs.0"/>
+  <edges id="207" edge_type="CtrlEdge" source_obj="//@regions.0/@basic_blocks.12" sink_obj="//@regions.0/@basic_blocks.8/@node_objs.1"/>
+  <edges id="208" source_obj="//@regions.0/@basic_blocks.3/@node_objs.2" sink_obj="//@regions.0/@basic_blocks.7/@node_objs.0"/>
+  <edges id="209" source_obj="//@regions.0/@basic_blocks.3/@node_objs.9" sink_obj="//@regions.0/@basic_blocks.7/@node_objs.0"/>
+  <edges id="210" edge_type="CtrlEdge" source_obj="//@regions.0/@basic_blocks.12" sink_obj="//@regions.0/@basic_blocks.7/@node_objs.1"/>
+  <edges id="211" source_obj="//@regions.0/@basic_blocks.3/@node_objs.2" sink_obj="//@regions.0/@basic_blocks.6/@node_objs.0"/>
+  <edges id="212" source_obj="//@regions.0/@basic_blocks.3/@node_objs.10" sink_obj="//@regions.0/@basic_blocks.6/@node_objs.0"/>
+  <edges id="213" edge_type="CtrlEdge" source_obj="//@regions.0/@basic_blocks.12" sink_obj="//@regions.0/@basic_blocks.6/@node_objs.1"/>
+  <edges id="214" source_obj="//@regions.0/@basic_blocks.3/@node_objs.2" sink_obj="//@regions.0/@basic_blocks.5/@node_objs.0"/>
+  <edges id="215" source_obj="//@regions.0/@basic_blocks.3/@node_objs.11" sink_obj="//@regions.0/@basic_blocks.5/@node_objs.0"/>
+  <edges id="216" edge_type="CtrlEdge" source_obj="//@regions.0/@basic_blocks.12" sink_obj="//@regions.0/@basic_blocks.5/@node_objs.1"/>
+  <edges id="217" source_obj="//@regions.0/@basic_blocks.3/@node_objs.2" sink_obj="//@regions.0/@basic_blocks.4/@node_objs.0"/>
+  <edges id="218" source_obj="//@regions.0/@basic_blocks.3/@node_objs.12" sink_obj="//@regions.0/@basic_blocks.4/@node_objs.0"/>
+  <edges id="219" edge_type="CtrlEdge" source_obj="//@regions.0/@basic_blocks.12" sink_obj="//@regions.0/@basic_blocks.4/@node_objs.1"/>
+  <edges id="220" source_obj="//@regions.0/@basic_blocks.3/@node_objs.2" sink_obj="//@regions.0/@basic_blocks.11/@node_objs.0"/>
+  <edges id="221" source_obj="//@regions.0/@basic_blocks.3/@node_objs.13" sink_obj="//@regions.0/@basic_blocks.11/@node_objs.0"/>
+  <edges id="222" edge_type="CtrlEdge" source_obj="//@regions.0/@basic_blocks.12" sink_obj="//@regions.0/@basic_blocks.11/@node_objs.1"/>
+  <edges id="269" edge_type="CtrlEdge" source_obj="//@blocks.0" sink_obj="//@regions.0/@basic_blocks.0"/>
+  <edges id="270" edge_type="CtrlEdge" source_obj="//@regions.0/@basic_blocks.0" sink_obj="//@blocks.1"/>
+  <edges id="271" edge_type="CtrlEdge" source_obj="//@regions.0/@basic_blocks.0" sink_obj="//@regions.0/@basic_blocks.1"/>
+  <edges id="272" edge_type="CtrlEdge" source_obj="//@regions.0/@basic_blocks.1" sink_obj="//@regions.0/@basic_blocks.2"/>
+  <edges id="273" edge_type="CtrlEdge" source_obj="//@regions.0/@basic_blocks.1" sink_obj="//@regions.0/@basic_blocks.3"/>
+  <edges id="274" edge_type="CtrlEdge" source_obj="//@regions.0/@basic_blocks.2" sink_obj="//@regions.0/@basic_blocks.3"/>
+  <edges id="275" edge_type="CtrlEdge" source_obj="//@regions.0/@basic_blocks.3" sink_obj="//@regions.0/@basic_blocks.11"/>
+  <edges id="276" edge_type="CtrlEdge" source_obj="//@regions.0/@basic_blocks.3" sink_obj="//@regions.0/@basic_blocks.10"/>
+  <edges id="277" edge_type="CtrlEdge" source_obj="//@regions.0/@basic_blocks.3" sink_obj="//@regions.0/@basic_blocks.9"/>
+  <edges id="278" edge_type="CtrlEdge" source_obj="//@regions.0/@basic_blocks.3" sink_obj="//@regions.0/@basic_blocks.8"/>
+  <edges id="279" edge_type="CtrlEdge" source_obj="//@regions.0/@basic_blocks.3" sink_obj="//@regions.0/@basic_blocks.7"/>
+  <edges id="280" edge_type="CtrlEdge" source_obj="//@regions.0/@basic_blocks.3" sink_obj="//@regions.0/@basic_blocks.6"/>
+  <edges id="281" edge_type="CtrlEdge" source_obj="//@regions.0/@basic_blocks.3" sink_obj="//@regions.0/@basic_blocks.5"/>
+  <edges id="282" edge_type="CtrlEdge" source_obj="//@regions.0/@basic_blocks.3" sink_obj="//@regions.0/@basic_blocks.4"/>
+  <edges id="283" edge_type="CtrlEdge" source_obj="//@regions.0/@basic_blocks.4" sink_obj="//@regions.0/@basic_blocks.12"/>
+  <edges id="284" edge_type="CtrlEdge" source_obj="//@regions.0/@basic_blocks.5" sink_obj="//@regions.0/@basic_blocks.12"/>
+  <edges id="285" edge_type="CtrlEdge" source_obj="//@regions.0/@basic_blocks.6" sink_obj="//@regions.0/@basic_blocks.12"/>
+  <edges id="286" edge_type="CtrlEdge" source_obj="//@regions.0/@basic_blocks.7" sink_obj="//@regions.0/@basic_blocks.12"/>
+  <edges id="287" edge_type="CtrlEdge" source_obj="//@regions.0/@basic_blocks.8" sink_obj="//@regions.0/@basic_blocks.12"/>
+  <edges id="288" edge_type="CtrlEdge" source_obj="//@regions.0/@basic_blocks.9" sink_obj="//@regions.0/@basic_blocks.12"/>
+  <edges id="289" edge_type="CtrlEdge" source_obj="//@regions.0/@basic_blocks.10" sink_obj="//@regions.0/@basic_blocks.12"/>
+  <edges id="290" edge_type="CtrlEdge" source_obj="//@regions.0/@basic_blocks.11" sink_obj="//@regions.0/@basic_blocks.12"/>
+  <edges id="291" edge_type="CtrlEdge" source_obj="//@regions.0/@basic_blocks.12" sink_obj="//@regions.0/@basic_blocks.0" is_back_edge="1"/>
+  <edges id="292" edge_type="VirtEdge" source_obj="//@blocks.0/@node_objs.4" sink_obj="//@regions.0/@basic_blocks.0/@node_objs.0"/>
+  <edges id="293" edge_type="VirtEdge" source_obj="//@blocks.0/@node_objs.5" sink_obj="//@regions.0/@basic_blocks.1/@node_objs.0"/>
+  <edges id="294" edge_type="VirtEdge" source_obj="//@blocks.0/@node_objs.4" sink_obj="//@regions.0/@basic_blocks.12/@node_objs.0"/>
+  <edges id="295" edge_type="VirtEdge" source_obj="//@blocks.0/@node_objs.5" sink_obj="//@regions.0/@basic_blocks.12/@node_objs.1"/>
+  <edges id="296" edge_type="VirtEdge" source_obj="//@regions.0/@basic_blocks.0/@node_objs.0" sink_obj="//@regions.0/@basic_blocks.12/@node_objs.0"/>
+  <edges id="297" edge_type="VirtEdge" source_obj="//@regions.0/@basic_blocks.1/@node_objs.0" sink_obj="//@regions.0/@basic_blocks.12/@node_objs.1"/>
+  <blocks id="19" name="newFuncRoot" type="BlockType">
+    <controlOutputObjs>for.inc59</controlOutputObjs>
+    <node_objs xsi:type="cdfg:CdfgNode" id="11" name="shiftreg6" coreId="374" bitwidth="480" opcode="alloca" m_display="0" m_topoIndex="1" m_clusterGroupNumber="-1">
+      <dataOutputObjs>store</dataOutputObjs>
+      <dataOutputObjs>store</dataOutputObjs>
+      <dataOutputObjs>load</dataOutputObjs>
+      <constName>empty</constName>
+    </node_objs>
+    <node_objs xsi:type="cdfg:CdfgNode" id="12" name="i" originalName="i" coreId="234466256" bitwidth="19" opcode="alloca" m_display="0" m_topoIndex="2" m_clusterGroupNumber="-1">
+      <dataOutputObjs>store</dataOutputObjs>
+      <dataOutputObjs>load</dataOutputObjs>
+      <dataOutputObjs>store</dataOutputObjs>
+      <constName>empty</constName>
+    </node_objs>
+    <node_objs xsi:type="cdfg:CdfgNode" id="13" name="sext_ln35_read" coreId="234652112" bitwidth="58" opcode="read" m_display="0" m_topoIndex="3" m_clusterGroupNumber="-1">
+      <dataInputObjs>sext_ln35</dataInputObjs>
+      <dataOutputObjs>sext</dataOutputObjs>
+    </node_objs>
+    <node_objs xsi:type="cdfg:CdfgNode" id="14" name="sext_ln35_cast" coreId="231440896" bitwidth="64" opcode="sext" m_display="0" m_topoIndex="4" m_clusterGroupNumber="-1">
+      <dataInputObjs>read</dataInputObjs>
+      <dataOutputObjs>getelementptr</dataOutputObjs>
+    </node_objs>
+    <node_objs xsi:type="cdfg:CdfgNode" id="16" name="i_write_ln0" coreId="4252502024" opcode="store" m_display="0" m_delay="0.46" m_topoIndex="5" m_clusterGroupNumber="-1">
+      <dataInputObjs>alloca</dataInputObjs>
+      <constName>empty</constName>
+    </node_objs>
+    <node_objs xsi:type="cdfg:CdfgNode" id="17" name="shiftreg6_write_ln0" coreId="232542304" opcode="store" m_display="0" m_delay="0.46" m_topoIndex="6" m_clusterGroupNumber="-1">
+      <dataInputObjs>alloca</dataInputObjs>
+      <constName>empty</constName>
+    </node_objs>
+    <node_objs xsi:type="cdfg:CdfgNode" id="18" name="br_ln0" coreId="232151824" opcode="br" m_display="0" m_topoIndex="7" m_clusterGroupNumber="-1">
+      <controlInputObjs>for.inc59</controlInputObjs>
+    </node_objs>
+  </blocks>
+  <blocks id="84" name="VITIS_LOOP_38_7.exitStub" type="BlockType">
+    <controlInputObjs>for.inc59</controlInputObjs>
+    <controlOutputObjs>br</controlOutputObjs>
+    <node_objs xsi:type="cdfg:CdfgNode" id="83" name="_ln0" coreId="230626832" opcode="ret" nodeLabel="1.0" m_display="0" m_topoIndex="20" m_clusterGroupNumber="-1"/>
+  </blocks>
+  <regions anchor_node="-1" region_type="8" interval="1" typeName="Pipeline" iiViolation="" id="310" pipe_depth="3" RegionName="VITIS_LOOP_35_6">
+    <basic_blocks id="27" name="for.inc59" type="BlockType">
+      <controlInputObjs>newFuncRoot</controlInputObjs>
+      <controlInputObjs>arrayidx581.exit</controlInputObjs>
+      <controlOutputObjs>br</controlOutputObjs>
+      <controlOutputObjs>br</controlOutputObjs>
+      <controlOutputObjs>VITIS_LOOP_38_7.exitStub</controlOutputObjs>
+      <controlOutputObjs>for.inc59.split</controlOutputObjs>
+      <node_objs xsi:type="cdfg:CdfgNode" id="20" name="i_15" originalName="i" coreId="4252427710" bitwidth="19" opcode="load" m_display="0" m_topoIndex="8" m_clusterGroupNumber="-1">
+        <dataInputObjs>alloca</dataInputObjs>
+        <dataOutputObjs>icmp</dataOutputObjs>
+        <dataOutputObjs>add</dataOutputObjs>
+        <dataOutputObjs>partselect</dataOutputObjs>
+        <dataOutputObjs>trunc</dataOutputObjs>
+        <dataOutputObjs>trunc</dataOutputObjs>
+      </node_objs>
+      <node_objs xsi:type="cdfg:CdfgNode" id="21" name="gmem_addr" lineNumber="35" fileName="forward_prop/src/forward_prop.cpp" fileDirectory=".." coreId="231797312" contextFuncName="save_variables_locally" bitwidth="512" opcode="getelementptr" nodeLabel="1.0" m_display="0" m_topoIndex="18" m_clusterGroupNumber="-1">
+        <inlineStackInfo fileName="forward_prop/src/forward_prop.cpp" linenumber="35" fileDirectory="/home/msi/ES-FL/code/HLS" functionName="save_variables_locally"/>
+        <dataInputObjs>gmem</dataInputObjs>
+        <dataInputObjs>sext</dataInputObjs>
+        <dataOutputObjs>read</dataOutputObjs>
+      </node_objs>
+      <node_objs xsi:type="cdfg:CdfgNode" id="23" name="icmp_ln35" lineNumber="35" fileName="forward_prop/src/forward_prop.cpp" fileDirectory=".." rtlName="icmp_ln35_fu_243_p2" coreName="Cmp" implIndex="auto" control="no" opType="icmp" coreId="9" contextFuncName="save_variables_locally" bitwidth="1" opcode="icmp" m_display="0" m_delay="0.92" m_topoIndex="9" m_clusterGroupNumber="-1">
+        <inlineStackInfo fileName="forward_prop/src/forward_prop.cpp" linenumber="35" fileDirectory="/home/msi/ES-FL/code/HLS" functionName="save_variables_locally"/>
+        <dataInputObjs>load</dataInputObjs>
+        <dataOutputObjs>br</dataOutputObjs>
+        <constName>empty</constName>
+      </node_objs>
+      <node_objs xsi:type="cdfg:CdfgNode" id="25" name="add_ln35" lineNumber="35" fileName="forward_prop/src/forward_prop.cpp" fileDirectory=".." rtlName="add_ln35_fu_249_p2" coreName="Adder" implIndex="fabric" control="no" opType="add" coreId="1" contextFuncName="save_variables_locally" bitwidth="19" opcode="add" m_display="0" m_delay="1.12" m_topoIndex="10" m_clusterGroupNumber="-1">
+        <inlineStackInfo fileName="forward_prop/src/forward_prop.cpp" linenumber="35" fileDirectory="/home/msi/ES-FL/code/HLS" functionName="save_variables_locally"/>
+        <dataInputObjs>load</dataInputObjs>
+        <dataOutputObjs>store</dataOutputObjs>
+        <constName>empty</constName>
+      </node_objs>
+      <node_objs xsi:type="cdfg:CdfgNode" id="26" name="br_ln35" lineNumber="35" fileName="forward_prop/src/forward_prop.cpp" fileDirectory=".." coreId="4253002636" contextFuncName="save_variables_locally" opcode="br" m_display="0" m_topoIndex="11" m_clusterGroupNumber="-1">
+        <inlineStackInfo fileName="forward_prop/src/forward_prop.cpp" linenumber="35" fileDirectory="/home/msi/ES-FL/code/HLS" functionName="save_variables_locally"/>
+        <dataInputObjs>icmp</dataInputObjs>
+        <controlInputObjs>for.inc59.split</controlInputObjs>
+        <controlInputObjs>VITIS_LOOP_38_7.exitStub</controlInputObjs>
+      </node_objs>
+      <fileValidLineNumbers fileName="forward_prop/src/forward_prop.cpp">
+        <validLinenumbers>35</validLinenumbers>
+      </fileValidLineNumbers>
+    </basic_blocks>
+    <basic_blocks id="34" name="for.inc59.split" type="BlockType">
+      <controlInputObjs>for.inc59</controlInputObjs>
+      <controlOutputObjs>br</controlOutputObjs>
+      <controlOutputObjs>phi</controlOutputObjs>
+      <controlOutputObjs>block_37</controlOutputObjs>
+      <controlOutputObjs>for.inc59.split._crit_edge</controlOutputObjs>
+      <node_objs xsi:type="cdfg:CdfgNode" id="28" name="shiftreg6_load" coreId="231094384" bitwidth="480" opcode="load" nodeLabel="2.0" m_display="0" m_topoIndex="21" m_clusterGroupNumber="-1">
+        <dataInputObjs>alloca</dataInputObjs>
+        <dataOutputObjs>zext</dataOutputObjs>
+      </node_objs>
+      <node_objs xsi:type="cdfg:CdfgNode" id="29" name="shiftreg6_cast" rtlName="shiftreg6_cast_fu_293_p1" coreId="231292560" bitwidth="512" opcode="zext" nodeLabel="2.0" m_display="0" m_topoIndex="22" m_clusterGroupNumber="-1">
+        <dataInputObjs>load</dataInputObjs>
+        <dataOutputObjs>phi</dataOutputObjs>
+      </node_objs>
+      <node_objs xsi:type="cdfg:CdfgNode" id="30" name="empty_136" rtlName="empty_136_fu_255_p1" coreId="4252608276" bitwidth="4" opcode="trunc" m_display="0" m_topoIndex="12" m_clusterGroupNumber="-1">
+        <dataInputObjs>load</dataInputObjs>
+        <dataOutputObjs>icmp</dataOutputObjs>
+      </node_objs>
+      <node_objs xsi:type="cdfg:CdfgNode" id="32" name="icmp_ln36" lineNumber="36" fileName="forward_prop/src/forward_prop.cpp" fileDirectory=".." rtlName="icmp_ln36_fu_259_p2" coreName="Cmp" implIndex="auto" control="no" opType="icmp" coreId="9" contextFuncName="save_variables_locally" bitwidth="1" opcode="icmp" m_display="0" m_delay="0.72" m_topoIndex="13" m_clusterGroupNumber="-1">
+        <inlineStackInfo fileName="forward_prop/src/forward_prop.cpp" linenumber="36" fileDirectory="/home/msi/ES-FL/code/HLS" functionName="save_variables_locally"/>
+        <dataInputObjs>trunc</dataInputObjs>
+        <dataOutputObjs>br</dataOutputObjs>
+        <constName>empty</constName>
+      </node_objs>
+      <node_objs xsi:type="cdfg:CdfgNode" id="33" name="br_ln36" lineNumber="36" fileName="forward_prop/src/forward_prop.cpp" fileDirectory=".." coreId="231699472" contextFuncName="save_variables_locally" opcode="br" nodeLabel="2.0" m_display="0" m_delay="0.46" m_topoIndex="23" m_clusterGroupNumber="-1">
+        <inlineStackInfo fileName="forward_prop/src/forward_prop.cpp" linenumber="36" fileDirectory="/home/msi/ES-FL/code/HLS" functionName="save_variables_locally"/>
+        <dataInputObjs>icmp</dataInputObjs>
+        <controlInputObjs>for.inc59.split._crit_edge</controlInputObjs>
+        <controlInputObjs>block_37</controlInputObjs>
+      </node_objs>
+      <fileValidLineNumbers fileName="forward_prop/src/forward_prop.cpp">
+        <validLinenumbers>36</validLinenumbers>
+      </fileValidLineNumbers>
+    </basic_blocks>
+    <basic_blocks id="37" name="block_37" type="BlockType">
+      <controlInputObjs>for.inc59.split</controlInputObjs>
+      <controlOutputObjs>phi</controlOutputObjs>
+      <controlOutputObjs>br</controlOutputObjs>
+      <controlOutputObjs>for.inc59.split._crit_edge</controlOutputObjs>
+      <node_objs xsi:type="cdfg:CdfgNode" id="35" name="gmem_addr_read" lineNumber="36" fileName="forward_prop/src/forward_prop.cpp" fileDirectory=".." coreName="m_axi" implIndex="m_axi" control="no" opType="adapter" coreId="121" contextFuncName="save_variables_locally" bitwidth="512" opcode="read" nodeLabel="1.0" m_display="0" m_delay="7.3" m_topoIndex="19" m_clusterGroupNumber="-1">
+        <inlineStackInfo fileName="forward_prop/src/forward_prop.cpp" linenumber="36" fileDirectory="/home/msi/ES-FL/code/HLS" functionName="save_variables_locally"/>
+        <dataInputObjs>getelementptr</dataInputObjs>
+        <dataOutputObjs>phi</dataOutputObjs>
+      </node_objs>
+      <node_objs xsi:type="cdfg:CdfgNode" id="36" name="br_ln36" lineNumber="36" fileName="forward_prop/src/forward_prop.cpp" fileDirectory=".." coreId="232532896" contextFuncName="save_variables_locally" opcode="br" nodeLabel="2.0" m_display="0" m_delay="0.46" m_topoIndex="24" m_clusterGroupNumber="-1">
+        <inlineStackInfo fileName="forward_prop/src/forward_prop.cpp" linenumber="36" fileDirectory="/home/msi/ES-FL/code/HLS" functionName="save_variables_locally"/>
+        <controlInputObjs>for.inc59.split._crit_edge</controlInputObjs>
+      </node_objs>
+      <fileValidLineNumbers fileName="forward_prop/src/forward_prop.cpp">
+        <validLinenumbers>36</validLinenumbers>
+      </fileValidLineNumbers>
+    </basic_blocks>
+    <basic_blocks id="54" name="for.inc59.split._crit_edge" type="BlockType">
+      <controlInputObjs>for.inc59.split</controlInputObjs>
+      <controlInputObjs>block_37</controlInputObjs>
+      <controlOutputObjs>br</controlOutputObjs>
+      <controlOutputObjs>br</controlOutputObjs>
+      <controlOutputObjs>arrayidx581.case.7</controlOutputObjs>
+      <controlOutputObjs>arrayidx581.case.0</controlOutputObjs>
+      <controlOutputObjs>arrayidx581.case.1</controlOutputObjs>
+      <controlOutputObjs>arrayidx581.case.2</controlOutputObjs>
+      <controlOutputObjs>arrayidx581.case.3</controlOutputObjs>
+      <controlOutputObjs>arrayidx581.case.4</controlOutputObjs>
+      <controlOutputObjs>arrayidx581.case.5</controlOutputObjs>
+      <controlOutputObjs>arrayidx581.case.6</controlOutputObjs>
+      <node_objs xsi:type="cdfg:CdfgNode" id="38" name="empty_135" lineNumber="36" fileName="forward_prop/src/forward_prop.cpp" fileDirectory=".." coreId="4251474232" contextFuncName="save_variables_locally" bitwidth="512" opcode="phi" nodeLabel="2.0" m_display="0" m_topoIndex="25" m_clusterGroupNumber="-1">
+        <inlineStackInfo fileName="forward_prop/src/forward_prop.cpp" linenumber="36" fileDirectory="/home/msi/ES-FL/code/HLS" functionName="save_variables_locally"/>
+        <dataInputObjs>read</dataInputObjs>
+        <dataInputObjs>zext</dataInputObjs>
+        <dataOutputObjs>trunc</dataOutputObjs>
+        <dataOutputObjs>partselect</dataOutputObjs>
+        <controlInputObjs>block_37</controlInputObjs>
+        <controlInputObjs>for.inc59.split</controlInputObjs>
+      </node_objs>
+      <node_objs xsi:type="cdfg:CdfgNode" id="39" name="trunc_ln36" lineNumber="36" fileName="forward_prop/src/forward_prop.cpp" fileDirectory=".." rtlName="trunc_ln36_fu_298_p1" coreId="4249676483" contextFuncName="save_variables_locally" bitwidth="32" opcode="trunc" nodeLabel="2.0" m_display="0" m_topoIndex="26" m_clusterGroupNumber="-1">
+        <inlineStackInfo fileName="forward_prop/src/forward_prop.cpp" linenumber="36" fileDirectory="/home/msi/ES-FL/code/HLS" functionName="save_variables_locally"/>
+        <dataInputObjs>phi</dataInputObjs>
+        <dataOutputObjs>bitcast</dataOutputObjs>
+      </node_objs>
+      <node_objs xsi:type="cdfg:CdfgNode" id="40" name="bitcast_ln36" lineNumber="36" fileName="forward_prop/src/forward_prop.cpp" fileDirectory=".." rtlName="bitcast_ln36_fu_302_p1" coreId="4250953883" contextFuncName="save_variables_locally" bitwidth="32" opcode="bitcast" nodeLabel="2.0" m_display="0" m_topoIndex="27" m_clusterGroupNumber="-1">
+        <inlineStackInfo fileName="forward_prop/src/forward_prop.cpp" linenumber="36" fileDirectory="/home/msi/ES-FL/code/HLS" functionName="save_variables_locally"/>
+        <dataInputObjs>trunc</dataInputObjs>
+        <dataOutputObjs>store</dataOutputObjs>
+        <dataOutputObjs>store</dataOutputObjs>
+        <dataOutputObjs>store</dataOutputObjs>
+        <dataOutputObjs>store</dataOutputObjs>
+        <dataOutputObjs>store</dataOutputObjs>
+        <dataOutputObjs>store</dataOutputObjs>
+        <dataOutputObjs>store</dataOutputObjs>
+        <dataOutputObjs>store</dataOutputObjs>
+      </node_objs>
+      <node_objs xsi:type="cdfg:CdfgNode" id="41" name="trunc_ln36_2" lineNumber="36" fileName="forward_prop/src/forward_prop.cpp" fileDirectory=".." rtlName="shiftreg6_fu_94" coreId="4249968732" contextFuncName="save_variables_locally" bitwidth="480" opcode="partselect" nodeLabel="2.0" m_display="0" m_topoIndex="28" m_clusterGroupNumber="-1">
+        <inlineStackInfo fileName="forward_prop/src/forward_prop.cpp" linenumber="36" fileDirectory="/home/msi/ES-FL/code/HLS" functionName="save_variables_locally"/>
+        <dataInputObjs>phi</dataInputObjs>
+        <dataOutputObjs>store</dataOutputObjs>
+        <constName>empty</constName>
+      </node_objs>
+      <node_objs xsi:type="cdfg:CdfgNode" id="42" name="lshr_ln36_1" lineNumber="36" fileName="forward_prop/src/forward_prop.cpp" fileDirectory=".." rtlName="lshr_ln36_1_reg_367" coreId="4245520378" contextFuncName="save_variables_locally" bitwidth="16" opcode="partselect" m_display="0" m_topoIndex="14" m_clusterGroupNumber="-1">
+        <inlineStackInfo fileName="forward_prop/src/forward_prop.cpp" linenumber="36" fileDirectory="/home/msi/ES-FL/code/HLS" functionName="save_variables_locally"/>
+        <dataInputObjs>load</dataInputObjs>
+        <dataOutputObjs>zext</dataOutputObjs>
+        <constName>empty</constName>
+      </node_objs>
+      <node_objs xsi:type="cdfg:CdfgNode" id="43" name="zext_ln36" lineNumber="36" fileName="forward_prop/src/forward_prop.cpp" fileDirectory=".." rtlName="zext_ln36_fu_324_p1" coreId="4273117095" contextFuncName="save_variables_locally" bitwidth="64" opcode="zext" nodeLabel="2.0" m_display="0" m_topoIndex="29" m_clusterGroupNumber="-1">
+        <inlineStackInfo fileName="forward_prop/src/forward_prop.cpp" linenumber="36" fileDirectory="/home/msi/ES-FL/code/HLS" functionName="save_variables_locally"/>
+        <dataInputObjs>partselect</dataInputObjs>
+        <dataOutputObjs>getelementptr</dataOutputObjs>
+        <dataOutputObjs>getelementptr</dataOutputObjs>
+        <dataOutputObjs>getelementptr</dataOutputObjs>
+        <dataOutputObjs>getelementptr</dataOutputObjs>
+        <dataOutputObjs>getelementptr</dataOutputObjs>
+        <dataOutputObjs>getelementptr</dataOutputObjs>
+        <dataOutputObjs>getelementptr</dataOutputObjs>
+        <dataOutputObjs>getelementptr</dataOutputObjs>
+      </node_objs>
+      <node_objs xsi:type="cdfg:CdfgNode" id="44" name="dense_weights_0_addr" lineNumber="36" fileName="forward_prop/src/forward_prop.cpp" fileDirectory=".." coreId="4250181395" contextFuncName="save_variables_locally" bitwidth="16" opcode="getelementptr" nodeLabel="2.0" m_display="0" m_topoIndex="30" m_clusterGroupNumber="-1">
+        <inlineStackInfo fileName="forward_prop/src/forward_prop.cpp" linenumber="36" fileDirectory="/home/msi/ES-FL/code/HLS" functionName="save_variables_locally"/>
+        <dataInputObjs>zext</dataInputObjs>
+        <dataOutputObjs>store</dataOutputObjs>
+        <dataOutputObjs>dense_weights_0</dataOutputObjs>
+        <constName>empty</constName>
+      </node_objs>
+      <node_objs xsi:type="cdfg:CdfgNode" id="45" name="dense_weights_1_addr" lineNumber="36" fileName="forward_prop/src/forward_prop.cpp" fileDirectory=".." coreId="4252559483" contextFuncName="save_variables_locally" bitwidth="16" opcode="getelementptr" nodeLabel="2.0" m_display="0" m_topoIndex="31" m_clusterGroupNumber="-1">
+        <inlineStackInfo fileName="forward_prop/src/forward_prop.cpp" linenumber="36" fileDirectory="/home/msi/ES-FL/code/HLS" functionName="save_variables_locally"/>
+        <dataInputObjs>zext</dataInputObjs>
+        <dataOutputObjs>dense_weights_1</dataOutputObjs>
+        <dataOutputObjs>store</dataOutputObjs>
+        <constName>empty</constName>
+      </node_objs>
+      <node_objs xsi:type="cdfg:CdfgNode" id="46" name="dense_weights_2_addr" lineNumber="36" fileName="forward_prop/src/forward_prop.cpp" fileDirectory=".." coreId="232744032" contextFuncName="save_variables_locally" bitwidth="16" opcode="getelementptr" nodeLabel="2.0" m_display="0" m_topoIndex="32" m_clusterGroupNumber="-1">
+        <inlineStackInfo fileName="forward_prop/src/forward_prop.cpp" linenumber="36" fileDirectory="/home/msi/ES-FL/code/HLS" functionName="save_variables_locally"/>
+        <dataInputObjs>zext</dataInputObjs>
+        <dataOutputObjs>dense_weights_2</dataOutputObjs>
+        <dataOutputObjs>store</dataOutputObjs>
+        <constName>empty</constName>
+      </node_objs>
+      <node_objs xsi:type="cdfg:CdfgNode" id="47" name="dense_weights_3_addr" lineNumber="36" fileName="forward_prop/src/forward_prop.cpp" fileDirectory=".." coreId="231930976" contextFuncName="save_variables_locally" bitwidth="16" opcode="getelementptr" nodeLabel="2.0" m_display="0" m_topoIndex="33" m_clusterGroupNumber="-1">
+        <inlineStackInfo fileName="forward_prop/src/forward_prop.cpp" linenumber="36" fileDirectory="/home/msi/ES-FL/code/HLS" functionName="save_variables_locally"/>
+        <dataInputObjs>zext</dataInputObjs>
+        <dataOutputObjs>dense_weights_3</dataOutputObjs>
+        <dataOutputObjs>store</dataOutputObjs>
+        <constName>empty</constName>
+      </node_objs>
+      <node_objs xsi:type="cdfg:CdfgNode" id="48" name="dense_weights_4_addr" lineNumber="36" fileName="forward_prop/src/forward_prop.cpp" fileDirectory=".." coreId="234652912" contextFuncName="save_variables_locally" bitwidth="16" opcode="getelementptr" nodeLabel="2.0" m_display="0" m_topoIndex="34" m_clusterGroupNumber="-1">
+        <inlineStackInfo fileName="forward_prop/src/forward_prop.cpp" linenumber="36" fileDirectory="/home/msi/ES-FL/code/HLS" functionName="save_variables_locally"/>
+        <dataInputObjs>zext</dataInputObjs>
+        <dataOutputObjs>dense_weights_4</dataOutputObjs>
+        <dataOutputObjs>store</dataOutputObjs>
+        <constName>empty</constName>
+      </node_objs>
+      <node_objs xsi:type="cdfg:CdfgNode" id="49" name="dense_weights_5_addr" lineNumber="36" fileName="forward_prop/src/forward_prop.cpp" fileDirectory=".." coreId="235691328" contextFuncName="save_variables_locally" bitwidth="16" opcode="getelementptr" nodeLabel="2.0" m_display="0" m_topoIndex="35" m_clusterGroupNumber="-1">
+        <inlineStackInfo fileName="forward_prop/src/forward_prop.cpp" linenumber="36" fileDirectory="/home/msi/ES-FL/code/HLS" functionName="save_variables_locally"/>
+        <dataInputObjs>zext</dataInputObjs>
+        <dataOutputObjs>dense_weights_5</dataOutputObjs>
+        <dataOutputObjs>store</dataOutputObjs>
+        <constName>empty</constName>
+      </node_objs>
+      <node_objs xsi:type="cdfg:CdfgNode" id="50" name="dense_weights_6_addr" lineNumber="36" fileName="forward_prop/src/forward_prop.cpp" fileDirectory=".." coreId="4252752708" contextFuncName="save_variables_locally" bitwidth="16" opcode="getelementptr" nodeLabel="2.0" m_display="0" m_topoIndex="36" m_clusterGroupNumber="-1">
+        <inlineStackInfo fileName="forward_prop/src/forward_prop.cpp" linenumber="36" fileDirectory="/home/msi/ES-FL/code/HLS" functionName="save_variables_locally"/>
+        <dataInputObjs>zext</dataInputObjs>
+        <dataOutputObjs>dense_weights_6</dataOutputObjs>
+        <dataOutputObjs>store</dataOutputObjs>
+        <constName>empty</constName>
+      </node_objs>
+      <node_objs xsi:type="cdfg:CdfgNode" id="51" name="dense_weights_7_addr" lineNumber="36" fileName="forward_prop/src/forward_prop.cpp" fileDirectory=".." coreId="4250181587" contextFuncName="save_variables_locally" bitwidth="16" opcode="getelementptr" nodeLabel="2.0" m_display="0" m_topoIndex="37" m_clusterGroupNumber="-1">
+        <inlineStackInfo fileName="forward_prop/src/forward_prop.cpp" linenumber="36" fileDirectory="/home/msi/ES-FL/code/HLS" functionName="save_variables_locally"/>
+        <dataInputObjs>zext</dataInputObjs>
+        <dataOutputObjs>dense_weights_7</dataOutputObjs>
+        <dataOutputObjs>store</dataOutputObjs>
+        <constName>empty</constName>
+      </node_objs>
+      <node_objs xsi:type="cdfg:CdfgNode" id="52" name="trunc_ln36_1" lineNumber="36" fileName="forward_prop/src/forward_prop.cpp" fileDirectory=".." rtlName="trunc_ln36_1_fu_275_p1" coreId="235691328" contextFuncName="save_variables_locally" bitwidth="3" opcode="trunc" m_display="0" m_topoIndex="15" m_clusterGroupNumber="-1">
+        <inlineStackInfo fileName="forward_prop/src/forward_prop.cpp" linenumber="36" fileDirectory="/home/msi/ES-FL/code/HLS" functionName="save_variables_locally"/>
+        <dataInputObjs>load</dataInputObjs>
+        <dataOutputObjs>switch</dataOutputObjs>
+      </node_objs>
+      <node_objs xsi:type="cdfg:CdfgNode" id="53" name="_ln36" lineNumber="36" fileName="forward_prop/src/forward_prop.cpp" fileDirectory=".." coreId="1920151408" contextFuncName="save_variables_locally" opcode="switch" m_display="0" m_delay="0.39" m_topoIndex="16" m_clusterGroupNumber="-1">
+        <inlineStackInfo fileName="forward_prop/src/forward_prop.cpp" linenumber="36" fileDirectory="/home/msi/ES-FL/code/HLS" functionName="save_variables_locally"/>
+        <dataInputObjs>trunc</dataInputObjs>
+        <controlInputObjs>arrayidx581.case.7</controlInputObjs>
+        <controlInputObjs>arrayidx581.case.0</controlInputObjs>
+        <controlInputObjs>arrayidx581.case.1</controlInputObjs>
+        <controlInputObjs>arrayidx581.case.2</controlInputObjs>
+        <controlInputObjs>arrayidx581.case.3</controlInputObjs>
+        <controlInputObjs>arrayidx581.case.4</controlInputObjs>
+        <controlInputObjs>arrayidx581.case.5</controlInputObjs>
+        <controlInputObjs>arrayidx581.case.6</controlInputObjs>
+        <constName>empty</constName>
+      </node_objs>
+      <fileValidLineNumbers fileName="forward_prop/src/forward_prop.cpp">
+        <validLinenumbers>36</validLinenumbers>
+      </fileValidLineNumbers>
+    </basic_blocks>
+    <basic_blocks id="57" name="arrayidx581.case.6" type="BlockType">
+      <controlInputObjs>for.inc59.split._crit_edge</controlInputObjs>
+      <controlOutputObjs>switch</controlOutputObjs>
+      <controlOutputObjs>arrayidx581.exit</controlOutputObjs>
+      <node_objs xsi:type="cdfg:CdfgNode" id="55" name="dense_weights_6_addr_write_ln36" lineNumber="36" fileName="forward_prop/src/forward_prop.cpp" fileDirectory=".." coreName="RAM" implIndex="auto" control="no" opType="ram" coreId="83" contextFuncName="save_variables_locally" opcode="store" nodeLabel="2.0" m_display="0" m_delay="1.29" m_topoIndex="38" m_clusterGroupNumber="-1">
+        <inlineStackInfo fileName="forward_prop/src/forward_prop.cpp" linenumber="36" fileDirectory="/home/msi/ES-FL/code/HLS" functionName="save_variables_locally"/>
+        <dataInputObjs>bitcast</dataInputObjs>
+        <dataInputObjs>getelementptr</dataInputObjs>
+      </node_objs>
+      <node_objs xsi:type="cdfg:CdfgNode" id="56" name="br_ln36" lineNumber="36" fileName="forward_prop/src/forward_prop.cpp" fileDirectory=".." coreId="542329928" contextFuncName="save_variables_locally" opcode="br" nodeLabel="2.0" m_display="0" m_topoIndex="39" m_clusterGroupNumber="-1">
+        <inlineStackInfo fileName="forward_prop/src/forward_prop.cpp" linenumber="36" fileDirectory="/home/msi/ES-FL/code/HLS" functionName="save_variables_locally"/>
+        <controlInputObjs>arrayidx581.exit</controlInputObjs>
+      </node_objs>
+      <fileValidLineNumbers fileName="forward_prop/src/forward_prop.cpp">
+        <validLinenumbers>36</validLinenumbers>
+      </fileValidLineNumbers>
+    </basic_blocks>
+    <basic_blocks id="60" name="arrayidx581.case.5" type="BlockType">
+      <controlInputObjs>for.inc59.split._crit_edge</controlInputObjs>
+      <controlOutputObjs>switch</controlOutputObjs>
+      <controlOutputObjs>arrayidx581.exit</controlOutputObjs>
+      <node_objs xsi:type="cdfg:CdfgNode" id="58" name="dense_weights_5_addr_write_ln36" lineNumber="36" fileName="forward_prop/src/forward_prop.cpp" fileDirectory=".." coreName="RAM" implIndex="auto" control="no" opType="ram" coreId="83" contextFuncName="save_variables_locally" opcode="store" nodeLabel="2.0" m_display="0" m_delay="1.29" m_topoIndex="40" m_clusterGroupNumber="-1">
+        <inlineStackInfo fileName="forward_prop/src/forward_prop.cpp" linenumber="36" fileDirectory="/home/msi/ES-FL/code/HLS" functionName="save_variables_locally"/>
+        <dataInputObjs>bitcast</dataInputObjs>
+        <dataInputObjs>getelementptr</dataInputObjs>
+      </node_objs>
+      <node_objs xsi:type="cdfg:CdfgNode" id="59" name="br_ln36" lineNumber="36" fileName="forward_prop/src/forward_prop.cpp" fileDirectory=".." coreId="4251243920" contextFuncName="save_variables_locally" opcode="br" nodeLabel="2.0" m_display="0" m_topoIndex="41" m_clusterGroupNumber="-1">
+        <inlineStackInfo fileName="forward_prop/src/forward_prop.cpp" linenumber="36" fileDirectory="/home/msi/ES-FL/code/HLS" functionName="save_variables_locally"/>
+        <controlInputObjs>arrayidx581.exit</controlInputObjs>
+      </node_objs>
+      <fileValidLineNumbers fileName="forward_prop/src/forward_prop.cpp">
+        <validLinenumbers>36</validLinenumbers>
+      </fileValidLineNumbers>
+    </basic_blocks>
+    <basic_blocks id="63" name="arrayidx581.case.4" type="BlockType">
+      <controlInputObjs>for.inc59.split._crit_edge</controlInputObjs>
+      <controlOutputObjs>switch</controlOutputObjs>
+      <controlOutputObjs>arrayidx581.exit</controlOutputObjs>
+      <node_objs xsi:type="cdfg:CdfgNode" id="61" name="dense_weights_4_addr_write_ln36" lineNumber="36" fileName="forward_prop/src/forward_prop.cpp" fileDirectory=".." coreName="RAM" implIndex="auto" control="no" opType="ram" coreId="83" contextFuncName="save_variables_locally" opcode="store" nodeLabel="2.0" m_display="0" m_delay="1.29" m_topoIndex="42" m_clusterGroupNumber="-1">
+        <inlineStackInfo fileName="forward_prop/src/forward_prop.cpp" linenumber="36" fileDirectory="/home/msi/ES-FL/code/HLS" functionName="save_variables_locally"/>
+        <dataInputObjs>bitcast</dataInputObjs>
+        <dataInputObjs>getelementptr</dataInputObjs>
+      </node_objs>
+      <node_objs xsi:type="cdfg:CdfgNode" id="62" name="br_ln36" lineNumber="36" fileName="forward_prop/src/forward_prop.cpp" fileDirectory=".." coreId="233063184" contextFuncName="save_variables_locally" opcode="br" nodeLabel="2.0" m_display="0" m_topoIndex="43" m_clusterGroupNumber="-1">
+        <inlineStackInfo fileName="forward_prop/src/forward_prop.cpp" linenumber="36" fileDirectory="/home/msi/ES-FL/code/HLS" functionName="save_variables_locally"/>
+        <controlInputObjs>arrayidx581.exit</controlInputObjs>
+      </node_objs>
+      <fileValidLineNumbers fileName="forward_prop/src/forward_prop.cpp">
+        <validLinenumbers>36</validLinenumbers>
+      </fileValidLineNumbers>
+    </basic_blocks>
+    <basic_blocks id="66" name="arrayidx581.case.3" type="BlockType">
+      <controlInputObjs>for.inc59.split._crit_edge</controlInputObjs>
+      <controlOutputObjs>switch</controlOutputObjs>
+      <controlOutputObjs>arrayidx581.exit</controlOutputObjs>
+      <node_objs xsi:type="cdfg:CdfgNode" id="64" name="dense_weights_3_addr_write_ln36" lineNumber="36" fileName="forward_prop/src/forward_prop.cpp" fileDirectory=".." coreName="RAM" implIndex="auto" control="no" opType="ram" coreId="83" contextFuncName="save_variables_locally" opcode="store" nodeLabel="2.0" m_display="0" m_delay="1.29" m_topoIndex="44" m_clusterGroupNumber="-1">
+        <inlineStackInfo fileName="forward_prop/src/forward_prop.cpp" linenumber="36" fileDirectory="/home/msi/ES-FL/code/HLS" functionName="save_variables_locally"/>
+        <dataInputObjs>bitcast</dataInputObjs>
+        <dataInputObjs>getelementptr</dataInputObjs>
+      </node_objs>
+      <node_objs xsi:type="cdfg:CdfgNode" id="65" name="br_ln36" lineNumber="36" fileName="forward_prop/src/forward_prop.cpp" fileDirectory=".." coreId="235691328" contextFuncName="save_variables_locally" opcode="br" nodeLabel="2.0" m_display="0" m_topoIndex="45" m_clusterGroupNumber="-1">
+        <inlineStackInfo fileName="forward_prop/src/forward_prop.cpp" linenumber="36" fileDirectory="/home/msi/ES-FL/code/HLS" functionName="save_variables_locally"/>
+        <controlInputObjs>arrayidx581.exit</controlInputObjs>
+      </node_objs>
+      <fileValidLineNumbers fileName="forward_prop/src/forward_prop.cpp">
+        <validLinenumbers>36</validLinenumbers>
+      </fileValidLineNumbers>
+    </basic_blocks>
+    <basic_blocks id="69" name="arrayidx581.case.2" type="BlockType">
+      <controlInputObjs>for.inc59.split._crit_edge</controlInputObjs>
+      <controlOutputObjs>switch</controlOutputObjs>
+      <controlOutputObjs>arrayidx581.exit</controlOutputObjs>
+      <node_objs xsi:type="cdfg:CdfgNode" id="67" name="dense_weights_2_addr_write_ln36" lineNumber="36" fileName="forward_prop/src/forward_prop.cpp" fileDirectory=".." coreName="RAM" implIndex="auto" control="no" opType="ram" coreId="83" contextFuncName="save_variables_locally" opcode="store" nodeLabel="2.0" m_display="0" m_delay="1.29" m_topoIndex="46" m_clusterGroupNumber="-1">
+        <inlineStackInfo fileName="forward_prop/src/forward_prop.cpp" linenumber="36" fileDirectory="/home/msi/ES-FL/code/HLS" functionName="save_variables_locally"/>
+        <dataInputObjs>bitcast</dataInputObjs>
+        <dataInputObjs>getelementptr</dataInputObjs>
+      </node_objs>
+      <node_objs xsi:type="cdfg:CdfgNode" id="68" name="br_ln36" lineNumber="36" fileName="forward_prop/src/forward_prop.cpp" fileDirectory=".." coreId="235691328" contextFuncName="save_variables_locally" opcode="br" nodeLabel="2.0" m_display="0" m_topoIndex="47" m_clusterGroupNumber="-1">
+        <inlineStackInfo fileName="forward_prop/src/forward_prop.cpp" linenumber="36" fileDirectory="/home/msi/ES-FL/code/HLS" functionName="save_variables_locally"/>
+        <controlInputObjs>arrayidx581.exit</controlInputObjs>
+      </node_objs>
+      <fileValidLineNumbers fileName="forward_prop/src/forward_prop.cpp">
+        <validLinenumbers>36</validLinenumbers>
+      </fileValidLineNumbers>
+    </basic_blocks>
+    <basic_blocks id="72" name="arrayidx581.case.1" type="BlockType">
+      <controlInputObjs>for.inc59.split._crit_edge</controlInputObjs>
+      <controlOutputObjs>switch</controlOutputObjs>
+      <controlOutputObjs>arrayidx581.exit</controlOutputObjs>
+      <node_objs xsi:type="cdfg:CdfgNode" id="70" name="dense_weights_1_addr_write_ln36" lineNumber="36" fileName="forward_prop/src/forward_prop.cpp" fileDirectory=".." coreName="RAM" implIndex="auto" control="no" opType="ram" coreId="83" contextFuncName="save_variables_locally" opcode="store" nodeLabel="2.0" m_display="0" m_delay="1.29" m_topoIndex="48" m_clusterGroupNumber="-1">
+        <inlineStackInfo fileName="forward_prop/src/forward_prop.cpp" linenumber="36" fileDirectory="/home/msi/ES-FL/code/HLS" functionName="save_variables_locally"/>
+        <dataInputObjs>bitcast</dataInputObjs>
+        <dataInputObjs>getelementptr</dataInputObjs>
+      </node_objs>
+      <node_objs xsi:type="cdfg:CdfgNode" id="71" name="br_ln36" lineNumber="36" fileName="forward_prop/src/forward_prop.cpp" fileDirectory=".." coreId="235691328" contextFuncName="save_variables_locally" opcode="br" nodeLabel="2.0" m_display="0" m_topoIndex="49" m_clusterGroupNumber="-1">
+        <inlineStackInfo fileName="forward_prop/src/forward_prop.cpp" linenumber="36" fileDirectory="/home/msi/ES-FL/code/HLS" functionName="save_variables_locally"/>
+        <controlInputObjs>arrayidx581.exit</controlInputObjs>
+      </node_objs>
+      <fileValidLineNumbers fileName="forward_prop/src/forward_prop.cpp">
+        <validLinenumbers>36</validLinenumbers>
+      </fileValidLineNumbers>
+    </basic_blocks>
+    <basic_blocks id="75" name="arrayidx581.case.0" type="BlockType">
+      <controlInputObjs>for.inc59.split._crit_edge</controlInputObjs>
+      <controlOutputObjs>switch</controlOutputObjs>
+      <controlOutputObjs>arrayidx581.exit</controlOutputObjs>
+      <node_objs xsi:type="cdfg:CdfgNode" id="73" name="dense_weights_0_addr_write_ln36" lineNumber="36" fileName="forward_prop/src/forward_prop.cpp" fileDirectory=".." coreName="RAM" implIndex="auto" control="no" opType="ram" coreId="83" contextFuncName="save_variables_locally" opcode="store" nodeLabel="2.0" m_display="0" m_delay="1.29" m_topoIndex="50" m_clusterGroupNumber="-1">
+        <inlineStackInfo fileName="forward_prop/src/forward_prop.cpp" linenumber="36" fileDirectory="/home/msi/ES-FL/code/HLS" functionName="save_variables_locally"/>
+        <dataInputObjs>bitcast</dataInputObjs>
+        <dataInputObjs>getelementptr</dataInputObjs>
+      </node_objs>
+      <node_objs xsi:type="cdfg:CdfgNode" id="74" name="br_ln36" lineNumber="36" fileName="forward_prop/src/forward_prop.cpp" fileDirectory=".." coreId="235691328" contextFuncName="save_variables_locally" opcode="br" nodeLabel="2.0" m_display="0" m_topoIndex="51" m_clusterGroupNumber="-1">
+        <inlineStackInfo fileName="forward_prop/src/forward_prop.cpp" linenumber="36" fileDirectory="/home/msi/ES-FL/code/HLS" functionName="save_variables_locally"/>
+        <controlInputObjs>arrayidx581.exit</controlInputObjs>
+      </node_objs>
+      <fileValidLineNumbers fileName="forward_prop/src/forward_prop.cpp">
+        <validLinenumbers>36</validLinenumbers>
+      </fileValidLineNumbers>
+    </basic_blocks>
+    <basic_blocks id="78" name="arrayidx581.case.7" type="BlockType">
+      <controlInputObjs>for.inc59.split._crit_edge</controlInputObjs>
+      <controlOutputObjs>switch</controlOutputObjs>
+      <controlOutputObjs>arrayidx581.exit</controlOutputObjs>
+      <node_objs xsi:type="cdfg:CdfgNode" id="76" name="dense_weights_7_addr_write_ln36" lineNumber="36" fileName="forward_prop/src/forward_prop.cpp" fileDirectory=".." coreName="RAM" implIndex="auto" control="no" opType="ram" coreId="83" contextFuncName="save_variables_locally" opcode="store" nodeLabel="2.0" m_display="0" m_delay="1.29" m_topoIndex="52" m_clusterGroupNumber="-1">
+        <inlineStackInfo fileName="forward_prop/src/forward_prop.cpp" linenumber="36" fileDirectory="/home/msi/ES-FL/code/HLS" functionName="save_variables_locally"/>
+        <dataInputObjs>bitcast</dataInputObjs>
+        <dataInputObjs>getelementptr</dataInputObjs>
+      </node_objs>
+      <node_objs xsi:type="cdfg:CdfgNode" id="77" name="br_ln36" lineNumber="36" fileName="forward_prop/src/forward_prop.cpp" fileDirectory=".." coreId="1397508187" contextFuncName="save_variables_locally" opcode="br" nodeLabel="2.0" m_display="0" m_topoIndex="53" m_clusterGroupNumber="-1">
+        <inlineStackInfo fileName="forward_prop/src/forward_prop.cpp" linenumber="36" fileDirectory="/home/msi/ES-FL/code/HLS" functionName="save_variables_locally"/>
+        <controlInputObjs>arrayidx581.exit</controlInputObjs>
+      </node_objs>
+      <fileValidLineNumbers fileName="forward_prop/src/forward_prop.cpp">
+        <validLinenumbers>36</validLinenumbers>
+      </fileValidLineNumbers>
+    </basic_blocks>
+    <basic_blocks id="82" name="arrayidx581.exit" type="BlockType">
+      <controlInputObjs>arrayidx581.case.6</controlInputObjs>
+      <controlInputObjs>arrayidx581.case.5</controlInputObjs>
+      <controlInputObjs>arrayidx581.case.4</controlInputObjs>
+      <controlInputObjs>arrayidx581.case.3</controlInputObjs>
+      <controlInputObjs>arrayidx581.case.2</controlInputObjs>
+      <controlInputObjs>arrayidx581.case.1</controlInputObjs>
+      <controlInputObjs>arrayidx581.case.0</controlInputObjs>
+      <controlInputObjs>arrayidx581.case.7</controlInputObjs>
+      <controlOutputObjs>br</controlOutputObjs>
+      <controlOutputObjs>br</controlOutputObjs>
+      <controlOutputObjs>br</controlOutputObjs>
+      <controlOutputObjs>br</controlOutputObjs>
+      <controlOutputObjs>br</controlOutputObjs>
+      <controlOutputObjs>br</controlOutputObjs>
+      <controlOutputObjs>br</controlOutputObjs>
+      <controlOutputObjs>br</controlOutputObjs>
+      <controlOutputObjs>for.inc59</controlOutputObjs>
+      <node_objs xsi:type="cdfg:CdfgNode" id="79" name="i_write_ln35" lineNumber="35" fileName="forward_prop/src/forward_prop.cpp" fileDirectory=".." coreId="4250931732" contextFuncName="save_variables_locally" opcode="store" m_display="0" m_delay="0.46" m_topoIndex="17" m_clusterGroupNumber="-1">
+        <inlineStackInfo fileName="forward_prop/src/forward_prop.cpp" linenumber="35" fileDirectory="/home/msi/ES-FL/code/HLS" functionName="save_variables_locally"/>
+        <dataInputObjs>add</dataInputObjs>
+        <dataInputObjs>alloca</dataInputObjs>
+      </node_objs>
+      <node_objs xsi:type="cdfg:CdfgNode" id="80" name="shiftreg6_write_ln35" lineNumber="35" fileName="forward_prop/src/forward_prop.cpp" fileDirectory=".." coreId="942881392" contextFuncName="save_variables_locally" opcode="store" nodeLabel="2.0" m_display="0" m_delay="0.46" m_topoIndex="54" m_clusterGroupNumber="-1">
+        <inlineStackInfo fileName="forward_prop/src/forward_prop.cpp" linenumber="35" fileDirectory="/home/msi/ES-FL/code/HLS" functionName="save_variables_locally"/>
+        <dataInputObjs>partselect</dataInputObjs>
+        <dataInputObjs>alloca</dataInputObjs>
+      </node_objs>
+      <node_objs xsi:type="cdfg:CdfgNode" id="81" name="br_ln35" lineNumber="35" fileName="forward_prop/src/forward_prop.cpp" fileDirectory=".." coreId="232808448" contextFuncName="save_variables_locally" opcode="br" nodeLabel="2.0" m_display="0" m_topoIndex="55" m_clusterGroupNumber="-1">
+        <inlineStackInfo fileName="forward_prop/src/forward_prop.cpp" linenumber="35" fileDirectory="/home/msi/ES-FL/code/HLS" functionName="save_variables_locally"/>
+        <controlInputObjs>for.inc59</controlInputObjs>
+      </node_objs>
+      <fileValidLineNumbers fileName="forward_prop/src/forward_prop.cpp">
+        <validLinenumbers>35</validLinenumbers>
+      </fileValidLineNumbers>
+    </basic_blocks>
+  </regions>
+  <ScheduleInfo time="0"/>
+  <ScheduleInfo time="1"/>
+  <ScheduleInfo time="2"/>
+  <regnodes realName="icmp_ln35_reg_359">
+    <nodeIds>23</nodeIds>
+  </regnodes>
+  <regnodes realName="lshr_ln36_1_reg_367">
+    <nodeIds>42</nodeIds>
+  </regnodes>
+  <regnodes realName="gmem_addr_read_reg_376">
+    <nodeIds>35</nodeIds>
+  </regnodes>
+  <regnodes realName="sext_ln35_cast_reg_354">
+    <nodeIds>14</nodeIds>
+  </regnodes>
+  <regnodes realName="icmp_ln36_reg_363">
+    <nodeIds>32</nodeIds>
+  </regnodes>
+  <regnodes realName="trunc_ln36_1_reg_372">
+    <nodeIds>52</nodeIds>
+  </regnodes>
+  <regnodes realName="shiftreg6_reg_340">
+    <nodeIds>11</nodeIds>
+  </regnodes>
+  <regnodes realName="i_reg_347">
+    <nodeIds>12</nodeIds>
+  </regnodes>
+  <regnodes realName="empty_135_reg_217">
+    <nodeIds>38</nodeIds>
+  </regnodes>
+  <expressionNodes realName="add_ln35_fu_249">
+    <nodeIds>25</nodeIds>
+  </expressionNodes>
+  <expressionNodes realName="shiftreg6_cast_fu_293">
+    <nodeIds>29</nodeIds>
+  </expressionNodes>
+  <expressionNodes realName="i_fu_98">
+    <nodeIds>12</nodeIds>
+  </expressionNodes>
+  <expressionNodes realName="dense_weights_4_addr_gep_fu_141">
+    <nodeIds>48</nodeIds>
+  </expressionNodes>
+  <expressionNodes realName="trunc_ln36_fu_298">
+    <nodeIds>39</nodeIds>
+  </expressionNodes>
+  <expressionNodes realName="bitcast_ln36_fu_302">
+    <nodeIds>40</nodeIds>
+  </expressionNodes>
+  <expressionNodes realName="empty_135_phi_fu_220">
+    <nodeIds>38</nodeIds>
+  </expressionNodes>
+  <expressionNodes realName="dense_weights_1_addr_gep_fu_120">
+    <nodeIds>45</nodeIds>
+  </expressionNodes>
+  <expressionNodes realName="dense_weights_7_addr_gep_fu_162">
+    <nodeIds>51</nodeIds>
+  </expressionNodes>
+  <expressionNodes realName="shiftreg6_fu_94">
+    <nodeIds>11</nodeIds>
+  </expressionNodes>
+  <expressionNodes realName="dense_weights_0_addr_gep_fu_113">
+    <nodeIds>44</nodeIds>
+  </expressionNodes>
+  <expressionNodes realName="trunc_ln36_1_fu_275">
+    <nodeIds>52</nodeIds>
+  </expressionNodes>
+  <expressionNodes realName="dense_weights_3_addr_gep_fu_134">
+    <nodeIds>47</nodeIds>
+  </expressionNodes>
+  <expressionNodes realName="sext_ln35_cast_fu_226">
+    <nodeIds>14</nodeIds>
+  </expressionNodes>
+  <expressionNodes realName="dense_weights_6_addr_gep_fu_155">
+    <nodeIds>50</nodeIds>
+  </expressionNodes>
+  <expressionNodes realName="lshr_ln36_1_fu_265">
+    <nodeIds>42</nodeIds>
+  </expressionNodes>
+  <expressionNodes realName="zext_ln36_fu_324">
+    <nodeIds>43</nodeIds>
+  </expressionNodes>
+  <expressionNodes realName="icmp_ln35_fu_243">
+    <nodeIds>23</nodeIds>
+  </expressionNodes>
+  <expressionNodes realName="gmem_addr_fu_284">
+    <nodeIds>21</nodeIds>
+  </expressionNodes>
+  <expressionNodes realName="icmp_ln36_fu_259">
+    <nodeIds>32</nodeIds>
+  </expressionNodes>
+  <expressionNodes realName="trunc_ln36_2_fu_314">
+    <nodeIds>41</nodeIds>
+  </expressionNodes>
+  <expressionNodes realName="dense_weights_2_addr_gep_fu_127">
+    <nodeIds>46</nodeIds>
+  </expressionNodes>
+  <expressionNodes realName="dense_weights_5_addr_gep_fu_148">
+    <nodeIds>49</nodeIds>
+  </expressionNodes>
+  <expressionNodes realName="empty_136_fu_255">
+    <nodeIds>30</nodeIds>
+  </expressionNodes>
+  <ioNodes realName="i_15_load_fu_240">
+    <nodeIds>20</nodeIds>
+  </ioNodes>
+  <ioNodes realName="sext_ln35_read_read_fu_102">
+    <nodeIds>13</nodeIds>
+  </ioNodes>
+  <ioNodes realName="shiftreg6_load_load_fu_290">
+    <nodeIds>28</nodeIds>
+  </ioNodes>
+  <ioNodes realName="store_ln0_store_fu_230">
+    <nodeIds>16</nodeIds>
+  </ioNodes>
+  <ioNodes realName="gmem_addr_read_read_fu_108">
+    <nodeIds>35</nodeIds>
+  </ioNodes>
+  <ioNodes realName="store_ln35_store_fu_279">
+    <nodeIds>79</nodeIds>
+  </ioNodes>
+  <ioNodes realName="store_ln35_store_fu_335">
+    <nodeIds>80</nodeIds>
+  </ioNodes>
+  <ioNodes realName="store_ln0_store_fu_235">
+    <nodeIds>17</nodeIds>
+  </ioNodes>
+  <memoryPorts dataString="dense_weights_0">
+    <nodeIds>73</nodeIds>
+  </memoryPorts>
+  <memoryPorts dataString="dense_weights_1">
+    <nodeIds>70</nodeIds>
+  </memoryPorts>
+  <memoryPorts dataString="dense_weights_2">
+    <nodeIds>67</nodeIds>
+  </memoryPorts>
+  <memoryPorts dataString="dense_weights_3">
+    <nodeIds>64</nodeIds>
+  </memoryPorts>
+  <memoryPorts dataString="dense_weights_4">
+    <nodeIds>61</nodeIds>
+  </memoryPorts>
+  <memoryPorts dataString="dense_weights_5">
+    <nodeIds>58</nodeIds>
+  </memoryPorts>
+  <memoryPorts dataString="dense_weights_6">
+    <nodeIds>55</nodeIds>
+  </memoryPorts>
+  <memoryPorts dataString="dense_weights_7">
+    <nodeIds>76</nodeIds>
+  </memoryPorts>
+  <ioPorts name="dense_weights_0(p0)">
+    <contents name="store">
+      <nodeIds>73</nodeIds>
+    </contents>
+  </ioPorts>
+  <ioPorts name="dense_weights_1(p0)">
+    <contents name="store">
+      <nodeIds>70</nodeIds>
+    </contents>
+  </ioPorts>
+  <ioPorts name="dense_weights_2(p0)">
+    <contents name="store">
+      <nodeIds>67</nodeIds>
+    </contents>
+  </ioPorts>
+  <ioPorts name="dense_weights_3(p0)">
+    <contents name="store">
+      <nodeIds>64</nodeIds>
+    </contents>
+  </ioPorts>
+  <ioPorts name="dense_weights_4(p0)">
+    <contents name="store">
+      <nodeIds>61</nodeIds>
+    </contents>
+  </ioPorts>
+  <ioPorts name="dense_weights_5(p0)">
+    <contents name="store">
+      <nodeIds>58</nodeIds>
+    </contents>
+  </ioPorts>
+  <ioPorts name="dense_weights_6(p0)">
+    <contents name="store">
+      <nodeIds>55</nodeIds>
+    </contents>
+  </ioPorts>
+  <ioPorts name="dense_weights_7(p0)">
+    <contents name="store">
+      <nodeIds>76</nodeIds>
+    </contents>
+  </ioPorts>
+  <ioPorts name="gmem">
+    <contents name="read">
+      <nodeIds>35</nodeIds>
+    </contents>
+  </ioPorts>
+  <ioPorts name="sext_ln35">
+    <contents name="read">
+      <nodeIds>13</nodeIds>
+    </contents>
+  </ioPorts>
+  <fsm>
+    <states id="1">
+      <operations id="11" stage="1" latency="1"/>
+      <operations id="12" stage="1" latency="1"/>
+      <operations id="13" stage="1" latency="1"/>
+      <operations id="14" stage="1" latency="1"/>
+      <operations id="15" stage="1" latency="1"/>
+      <operations id="16" stage="1" latency="1"/>
+      <operations id="17" stage="1" latency="1"/>
+      <operations id="18" stage="1" latency="1"/>
+      <operations id="20" stage="1" latency="1"/>
+      <operations id="23" stage="1" latency="1"/>
+      <operations id="25" stage="1" latency="1"/>
+      <operations id="26" stage="1" latency="1"/>
+      <operations id="30" stage="1" latency="1"/>
+      <operations id="32" stage="1" latency="1"/>
+      <operations id="42" stage="1" latency="1"/>
+      <operations id="52" stage="1" latency="1"/>
+      <operations id="53" stage="1" latency="1"/>
+      <operations id="79" stage="1" latency="1"/>
+    </states>
+    <states id="2">
+      <operations id="21" stage="1" latency="1"/>
+      <operations id="22" stage="1" latency="1"/>
+      <operations id="24" stage="1" latency="1"/>
+      <operations id="35" stage="1" latency="1"/>
+      <operations id="83" stage="1" latency="1"/>
+    </states>
+    <states id="3">
+      <operations id="28" stage="1" latency="1"/>
+      <operations id="29" stage="1" latency="1"/>
+      <operations id="31" stage="1" latency="1"/>
+      <operations id="33" stage="1" latency="1"/>
+      <operations id="36" stage="1" latency="1"/>
+      <operations id="38" stage="1" latency="1"/>
+      <operations id="39" stage="1" latency="1"/>
+      <operations id="40" stage="1" latency="1"/>
+      <operations id="41" stage="1" latency="1"/>
+      <operations id="43" stage="1" latency="1"/>
+      <operations id="44" stage="1" latency="1"/>
+      <operations id="45" stage="1" latency="1"/>
+      <operations id="46" stage="1" latency="1"/>
+      <operations id="47" stage="1" latency="1"/>
+      <operations id="48" stage="1" latency="1"/>
+      <operations id="49" stage="1" latency="1"/>
+      <operations id="50" stage="1" latency="1"/>
+      <operations id="51" stage="1" latency="1"/>
+      <operations id="55" stage="1" latency="1"/>
+      <operations id="56" stage="1" latency="1"/>
+      <operations id="58" stage="1" latency="1"/>
+      <operations id="59" stage="1" latency="1"/>
+      <operations id="61" stage="1" latency="1"/>
+      <operations id="62" stage="1" latency="1"/>
+      <operations id="64" stage="1" latency="1"/>
+      <operations id="65" stage="1" latency="1"/>
+      <operations id="67" stage="1" latency="1"/>
+      <operations id="68" stage="1" latency="1"/>
+      <operations id="70" stage="1" latency="1"/>
+      <operations id="71" stage="1" latency="1"/>
+      <operations id="73" stage="1" latency="1"/>
+      <operations id="74" stage="1" latency="1"/>
+      <operations id="76" stage="1" latency="1"/>
+      <operations id="77" stage="1" latency="1"/>
+      <operations id="80" stage="1" latency="1"/>
+      <operations id="81" stage="1" latency="1"/>
+    </states>
+    <transitions inState="1" outState="2">
+      <condition id="-1"/>
+    </transitions>
+    <transitions inState="2" outState="3">
+      <condition id="-1"/>
+    </transitions>
+  </fsm>
+  <CFGRegionsRoot>
+    <cfgRegions mId="1" mTag="save_variables_locally_Pipeline_VITIS_LOOP_35_6" mII="-1" mDepth="-1" mMinTripCount="-1" mMaxTripCount="-1" mMinLatency="401411" mMaxLatency="401411">
+      <subRegions>2</subRegions>
+      <subRegions>3</subRegions>
+      <subRegions>4</subRegions>
+      <mDfPipe/>
+    </cfgRegions>
+    <cfgRegions mId="2" mTag="Entry" mII="-1" mDepth="-1" mMinTripCount="-1" mMaxTripCount="-1">
+      <basicBlocks>19</basicBlocks>
+      <mDfPipe/>
+    </cfgRegions>
+    <cfgRegions mId="3" mTag="VITIS_LOOP_35_6" mII="1" mDepth="3" mMinTripCount="401408" mMaxTripCount="401408" mMinLatency="401409" mMaxLatency="401409" mType="1">
+      <basicBlocks>27</basicBlocks>
+      <basicBlocks>34</basicBlocks>
+      <basicBlocks>37</basicBlocks>
+      <basicBlocks>54</basicBlocks>
+      <basicBlocks>57</basicBlocks>
+      <basicBlocks>60</basicBlocks>
+      <basicBlocks>63</basicBlocks>
+      <basicBlocks>66</basicBlocks>
+      <basicBlocks>69</basicBlocks>
+      <basicBlocks>72</basicBlocks>
+      <basicBlocks>75</basicBlocks>
+      <basicBlocks>78</basicBlocks>
+      <basicBlocks>82</basicBlocks>
+      <mDfPipe/>
+    </cfgRegions>
+    <cfgRegions mId="4" mTag="Return" mII="-1" mDepth="-1" mMinTripCount="-1" mMaxTripCount="-1">
+      <basicBlocks>84</basicBlocks>
+      <mDfPipe/>
+    </cfgRegions>
+  </CFGRegionsRoot>
+</cdfg:DBCdfg>

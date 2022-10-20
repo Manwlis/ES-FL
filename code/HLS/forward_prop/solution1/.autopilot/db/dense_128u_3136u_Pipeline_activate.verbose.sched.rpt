@@ -1,0 +1,278 @@
+
+
+================================================================
+== Vitis HLS Report for 'dense_128u_3136u_Pipeline_activate'
+================================================================
+* Date:           Tue Oct 18 21:15:20 2022
+
+* Version:        2022.1 (Build 3526262 on Mon Apr 18 15:47:01 MDT 2022)
+* Project:        forward_prop
+* Solution:       solution1 (Vitis Kernel Flow Target)
+* Product family: virtexuplus
+* Target device:  xcvu5p-flva2104-1-e
+
+
+================================================================
+== Performance Estimates
+================================================================
++ Timing: 
+    * Summary: 
+    +--------+----------+----------+------------+
+    |  Clock |  Target  | Estimated| Uncertainty|
+    +--------+----------+----------+------------+
+    |ap_clk  |  10.00 ns|  4.301 ns|     2.70 ns|
+    +--------+----------+----------+------------+
+
++ Latency: 
+    * Summary: 
+    +---------+---------+----------+----------+-----+-----+---------+
+    |  Latency (cycles) |  Latency (absolute) |  Interval | Pipeline|
+    |   min   |   max   |    min   |    max   | min | max |   Type  |
+    +---------+---------+----------+----------+-----+-----+---------+
+    |      130|      130|  1.300 us|  1.300 us|  130|  130|       no|
+    +---------+---------+----------+----------+-----+-----+---------+
+
+    + Detail: 
+        * Instance: 
+        N/A
+
+        * Loop: 
+        +------------+---------+---------+----------+-----------+-----------+------+----------+
+        |            |  Latency (cycles) | Iteration|  Initiation Interval  | Trip |          |
+        |  Loop Name |   min   |   max   |  Latency |  achieved |   target  | Count| Pipelined|
+        +------------+---------+---------+----------+-----------+-----------+------+----------+
+        |- activate  |      128|      128|         2|          1|          1|   128|       yes|
+        +------------+---------+---------+----------+-----------+-----------+------+----------+
+
+============================================================
++ Verbose Summary: Synthesis Manager
+============================================================
+InlineROM: 1
+ExposeGlobal: 0
+============================================================
++ Verbose Summary: CDFG Model
+============================================================
+IsTopModel: 0
+ResetActiveHigh: 1
+IsCombinational: 0
+IsDatapathOnly: 0
+HasWiredReturn: 1
+HasMFsm: 2
+HasVarLatency: 1
+IsPipeline: 0
+IsRtlPipelined: 0
+IsInstanceOverlapped: 0
+IsDontTouch: 0
+HasImplIP: 0
+IsGatedGlobalClock: 0
+
++ Individual pipeline summary: 
+  * Pipeline-0: initiation interval (II) = 1, depth = 2
+
+
+============================================================
++ Verbose Summary: Schedule
+============================================================
+* Number of FSM states : 2
+* Pipeline : 1
+  Pipeline-0 : II = 1, D = 2, States = { 1 2 }
+* Dataflow Pipeline: 0
+
+* FSM state transitions: 
+1 --> 2 
+2 --> 
+
+* FSM state operations: 
+
+State 1 <SV = 0> <Delay = 3.17>
+ST_1 : Operation 5 [1/1] (0.00ns)   --->   "%k_1 = alloca i32 1"   --->   Operation 5 'alloca' 'k_1' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 6 [1/1] (0.00ns)   --->   "%specinterface_ln0 = specinterface void @_ssdm_op_SpecInterface, i32 %dense_feature_map_stream128, void @empty_39, i32 0, i32 0, void @empty_30, i32 0, i32 0, void @empty_30, void @empty_30, void @empty_30, i32 0, i32 0, i32 0, i32 0, void @empty_30, void @empty_30, i32 4294967295, i32 0"   --->   Operation 6 'specinterface' 'specinterface_ln0' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 7 [1/1] (0.00ns)   --->   "%specinterface_ln0 = specinterface void @_ssdm_op_SpecInterface, i1 %dense_activations_stream129, void @empty_39, i32 0, i32 0, void @empty_30, i32 0, i32 0, void @empty_30, void @empty_30, void @empty_30, i32 0, i32 0, i32 0, i32 0, void @empty_30, void @empty_30, i32 4294967295, i32 0"   --->   Operation 7 'specinterface' 'specinterface_ln0' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 8 [1/1] (0.00ns)   --->   "%specinterface_ln0 = specinterface void @_ssdm_op_SpecInterface, i32 %dense_f_map_out134, void @empty_39, i32 0, i32 0, void @empty_30, i32 0, i32 0, void @empty_30, void @empty_30, void @empty_30, i32 0, i32 0, i32 0, i32 0, void @empty_30, void @empty_30, i32 4294967295, i32 0"   --->   Operation 8 'specinterface' 'specinterface_ln0' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 9 [1/1] (0.00ns)   --->   "%add17_127154_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_127154_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 9 'read' 'add17_127154_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 10 [1/1] (0.00ns)   --->   "%add17_126153_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_126153_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 10 'read' 'add17_126153_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 11 [1/1] (0.00ns)   --->   "%add17_125152_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_125152_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 11 'read' 'add17_125152_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 12 [1/1] (0.00ns)   --->   "%add17_124151_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_124151_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 12 'read' 'add17_124151_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 13 [1/1] (0.00ns)   --->   "%add17_123150_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_123150_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 13 'read' 'add17_123150_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 14 [1/1] (0.00ns)   --->   "%add17_122149_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_122149_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 14 'read' 'add17_122149_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 15 [1/1] (0.00ns)   --->   "%add17_121148_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_121148_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 15 'read' 'add17_121148_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 16 [1/1] (0.00ns)   --->   "%add17_120147_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_120147_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 16 'read' 'add17_120147_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 17 [1/1] (0.00ns)   --->   "%add17_119146_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_119146_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 17 'read' 'add17_119146_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 18 [1/1] (0.00ns)   --->   "%add17_118145_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_118145_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 18 'read' 'add17_118145_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 19 [1/1] (0.00ns)   --->   "%add17_117144_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_117144_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 19 'read' 'add17_117144_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 20 [1/1] (0.00ns)   --->   "%add17_116143_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_116143_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 20 'read' 'add17_116143_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 21 [1/1] (0.00ns)   --->   "%add17_115142_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_115142_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 21 'read' 'add17_115142_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 22 [1/1] (0.00ns)   --->   "%add17_114141_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_114141_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 22 'read' 'add17_114141_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 23 [1/1] (0.00ns)   --->   "%add17_113140_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_113140_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 23 'read' 'add17_113140_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 24 [1/1] (0.00ns)   --->   "%add17_112139_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_112139_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 24 'read' 'add17_112139_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 25 [1/1] (0.00ns)   --->   "%add17_111138_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_111138_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 25 'read' 'add17_111138_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 26 [1/1] (0.00ns)   --->   "%add17_110137_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_110137_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 26 'read' 'add17_110137_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 27 [1/1] (0.00ns)   --->   "%add17_109136_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_109136_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 27 'read' 'add17_109136_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 28 [1/1] (0.00ns)   --->   "%add17_108135_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_108135_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 28 'read' 'add17_108135_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 29 [1/1] (0.00ns)   --->   "%add17_107134_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_107134_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 29 'read' 'add17_107134_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 30 [1/1] (0.00ns)   --->   "%add17_106133_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_106133_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 30 'read' 'add17_106133_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 31 [1/1] (0.00ns)   --->   "%add17_105132_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_105132_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 31 'read' 'add17_105132_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 32 [1/1] (0.00ns)   --->   "%add17_104131_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_104131_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 32 'read' 'add17_104131_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 33 [1/1] (0.00ns)   --->   "%add17_103130_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_103130_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 33 'read' 'add17_103130_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 34 [1/1] (0.00ns)   --->   "%add17_102129_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_102129_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 34 'read' 'add17_102129_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 35 [1/1] (0.00ns)   --->   "%add17_101128_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_101128_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 35 'read' 'add17_101128_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 36 [1/1] (0.00ns)   --->   "%add17_100127_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_100127_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 36 'read' 'add17_100127_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 37 [1/1] (0.00ns)   --->   "%add17_99126_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_99126_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 37 'read' 'add17_99126_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 38 [1/1] (0.00ns)   --->   "%add17_98125_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_98125_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 38 'read' 'add17_98125_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 39 [1/1] (0.00ns)   --->   "%add17_97124_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_97124_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 39 'read' 'add17_97124_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 40 [1/1] (0.00ns)   --->   "%add17_96123_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_96123_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 40 'read' 'add17_96123_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 41 [1/1] (0.00ns)   --->   "%add17_95122_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_95122_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 41 'read' 'add17_95122_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 42 [1/1] (0.00ns)   --->   "%add17_94121_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_94121_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 42 'read' 'add17_94121_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 43 [1/1] (0.00ns)   --->   "%add17_93120_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_93120_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 43 'read' 'add17_93120_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 44 [1/1] (0.00ns)   --->   "%add17_92119_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_92119_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 44 'read' 'add17_92119_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 45 [1/1] (0.00ns)   --->   "%add17_91118_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_91118_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 45 'read' 'add17_91118_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 46 [1/1] (0.00ns)   --->   "%add17_90117_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_90117_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 46 'read' 'add17_90117_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 47 [1/1] (0.00ns)   --->   "%add17_89116_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_89116_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 47 'read' 'add17_89116_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 48 [1/1] (0.00ns)   --->   "%add17_88115_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_88115_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 48 'read' 'add17_88115_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 49 [1/1] (0.00ns)   --->   "%add17_87114_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_87114_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 49 'read' 'add17_87114_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 50 [1/1] (0.00ns)   --->   "%add17_86113_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_86113_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 50 'read' 'add17_86113_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 51 [1/1] (0.00ns)   --->   "%add17_85112_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_85112_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 51 'read' 'add17_85112_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 52 [1/1] (0.00ns)   --->   "%add17_84111_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_84111_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 52 'read' 'add17_84111_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 53 [1/1] (0.00ns)   --->   "%add17_83110_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_83110_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 53 'read' 'add17_83110_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 54 [1/1] (0.00ns)   --->   "%add17_82109_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_82109_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 54 'read' 'add17_82109_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 55 [1/1] (0.00ns)   --->   "%add17_81108_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_81108_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 55 'read' 'add17_81108_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 56 [1/1] (0.00ns)   --->   "%add17_80107_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_80107_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 56 'read' 'add17_80107_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 57 [1/1] (0.00ns)   --->   "%add17_79106_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_79106_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 57 'read' 'add17_79106_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 58 [1/1] (0.00ns)   --->   "%add17_78105_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_78105_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 58 'read' 'add17_78105_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 59 [1/1] (0.00ns)   --->   "%add17_77104_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_77104_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 59 'read' 'add17_77104_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 60 [1/1] (0.00ns)   --->   "%add17_76103_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_76103_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 60 'read' 'add17_76103_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 61 [1/1] (0.00ns)   --->   "%add17_75102_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_75102_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 61 'read' 'add17_75102_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 62 [1/1] (0.00ns)   --->   "%add17_74101_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_74101_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 62 'read' 'add17_74101_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 63 [1/1] (0.00ns)   --->   "%add17_73100_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_73100_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 63 'read' 'add17_73100_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 64 [1/1] (0.00ns)   --->   "%add17_7299_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_7299_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 64 'read' 'add17_7299_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 65 [1/1] (0.00ns)   --->   "%add17_7198_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_7198_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 65 'read' 'add17_7198_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 66 [1/1] (0.00ns)   --->   "%add17_7097_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_7097_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 66 'read' 'add17_7097_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 67 [1/1] (0.00ns)   --->   "%add17_6996_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_6996_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 67 'read' 'add17_6996_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 68 [1/1] (0.00ns)   --->   "%add17_6895_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_6895_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 68 'read' 'add17_6895_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 69 [1/1] (0.00ns)   --->   "%add17_6794_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_6794_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 69 'read' 'add17_6794_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 70 [1/1] (0.00ns)   --->   "%add17_6693_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_6693_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 70 'read' 'add17_6693_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 71 [1/1] (0.00ns)   --->   "%add17_6592_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_6592_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 71 'read' 'add17_6592_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 72 [1/1] (0.00ns)   --->   "%add17_6491_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_6491_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 72 'read' 'add17_6491_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 73 [1/1] (0.00ns)   --->   "%add17_6390_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_6390_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 73 'read' 'add17_6390_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 74 [1/1] (0.00ns)   --->   "%add17_6289_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_6289_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 74 'read' 'add17_6289_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 75 [1/1] (0.00ns)   --->   "%add17_6188_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_6188_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 75 'read' 'add17_6188_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 76 [1/1] (0.00ns)   --->   "%add17_6087_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_6087_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 76 'read' 'add17_6087_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 77 [1/1] (0.00ns)   --->   "%add17_5986_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_5986_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 77 'read' 'add17_5986_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 78 [1/1] (0.00ns)   --->   "%add17_5885_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_5885_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 78 'read' 'add17_5885_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 79 [1/1] (0.00ns)   --->   "%add17_5784_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_5784_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 79 'read' 'add17_5784_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 80 [1/1] (0.00ns)   --->   "%add17_5683_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_5683_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 80 'read' 'add17_5683_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 81 [1/1] (0.00ns)   --->   "%add17_5582_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_5582_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 81 'read' 'add17_5582_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 82 [1/1] (0.00ns)   --->   "%add17_5481_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_5481_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 82 'read' 'add17_5481_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 83 [1/1] (0.00ns)   --->   "%add17_5380_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_5380_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 83 'read' 'add17_5380_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 84 [1/1] (0.00ns)   --->   "%add17_5279_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_5279_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 84 'read' 'add17_5279_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 85 [1/1] (0.00ns)   --->   "%add17_5178_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_5178_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 85 'read' 'add17_5178_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 86 [1/1] (0.00ns)   --->   "%add17_5077_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_5077_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 86 'read' 'add17_5077_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 87 [1/1] (0.00ns)   --->   "%add17_4976_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_4976_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 87 'read' 'add17_4976_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 88 [1/1] (0.00ns)   --->   "%add17_4875_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_4875_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 88 'read' 'add17_4875_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 89 [1/1] (0.00ns)   --->   "%add17_4774_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_4774_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 89 'read' 'add17_4774_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 90 [1/1] (0.00ns)   --->   "%add17_4673_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_4673_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 90 'read' 'add17_4673_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 91 [1/1] (0.00ns)   --->   "%add17_4572_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_4572_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 91 'read' 'add17_4572_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 92 [1/1] (0.00ns)   --->   "%add17_4471_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_4471_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 92 'read' 'add17_4471_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 93 [1/1] (0.00ns)   --->   "%add17_4370_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_4370_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 93 'read' 'add17_4370_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 94 [1/1] (0.00ns)   --->   "%add17_4269_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_4269_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 94 'read' 'add17_4269_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 95 [1/1] (0.00ns)   --->   "%add17_4168_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_4168_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 95 'read' 'add17_4168_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 96 [1/1] (0.00ns)   --->   "%add17_4067_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_4067_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 96 'read' 'add17_4067_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 97 [1/1] (0.00ns)   --->   "%add17_3966_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_3966_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 97 'read' 'add17_3966_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 98 [1/1] (0.00ns)   --->   "%add17_3865_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_3865_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 98 'read' 'add17_3865_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 99 [1/1] (0.00ns)   --->   "%add17_3764_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_3764_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 99 'read' 'add17_3764_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 100 [1/1] (0.00ns)   --->   "%add17_3663_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_3663_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 100 'read' 'add17_3663_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 101 [1/1] (0.00ns)   --->   "%add17_3562_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_3562_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 101 'read' 'add17_3562_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 102 [1/1] (0.00ns)   --->   "%add17_3461_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_3461_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 102 'read' 'add17_3461_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 103 [1/1] (0.00ns)   --->   "%add17_3360_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_3360_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 103 'read' 'add17_3360_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 104 [1/1] (0.00ns)   --->   "%add17_3259_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_3259_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 104 'read' 'add17_3259_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 105 [1/1] (0.00ns)   --->   "%add17_3158_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_3158_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 105 'read' 'add17_3158_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 106 [1/1] (0.00ns)   --->   "%add17_3057_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_3057_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 106 'read' 'add17_3057_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 107 [1/1] (0.00ns)   --->   "%add17_2956_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_2956_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 107 'read' 'add17_2956_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 108 [1/1] (0.00ns)   --->   "%add17_2855_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_2855_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 108 'read' 'add17_2855_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 109 [1/1] (0.00ns)   --->   "%add17_2754_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_2754_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 109 'read' 'add17_2754_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 110 [1/1] (0.00ns)   --->   "%add17_2653_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_2653_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 110 'read' 'add17_2653_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 111 [1/1] (0.00ns)   --->   "%add17_2552_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_2552_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 111 'read' 'add17_2552_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 112 [1/1] (0.00ns)   --->   "%add17_2451_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_2451_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 112 'read' 'add17_2451_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 113 [1/1] (0.00ns)   --->   "%add17_2350_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_2350_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 113 'read' 'add17_2350_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 114 [1/1] (0.00ns)   --->   "%add17_2249_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_2249_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 114 'read' 'add17_2249_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 115 [1/1] (0.00ns)   --->   "%add17_2148_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_2148_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 115 'read' 'add17_2148_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 116 [1/1] (0.00ns)   --->   "%add17_2047_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_2047_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 116 'read' 'add17_2047_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 117 [1/1] (0.00ns)   --->   "%add17_1946_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_1946_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 117 'read' 'add17_1946_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 118 [1/1] (0.00ns)   --->   "%add17_1845_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_1845_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 118 'read' 'add17_1845_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 119 [1/1] (0.00ns)   --->   "%add17_1744_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_1744_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 119 'read' 'add17_1744_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 120 [1/1] (0.00ns)   --->   "%add17_1643_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_1643_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 120 'read' 'add17_1643_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 121 [1/1] (0.00ns)   --->   "%add17_1542_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_1542_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 121 'read' 'add17_1542_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 122 [1/1] (0.00ns)   --->   "%add17_1441_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_1441_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 122 'read' 'add17_1441_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 123 [1/1] (0.00ns)   --->   "%add17_1340_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_1340_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 123 'read' 'add17_1340_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 124 [1/1] (0.00ns)   --->   "%add17_1239_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_1239_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 124 'read' 'add17_1239_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 125 [1/1] (0.00ns)   --->   "%add17_1138_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_1138_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 125 'read' 'add17_1138_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 126 [1/1] (0.00ns)   --->   "%add17_1037_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_1037_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 126 'read' 'add17_1037_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 127 [1/1] (0.00ns)   --->   "%add17_936_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_936_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 127 'read' 'add17_936_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 128 [1/1] (0.00ns)   --->   "%add17_835_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_835_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 128 'read' 'add17_835_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 129 [1/1] (0.00ns)   --->   "%add17_734_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_734_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 129 'read' 'add17_734_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 130 [1/1] (0.00ns)   --->   "%add17_633_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_633_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 130 'read' 'add17_633_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 131 [1/1] (0.00ns)   --->   "%add17_532_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_532_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 131 'read' 'add17_532_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 132 [1/1] (0.00ns)   --->   "%add17_431_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_431_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 132 'read' 'add17_431_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 133 [1/1] (0.00ns)   --->   "%add17_330_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_330_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 133 'read' 'add17_330_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 134 [1/1] (0.00ns)   --->   "%add17_229_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_229_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 134 'read' 'add17_229_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 135 [1/1] (0.00ns)   --->   "%add17_128_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add17_128_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 135 'read' 'add17_128_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 136 [1/1] (0.00ns)   --->   "%add177_reload_read = read i32 @_ssdm_op_Read.ap_auto.float, i32 %add177_reload" [forward_prop/src/forward_prop.cpp:419]   --->   Operation 136 'read' 'add177_reload_read' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 137 [1/1] (0.46ns)   --->   "%store_ln0 = store i8 0, i8 %k_1"   --->   Operation 137 'store' 'store_ln0' <Predicate = true> <Delay = 0.46>
+ST_1 : Operation 138 [1/1] (0.00ns)   --->   "%br_ln0 = br void %for.body28"   --->   Operation 138 'br' 'br_ln0' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 139 [1/1] (0.00ns)   --->   "%k = load i8 %k_1" [forward_prop/src/forward_prop.cpp:441]   --->   Operation 139 'load' 'k' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 140 [1/1] (0.70ns)   --->   "%icmp_ln441 = icmp_eq  i8 %k, i8 128" [forward_prop/src/forward_prop.cpp:441]   --->   Operation 140 'icmp' 'icmp_ln441' <Predicate = true> <Delay = 0.70> <CoreInst = "Cmp">   --->   Core 9 'Cmp' <Latency = 0> <II = 1> <Delay = 0.70> <FuncUnit> <Opcode : 'icmp'> <InPorts = 2> <OutPorts = 1>
+ST_1 : Operation 141 [1/1] (0.00ns)   --->   "%empty = speclooptripcount i32 @_ssdm_op_SpecLoopTripCount, i64 128, i64 128, i64 128"   --->   Operation 141 'speclooptripcount' 'empty' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 142 [1/1] (0.87ns)   --->   "%add_ln441 = add i8 %k, i8 1" [forward_prop/src/forward_prop.cpp:441]   --->   Operation 142 'add' 'add_ln441' <Predicate = true> <Delay = 0.87> <CoreInst = "Adder">   --->   Core 1 'Adder' <Latency = 0> <II = 1> <Delay = 0.87> <FuncUnit> <Opcode : 'add' 'sub'> <InPorts = 2> <OutPorts = 1>
+ST_1 : Operation 143 [1/1] (0.00ns)   --->   "%br_ln441 = br i1 %icmp_ln441, void %for.body28.split, void %for.end36.exitStub" [forward_prop/src/forward_prop.cpp:441]   --->   Operation 143 'br' 'br_ln441' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 144 [1/1] (1.26ns)   --->   "%tmp_s = mux i32 @_ssdm_op_Mux.ap_auto.128float.i8, i32 %add177_reload_read, i32 %add17_128_reload_read, i32 %add17_229_reload_read, i32 %add17_330_reload_read, i32 %add17_431_reload_read, i32 %add17_532_reload_read, i32 %add17_633_reload_read, i32 %add17_734_reload_read, i32 %add17_835_reload_read, i32 %add17_936_reload_read, i32 %add17_1037_reload_read, i32 %add17_1138_reload_read, i32 %add17_1239_reload_read, i32 %add17_1340_reload_read, i32 %add17_1441_reload_read, i32 %add17_1542_reload_read, i32 %add17_1643_reload_read, i32 %add17_1744_reload_read, i32 %add17_1845_reload_read, i32 %add17_1946_reload_read, i32 %add17_2047_reload_read, i32 %add17_2148_reload_read, i32 %add17_2249_reload_read, i32 %add17_2350_reload_read, i32 %add17_2451_reload_read, i32 %add17_2552_reload_read, i32 %add17_2653_reload_read, i32 %add17_2754_reload_read, i32 %add17_2855_reload_read, i32 %add17_2956_reload_read, i32 %add17_3057_reload_read, i32 %add17_3158_reload_read, i32 %add17_3259_reload_read, i32 %add17_3360_reload_read, i32 %add17_3461_reload_read, i32 %add17_3562_reload_read, i32 %add17_3663_reload_read, i32 %add17_3764_reload_read, i32 %add17_3865_reload_read, i32 %add17_3966_reload_read, i32 %add17_4067_reload_read, i32 %add17_4168_reload_read, i32 %add17_4269_reload_read, i32 %add17_4370_reload_read, i32 %add17_4471_reload_read, i32 %add17_4572_reload_read, i32 %add17_4673_reload_read, i32 %add17_4774_reload_read, i32 %add17_4875_reload_read, i32 %add17_4976_reload_read, i32 %add17_5077_reload_read, i32 %add17_5178_reload_read, i32 %add17_5279_reload_read, i32 %add17_5380_reload_read, i32 %add17_5481_reload_read, i32 %add17_5582_reload_read, i32 %add17_5683_reload_read, i32 %add17_5784_reload_read, i32 %add17_5885_reload_read, i32 %add17_5986_reload_read, i32 %add17_6087_reload_read, i32 %add17_6188_reload_read, i32 %add17_6289_reload_read, i32 %add17_6390_reload_read, i32 %add17_6491_reload_read, i32 %add17_6592_reload_read, i32 %add17_6693_reload_read, i32 %add17_6794_reload_read, i32 %add17_6895_reload_read, i32 %add17_6996_reload_read, i32 %add17_7097_reload_read, i32 %add17_7198_reload_read, i32 %add17_7299_reload_read, i32 %add17_73100_reload_read, i32 %add17_74101_reload_read, i32 %add17_75102_reload_read, i32 %add17_76103_reload_read, i32 %add17_77104_reload_read, i32 %add17_78105_reload_read, i32 %add17_79106_reload_read, i32 %add17_80107_reload_read, i32 %add17_81108_reload_read, i32 %add17_82109_reload_read, i32 %add17_83110_reload_read, i32 %add17_84111_reload_read, i32 %add17_85112_reload_read, i32 %add17_86113_reload_read, i32 %add17_87114_reload_read, i32 %add17_88115_reload_read, i32 %add17_89116_reload_read, i32 %add17_90117_reload_read, i32 %add17_91118_reload_read, i32 %add17_92119_reload_read, i32 %add17_93120_reload_read, i32 %add17_94121_reload_read, i32 %add17_95122_reload_read, i32 %add17_96123_reload_read, i32 %add17_97124_reload_read, i32 %add17_98125_reload_read, i32 %add17_99126_reload_read, i32 %add17_100127_reload_read, i32 %add17_101128_reload_read, i32 %add17_102129_reload_read, i32 %add17_103130_reload_read, i32 %add17_104131_reload_read, i32 %add17_105132_reload_read, i32 %add17_106133_reload_read, i32 %add17_107134_reload_read, i32 %add17_108135_reload_read, i32 %add17_109136_reload_read, i32 %add17_110137_reload_read, i32 %add17_111138_reload_read, i32 %add17_112139_reload_read, i32 %add17_113140_reload_read, i32 %add17_114141_reload_read, i32 %add17_115142_reload_read, i32 %add17_116143_reload_read, i32 %add17_117144_reload_read, i32 %add17_118145_reload_read, i32 %add17_119146_reload_read, i32 %add17_120147_reload_read, i32 %add17_121148_reload_read, i32 %add17_122149_reload_read, i32 %add17_123150_reload_read, i32 %add17_124151_reload_read, i32 %add17_125152_reload_read, i32 %add17_126153_reload_read, i32 %add17_127154_reload_read, i8 %k" [forward_prop/src/forward_prop.cpp:444]   --->   Operation 144 'mux' 'tmp_s' <Predicate = (!icmp_ln441)> <Delay = 1.26> <CoreInst = "Multiplexer">   --->   Core 76 'Multiplexer' <Latency = 0> <II = 1> <Delay = 1.26> <FuncUnit> <Opcode : 'mux'> <InPorts = 2> <OutPorts = 1>
+ST_1 : Operation 145 [2/2] (1.91ns)   --->   "%activation = fcmp_ogt  i32 %tmp_s, i32 0" [forward_prop/src/forward_prop.cpp:444]   --->   Operation 145 'fcmp' 'activation' <Predicate = (!icmp_ln441)> <Delay = 1.91> <CoreInst = "FCompare">   --->   Core 19 'FCompare' <Latency = 1> <II = 1> <Delay = 1.91> <FuncUnit> <Opcode : 'fcmp'> <InPorts = 2> <OutPorts = 1>
+ST_1 : Operation 146 [1/1] (0.46ns)   --->   "%store_ln441 = store i8 %add_ln441, i8 %k_1" [forward_prop/src/forward_prop.cpp:441]   --->   Operation 146 'store' 'store_ln441' <Predicate = (!icmp_ln441)> <Delay = 0.46>
+ST_1 : Operation 156 [1/1] (0.00ns)   --->   "%ret_ln0 = ret"   --->   Operation 156 'ret' 'ret_ln0' <Predicate = (icmp_ln441)> <Delay = 0.00>
+
+State 2 <SV = 1> <Delay = 4.30>
+ST_2 : Operation 147 [1/1] (0.00ns)   --->   "%specpipeline_ln443 = specpipeline void @_ssdm_op_SpecPipeline, i32 4294967295, i32 0, i32 0, i32 0, void @empty_30" [forward_prop/src/forward_prop.cpp:443]   --->   Operation 147 'specpipeline' 'specpipeline_ln443' <Predicate = true> <Delay = 0.00>
+ST_2 : Operation 148 [1/1] (0.00ns)   --->   "%specloopname_ln441 = specloopname void @_ssdm_op_SpecLoopName, void @empty_18" [forward_prop/src/forward_prop.cpp:441]   --->   Operation 148 'specloopname' 'specloopname_ln441' <Predicate = true> <Delay = 0.00>
+ST_2 : Operation 149 [1/2] (1.91ns)   --->   "%activation = fcmp_ogt  i32 %tmp_s, i32 0" [forward_prop/src/forward_prop.cpp:444]   --->   Operation 149 'fcmp' 'activation' <Predicate = true> <Delay = 1.91> <CoreInst = "FCompare">   --->   Core 19 'FCompare' <Latency = 1> <II = 1> <Delay = 1.91> <FuncUnit> <Opcode : 'fcmp'> <InPorts = 2> <OutPorts = 1>
+ST_2 : Operation 150 [1/1] (0.00ns)   --->   "%bitcast_ln174 = bitcast i32 %tmp_s" [/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/hls_stream_39.h:174]   --->   Operation 150 'bitcast' 'bitcast_ln174' <Predicate = true> <Delay = 0.00>
+ST_2 : Operation 151 [1/1] (0.28ns)   --->   "%select_ln174 = select i1 %activation, i32 %bitcast_ln174, i32 0" [/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/hls_stream_39.h:174]   --->   Operation 151 'select' 'select_ln174' <Predicate = true> <Delay = 0.28> <CoreInst = "Sel">   --->   Core 73 'Sel' <Latency = 0> <II = 1> <Delay = 0.28> <FuncUnit> <Opcode : 'select'> <InPorts = 3> <OutPorts = 1>
+ST_2 : Operation 152 [1/1] (2.10ns)   --->   "%write_ln174 = write void @_ssdm_op_Write.ap_fifo.volatile.i32P0A, i32 %dense_feature_map_stream128, i32 %select_ln174" [/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/hls_stream_39.h:174]   --->   Operation 152 'write' 'write_ln174' <Predicate = true> <Delay = 2.10> <CoreInst = "FIFO_SRL">   --->   Core 81 'FIFO_SRL' <Latency = 0> <II = 1> <Delay = 2.10> <Storage> <Opcode : 'read' 'write' 'nbread' 'nbwrite'> <Ports = 0> <Width = 32> <Depth = 3> <FIFO>
+ST_2 : Operation 153 [1/1] (2.29ns)   --->   "%write_ln174 = write void @_ssdm_op_Write.ap_fifo.volatile.i1P0A, i1 %dense_activations_stream129, i1 %activation" [/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/hls_stream_39.h:174]   --->   Operation 153 'write' 'write_ln174' <Predicate = true> <Delay = 2.29> <CoreInst = "FIFO_SRL">   --->   Core 81 'FIFO_SRL' <Latency = 0> <II = 1> <Delay = 2.29> <Storage> <Opcode : 'read' 'write' 'nbread' 'nbwrite'> <Ports = 0> <Width = 1> <Depth = 128> <FIFO>
+ST_2 : Operation 154 [1/1] (1.69ns)   --->   "%write_ln174 = write void @_ssdm_op_Write.ap_fifo.volatile.i32P0A, i32 %dense_f_map_out134, i32 %select_ln174" [/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/hls_stream_39.h:174]   --->   Operation 154 'write' 'write_ln174' <Predicate = true> <Delay = 1.69> <CoreInst = "FIFO">   --->   Core 78 'FIFO' <Latency = 0> <II = 1> <Delay = 1.69> <Storage> <Opcode : 'read' 'write' 'nbread' 'nbwrite'> <Ports = 0> <Width = 32> <Depth = 128> <FIFO>
+ST_2 : Operation 155 [1/1] (0.00ns)   --->   "%br_ln441 = br void %for.body28" [forward_prop/src/forward_prop.cpp:441]   --->   Operation 155 'br' 'br_ln441' <Predicate = true> <Delay = 0.00>
+
+
+============================================================
++ Verbose Summary: Timing violations
+============================================================
+Target clock period: 10ns, clock uncertainty: 2.7ns.
+
+ <State 1>: 3.17ns
+The critical path consists of the following:
+	'alloca' operation ('k') [132]  (0 ns)
+	'load' operation ('k', forward_prop/src/forward_prop.cpp:441) on local variable 'k' [267]  (0 ns)
+	'mux' operation ('tmp_s', forward_prop/src/forward_prop.cpp:444) [275]  (1.26 ns)
+	'fcmp' operation ('activation', forward_prop/src/forward_prop.cpp:444) [276]  (1.91 ns)
+
+ <State 2>: 4.3ns
+The critical path consists of the following:
+	'fcmp' operation ('activation', forward_prop/src/forward_prop.cpp:444) [276]  (1.91 ns)
+	'select' operation ('select_ln174', /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/hls_stream_39.h:174) [278]  (0.286 ns)
+	fifo write operation ('write_ln174', /media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/hls_stream_39.h:174) on port 'dense_feature_map_stream128' (/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/hls_stream_39.h:174) [279]  (2.1 ns)
+
+
+============================================================
++ Verbose Summary: Binding
+============================================================
+N/A
+* FSMD analyzer results:
+  - Output states:
+ - Input state : 
+  - Chain level:
+	State 1
+	State 2
+
+
+============================================================
++ Verbose Summary: Datapath Resource usage 
+============================================================
+N/A

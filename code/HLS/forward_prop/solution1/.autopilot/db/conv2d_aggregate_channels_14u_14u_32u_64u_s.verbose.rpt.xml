@@ -1,0 +1,503 @@
+<profile>
+
+<section name = "Vitis HLS Report for 'conv2d_aggregate_channels_14u_14u_32u_64u_s'" level="0">
+<item name = "Date">Tue Oct 18 21:21:02 2022
+</item>
+<item name = "Version">2022.1 (Build 3526262 on Mon Apr 18 15:47:01 MDT 2022)</item>
+<item name = "Project">forward_prop</item>
+<item name = "Solution">solution1 (Vitis Kernel Flow Target)</item>
+<item name = "Product family">virtexuplus</item>
+<item name = "Target device">xcvu5p-flva2104-1-e</item>
+</section>
+
+<section name = "Performance Estimates" level="0">
+<item name = "Timing">
+<section name = "" level="1">
+<item name = "Summary"><table name="" hasTotal="0">
+<keys size="4">Clock, Target, Estimated, Uncertainty</keys>
+<column name="ap_clk">10.00 ns, 7.297 ns, 2.70 ns</column>
+</table>
+</item>
+</section>
+</item>
+<item name = "Latency">
+<section name = "" level="1">
+<item name = "Summary"><table name="" hasTotal="0">
+<keys size="8">, min, max, min, max, min, max, Type</keys>
+<column name="">12566, 12566, 0.126 ms, 0.126 ms, 12566, 12566, no</column>
+</table>
+</item>
+<item name = "Detail">
+<section name = "" level="1">
+<item name = "Instance"><table name="" hasTotal="0">
+<keys size="9">Instance, Module, min, max, min, max, min, max, Type</keys>
+</table>
+</item>
+<item name = "Loop"><table name="" hasTotal="0">
+<keys size="8">Loop Name, min, max, Latency, achieved, target, Count, Pipelined</keys>
+<column name="- inputs_filter">12564, 12564, 22, 1, 1, 12544, yes</column>
+</table>
+</item>
+</section>
+</item>
+</section>
+</item>
+</section>
+
+<section name = "Utilization Estimates" level="0">
+<item name = "Summary"><table name="" hasTotal="1">
+<keys size="6">Name, BRAM_18K, DSP, FF, LUT, URAM</keys>
+<column name="DSP">-, -, -, -, -</column>
+<column name="Expression">-, -, 0, 109, -</column>
+<column name="FIFO">-, -, -, -, -</column>
+<column name="Instance">-, 64, 5664, 7328, -</column>
+<column name="Memory">-, -, -, -, -</column>
+<column name="Multiplexer">-, -, -, 378, -</column>
+<column name="Register">-, -, 2694, 256, -</column>
+<specialColumn name="Available SLR">1024, 1737, 600577, 300288, 235</specialColumn>
+<specialColumn name="Utilization SLR (%)">0, 3, 1, 2, 0</specialColumn>
+<specialColumn name="Available">2048, 3474, 1201154, 600577, 470</specialColumn>
+<specialColumn name="Utilization (%)">0, 1, ~0, 1, 0</specialColumn>
+</table>
+</item>
+<item name = "Detail">
+<section name = "" level="1">
+<item name = "Instance"><table name="" hasTotal="1">
+<keys size="7">Instance, Module, BRAM_18K, DSP, FF, LUT, URAM</keys>
+<column name="fadd_32ns_32ns_32_3_full_dsp_1_U19692">fadd_32ns_32ns_32_3_full_dsp_1, 0, 2, 177, 229, 0</column>
+<column name="fadd_32ns_32ns_32_3_full_dsp_1_U19693">fadd_32ns_32ns_32_3_full_dsp_1, 0, 2, 177, 229, 0</column>
+<column name="fadd_32ns_32ns_32_3_full_dsp_1_U19694">fadd_32ns_32ns_32_3_full_dsp_1, 0, 2, 177, 229, 0</column>
+<column name="fadd_32ns_32ns_32_3_full_dsp_1_U19695">fadd_32ns_32ns_32_3_full_dsp_1, 0, 2, 177, 229, 0</column>
+<column name="fadd_32ns_32ns_32_3_full_dsp_1_U19696">fadd_32ns_32ns_32_3_full_dsp_1, 0, 2, 177, 229, 0</column>
+<column name="fadd_32ns_32ns_32_3_full_dsp_1_U19697">fadd_32ns_32ns_32_3_full_dsp_1, 0, 2, 177, 229, 0</column>
+<column name="fadd_32ns_32ns_32_3_full_dsp_1_U19698">fadd_32ns_32ns_32_3_full_dsp_1, 0, 2, 177, 229, 0</column>
+<column name="fadd_32ns_32ns_32_3_full_dsp_1_U19699">fadd_32ns_32ns_32_3_full_dsp_1, 0, 2, 177, 229, 0</column>
+<column name="fadd_32ns_32ns_32_3_full_dsp_1_U19700">fadd_32ns_32ns_32_3_full_dsp_1, 0, 2, 177, 229, 0</column>
+<column name="fadd_32ns_32ns_32_3_full_dsp_1_U19701">fadd_32ns_32ns_32_3_full_dsp_1, 0, 2, 177, 229, 0</column>
+<column name="fadd_32ns_32ns_32_3_full_dsp_1_U19702">fadd_32ns_32ns_32_3_full_dsp_1, 0, 2, 177, 229, 0</column>
+<column name="fadd_32ns_32ns_32_3_full_dsp_1_U19703">fadd_32ns_32ns_32_3_full_dsp_1, 0, 2, 177, 229, 0</column>
+<column name="fadd_32ns_32ns_32_3_full_dsp_1_U19704">fadd_32ns_32ns_32_3_full_dsp_1, 0, 2, 177, 229, 0</column>
+<column name="fadd_32ns_32ns_32_3_full_dsp_1_U19705">fadd_32ns_32ns_32_3_full_dsp_1, 0, 2, 177, 229, 0</column>
+<column name="fadd_32ns_32ns_32_3_full_dsp_1_U19706">fadd_32ns_32ns_32_3_full_dsp_1, 0, 2, 177, 229, 0</column>
+<column name="fadd_32ns_32ns_32_3_full_dsp_1_U19707">fadd_32ns_32ns_32_3_full_dsp_1, 0, 2, 177, 229, 0</column>
+<column name="fadd_32ns_32ns_32_3_full_dsp_1_U19708">fadd_32ns_32ns_32_3_full_dsp_1, 0, 2, 177, 229, 0</column>
+<column name="fadd_32ns_32ns_32_3_full_dsp_1_U19709">fadd_32ns_32ns_32_3_full_dsp_1, 0, 2, 177, 229, 0</column>
+<column name="fadd_32ns_32ns_32_3_full_dsp_1_U19710">fadd_32ns_32ns_32_3_full_dsp_1, 0, 2, 177, 229, 0</column>
+<column name="fadd_32ns_32ns_32_3_full_dsp_1_U19711">fadd_32ns_32ns_32_3_full_dsp_1, 0, 2, 177, 229, 0</column>
+<column name="fadd_32ns_32ns_32_3_full_dsp_1_U19712">fadd_32ns_32ns_32_3_full_dsp_1, 0, 2, 177, 229, 0</column>
+<column name="fadd_32ns_32ns_32_3_full_dsp_1_U19713">fadd_32ns_32ns_32_3_full_dsp_1, 0, 2, 177, 229, 0</column>
+<column name="fadd_32ns_32ns_32_3_full_dsp_1_U19714">fadd_32ns_32ns_32_3_full_dsp_1, 0, 2, 177, 229, 0</column>
+<column name="fadd_32ns_32ns_32_3_full_dsp_1_U19715">fadd_32ns_32ns_32_3_full_dsp_1, 0, 2, 177, 229, 0</column>
+<column name="fadd_32ns_32ns_32_3_full_dsp_1_U19716">fadd_32ns_32ns_32_3_full_dsp_1, 0, 2, 177, 229, 0</column>
+<column name="fadd_32ns_32ns_32_3_full_dsp_1_U19717">fadd_32ns_32ns_32_3_full_dsp_1, 0, 2, 177, 229, 0</column>
+<column name="fadd_32ns_32ns_32_3_full_dsp_1_U19718">fadd_32ns_32ns_32_3_full_dsp_1, 0, 2, 177, 229, 0</column>
+<column name="fadd_32ns_32ns_32_3_full_dsp_1_U19719">fadd_32ns_32ns_32_3_full_dsp_1, 0, 2, 177, 229, 0</column>
+<column name="fadd_32ns_32ns_32_3_full_dsp_1_U19720">fadd_32ns_32ns_32_3_full_dsp_1, 0, 2, 177, 229, 0</column>
+<column name="fadd_32ns_32ns_32_3_full_dsp_1_U19721">fadd_32ns_32ns_32_3_full_dsp_1, 0, 2, 177, 229, 0</column>
+<column name="fadd_32ns_32ns_32_3_full_dsp_1_U19722">fadd_32ns_32ns_32_3_full_dsp_1, 0, 2, 177, 229, 0</column>
+<column name="fadd_32ns_32ns_32_3_full_dsp_1_U19723">fadd_32ns_32ns_32_3_full_dsp_1, 0, 2, 177, 229, 0</column>
+<column name="fcmp_32ns_32ns_1_2_no_dsp_1_U19724">fcmp_32ns_32ns_1_2_no_dsp_1, 0, 0, 0, 0, 0</column>
+</table>
+</item>
+<item name = "DSP"><table name="" hasTotal="0">
+<keys size="3">Instance, Module, Expression</keys>
+</table>
+</item>
+<item name = "Memory"><table name="" hasTotal="1">
+<keys size="10">Memory, Module, BRAM_18K, FF, LUT, URAM, Words, Bits, Banks, W*Bits*Banks</keys>
+</table>
+</item>
+<item name = "FIFO"><table name="" hasTotal="1">
+<keys size="8">Name, BRAM_18K, FF, LUT, URAM, Depth, Bits, Size:D*B</keys>
+</table>
+</item>
+<item name = "Expression"><table name="" hasTotal="1">
+<keys size="7">Variable Name, Operation, DSP, FF, LUT, Bitwidth P0, Bitwidth P1</keys>
+<column name="add_ln323_fu_507_p2">+, 0, 0, 21, 14, 1</column>
+<column name="add_ln324_fu_660_p2">+, 0, 0, 14, 7, 1</column>
+<column name="ap_condition_917">and, 0, 0, 2, 1, 1</column>
+<column name="icmp_ln323_fu_501_p2">icmp, 0, 0, 12, 14, 13</column>
+<column name="icmp_ln324_fu_641_p2">icmp, 0, 0, 11, 7, 8</column>
+<column name="ap_block_pp0_stage0_00001">or, 0, 0, 2, 1, 1</column>
+<column name="ap_block_pp0_stage0_01001">or, 0, 0, 2, 1, 1</column>
+<column name="ap_block_state22_pp0_stage0_iter21">or, 0, 0, 2, 1, 1</column>
+<column name="ap_block_state2_pp0_stage0_iter1">or, 0, 0, 2, 1, 1</column>
+<column name="select_ln174_fu_682_p3">select, 0, 0, 32, 1, 32</column>
+<column name="select_ln323_fu_647_p3">select, 0, 0, 7, 1, 1</column>
+<column name="ap_enable_pp0">xor, 0, 0, 2, 1, 2</column>
+</table>
+</item>
+<item name = "Multiplexer"><table name="" hasTotal="1">
+<keys size="5">Name, LUT, Input Size, Bits, Total Bits</keys>
+<column name="ap_done_int">9, 2, 1, 2</column>
+<column name="ap_enable_reg_pp0_iter1">9, 2, 1, 2</column>
+<column name="ap_sig_allocacmp_filter_load">9, 2, 7, 14</column>
+<column name="ap_sig_allocacmp_indvar_flatten_load">9, 2, 14, 28</column>
+<column name="conv2d_64_activations_stream126_blk_n">9, 2, 1, 2</column>
+<column name="conv2d_64_f_map_out132_blk_n">9, 2, 1, 2</column>
+<column name="conv2d_64_feature_map_stream125_blk_n">9, 2, 1, 2</column>
+<column name="filter_fu_120">9, 2, 7, 14</column>
+<column name="in_channel_map_stream_0_blk_n">9, 2, 1, 2</column>
+<column name="in_channel_map_stream_10_blk_n">9, 2, 1, 2</column>
+<column name="in_channel_map_stream_11_blk_n">9, 2, 1, 2</column>
+<column name="in_channel_map_stream_1213_blk_n">9, 2, 1, 2</column>
+<column name="in_channel_map_stream_13_blk_n">9, 2, 1, 2</column>
+<column name="in_channel_map_stream_14_blk_n">9, 2, 1, 2</column>
+<column name="in_channel_map_stream_15_blk_n">9, 2, 1, 2</column>
+<column name="in_channel_map_stream_16_blk_n">9, 2, 1, 2</column>
+<column name="in_channel_map_stream_17_blk_n">9, 2, 1, 2</column>
+<column name="in_channel_map_stream_18_blk_n">9, 2, 1, 2</column>
+<column name="in_channel_map_stream_19_blk_n">9, 2, 1, 2</column>
+<column name="in_channel_map_stream_1_blk_n">9, 2, 1, 2</column>
+<column name="in_channel_map_stream_20_blk_n">9, 2, 1, 2</column>
+<column name="in_channel_map_stream_21_blk_n">9, 2, 1, 2</column>
+<column name="in_channel_map_stream_22_blk_n">9, 2, 1, 2</column>
+<column name="in_channel_map_stream_2325_blk_n">9, 2, 1, 2</column>
+<column name="in_channel_map_stream_24_blk_n">9, 2, 1, 2</column>
+<column name="in_channel_map_stream_25_blk_n">9, 2, 1, 2</column>
+<column name="in_channel_map_stream_26_blk_n">9, 2, 1, 2</column>
+<column name="in_channel_map_stream_27_blk_n">9, 2, 1, 2</column>
+<column name="in_channel_map_stream_28_blk_n">9, 2, 1, 2</column>
+<column name="in_channel_map_stream_29_blk_n">9, 2, 1, 2</column>
+<column name="in_channel_map_stream_2_blk_n">9, 2, 1, 2</column>
+<column name="in_channel_map_stream_30_blk_n">9, 2, 1, 2</column>
+<column name="in_channel_map_stream_31_blk_n">9, 2, 1, 2</column>
+<column name="in_channel_map_stream_3_blk_n">9, 2, 1, 2</column>
+<column name="in_channel_map_stream_4_blk_n">9, 2, 1, 2</column>
+<column name="in_channel_map_stream_5_blk_n">9, 2, 1, 2</column>
+<column name="in_channel_map_stream_6_blk_n">9, 2, 1, 2</column>
+<column name="in_channel_map_stream_7_blk_n">9, 2, 1, 2</column>
+<column name="in_channel_map_stream_8_blk_n">9, 2, 1, 2</column>
+<column name="in_channel_map_stream_9_blk_n">9, 2, 1, 2</column>
+<column name="indvar_flatten_fu_124">9, 2, 14, 28</column>
+<column name="real_start">9, 2, 1, 2</column>
+</table>
+</item>
+<item name = "Register"><table name="" hasTotal="1">
+<keys size="5">Name, FF, LUT, Bits, Const Bits</keys>
+<column name="ap_CS_fsm">1, 0, 1, 0</column>
+<column name="ap_condition_exit_pp0_iter0_stage0_pp0_iter1_reg">1, 0, 1, 0</column>
+<column name="ap_condition_exit_pp0_iter0_stage0_pp0_iter2_reg">1, 0, 1, 0</column>
+<column name="ap_done_reg">1, 0, 1, 0</column>
+<column name="ap_enable_reg_pp0_iter1">1, 0, 1, 0</column>
+<column name="ap_enable_reg_pp0_iter10">1, 0, 1, 0</column>
+<column name="ap_enable_reg_pp0_iter11">1, 0, 1, 0</column>
+<column name="ap_enable_reg_pp0_iter12">1, 0, 1, 0</column>
+<column name="ap_enable_reg_pp0_iter13">1, 0, 1, 0</column>
+<column name="ap_enable_reg_pp0_iter14">1, 0, 1, 0</column>
+<column name="ap_enable_reg_pp0_iter15">1, 0, 1, 0</column>
+<column name="ap_enable_reg_pp0_iter16">1, 0, 1, 0</column>
+<column name="ap_enable_reg_pp0_iter17">1, 0, 1, 0</column>
+<column name="ap_enable_reg_pp0_iter18">1, 0, 1, 0</column>
+<column name="ap_enable_reg_pp0_iter19">1, 0, 1, 0</column>
+<column name="ap_enable_reg_pp0_iter2">1, 0, 1, 0</column>
+<column name="ap_enable_reg_pp0_iter20">1, 0, 1, 0</column>
+<column name="ap_enable_reg_pp0_iter21">1, 0, 1, 0</column>
+<column name="ap_enable_reg_pp0_iter3">1, 0, 1, 0</column>
+<column name="ap_enable_reg_pp0_iter4">1, 0, 1, 0</column>
+<column name="ap_enable_reg_pp0_iter5">1, 0, 1, 0</column>
+<column name="ap_enable_reg_pp0_iter6">1, 0, 1, 0</column>
+<column name="ap_enable_reg_pp0_iter7">1, 0, 1, 0</column>
+<column name="ap_enable_reg_pp0_iter8">1, 0, 1, 0</column>
+<column name="ap_enable_reg_pp0_iter9">1, 0, 1, 0</column>
+<column name="ap_loop_exit_ready_pp0_iter10_reg">1, 0, 1, 0</column>
+<column name="ap_loop_exit_ready_pp0_iter11_reg">1, 0, 1, 0</column>
+<column name="ap_loop_exit_ready_pp0_iter12_reg">1, 0, 1, 0</column>
+<column name="ap_loop_exit_ready_pp0_iter13_reg">1, 0, 1, 0</column>
+<column name="ap_loop_exit_ready_pp0_iter14_reg">1, 0, 1, 0</column>
+<column name="ap_loop_exit_ready_pp0_iter15_reg">1, 0, 1, 0</column>
+<column name="ap_loop_exit_ready_pp0_iter16_reg">1, 0, 1, 0</column>
+<column name="ap_loop_exit_ready_pp0_iter17_reg">1, 0, 1, 0</column>
+<column name="ap_loop_exit_ready_pp0_iter18_reg">1, 0, 1, 0</column>
+<column name="ap_loop_exit_ready_pp0_iter19_reg">1, 0, 1, 0</column>
+<column name="ap_loop_exit_ready_pp0_iter1_reg">1, 0, 1, 0</column>
+<column name="ap_loop_exit_ready_pp0_iter20_reg">1, 0, 1, 0</column>
+<column name="ap_loop_exit_ready_pp0_iter2_reg">1, 0, 1, 0</column>
+<column name="ap_loop_exit_ready_pp0_iter3_reg">1, 0, 1, 0</column>
+<column name="ap_loop_exit_ready_pp0_iter4_reg">1, 0, 1, 0</column>
+<column name="ap_loop_exit_ready_pp0_iter5_reg">1, 0, 1, 0</column>
+<column name="ap_loop_exit_ready_pp0_iter6_reg">1, 0, 1, 0</column>
+<column name="ap_loop_exit_ready_pp0_iter7_reg">1, 0, 1, 0</column>
+<column name="ap_loop_exit_ready_pp0_iter8_reg">1, 0, 1, 0</column>
+<column name="ap_loop_exit_ready_pp0_iter9_reg">1, 0, 1, 0</column>
+<column name="ap_loop_init_pp0_iter1_reg">1, 0, 1, 0</column>
+<column name="ap_loop_init_pp0_iter2_reg">1, 0, 1, 0</column>
+<column name="ap_loop_init_pp0_iter3_reg">1, 0, 1, 0</column>
+<column name="filter_fu_120">7, 0, 7, 0</column>
+<column name="in_channel_map_stream_0_read_reg_710">32, 0, 32, 0</column>
+<column name="in_channel_map_stream_10_read_reg_760">32, 0, 32, 0</column>
+<column name="in_channel_map_stream_11_read_reg_765">32, 0, 32, 0</column>
+<column name="in_channel_map_stream_1213_read_reg_770">32, 0, 32, 0</column>
+<column name="in_channel_map_stream_13_read_reg_775">32, 0, 32, 0</column>
+<column name="in_channel_map_stream_14_read_reg_780">32, 0, 32, 0</column>
+<column name="in_channel_map_stream_15_read_reg_785">32, 0, 32, 0</column>
+<column name="in_channel_map_stream_16_read_reg_790">32, 0, 32, 0</column>
+<column name="in_channel_map_stream_17_read_reg_795">32, 0, 32, 0</column>
+<column name="in_channel_map_stream_18_read_reg_800">32, 0, 32, 0</column>
+<column name="in_channel_map_stream_19_read_reg_805">32, 0, 32, 0</column>
+<column name="in_channel_map_stream_1_read_reg_715">32, 0, 32, 0</column>
+<column name="in_channel_map_stream_20_read_reg_810">32, 0, 32, 0</column>
+<column name="in_channel_map_stream_21_read_reg_815">32, 0, 32, 0</column>
+<column name="in_channel_map_stream_22_read_reg_820">32, 0, 32, 0</column>
+<column name="in_channel_map_stream_2325_read_reg_825">32, 0, 32, 0</column>
+<column name="in_channel_map_stream_24_read_reg_830">32, 0, 32, 0</column>
+<column name="in_channel_map_stream_25_read_reg_835">32, 0, 32, 0</column>
+<column name="in_channel_map_stream_26_read_reg_840">32, 0, 32, 0</column>
+<column name="in_channel_map_stream_27_read_reg_845">32, 0, 32, 0</column>
+<column name="in_channel_map_stream_28_read_reg_850">32, 0, 32, 0</column>
+<column name="in_channel_map_stream_29_read_reg_855">32, 0, 32, 0</column>
+<column name="in_channel_map_stream_2_read_reg_720">32, 0, 32, 0</column>
+<column name="in_channel_map_stream_30_read_reg_860">32, 0, 32, 0</column>
+<column name="in_channel_map_stream_31_read_reg_865">32, 0, 32, 0</column>
+<column name="in_channel_map_stream_3_read_reg_725">32, 0, 32, 0</column>
+<column name="in_channel_map_stream_4_read_reg_730">32, 0, 32, 0</column>
+<column name="in_channel_map_stream_5_read_reg_735">32, 0, 32, 0</column>
+<column name="in_channel_map_stream_6_read_reg_740">32, 0, 32, 0</column>
+<column name="in_channel_map_stream_7_read_reg_745">32, 0, 32, 0</column>
+<column name="in_channel_map_stream_8_read_reg_750">32, 0, 32, 0</column>
+<column name="in_channel_map_stream_9_read_reg_755">32, 0, 32, 0</column>
+<column name="indvar_flatten_fu_124">14, 0, 14, 0</column>
+<column name="start_once_reg">1, 0, 1, 0</column>
+<column name="temp_sum_18720_s_reg_1195">32, 0, 32, 0</column>
+<column name="temp_sum_18720_s_reg_1195_pp0_iter20_reg">32, 0, 32, 0</column>
+<column name="temp_sum_reg_1025">32, 0, 32, 0</column>
+<column name="tmp30_reg_1185">32, 0, 32, 0</column>
+<column name="tmp31_reg_1175">32, 0, 32, 0</column>
+<column name="tmp32_reg_1155">32, 0, 32, 0</column>
+<column name="tmp33_reg_1115">32, 0, 32, 0</column>
+<column name="tmp34_reg_1030">32, 0, 32, 0</column>
+<column name="tmp35_reg_1120">32, 0, 32, 0</column>
+<column name="tmp36_reg_1035">32, 0, 32, 0</column>
+<column name="tmp37_reg_1040">32, 0, 32, 0</column>
+<column name="tmp38_reg_1160">32, 0, 32, 0</column>
+<column name="tmp39_reg_1125">32, 0, 32, 0</column>
+<column name="tmp40_reg_1045">32, 0, 32, 0</column>
+<column name="tmp41_reg_1050">32, 0, 32, 0</column>
+<column name="tmp42_reg_1130">32, 0, 32, 0</column>
+<column name="tmp43_reg_1055">32, 0, 32, 0</column>
+<column name="tmp44_reg_1060">32, 0, 32, 0</column>
+<column name="tmp45_reg_1190">32, 0, 32, 0</column>
+<column name="tmp46_reg_1165">32, 0, 32, 0</column>
+<column name="tmp47_reg_1135">32, 0, 32, 0</column>
+<column name="tmp48_reg_1065">32, 0, 32, 0</column>
+<column name="tmp49_reg_1070">32, 0, 32, 0</column>
+<column name="tmp50_reg_1140">32, 0, 32, 0</column>
+<column name="tmp51_reg_1075">32, 0, 32, 0</column>
+<column name="tmp52_reg_1080">32, 0, 32, 0</column>
+<column name="tmp53_reg_1180">32, 0, 32, 0</column>
+<column name="tmp54_reg_1145">32, 0, 32, 0</column>
+<column name="tmp55_reg_1085">32, 0, 32, 0</column>
+<column name="tmp56_reg_1090">32, 0, 32, 0</column>
+<column name="tmp57_reg_1170">32, 0, 32, 0</column>
+<column name="tmp58_reg_1095">32, 0, 32, 0</column>
+<column name="tmp59_reg_1150">32, 0, 32, 0</column>
+<column name="tmp60_reg_1100">32, 0, 32, 0</column>
+<column name="in_channel_map_stream_14_read_reg_780">64, 32, 32, 0</column>
+<column name="in_channel_map_stream_29_read_reg_855">64, 32, 32, 0</column>
+<column name="tmp34_reg_1030">64, 32, 32, 0</column>
+<column name="tmp35_reg_1120">64, 32, 32, 0</column>
+<column name="tmp38_reg_1160">64, 32, 32, 0</column>
+<column name="tmp46_reg_1165">64, 32, 32, 0</column>
+<column name="tmp54_reg_1145">64, 32, 32, 0</column>
+<column name="tmp58_reg_1095">64, 32, 32, 0</column>
+</table>
+</item>
+</section>
+</item>
+</section>
+
+<section name = "Interface" level="0">
+<item name = "Summary"><table name="" hasTotal="0">
+<keys size="6">RTL Ports, Dir, Bits, Protocol, Source Object, C Type</keys>
+<column name="ap_clk">in, 1, ap_ctrl_hs, conv2d_aggregate_channels&lt;14u, 14u, 32u, 64u&gt;, return value</column>
+<column name="ap_rst">in, 1, ap_ctrl_hs, conv2d_aggregate_channels&lt;14u, 14u, 32u, 64u&gt;, return value</column>
+<column name="ap_start">in, 1, ap_ctrl_hs, conv2d_aggregate_channels&lt;14u, 14u, 32u, 64u&gt;, return value</column>
+<column name="start_full_n">in, 1, ap_ctrl_hs, conv2d_aggregate_channels&lt;14u, 14u, 32u, 64u&gt;, return value</column>
+<column name="ap_done">out, 1, ap_ctrl_hs, conv2d_aggregate_channels&lt;14u, 14u, 32u, 64u&gt;, return value</column>
+<column name="ap_continue">in, 1, ap_ctrl_hs, conv2d_aggregate_channels&lt;14u, 14u, 32u, 64u&gt;, return value</column>
+<column name="ap_idle">out, 1, ap_ctrl_hs, conv2d_aggregate_channels&lt;14u, 14u, 32u, 64u&gt;, return value</column>
+<column name="ap_ready">out, 1, ap_ctrl_hs, conv2d_aggregate_channels&lt;14u, 14u, 32u, 64u&gt;, return value</column>
+<column name="start_out">out, 1, ap_ctrl_hs, conv2d_aggregate_channels&lt;14u, 14u, 32u, 64u&gt;, return value</column>
+<column name="start_write">out, 1, ap_ctrl_hs, conv2d_aggregate_channels&lt;14u, 14u, 32u, 64u&gt;, return value</column>
+<column name="in_channel_map_stream_0_dout">in, 32, ap_fifo, in_channel_map_stream_0, pointer</column>
+<column name="in_channel_map_stream_0_num_data_valid">in, 3, ap_fifo, in_channel_map_stream_0, pointer</column>
+<column name="in_channel_map_stream_0_fifo_cap">in, 3, ap_fifo, in_channel_map_stream_0, pointer</column>
+<column name="in_channel_map_stream_0_empty_n">in, 1, ap_fifo, in_channel_map_stream_0, pointer</column>
+<column name="in_channel_map_stream_0_read">out, 1, ap_fifo, in_channel_map_stream_0, pointer</column>
+<column name="in_channel_map_stream_1_dout">in, 32, ap_fifo, in_channel_map_stream_1, pointer</column>
+<column name="in_channel_map_stream_1_num_data_valid">in, 3, ap_fifo, in_channel_map_stream_1, pointer</column>
+<column name="in_channel_map_stream_1_fifo_cap">in, 3, ap_fifo, in_channel_map_stream_1, pointer</column>
+<column name="in_channel_map_stream_1_empty_n">in, 1, ap_fifo, in_channel_map_stream_1, pointer</column>
+<column name="in_channel_map_stream_1_read">out, 1, ap_fifo, in_channel_map_stream_1, pointer</column>
+<column name="in_channel_map_stream_2_dout">in, 32, ap_fifo, in_channel_map_stream_2, pointer</column>
+<column name="in_channel_map_stream_2_num_data_valid">in, 3, ap_fifo, in_channel_map_stream_2, pointer</column>
+<column name="in_channel_map_stream_2_fifo_cap">in, 3, ap_fifo, in_channel_map_stream_2, pointer</column>
+<column name="in_channel_map_stream_2_empty_n">in, 1, ap_fifo, in_channel_map_stream_2, pointer</column>
+<column name="in_channel_map_stream_2_read">out, 1, ap_fifo, in_channel_map_stream_2, pointer</column>
+<column name="in_channel_map_stream_3_dout">in, 32, ap_fifo, in_channel_map_stream_3, pointer</column>
+<column name="in_channel_map_stream_3_num_data_valid">in, 3, ap_fifo, in_channel_map_stream_3, pointer</column>
+<column name="in_channel_map_stream_3_fifo_cap">in, 3, ap_fifo, in_channel_map_stream_3, pointer</column>
+<column name="in_channel_map_stream_3_empty_n">in, 1, ap_fifo, in_channel_map_stream_3, pointer</column>
+<column name="in_channel_map_stream_3_read">out, 1, ap_fifo, in_channel_map_stream_3, pointer</column>
+<column name="in_channel_map_stream_4_dout">in, 32, ap_fifo, in_channel_map_stream_4, pointer</column>
+<column name="in_channel_map_stream_4_num_data_valid">in, 3, ap_fifo, in_channel_map_stream_4, pointer</column>
+<column name="in_channel_map_stream_4_fifo_cap">in, 3, ap_fifo, in_channel_map_stream_4, pointer</column>
+<column name="in_channel_map_stream_4_empty_n">in, 1, ap_fifo, in_channel_map_stream_4, pointer</column>
+<column name="in_channel_map_stream_4_read">out, 1, ap_fifo, in_channel_map_stream_4, pointer</column>
+<column name="in_channel_map_stream_5_dout">in, 32, ap_fifo, in_channel_map_stream_5, pointer</column>
+<column name="in_channel_map_stream_5_num_data_valid">in, 3, ap_fifo, in_channel_map_stream_5, pointer</column>
+<column name="in_channel_map_stream_5_fifo_cap">in, 3, ap_fifo, in_channel_map_stream_5, pointer</column>
+<column name="in_channel_map_stream_5_empty_n">in, 1, ap_fifo, in_channel_map_stream_5, pointer</column>
+<column name="in_channel_map_stream_5_read">out, 1, ap_fifo, in_channel_map_stream_5, pointer</column>
+<column name="in_channel_map_stream_6_dout">in, 32, ap_fifo, in_channel_map_stream_6, pointer</column>
+<column name="in_channel_map_stream_6_num_data_valid">in, 3, ap_fifo, in_channel_map_stream_6, pointer</column>
+<column name="in_channel_map_stream_6_fifo_cap">in, 3, ap_fifo, in_channel_map_stream_6, pointer</column>
+<column name="in_channel_map_stream_6_empty_n">in, 1, ap_fifo, in_channel_map_stream_6, pointer</column>
+<column name="in_channel_map_stream_6_read">out, 1, ap_fifo, in_channel_map_stream_6, pointer</column>
+<column name="in_channel_map_stream_7_dout">in, 32, ap_fifo, in_channel_map_stream_7, pointer</column>
+<column name="in_channel_map_stream_7_num_data_valid">in, 3, ap_fifo, in_channel_map_stream_7, pointer</column>
+<column name="in_channel_map_stream_7_fifo_cap">in, 3, ap_fifo, in_channel_map_stream_7, pointer</column>
+<column name="in_channel_map_stream_7_empty_n">in, 1, ap_fifo, in_channel_map_stream_7, pointer</column>
+<column name="in_channel_map_stream_7_read">out, 1, ap_fifo, in_channel_map_stream_7, pointer</column>
+<column name="in_channel_map_stream_8_dout">in, 32, ap_fifo, in_channel_map_stream_8, pointer</column>
+<column name="in_channel_map_stream_8_num_data_valid">in, 3, ap_fifo, in_channel_map_stream_8, pointer</column>
+<column name="in_channel_map_stream_8_fifo_cap">in, 3, ap_fifo, in_channel_map_stream_8, pointer</column>
+<column name="in_channel_map_stream_8_empty_n">in, 1, ap_fifo, in_channel_map_stream_8, pointer</column>
+<column name="in_channel_map_stream_8_read">out, 1, ap_fifo, in_channel_map_stream_8, pointer</column>
+<column name="in_channel_map_stream_9_dout">in, 32, ap_fifo, in_channel_map_stream_9, pointer</column>
+<column name="in_channel_map_stream_9_num_data_valid">in, 3, ap_fifo, in_channel_map_stream_9, pointer</column>
+<column name="in_channel_map_stream_9_fifo_cap">in, 3, ap_fifo, in_channel_map_stream_9, pointer</column>
+<column name="in_channel_map_stream_9_empty_n">in, 1, ap_fifo, in_channel_map_stream_9, pointer</column>
+<column name="in_channel_map_stream_9_read">out, 1, ap_fifo, in_channel_map_stream_9, pointer</column>
+<column name="in_channel_map_stream_10_dout">in, 32, ap_fifo, in_channel_map_stream_10, pointer</column>
+<column name="in_channel_map_stream_10_num_data_valid">in, 3, ap_fifo, in_channel_map_stream_10, pointer</column>
+<column name="in_channel_map_stream_10_fifo_cap">in, 3, ap_fifo, in_channel_map_stream_10, pointer</column>
+<column name="in_channel_map_stream_10_empty_n">in, 1, ap_fifo, in_channel_map_stream_10, pointer</column>
+<column name="in_channel_map_stream_10_read">out, 1, ap_fifo, in_channel_map_stream_10, pointer</column>
+<column name="in_channel_map_stream_11_dout">in, 32, ap_fifo, in_channel_map_stream_11, pointer</column>
+<column name="in_channel_map_stream_11_num_data_valid">in, 3, ap_fifo, in_channel_map_stream_11, pointer</column>
+<column name="in_channel_map_stream_11_fifo_cap">in, 3, ap_fifo, in_channel_map_stream_11, pointer</column>
+<column name="in_channel_map_stream_11_empty_n">in, 1, ap_fifo, in_channel_map_stream_11, pointer</column>
+<column name="in_channel_map_stream_11_read">out, 1, ap_fifo, in_channel_map_stream_11, pointer</column>
+<column name="in_channel_map_stream_1213_dout">in, 32, ap_fifo, in_channel_map_stream_1213, pointer</column>
+<column name="in_channel_map_stream_1213_num_data_valid">in, 3, ap_fifo, in_channel_map_stream_1213, pointer</column>
+<column name="in_channel_map_stream_1213_fifo_cap">in, 3, ap_fifo, in_channel_map_stream_1213, pointer</column>
+<column name="in_channel_map_stream_1213_empty_n">in, 1, ap_fifo, in_channel_map_stream_1213, pointer</column>
+<column name="in_channel_map_stream_1213_read">out, 1, ap_fifo, in_channel_map_stream_1213, pointer</column>
+<column name="in_channel_map_stream_13_dout">in, 32, ap_fifo, in_channel_map_stream_13, pointer</column>
+<column name="in_channel_map_stream_13_num_data_valid">in, 3, ap_fifo, in_channel_map_stream_13, pointer</column>
+<column name="in_channel_map_stream_13_fifo_cap">in, 3, ap_fifo, in_channel_map_stream_13, pointer</column>
+<column name="in_channel_map_stream_13_empty_n">in, 1, ap_fifo, in_channel_map_stream_13, pointer</column>
+<column name="in_channel_map_stream_13_read">out, 1, ap_fifo, in_channel_map_stream_13, pointer</column>
+<column name="in_channel_map_stream_14_dout">in, 32, ap_fifo, in_channel_map_stream_14, pointer</column>
+<column name="in_channel_map_stream_14_num_data_valid">in, 3, ap_fifo, in_channel_map_stream_14, pointer</column>
+<column name="in_channel_map_stream_14_fifo_cap">in, 3, ap_fifo, in_channel_map_stream_14, pointer</column>
+<column name="in_channel_map_stream_14_empty_n">in, 1, ap_fifo, in_channel_map_stream_14, pointer</column>
+<column name="in_channel_map_stream_14_read">out, 1, ap_fifo, in_channel_map_stream_14, pointer</column>
+<column name="in_channel_map_stream_15_dout">in, 32, ap_fifo, in_channel_map_stream_15, pointer</column>
+<column name="in_channel_map_stream_15_num_data_valid">in, 3, ap_fifo, in_channel_map_stream_15, pointer</column>
+<column name="in_channel_map_stream_15_fifo_cap">in, 3, ap_fifo, in_channel_map_stream_15, pointer</column>
+<column name="in_channel_map_stream_15_empty_n">in, 1, ap_fifo, in_channel_map_stream_15, pointer</column>
+<column name="in_channel_map_stream_15_read">out, 1, ap_fifo, in_channel_map_stream_15, pointer</column>
+<column name="in_channel_map_stream_16_dout">in, 32, ap_fifo, in_channel_map_stream_16, pointer</column>
+<column name="in_channel_map_stream_16_num_data_valid">in, 3, ap_fifo, in_channel_map_stream_16, pointer</column>
+<column name="in_channel_map_stream_16_fifo_cap">in, 3, ap_fifo, in_channel_map_stream_16, pointer</column>
+<column name="in_channel_map_stream_16_empty_n">in, 1, ap_fifo, in_channel_map_stream_16, pointer</column>
+<column name="in_channel_map_stream_16_read">out, 1, ap_fifo, in_channel_map_stream_16, pointer</column>
+<column name="in_channel_map_stream_17_dout">in, 32, ap_fifo, in_channel_map_stream_17, pointer</column>
+<column name="in_channel_map_stream_17_num_data_valid">in, 3, ap_fifo, in_channel_map_stream_17, pointer</column>
+<column name="in_channel_map_stream_17_fifo_cap">in, 3, ap_fifo, in_channel_map_stream_17, pointer</column>
+<column name="in_channel_map_stream_17_empty_n">in, 1, ap_fifo, in_channel_map_stream_17, pointer</column>
+<column name="in_channel_map_stream_17_read">out, 1, ap_fifo, in_channel_map_stream_17, pointer</column>
+<column name="in_channel_map_stream_18_dout">in, 32, ap_fifo, in_channel_map_stream_18, pointer</column>
+<column name="in_channel_map_stream_18_num_data_valid">in, 3, ap_fifo, in_channel_map_stream_18, pointer</column>
+<column name="in_channel_map_stream_18_fifo_cap">in, 3, ap_fifo, in_channel_map_stream_18, pointer</column>
+<column name="in_channel_map_stream_18_empty_n">in, 1, ap_fifo, in_channel_map_stream_18, pointer</column>
+<column name="in_channel_map_stream_18_read">out, 1, ap_fifo, in_channel_map_stream_18, pointer</column>
+<column name="in_channel_map_stream_19_dout">in, 32, ap_fifo, in_channel_map_stream_19, pointer</column>
+<column name="in_channel_map_stream_19_num_data_valid">in, 3, ap_fifo, in_channel_map_stream_19, pointer</column>
+<column name="in_channel_map_stream_19_fifo_cap">in, 3, ap_fifo, in_channel_map_stream_19, pointer</column>
+<column name="in_channel_map_stream_19_empty_n">in, 1, ap_fifo, in_channel_map_stream_19, pointer</column>
+<column name="in_channel_map_stream_19_read">out, 1, ap_fifo, in_channel_map_stream_19, pointer</column>
+<column name="in_channel_map_stream_20_dout">in, 32, ap_fifo, in_channel_map_stream_20, pointer</column>
+<column name="in_channel_map_stream_20_num_data_valid">in, 3, ap_fifo, in_channel_map_stream_20, pointer</column>
+<column name="in_channel_map_stream_20_fifo_cap">in, 3, ap_fifo, in_channel_map_stream_20, pointer</column>
+<column name="in_channel_map_stream_20_empty_n">in, 1, ap_fifo, in_channel_map_stream_20, pointer</column>
+<column name="in_channel_map_stream_20_read">out, 1, ap_fifo, in_channel_map_stream_20, pointer</column>
+<column name="in_channel_map_stream_21_dout">in, 32, ap_fifo, in_channel_map_stream_21, pointer</column>
+<column name="in_channel_map_stream_21_num_data_valid">in, 3, ap_fifo, in_channel_map_stream_21, pointer</column>
+<column name="in_channel_map_stream_21_fifo_cap">in, 3, ap_fifo, in_channel_map_stream_21, pointer</column>
+<column name="in_channel_map_stream_21_empty_n">in, 1, ap_fifo, in_channel_map_stream_21, pointer</column>
+<column name="in_channel_map_stream_21_read">out, 1, ap_fifo, in_channel_map_stream_21, pointer</column>
+<column name="in_channel_map_stream_22_dout">in, 32, ap_fifo, in_channel_map_stream_22, pointer</column>
+<column name="in_channel_map_stream_22_num_data_valid">in, 3, ap_fifo, in_channel_map_stream_22, pointer</column>
+<column name="in_channel_map_stream_22_fifo_cap">in, 3, ap_fifo, in_channel_map_stream_22, pointer</column>
+<column name="in_channel_map_stream_22_empty_n">in, 1, ap_fifo, in_channel_map_stream_22, pointer</column>
+<column name="in_channel_map_stream_22_read">out, 1, ap_fifo, in_channel_map_stream_22, pointer</column>
+<column name="in_channel_map_stream_2325_dout">in, 32, ap_fifo, in_channel_map_stream_2325, pointer</column>
+<column name="in_channel_map_stream_2325_num_data_valid">in, 3, ap_fifo, in_channel_map_stream_2325, pointer</column>
+<column name="in_channel_map_stream_2325_fifo_cap">in, 3, ap_fifo, in_channel_map_stream_2325, pointer</column>
+<column name="in_channel_map_stream_2325_empty_n">in, 1, ap_fifo, in_channel_map_stream_2325, pointer</column>
+<column name="in_channel_map_stream_2325_read">out, 1, ap_fifo, in_channel_map_stream_2325, pointer</column>
+<column name="in_channel_map_stream_24_dout">in, 32, ap_fifo, in_channel_map_stream_24, pointer</column>
+<column name="in_channel_map_stream_24_num_data_valid">in, 3, ap_fifo, in_channel_map_stream_24, pointer</column>
+<column name="in_channel_map_stream_24_fifo_cap">in, 3, ap_fifo, in_channel_map_stream_24, pointer</column>
+<column name="in_channel_map_stream_24_empty_n">in, 1, ap_fifo, in_channel_map_stream_24, pointer</column>
+<column name="in_channel_map_stream_24_read">out, 1, ap_fifo, in_channel_map_stream_24, pointer</column>
+<column name="in_channel_map_stream_25_dout">in, 32, ap_fifo, in_channel_map_stream_25, pointer</column>
+<column name="in_channel_map_stream_25_num_data_valid">in, 3, ap_fifo, in_channel_map_stream_25, pointer</column>
+<column name="in_channel_map_stream_25_fifo_cap">in, 3, ap_fifo, in_channel_map_stream_25, pointer</column>
+<column name="in_channel_map_stream_25_empty_n">in, 1, ap_fifo, in_channel_map_stream_25, pointer</column>
+<column name="in_channel_map_stream_25_read">out, 1, ap_fifo, in_channel_map_stream_25, pointer</column>
+<column name="in_channel_map_stream_26_dout">in, 32, ap_fifo, in_channel_map_stream_26, pointer</column>
+<column name="in_channel_map_stream_26_num_data_valid">in, 3, ap_fifo, in_channel_map_stream_26, pointer</column>
+<column name="in_channel_map_stream_26_fifo_cap">in, 3, ap_fifo, in_channel_map_stream_26, pointer</column>
+<column name="in_channel_map_stream_26_empty_n">in, 1, ap_fifo, in_channel_map_stream_26, pointer</column>
+<column name="in_channel_map_stream_26_read">out, 1, ap_fifo, in_channel_map_stream_26, pointer</column>
+<column name="in_channel_map_stream_27_dout">in, 32, ap_fifo, in_channel_map_stream_27, pointer</column>
+<column name="in_channel_map_stream_27_num_data_valid">in, 3, ap_fifo, in_channel_map_stream_27, pointer</column>
+<column name="in_channel_map_stream_27_fifo_cap">in, 3, ap_fifo, in_channel_map_stream_27, pointer</column>
+<column name="in_channel_map_stream_27_empty_n">in, 1, ap_fifo, in_channel_map_stream_27, pointer</column>
+<column name="in_channel_map_stream_27_read">out, 1, ap_fifo, in_channel_map_stream_27, pointer</column>
+<column name="in_channel_map_stream_28_dout">in, 32, ap_fifo, in_channel_map_stream_28, pointer</column>
+<column name="in_channel_map_stream_28_num_data_valid">in, 3, ap_fifo, in_channel_map_stream_28, pointer</column>
+<column name="in_channel_map_stream_28_fifo_cap">in, 3, ap_fifo, in_channel_map_stream_28, pointer</column>
+<column name="in_channel_map_stream_28_empty_n">in, 1, ap_fifo, in_channel_map_stream_28, pointer</column>
+<column name="in_channel_map_stream_28_read">out, 1, ap_fifo, in_channel_map_stream_28, pointer</column>
+<column name="in_channel_map_stream_29_dout">in, 32, ap_fifo, in_channel_map_stream_29, pointer</column>
+<column name="in_channel_map_stream_29_num_data_valid">in, 3, ap_fifo, in_channel_map_stream_29, pointer</column>
+<column name="in_channel_map_stream_29_fifo_cap">in, 3, ap_fifo, in_channel_map_stream_29, pointer</column>
+<column name="in_channel_map_stream_29_empty_n">in, 1, ap_fifo, in_channel_map_stream_29, pointer</column>
+<column name="in_channel_map_stream_29_read">out, 1, ap_fifo, in_channel_map_stream_29, pointer</column>
+<column name="in_channel_map_stream_30_dout">in, 32, ap_fifo, in_channel_map_stream_30, pointer</column>
+<column name="in_channel_map_stream_30_num_data_valid">in, 3, ap_fifo, in_channel_map_stream_30, pointer</column>
+<column name="in_channel_map_stream_30_fifo_cap">in, 3, ap_fifo, in_channel_map_stream_30, pointer</column>
+<column name="in_channel_map_stream_30_empty_n">in, 1, ap_fifo, in_channel_map_stream_30, pointer</column>
+<column name="in_channel_map_stream_30_read">out, 1, ap_fifo, in_channel_map_stream_30, pointer</column>
+<column name="in_channel_map_stream_31_dout">in, 32, ap_fifo, in_channel_map_stream_31, pointer</column>
+<column name="in_channel_map_stream_31_num_data_valid">in, 3, ap_fifo, in_channel_map_stream_31, pointer</column>
+<column name="in_channel_map_stream_31_fifo_cap">in, 3, ap_fifo, in_channel_map_stream_31, pointer</column>
+<column name="in_channel_map_stream_31_empty_n">in, 1, ap_fifo, in_channel_map_stream_31, pointer</column>
+<column name="in_channel_map_stream_31_read">out, 1, ap_fifo, in_channel_map_stream_31, pointer</column>
+<column name="conv2d_64_feature_map_stream125_din">out, 32, ap_fifo, conv2d_64_feature_map_stream125, pointer</column>
+<column name="conv2d_64_feature_map_stream125_num_data_valid">in, 3, ap_fifo, conv2d_64_feature_map_stream125, pointer</column>
+<column name="conv2d_64_feature_map_stream125_fifo_cap">in, 3, ap_fifo, conv2d_64_feature_map_stream125, pointer</column>
+<column name="conv2d_64_feature_map_stream125_full_n">in, 1, ap_fifo, conv2d_64_feature_map_stream125, pointer</column>
+<column name="conv2d_64_feature_map_stream125_write">out, 1, ap_fifo, conv2d_64_feature_map_stream125, pointer</column>
+<column name="conv2d_64_activations_stream126_din">out, 1, ap_fifo, conv2d_64_activations_stream126, pointer</column>
+<column name="conv2d_64_activations_stream126_num_data_valid">in, 15, ap_fifo, conv2d_64_activations_stream126, pointer</column>
+<column name="conv2d_64_activations_stream126_fifo_cap">in, 15, ap_fifo, conv2d_64_activations_stream126, pointer</column>
+<column name="conv2d_64_activations_stream126_full_n">in, 1, ap_fifo, conv2d_64_activations_stream126, pointer</column>
+<column name="conv2d_64_activations_stream126_write">out, 1, ap_fifo, conv2d_64_activations_stream126, pointer</column>
+<column name="conv2d_64_f_map_out132_din">out, 32, ap_fifo, conv2d_64_f_map_out132, pointer</column>
+<column name="conv2d_64_f_map_out132_num_data_valid">in, 15, ap_fifo, conv2d_64_f_map_out132, pointer</column>
+<column name="conv2d_64_f_map_out132_fifo_cap">in, 15, ap_fifo, conv2d_64_f_map_out132, pointer</column>
+<column name="conv2d_64_f_map_out132_full_n">in, 1, ap_fifo, conv2d_64_f_map_out132, pointer</column>
+<column name="conv2d_64_f_map_out132_write">out, 1, ap_fifo, conv2d_64_f_map_out132, pointer</column>
+<column name="biases_address0">out, 6, ap_memory, biases, array</column>
+<column name="biases_ce0">out, 1, ap_memory, biases, array</column>
+<column name="biases_q0">in, 32, ap_memory, biases, array</column>
+</table>
+</item>
+</section>
+</profile>

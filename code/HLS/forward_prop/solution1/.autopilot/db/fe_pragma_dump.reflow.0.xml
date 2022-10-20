@@ -1,0 +1,65 @@
+<pragmas>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/hls_stream_39.h" line="154" pragmaType="inline" parentfunction="read" off="0" region="0" recursive="0"/>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/ap_axi_sdata.h" line="0" pragmaType="inline" parentfunction="get_user_ptr" off="0" region="0" recursive="0"/>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/hls_stream_39.h" line="154" pragmaType="inline" parentfunction="read" off="0" region="0" recursive="0"/>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/hls_stream_39.h" line="144" pragmaType="inline" parentfunction="read" off="0" region="0" recursive="0"/>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/hls_stream_39.h" line="144" pragmaType="inline" parentfunction="read" off="0" region="0" recursive="0"/>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/hls_stream_39.h" line="144" pragmaType="inline" parentfunction="read" off="0" region="0" recursive="0"/>
+<pragma file="forward_prop/src/forward_prop.cpp" line="574" pragmaType="dataflow" parentfunction="accel" disable_start_propagation="0"/>
+<pragma file="forward_prop/src/forward_prop.cpp" line="691" pragmaType="unroll" parentfunction="accel" factor="-1" skip_exit_check="0"/>
+<pragma file="forward_prop/src/forward_prop.cpp" line="580" pragmaType="array_partition" parentfunction="accel" dim="1" factor="0" mode="complete" dynamic="0" variable=""/>
+<pragma file="forward_prop/src/forward_prop.cpp" line="581" pragmaType="stream" parentfunction="accel" depth="0" type="shared" variable="conv2d_64_weights"/>
+<pragma file="forward_prop/src/forward_prop.cpp" line="582" pragmaType="stable" parentfunction="accel" variable="conv2d_64_weights"/>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/hls_stream_39.h" line="208" pragmaType="inline" parentfunction="hls::stream<float, 12544>::stream()" off="0" region="0" recursive="0"/>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/hls_stream_39.h" line="208" pragmaType="inline" parentfunction="hls::stream<float, 3>::stream()" off="0" region="0" recursive="0"/>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/hls_stream_39.h" line="208" pragmaType="inline" parentfunction="hls::stream<bool, 25088>::stream()" off="0" region="0" recursive="0"/>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/hls_stream_39.h" line="208" pragmaType="inline" parentfunction="hls::stream<window<bool, 2u, 2u>, 6272>::stream()" off="0" region="0" recursive="0"/>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/hls_stream_39.h" line="208" pragmaType="inline" parentfunction="hls::stream<bool, 12544>::stream()" off="0" region="0" recursive="0"/>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/hls_stream_39.h" line="208" pragmaType="inline" parentfunction="hls::stream<window<bool, 2u, 2u>, 3136>::stream()" off="0" region="0" recursive="0"/>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/hls_stream_39.h" line="208" pragmaType="inline" parentfunction="hls::stream<bool, 128>::stream()" off="0" region="0" recursive="0"/>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/hls_stream_39.h" line="208" pragmaType="inline" parentfunction="hls::stream<float, 25088>::stream()" off="0" region="0" recursive="0"/>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/hls_stream_39.h" line="208" pragmaType="inline" parentfunction="hls::stream<float, 6272>::stream()" off="0" region="0" recursive="0"/>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/hls_stream_39.h" line="208" pragmaType="inline" parentfunction="hls::stream<float, 3136>::stream()" off="0" region="0" recursive="0"/>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/hls_stream_39.h" line="208" pragmaType="inline" parentfunction="hls::stream<float, 128>::stream()" off="0" region="0" recursive="0"/>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/hls_stream_39.h" line="208" pragmaType="inline" parentfunction="hls::stream<float, 10>::stream()" off="0" region="0" recursive="0"/>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/hls_stream_39.h" line="208" pragmaType="inline" parentfunction="hls::stream<window<float, 3u, 3u>, 3>::stream()" off="0" region="0" recursive="0"/>
+<pragma file="forward_prop/src/forward_prop.cpp" line="59" pragmaType="array_partition" parentfunction="create_window_stream_conv2d_1c" dim="2" factor="0" mode="complete" dynamic="0" variable=""/>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/hls_stream_39.h" line="208" pragmaType="inline" parentfunction="hls::stream<window<float, 2u, 2u>, 3>::stream()" off="0" region="0" recursive="0"/>
+<pragma file="forward_prop/src/forward_prop.cpp" line="393" pragmaType="pipeline" parentfunction="maxp2d" off="0" ii="1" rewind="0" style=""/>
+<pragma file="forward_prop/src/forward_prop.cpp" line="195" pragmaType="array_partition" parentfunction="create_window_stream_conv2d_mc" dim="2" factor="0" mode="complete" dynamic="0" variable=""/>
+<pragma file="forward_prop/src/forward_prop.cpp" line="277" pragmaType="pipeline" parentfunction="conv2d_sum_mc" off="0" ii="64" rewind="0" style=""/>
+<pragma file="forward_prop/src/forward_prop.cpp" line="393" pragmaType="pipeline" parentfunction="maxp2d" off="0" ii="1" rewind="0" style=""/>
+<pragma file="forward_prop/src/forward_prop.cpp" line="443" pragmaType="pipeline" parentfunction="dense" off="0" ii="-1" rewind="0" style=""/>
+<pragma file="forward_prop/src/forward_prop.cpp" line="433" pragmaType="pipeline" parentfunction="dense" off="0" ii="8" rewind="0" style=""/>
+<pragma file="forward_prop/src/forward_prop.cpp" line="426" pragmaType="array_partition" parentfunction="dense" dim="1" factor="0" mode="complete" dynamic="0" variable=""/>
+<pragma file="forward_prop/src/forward_prop.cpp" line="485" pragmaType="pipeline" parentfunction="softmax" off="0" ii="4" rewind="0" style=""/>
+<pragma file="forward_prop/src/forward_prop.cpp" line="470" pragmaType="pipeline" parentfunction="softmax" off="0" ii="4" rewind="0" style=""/>
+<pragma file="forward_prop/src/forward_prop.cpp" line="461" pragmaType="array_partition" parentfunction="softmax" dim="1" factor="0" mode="complete" dynamic="0" variable=""/>
+<pragma file="/wrk/ci/prod/2022.1/rdi_builds/continuous/2022_04_18_3526262/src/shared/hls/clib/hlsmath/src/c++/logfloat.cpp" line="8" pragmaType="inline" parentfunction="log" off="0" region="0" recursive="0"/>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/hls_stream_39.h" line="173" pragmaType="inline" parentfunction="write" off="0" region="0" recursive="0"/>
+<pragma file="/wrk/ci/prod/2022.1/rdi_builds/continuous/2022_04_18_3526262/src/shared/hls/clib/hlsmath/src/common/hls_log_float.cpp" line="8" pragmaType="inline" parentfunction="log" off="0" region="0" recursive="0"/>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/hls_stream_39.h" line="173" pragmaType="inline" parentfunction="write" off="0" region="0" recursive="0"/>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/hls_stream_39.h" line="154" pragmaType="inline" parentfunction="read" off="0" region="0" recursive="0"/>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/hls_stream_39.h" line="173" pragmaType="inline" parentfunction="write" off="0" region="0" recursive="0"/>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/hls_stream_39.h" line="144" pragmaType="inline" parentfunction="read" off="0" region="0" recursive="0"/>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/hls_stream_39.h" line="173" pragmaType="inline" parentfunction="write" off="0" region="0" recursive="0"/>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/hls_stream_39.h" line="154" pragmaType="inline" parentfunction="read" off="0" region="0" recursive="0"/>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/hls_stream_39.h" line="144" pragmaType="inline" parentfunction="read" off="0" region="0" recursive="0"/>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/hls_stream_39.h" line="173" pragmaType="inline" parentfunction="write" off="0" region="0" recursive="0"/>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/hls_stream_39.h" line="103" pragmaType="inline" parentfunction="hls::stream<window<float, 2u, 2u>, 0>::stream()" off="0" region="0" recursive="0"/>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/ap_axi_sdata.h" line="291" pragmaType="inline" parentfunction="read" off="0" region="0" recursive="0"/>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/ap_axi_sdata.h" line="0" pragmaType="inline" parentfunction="get_id_ptr" off="0" region="0" recursive="0"/>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/ap_axi_sdata.h" line="0" pragmaType="inline" parentfunction="get_dest_ptr" off="0" region="0" recursive="0"/>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/ap_common.h" line="0" pragmaType="inline" parentfunction="ssdm_int<1, false>::ssdm_int()" off="0" region="0" recursive="0"/>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/ap_int.h" line="230" pragmaType="inline" parentfunction="ap_uint<4>::ap_uint()" off="0" region="0" recursive="0"/>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/ap_int.h" line="230" pragmaType="inline" parentfunction="ap_uint<1>::ap_uint()" off="0" region="0" recursive="0"/>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/ap_int_base.h" line="221" pragmaType="inline" parentfunction="ap_int_base<1, false>::ap_int_base()" off="0" region="0" recursive="0"/>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/ap_common.h" line="0" pragmaType="inline" parentfunction="ssdm_int<4, false>::ssdm_int()" off="0" region="0" recursive="0"/>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/ap_int_base.h" line="221" pragmaType="inline" parentfunction="ap_int_base<4, false>::ap_int_base()" off="0" region="0" recursive="0"/>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/hls_stream_39.h" line="103" pragmaType="inline" parentfunction="hls::stream<window<float, 3u, 3u>, 0>::stream()" off="0" region="0" recursive="0"/>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/hls_stream_39.h" line="103" pragmaType="inline" parentfunction="hls::stream<float, 0>::stream()" off="0" region="0" recursive="0"/>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/hls_stream_39.h" line="103" pragmaType="inline" parentfunction="hls::stream<bool, 0>::stream()" off="0" region="0" recursive="0"/>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/hls_stream_39.h" line="103" pragmaType="inline" parentfunction="hls::stream<window<bool, 2u, 2u>, 0>::stream()" off="0" region="0" recursive="0"/>
+<pragma file="forward_prop/src/forward_prop.cpp" line="141" pragmaType="pipeline" parentfunction="conv2d_sum_1c" off="0" ii="32" rewind="0" style=""/>
+<pragma file="/media/msi/SSD/Xilinx/Vitis_HLS/2022.1/common/technology/autopilot/hls_stream_39.h" line="0" pragmaType="inline" parentfunction="read" off="0" region="0" recursive="0"/>
+</pragmas>

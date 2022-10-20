@@ -1,0 +1,211 @@
+
+
+================================================================
+== Vitis HLS Report for 'maxp2d_3136u_2u_2u_s'
+================================================================
+* Date:           Tue Oct 18 21:21:04 2022
+
+* Version:        2022.1 (Build 3526262 on Mon Apr 18 15:47:01 MDT 2022)
+* Project:        forward_prop
+* Solution:       solution1 (Vitis Kernel Flow Target)
+* Product family: virtexuplus
+* Target device:  xcvu5p-flva2104-1-e
+
+
+================================================================
+== Performance Estimates
+================================================================
++ Timing: 
+    * Summary: 
+    +--------+----------+----------+------------+
+    |  Clock |  Target  | Estimated| Uncertainty|
+    +--------+----------+----------+------------+
+    |ap_clk  |  10.00 ns|  4.112 ns|     2.70 ns|
+    +--------+----------+----------+------------+
+
++ Latency: 
+    * Summary: 
+    +---------+---------+-----------+-----------+------+------+---------+
+    |  Latency (cycles) |   Latency (absolute)  |   Interval  | Pipeline|
+    |   min   |   max   |    min    |    max    |  min |  max |   Type  |
+    +---------+---------+-----------+-----------+------+------+---------+
+    |     3143|     3143|  31.430 us|  31.430 us|  3143|  3143|       no|
+    +---------+---------+-----------+-----------+------+------+---------+
+
+    + Detail: 
+        * Instance: 
+        N/A
+
+        * Loop: 
+        +--------------------+---------+---------+----------+-----------+-----------+------+----------+
+        |                    |  Latency (cycles) | Iteration|  Initiation Interval  | Trip |          |
+        |      Loop Name     |   min   |   max   |  Latency |  achieved |   target  | Count| Pipelined|
+        +--------------------+---------+---------+----------+-----------+-----------+------+----------+
+        |- VITIS_LOOP_390_1  |     3141|     3141|         7|          1|          1|  3136|       yes|
+        +--------------------+---------+---------+----------+-----------+-----------+------+----------+
+
+
+
+================================================================
+== Utilization Estimates
+================================================================
+* Summary: 
++---------------------+---------+------+---------+--------+-----+
+|         Name        | BRAM_18K|  DSP |    FF   |   LUT  | URAM|
++---------------------+---------+------+---------+--------+-----+
+|DSP                  |        -|     -|        -|       -|    -|
+|Expression           |        -|     -|        0|     169|    -|
+|FIFO                 |        -|     -|        -|       -|    -|
+|Instance             |        -|     -|        -|       -|    -|
+|Memory               |        -|     -|        -|       -|    -|
+|Multiplexer          |        -|     -|        -|      72|    -|
+|Register             |        -|     -|      665|     128|    -|
++---------------------+---------+------+---------+--------+-----+
+|Total                |        0|     0|      665|     369|    0|
++---------------------+---------+------+---------+--------+-----+
+|Available SLR        |     1024|  1737|   600577|  300288|  235|
++---------------------+---------+------+---------+--------+-----+
+|Utilization SLR (%)  |        0|     0|       ~0|      ~0|    0|
++---------------------+---------+------+---------+--------+-----+
+|Available            |     2048|  3474|  1201154|  600577|  470|
++---------------------+---------+------+---------+--------+-----+
+|Utilization (%)      |        0|     0|       ~0|      ~0|    0|
++---------------------+---------+------+---------+--------+-----+
+
++ Detail: 
+    * Instance: 
+    +------------------------------------+-----------------------------+---------+----+---+----+-----+
+    |              Instance              |            Module           | BRAM_18K| DSP| FF| LUT| URAM|
+    +------------------------------------+-----------------------------+---------+----+---+----+-----+
+    |fcmp_32ns_32ns_1_2_no_dsp_1_U19763  |fcmp_32ns_32ns_1_2_no_dsp_1  |        0|   0|  0|   0|    0|
+    |fcmp_32ns_32ns_1_2_no_dsp_1_U19764  |fcmp_32ns_32ns_1_2_no_dsp_1  |        0|   0|  0|   0|    0|
+    |fcmp_32ns_32ns_1_2_no_dsp_1_U19765  |fcmp_32ns_32ns_1_2_no_dsp_1  |        0|   0|  0|   0|    0|
+    |fcmp_32ns_32ns_1_2_no_dsp_1_U19766  |fcmp_32ns_32ns_1_2_no_dsp_1  |        0|   0|  0|   0|    0|
+    |fcmp_32ns_32ns_1_2_no_dsp_1_U19767  |fcmp_32ns_32ns_1_2_no_dsp_1  |        0|   0|  0|   0|    0|
+    |fcmp_32ns_32ns_1_2_no_dsp_1_U19768  |fcmp_32ns_32ns_1_2_no_dsp_1  |        0|   0|  0|   0|    0|
+    |fcmp_32ns_32ns_1_2_no_dsp_1_U19769  |fcmp_32ns_32ns_1_2_no_dsp_1  |        0|   0|  0|   0|    0|
+    |fcmp_32ns_32ns_1_2_no_dsp_1_U19770  |fcmp_32ns_32ns_1_2_no_dsp_1  |        0|   0|  0|   0|    0|
+    +------------------------------------+-----------------------------+---------+----+---+----+-----+
+    |Total                               |                             |        0|   0|  0|   0|    0|
+    +------------------------------------+-----------------------------+---------+----+---+----+-----+
+
+    * DSP: 
+    N/A
+
+    * Memory: 
+    N/A
+
+    * FIFO: 
+    N/A
+
+    * Expression: 
+    +----------------------------------+----------+----+---+----+------------+------------+
+    |           Variable Name          | Operation| DSP| FF| LUT| Bitwidth P0| Bitwidth P1|
+    +----------------------------------+----------+----+---+----+------------+------------+
+    |w_4_fu_138_p2                     |         +|   0|  0|  19|          12|           1|
+    |ap_condition_176                  |       and|   0|  0|   2|           1|           1|
+    |icmp_ln390_fu_132_p2              |      icmp|   0|  0|  12|          12|          11|
+    |ap_block_pp0_stage0_00001         |        or|   0|  0|   2|           1|           1|
+    |ap_block_pp0_stage0_01001         |        or|   0|  0|   2|           1|           1|
+    |ap_block_state7_pp0_stage0_iter6  |        or|   0|  0|   2|           1|           1|
+    |grp_fu_100_p1                     |    select|   0|  0|  32|           1|          32|
+    |grp_fu_104_p1                     |    select|   0|  0|  32|           1|          32|
+    |grp_fu_96_p1                      |    select|   0|  0|  32|           1|          32|
+    |max_14_fu_222_p3                  |    select|   0|  0|  32|           1|          32|
+    |ap_enable_pp0                     |       xor|   0|  0|   2|           1|           2|
+    +----------------------------------+----------+----+---+----+------------+------------+
+    |Total                             |          |   0|  0| 169|          33|         146|
+    +----------------------------------+----------+----+---+----+------------+------------+
+
+    * Multiplexer: 
+    +-------------------------------------------+----+-----------+-----+-----------+
+    |                    Name                   | LUT| Input Size| Bits| Total Bits|
+    +-------------------------------------------+----+-----------+-----+-----------+
+    |ap_done_int                                |   9|          2|    1|          2|
+    |ap_enable_reg_pp0_iter1                    |   9|          2|    1|          2|
+    |ap_sig_allocacmp_w_3                       |   9|          2|   12|         24|
+    |maxp2d_64_activations_window_stream_blk_n  |   9|          2|    1|          2|
+    |maxp2d_64_f_map_out133_blk_n               |   9|          2|    1|          2|
+    |maxp2d_64_feature_map_stream127_blk_n      |   9|          2|    1|          2|
+    |maxp2d_64_window_stream_blk_n              |   9|          2|    1|          2|
+    |w_fu_60                                    |   9|          2|   12|         24|
+    +-------------------------------------------+----+-----------+-----+-----------+
+    |Total                                      |  72|         16|   30|         60|
+    +-------------------------------------------+----+-----------+-----+-----------+
+
+    * Register: 
+    +-------------------------------------+----+----+-----+-----------+
+    |                 Name                | FF | LUT| Bits| Const Bits|
+    +-------------------------------------+----+----+-----+-----------+
+    |ap_CS_fsm                            |   1|   0|    1|          0|
+    |ap_done_reg                          |   1|   0|    1|          0|
+    |ap_enable_reg_pp0_iter1              |   1|   0|    1|          0|
+    |ap_enable_reg_pp0_iter2              |   1|   0|    1|          0|
+    |ap_enable_reg_pp0_iter3              |   1|   0|    1|          0|
+    |ap_enable_reg_pp0_iter4              |   1|   0|    1|          0|
+    |ap_enable_reg_pp0_iter5              |   1|   0|    1|          0|
+    |ap_enable_reg_pp0_iter6              |   1|   0|    1|          0|
+    |ap_loop_exit_ready_pp0_iter1_reg     |   1|   0|    1|          0|
+    |ap_loop_exit_ready_pp0_iter2_reg     |   1|   0|    1|          0|
+    |ap_loop_exit_ready_pp0_iter3_reg     |   1|   0|    1|          0|
+    |ap_loop_exit_ready_pp0_iter4_reg     |   1|   0|    1|          0|
+    |ap_loop_exit_ready_pp0_iter5_reg     |   1|   0|    1|          0|
+    |max_10_reg_303                       |  32|   0|   32|          0|
+    |max_11_reg_296                       |  32|   0|   32|          0|
+    |max_12_reg_316                       |  32|   0|   32|          0|
+    |max_13_reg_309                       |  32|   0|   32|          0|
+    |max_14_reg_322                       |  32|   0|   32|          0|
+    |max_8_reg_290                        |  32|   0|   32|          0|
+    |temp_window_elements_4_reg_283       |  32|   0|   32|          0|
+    |temp_window_elements_reg_276         |  32|   0|   32|          0|
+    |trunc_ln145_2_reg_266                |  32|   0|   32|          0|
+    |trunc_ln145_2_reg_266_pp0_iter2_reg  |  32|   0|   32|          0|
+    |trunc_ln145_3_reg_271                |  32|   0|   32|          0|
+    |trunc_ln145_s_reg_261                |  32|   0|   32|          0|
+    |w_fu_60                              |  12|   0|   12|          0|
+    |max_11_reg_296                       |  64|  32|   32|          0|
+    |temp_window_elements_4_reg_283       |  64|  32|   32|          0|
+    |temp_window_elements_reg_276         |  64|  32|   32|          0|
+    |trunc_ln145_3_reg_271                |  64|  32|   32|          0|
+    +-------------------------------------+----+----+-----+-----------+
+    |Total                                | 665| 128|  537|          0|
+    +-------------------------------------+----+----+-----+-----------+
+
+
+
+================================================================
+== Interface
+================================================================
+* Summary: 
++----------------------------------------------------+-----+-----+------------+-------------------------------------+--------------+
+|                      RTL Ports                     | Dir | Bits|  Protocol  |            Source Object            |    C Type    |
++----------------------------------------------------+-----+-----+------------+-------------------------------------+--------------+
+|ap_clk                                              |   in|    1|  ap_ctrl_hs|                maxp2d<3136u, 2u, 2u>|  return value|
+|ap_rst                                              |   in|    1|  ap_ctrl_hs|                maxp2d<3136u, 2u, 2u>|  return value|
+|ap_start                                            |   in|    1|  ap_ctrl_hs|                maxp2d<3136u, 2u, 2u>|  return value|
+|ap_done                                             |  out|    1|  ap_ctrl_hs|                maxp2d<3136u, 2u, 2u>|  return value|
+|ap_continue                                         |   in|    1|  ap_ctrl_hs|                maxp2d<3136u, 2u, 2u>|  return value|
+|ap_idle                                             |  out|    1|  ap_ctrl_hs|                maxp2d<3136u, 2u, 2u>|  return value|
+|ap_ready                                            |  out|    1|  ap_ctrl_hs|                maxp2d<3136u, 2u, 2u>|  return value|
+|maxp2d_64_window_stream_dout                        |   in|  128|     ap_fifo|              maxp2d_64_window_stream|       pointer|
+|maxp2d_64_window_stream_num_data_valid              |   in|    3|     ap_fifo|              maxp2d_64_window_stream|       pointer|
+|maxp2d_64_window_stream_fifo_cap                    |   in|    3|     ap_fifo|              maxp2d_64_window_stream|       pointer|
+|maxp2d_64_window_stream_empty_n                     |   in|    1|     ap_fifo|              maxp2d_64_window_stream|       pointer|
+|maxp2d_64_window_stream_read                        |  out|    1|     ap_fifo|              maxp2d_64_window_stream|       pointer|
+|maxp2d_64_feature_map_stream127_din                 |  out|   32|     ap_fifo|      maxp2d_64_feature_map_stream127|       pointer|
+|maxp2d_64_feature_map_stream127_num_data_valid      |   in|    3|     ap_fifo|      maxp2d_64_feature_map_stream127|       pointer|
+|maxp2d_64_feature_map_stream127_fifo_cap            |   in|    3|     ap_fifo|      maxp2d_64_feature_map_stream127|       pointer|
+|maxp2d_64_feature_map_stream127_full_n              |   in|    1|     ap_fifo|      maxp2d_64_feature_map_stream127|       pointer|
+|maxp2d_64_feature_map_stream127_write               |  out|    1|     ap_fifo|      maxp2d_64_feature_map_stream127|       pointer|
+|maxp2d_64_activations_window_stream_din             |  out|    4|     ap_fifo|  maxp2d_64_activations_window_stream|       pointer|
+|maxp2d_64_activations_window_stream_num_data_valid  |   in|   13|     ap_fifo|  maxp2d_64_activations_window_stream|       pointer|
+|maxp2d_64_activations_window_stream_fifo_cap        |   in|   13|     ap_fifo|  maxp2d_64_activations_window_stream|       pointer|
+|maxp2d_64_activations_window_stream_full_n          |   in|    1|     ap_fifo|  maxp2d_64_activations_window_stream|       pointer|
+|maxp2d_64_activations_window_stream_write           |  out|    1|     ap_fifo|  maxp2d_64_activations_window_stream|       pointer|
+|maxp2d_64_f_map_out133_din                          |  out|   32|     ap_fifo|               maxp2d_64_f_map_out133|       pointer|
+|maxp2d_64_f_map_out133_num_data_valid               |   in|   13|     ap_fifo|               maxp2d_64_f_map_out133|       pointer|
+|maxp2d_64_f_map_out133_fifo_cap                     |   in|   13|     ap_fifo|               maxp2d_64_f_map_out133|       pointer|
+|maxp2d_64_f_map_out133_full_n                       |   in|    1|     ap_fifo|               maxp2d_64_f_map_out133|       pointer|
+|maxp2d_64_f_map_out133_write                        |  out|    1|     ap_fifo|               maxp2d_64_f_map_out133|       pointer|
++----------------------------------------------------+-----+-----+------------+-------------------------------------+--------------+
+
