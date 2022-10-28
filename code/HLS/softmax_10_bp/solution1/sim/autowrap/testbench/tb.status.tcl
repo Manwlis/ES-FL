@@ -1,1 +1,0 @@
-set ::AESL_AUTOSIM::gTopFileName /home/msi/ES-FL/code/HLS/softmax_10_bp/solution1/./sim/autowrap/testbench/softmax_10_bp.cpp_pre.cpp.tb.cpp

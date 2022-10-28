@@ -6,3 +6,11 @@ cnn_cpp/output_gradients/
 cnn_cpp/variable_gradients/
 cnn_cpp/variables/
 cnn_cpp/temp/
+cnn_hls/all_fwp/src/activations
+cnn_hls/all_fwp/src/data
+cnn_hls/conv_sc_fwp/src/data
+cnn_hls/conv_mc_fwp/src/data
+cnn_hls/dense_fwp/src/data
+cnn_hls/maxp_fwp/src/data
+cnn_hls/softmax_fwp/src/data
+cnn_hls/softmax_bp/src/data

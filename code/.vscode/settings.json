@@ -69,5 +69,6 @@
 		"variant": "cpp",
 		"queue": "cpp",
 		"*.inc": "cpp"
-	}
+	},
+	"C_Cpp.errorSquiggles": "Enabled"
 }

@@ -26,16 +26,16 @@ g++ -Wall -Wno-unknown-pragmas cnn.cpp -o temp/cnn
 flags='--brief --report-identical-files --ignore-all-space'
 
 echo -e "\n~~~~~~~~~~~~~~~ Activations ~~~~~~~~~~~~~~\n"
-diff ${flags} activations/l0_conv32_tf.txt	activations/l0_conv32_cpp.txt
+diff ${flags} activations/l0_conv16_tf.txt	activations/l0_conv16_cpp.txt
 
 echo ""
-diff ${flags} activations/l1_maxp32_tf.txt	activations/l1_maxp32_cpp.txt
+diff ${flags} activations/l1_maxp16_tf.txt	activations/l1_maxp16_cpp.txt
 
 echo ""
-diff ${flags} activations/l2_conv64_tf.txt	activations/l2_conv64_cpp.txt
+diff ${flags} activations/l2_conv32_tf.txt	activations/l2_conv32_cpp.txt
 
 echo ""
-diff ${flags} activations/l3_maxp64_tf.txt	activations/l3_maxp64_cpp.txt
+diff ${flags} activations/l3_maxp32_tf.txt	activations/l3_maxp32_cpp.txt
 
 echo ""
 diff ${flags} activations/l4_dense_tf.txt	activations/l4_dense_cpp.txt
@@ -47,16 +47,16 @@ echo -e "\n~~~~~~~~~~~~ Output Gradients ~~~~~~~~~~~~\n"
 diff ${flags} output_gradients/l4_dense_tf.txt	output_gradients/l4_dense_cpp.txt
 
 echo ""
-diff ${flags} output_gradients/l3_maxp64_tf.txt	output_gradients/l3_maxp64_cpp.txt
+diff ${flags} output_gradients/l3_maxp32_tf.txt	output_gradients/l3_maxp32_cpp.txt
 
 echo ""
-diff ${flags} output_gradients/l2_conv64_tf.txt	output_gradients/l2_conv64_cpp.txt
+diff ${flags} output_gradients/l2_conv32_tf.txt	output_gradients/l2_conv32_cpp.txt
 
 echo ""
-diff ${flags} output_gradients/l1_maxp32_tf.txt	output_gradients/l1_maxp32_cpp.txt
+diff ${flags} output_gradients/l1_maxp16_tf.txt	output_gradients/l1_maxp16_cpp.txt
 
 echo ""
-diff ${flags} output_gradients/l0_conv32_tf.txt	output_gradients/l0_conv32_cpp.txt
+diff ${flags} output_gradients/l0_conv16_tf.txt	output_gradients/l0_conv16_cpp.txt
 
 echo -e "\n~~~~~~~~~~~ Variable Gradients ~~~~~~~~~~~\n"
 diff ${flags} variable_gradients/l5_weights_tf.txt	variable_gradients/l5_weights_cpp.txt

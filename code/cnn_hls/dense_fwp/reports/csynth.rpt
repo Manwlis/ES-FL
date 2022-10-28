@@ -1,0 +1,318 @@
+
+
+================================================================
+== Synthesis Summary Report of 'accel'
+================================================================
++ General Information: 
+    * Date:           Mon Oct 24 19:42:31 2022
+    * Version:        2022.1 (Build 3526262 on Mon Apr 18 15:47:01 MDT 2022)
+    * Project:        dense_fwp
+    * Solution:       solution1 (Vitis Kernel Flow Target)
+    * Product family: zynquplus
+    * Target device:  xczu9eg-ffvb1156-2-e
+    
+
++ Performance & Resource Estimates: 
+    
+    PS: '+' for module; 'o' for loop; '*' for dataflow
+    +-----------------------------------------------------+------+------+---------+-----------+----------+---------+------+----------+------+---------+------------+------------+-----+
+    |                       Modules                       | Issue|      | Latency |  Latency  | Iteration|         | Trip |          |      |         |            |            |     |
+    |                       & Loops                       | Type | Slack| (cycles)|    (ns)   |  Latency | Interval| Count| Pipelined| BRAM |   DSP   |     FF     |     LUT    | URAM|
+    +-----------------------------------------------------+------+------+---------+-----------+----------+---------+------+----------+------+---------+------------+------------+-----+
+    |+ accel*                                             |     -|  0.00|     6501|  6.501e+04|         -|     6502|     -|  dataflow|     -|  80 (3%)|  16180 (2%)|  13780 (5%)|    -|
+    | + dense_64u_1568u_s                                 |     -|  0.00|     6501|  6.501e+04|         -|     6501|     -|        no|     -|  80 (3%)|  13357 (2%)|   9598 (3%)|    -|
+    |  + dense_64u_1568u_Pipeline_init_sums               |     -|  0.00|        8|     80.000|         -|        8|     -|        no|     -|        -|  2578 (~0%)|   407 (~0%)|    -|
+    |   o init_sums                                       |     -|  7.30|        6|     60.000|         3|        1|     4|       yes|     -|        -|           -|           -|    -|
+    |  + dense_64u_1568u_Pipeline_inputs                  |     -|  0.00|     6281|  6.281e+04|         -|     6281|     -|        no|     -|  80 (3%)|  10470 (1%)|   7762 (2%)|    -|
+    |   o inputs                                          |     -|  7.30|     6279|  6.279e+04|        12|        4|  1568|       yes|     -|        -|           -|           -|    -|
+    |  + dense_64u_1568u_Pipeline_activate                |     -|  2.23|       66|    660.000|         -|       66|     -|        no|     -|        -|    42 (~0%)|   390 (~0%)|    -|
+    |   o activate                                        |     -|  7.30|       64|    640.000|         2|        1|    64|       yes|     -|        -|           -|           -|    -|
+    | + entry_proc                                        |     -|  5.46|        0|      0.000|         -|        0|     -|        no|     -|        -|     3 (~0%)|    29 (~0%)|    -|
+    | + write_mem_float_bool_64u_s                        |     -|  0.00|      138|  1.380e+03|         -|      138|     -|        no|     -|        -|   659 (~0%)|  1168 (~0%)|    -|
+    |  + write_mem_float_bool_64u_Pipeline_write_out_mem  |     -|  0.00|       67|    670.000|         -|       67|     -|        no|     -|        -|   527 (~0%)|   589 (~0%)|    -|
+    |   o write_out_mem                                   |     -|  7.30|       65|    650.000|         3|        1|    64|       yes|     -|        -|           -|           -|    -|
+    +-----------------------------------------------------+------+------+---------+-----------+----------+---------+------+----------+------+---------+------------+------------+-----+
+
+
+================================================================
+== HW Interfaces
+================================================================
+* M_AXI
++------------+------------+---------------+---------+--------+----------+-----------+--------------+--------------+-------------+-------------+
+| Interface  | Data Width | Address Width | Latency | Offset | Register | Max Widen | Max Read     | Max Write    | Num Read    | Num Write   |
+|            | (SW->HW)   |               |         |        |          | Bitwidth  | Burst Length | Burst Length | Outstanding | Outstanding |
++------------+------------+---------------+---------+--------+----------+-----------+--------------+--------------+-------------+-------------+
+| m_axi_gmem | 32 -> 512  | 64            | 64      | slave  | 0        | 512       | 16           | 16           | 16          | 16          |
++------------+------------+---------------+---------+--------+----------+-----------+--------------+--------------+-------------+-------------+
+
+* S_AXILITE Interfaces
++---------------+------------+---------------+--------+----------+
+| Interface     | Data Width | Address Width | Offset | Register |
++---------------+------------+---------------+--------+----------+
+| s_axi_control | 32         | 6             | 16     | 0        |
++---------------+------------+---------------+--------+----------+
+
+* S_AXILITE Registers
++---------------+---------------------+--------+-------+--------+----------------------------------+------------------------------------------------------------------------------------+
+| Interface     | Register            | Offset | Width | Access | Description                      | Bit Fields                                                                         |
++---------------+---------------------+--------+-------+--------+----------------------------------+------------------------------------------------------------------------------------+
+| s_axi_control | CTRL                | 0x00   | 32    | RW     | Control signals                  | 0=AP_START 1=AP_DONE 2=AP_IDLE 3=AP_READY 4=AP_CONTINUE 7=AUTO_RESTART 9=INTERRUPT |
+| s_axi_control | GIER                | 0x04   | 32    | RW     | Global Interrupt Enable Register | 0=Enable                                                                           |
+| s_axi_control | IP_IER              | 0x08   | 32    | RW     | IP Interrupt Enable Register     | 0=CHAN0_INT_EN 1=CHAN1_INT_EN                                                      |
+| s_axi_control | IP_ISR              | 0x0c   | 32    | RW     | IP Interrupt Status Register     | 0=CHAN0_INT_ST 1=CHAN1_INT_ST                                                      |
+| s_axi_control | dense_weights_1     | 0x10   | 32    | W      | Data signal of dense_weights     |                                                                                    |
+| s_axi_control | dense_weights_2     | 0x14   | 32    | W      | Data signal of dense_weights     |                                                                                    |
+| s_axi_control | dense_biases_1      | 0x1c   | 32    | W      | Data signal of dense_biases      |                                                                                    |
+| s_axi_control | dense_biases_2      | 0x20   | 32    | W      | Data signal of dense_biases      |                                                                                    |
+| s_axi_control | dense_feature_map_1 | 0x28   | 32    | W      | Data signal of dense_feature_map |                                                                                    |
+| s_axi_control | dense_feature_map_2 | 0x2c   | 32    | W      | Data signal of dense_feature_map |                                                                                    |
++---------------+---------------------+--------+-------+--------+----------------------------------+------------------------------------------------------------------------------------+
+
+* AXIS
++--------------+---------------+-------+-------+-------+--------+-------+--------+
+| Interface    | Register Mode | TDATA | TKEEP | TLAST | TREADY | TSTRB | TVALID |
++--------------+---------------+-------+-------+-------+--------+-------+--------+
+| input_stream | both          | 32    | 4     | 1     | 1      | 4     | 1      |
++--------------+---------------+-------+-------+-------+--------+-------+--------+
+
+* TOP LEVEL CONTROL
++-----------+---------------+-----------+
+| Interface | Type          | Ports     |
++-----------+---------------+-----------+
+| ap_clk    | clock         | ap_clk    |
+| ap_rst_n  | reset         | ap_rst_n  |
+| interrupt | interrupt     | interrupt |
+| ap_ctrl   | ap_ctrl_chain |           |
++-----------+---------------+-----------+
+
+
+================================================================
+== SW I/O Information
+================================================================
+* Top Function Arguments
++-------------------+-----------+---------------------------------------+
+| Argument          | Direction | Datatype                              |
++-------------------+-----------+---------------------------------------+
+| input_stream      | in        | stream<hls::axis<float, 0, 0, 0>, 0>& |
+| dense_weights     | inout     | float*                                |
+| dense_biases      | inout     | float*                                |
+| dense_feature_map | inout     | float*                                |
++-------------------+-----------+---------------------------------------+
+
+* SW-to-HW Mapping
++-------------------+---------------+-----------+----------+-----------------------------------------------+
+| Argument          | HW Interface  | HW Type   | HW Usage | HW Info                                       |
++-------------------+---------------+-----------+----------+-----------------------------------------------+
+| input_stream      | input_stream  | interface |          |                                               |
+| dense_weights     | m_axi_gmem    | interface |          |                                               |
+| dense_weights     | s_axi_control | register  | offset   | name=dense_weights_1 offset=0x10 range=32     |
+| dense_weights     | s_axi_control | register  | offset   | name=dense_weights_2 offset=0x14 range=32     |
+| dense_biases      | m_axi_gmem    | interface |          |                                               |
+| dense_biases      | s_axi_control | register  | offset   | name=dense_biases_1 offset=0x1c range=32      |
+| dense_biases      | s_axi_control | register  | offset   | name=dense_biases_2 offset=0x20 range=32      |
+| dense_feature_map | m_axi_gmem    | interface |          |                                               |
+| dense_feature_map | s_axi_control | register  | offset   | name=dense_feature_map_1 offset=0x28 range=32 |
+| dense_feature_map | s_axi_control | register  | offset   | name=dense_feature_map_2 offset=0x2c range=32 |
++-------------------+---------------+-----------+----------+-----------------------------------------------+
+
+
+================================================================
+== M_AXI Burst Information
+================================================================
+ Note: All burst requests might be further partitioned into multiple requests during RTL generation based on max_read_burst_length or max_write_burst_length settings.
+
+* Inferred Burst Summary
++--------------+-----------+-----------+--------+-------+-----------------------------------+
+| HW Interface | Loop      | Direction | Length | Width | Location                          |
++--------------+-----------+-----------+--------+-------+-----------------------------------+
+| m_axi_gmem   | init_sums | read      | 4      | 512   | dense_fwp/src/dense_fwp.cpp:13:13 |
+| m_axi_gmem   | inputs    | read      | 6272   | 512   | dense_fwp/src/dense_fwp.cpp:16:10 |
+| m_axi_gmem   |           | write     | 4      | 512   | dense_fwp/src/dense_fwp.hpp:30:17 |
++--------------+-----------+-----------+--------+-------+-----------------------------------+
+
+* Inferred Bursts and Widening Missed
++--------------+----------+-----------+----------------------------------------------------------------------------------------------------------+------------+-----------------------------------+
+| HW Interface | Variable | Loop      | Problem                                                                                                  | Resolution | Location                          |
++--------------+----------+-----------+----------------------------------------------------------------------------------------------------------+------------+-----------------------------------+
+| m_axi_gmem   | biases   | init_sums | Could not widen since type i512 size is greater than or equal to the max_widen_bitwidth threshold of 512 | 214-353    | dense_fwp/src/dense_fwp.cpp:13:13 |
+| m_axi_gmem   | weights  | inputs    | Could not widen since type i512 size is greater than or equal to the max_widen_bitwidth threshold of 512 | 214-353    | dense_fwp/src/dense_fwp.cpp:16:10 |
++--------------+----------+-----------+----------------------------------------------------------------------------------------------------------+------------+-----------------------------------+
+
+    * Resolution URL: www.xilinx.com/cgi-bin/docs/rdoc?v=2022.1;t=hls+guidance;d=XXX-YYY.html (replace XXX-YYY with column value)
+
+================================================================
+== Bind Op Report
+================================================================
++-----------------------------------------------------+-----+--------+----------------+------+---------+---------+
+| Name                                                | DSP | Pragma | Variable       | Op   | Impl    | Latency |
++-----------------------------------------------------+-----+--------+----------------+------+---------+---------+
+| + accel                                             | 80  |        |                |      |         |         |
+|  + dense_64u_1568u_s                                | 80  |        |                |      |         |         |
+|   + dense_64u_1568u_Pipeline_init_sums              | 0   |        |                |      |         |         |
+|     add_ln13_1_fu_1409_p2                           | -   |        | add_ln13_1     | add  | fabric  | 0       |
+|     add_ln13_fu_2067_p2                             | -   |        | add_ln13       | add  | fabric  | 0       |
+|   + dense_64u_1568u_Pipeline_inputs                 | 80  |        |                |      |         |         |
+|     add_ln16_fu_2171_p2                             | -   |        | add_ln16       | add  | fabric  | 0       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U85               | 3   |        | mul            | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U69              | 2   |        | kernel_sum_64  | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U86               | 3   |        | mul_1          | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U70              | 2   |        | kernel_sum_65  | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U87               | 3   |        | mul_2          | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U71              | 2   |        | kernel_sum_66  | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U88               | 3   |        | mul_3          | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U72              | 2   |        | kernel_sum_67  | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U89               | 3   |        | mul_4          | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U73              | 2   |        | kernel_sum_68  | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U90               | 3   |        | mul_5          | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U74              | 2   |        | kernel_sum_69  | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U91               | 3   |        | mul_6          | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U75              | 2   |        | kernel_sum_70  | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U92               | 3   |        | mul_7          | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U76              | 2   |        | kernel_sum_71  | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U93               | 3   |        | mul_8          | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U77              | 2   |        | kernel_sum_72  | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U94               | 3   |        | mul_9          | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U78              | 2   |        | kernel_sum_73  | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U95               | 3   |        | mul_s          | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U79              | 2   |        | kernel_sum_74  | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U96               | 3   |        | mul_10         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U80              | 2   |        | kernel_sum_75  | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U97               | 3   |        | mul_11         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U81              | 2   |        | kernel_sum_76  | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U98               | 3   |        | mul_12         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U82              | 2   |        | kernel_sum_77  | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U99               | 3   |        | mul_13         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U83              | 2   |        | kernel_sum_78  | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U100              | 3   |        | mul_14         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U84              | 2   |        | kernel_sum_79  | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U85               | 3   |        | mul_15         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U69              | 2   |        | kernel_sum_80  | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U86               | 3   |        | mul_16         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U70              | 2   |        | kernel_sum_81  | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U87               | 3   |        | mul_17         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U71              | 2   |        | kernel_sum_82  | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U88               | 3   |        | mul_18         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U72              | 2   |        | kernel_sum_83  | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U89               | 3   |        | mul_19         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U73              | 2   |        | kernel_sum_84  | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U90               | 3   |        | mul_20         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U74              | 2   |        | kernel_sum_85  | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U91               | 3   |        | mul_21         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U75              | 2   |        | kernel_sum_86  | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U92               | 3   |        | mul_22         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U76              | 2   |        | kernel_sum_87  | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U93               | 3   |        | mul_23         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U77              | 2   |        | kernel_sum_88  | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U94               | 3   |        | mul_24         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U78              | 2   |        | kernel_sum_89  | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U95               | 3   |        | mul_25         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U79              | 2   |        | kernel_sum_90  | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U96               | 3   |        | mul_26         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U80              | 2   |        | kernel_sum_91  | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U97               | 3   |        | mul_27         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U81              | 2   |        | kernel_sum_92  | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U98               | 3   |        | mul_28         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U82              | 2   |        | kernel_sum_93  | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U99               | 3   |        | mul_29         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U83              | 2   |        | kernel_sum_94  | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U100              | 3   |        | mul_30         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U84              | 2   |        | kernel_sum_95  | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U85               | 3   |        | mul_31         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U69              | 2   |        | kernel_sum_96  | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U86               | 3   |        | mul_32         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U70              | 2   |        | kernel_sum_97  | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U87               | 3   |        | mul_33         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U71              | 2   |        | kernel_sum_98  | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U88               | 3   |        | mul_34         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U72              | 2   |        | kernel_sum_99  | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U89               | 3   |        | mul_35         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U73              | 2   |        | kernel_sum_100 | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U90               | 3   |        | mul_36         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U74              | 2   |        | kernel_sum_101 | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U91               | 3   |        | mul_37         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U75              | 2   |        | kernel_sum_102 | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U92               | 3   |        | mul_38         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U76              | 2   |        | kernel_sum_103 | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U93               | 3   |        | mul_39         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U77              | 2   |        | kernel_sum_104 | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U94               | 3   |        | mul_40         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U78              | 2   |        | kernel_sum_105 | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U95               | 3   |        | mul_41         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U79              | 2   |        | kernel_sum_106 | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U96               | 3   |        | mul_42         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U80              | 2   |        | kernel_sum_107 | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U97               | 3   |        | mul_43         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U81              | 2   |        | kernel_sum_108 | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U98               | 3   |        | mul_44         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U82              | 2   |        | kernel_sum_109 | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U99               | 3   |        | mul_45         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U83              | 2   |        | kernel_sum_110 | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U100              | 3   |        | mul_46         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U84              | 2   |        | kernel_sum_111 | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U85               | 3   |        | mul_47         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U69              | 2   |        | kernel_sum_112 | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U86               | 3   |        | mul_48         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U70              | 2   |        | kernel_sum_113 | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U87               | 3   |        | mul_49         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U71              | 2   |        | kernel_sum_114 | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U88               | 3   |        | mul_50         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U72              | 2   |        | kernel_sum_115 | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U89               | 3   |        | mul_51         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U73              | 2   |        | kernel_sum_116 | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U90               | 3   |        | mul_52         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U74              | 2   |        | kernel_sum_117 | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U91               | 3   |        | mul_53         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U75              | 2   |        | kernel_sum_118 | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U92               | 3   |        | mul_54         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U76              | 2   |        | kernel_sum_119 | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U93               | 3   |        | mul_55         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U77              | 2   |        | kernel_sum_120 | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U94               | 3   |        | mul_56         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U78              | 2   |        | kernel_sum_121 | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U95               | 3   |        | mul_57         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U79              | 2   |        | kernel_sum_122 | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U96               | 3   |        | mul_58         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U80              | 2   |        | kernel_sum_123 | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U97               | 3   |        | mul_59         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U81              | 2   |        | kernel_sum_124 | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U98               | 3   |        | mul_60         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U82              | 2   |        | kernel_sum_125 | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U99               | 3   |        | mul_61         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U83              | 2   |        | kernel_sum_126 | fadd | fulldsp | 3       |
+|     fmul_32ns_32ns_32_3_max_dsp_1_U100              | 3   |        | mul_62         | fmul | maxdsp  | 2       |
+|     fadd_32ns_32ns_32_4_full_dsp_1_U84              | 2   |        | kernel_sum_127 | fadd | fulldsp | 3       |
+|   + dense_64u_1568u_Pipeline_activate               | 0   |        |                |      |         |         |
+|     add_ln27_fu_592_p2                              | -   |        | add_ln27       | add  | fabric  | 0       |
+|  + write_mem_float_bool_64u_s                       | 0   |        |                |      |         |         |
+|   + write_mem_float_bool_64u_Pipeline_write_out_mem | 0   |        |                |      |         |         |
+|     add_ln30_fu_129_p2                              | -   |        | add_ln30       | add  | fabric  | 0       |
++-----------------------------------------------------+-----+--------+----------------+------+---------+---------+
+
+
+================================================================
+== Bind Storage Report
+================================================================
++-------------------------+------+------+--------+---------------------+---------+------+---------+
+| Name                    | BRAM | URAM | Pragma | Variable            | Storage | Impl | Latency |
++-------------------------+------+------+--------+---------------------+---------+------+---------+
+| + accel                 | 0    | 0    |        |                     |         |      |         |
+|   dense_feature_map_c_U | -    | -    |        | dense_feature_map_c | fifo    | srl  | 0       |
+|   feature_map_stream_U  | -    | -    |        | feature_map_stream  | fifo    | srl  | 0       |
+|   activations_stream_U  | -    | -    |        | activations_stream  | fifo    | srl  | 0       |
++-------------------------+------+------+--------+---------------------+---------+------+---------+
+
+
+================================================================
+== Pragma Report
+================================================================
+* Valid Pragma Syntax
++-----------------+-----------------------------------+-----------------------------------------------------+
+| Type            | Options                           | Location                                            |
++-----------------+-----------------------------------+-----------------------------------------------------+
+| array_partition | variable=kernel_sum type=complete | dense_fwp/src/dense_fwp.cpp:11 in dense, kernel_sum |
+| pipeline        | II=4                              | dense_fwp/src/dense_fwp.cpp:19 in dense             |
+| pipeline        |                                   | dense_fwp/src/dense_fwp.cpp:29 in dense             |
+| dataflow        |                                   | dense_fwp/src/dense_fwp.cpp:46 in accel             |
++-----------------+-----------------------------------+-----------------------------------------------------+
+
+

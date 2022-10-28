@@ -1,4 +1,0 @@
-dict set slaves control {ports {gmem_conv2d_32_weights {type i_ap_none width 64} gmem_conv2d_32_biases {type i_ap_none width 64} gmem_conv2d_64_weights {type i_ap_none width 64} gmem_conv2d_64_biases {type i_ap_none width 64} gmem_dense_weights {type i_ap_none width 64} gmem_dense_biases {type i_ap_none width 64} gmem_softmax_weights {type i_ap_none width 64} gmem_softmax_biases {type i_ap_none width 64} gmem_conv2d_32_feature_map {type i_ap_none width 64} gmem_maxp2d_32_feature_map {type i_ap_none width 64} gmem_conv2d_64_feature_map {type i_ap_none width 64} gmem_maxp2d_64_feature_map {type i_ap_none width 64} gmem_dense_feature_map {type i_ap_none width 64} gmem_softmax_feature_map {type i_ap_none width 64} ap_start {type ap_ctrl width 1} ap_done {type ap_ctrl width 1} ap_ready {type ap_ctrl width 1} ap_continue {type ap_ctrl width 1} ap_idle {type ap_ctrl width 1}} mems {} has_ctrl 1}
-set datawidth 32
-set addrwidth 64
-set intr_clr_mode COR
