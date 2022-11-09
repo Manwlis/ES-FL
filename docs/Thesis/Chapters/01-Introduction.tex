@@ -13,22 +13,21 @@ Most FL research, to our knowledge, focuses on simulations and treats edge devic
 
 Beside being incompatible, these two technologies may complement each other, which is something worth investigating. Frequently in FL, transformations are applied on the generated ANN variables to reduce network utilization and enhance privacy. These transformations, which include quantization \cite{Mills2020}, adding Gaussian noise \cite{Wei2020} and others, tend to be spatially independent and could be implemented highly efficiently in hardware accelerators like FPGAs.
 
-Finally, FL literature is almost devoid of wall-clock time examples. This thesis aims to provide a real world FL implementation that may be considered as a benchmark for future research. Furthermore, in order to be extendable and utilized in future works, the implementation is modular and platform independent.
+Finally, FL literature is almost devoid of wall-clock time examples. This thesis aims to provide a real world FL implementation that may be considered as a benchmark for future research. Furthermore, in order to be extendable and utilized in future works, the FL implementation is modular and platform independent.
 
 
 \section{Scientific Contributions}
 
-The main focus of this thesis is combining FL training with FPGA implementations of ANN, while exploring and overcoming their inherent conflicts.\\
-Furthermore, it focus on the mostly unexplored FL setting of small client pools and its inherent difficulties.\\
-Finally, it gives a real world implementation of FL that can be used as a benchmark for future works. It provides an FL implementation that is agnostic to the ANN training implementation and can be used as a starting point for future works. 
+The main focus of this thesis is combining FL training with FPGA based ANN implementations, while exploring and overcoming their inherent conflicts. Furthermore, it focus on the mostly unexplored FL setting of small client pools and its implicit difficulties. Finally, it provides a real world implementation of FL that can be used as a benchmark for future works. This FL implementation is agnostic of the ANN training implementation and can be used as a starting point for future works.
 
 \section{Thesis Outline}
 % Todo: Fill chapter descriptions
 \begin{itemize}
-	\item \textbf{Chapter 2 - Theoretical Background:} Description of the theoretical background of ML and FL.
-	\item \textbf{Chapter 3 - Related Work:} Related works on FL, optimization techniques and hardware implementations of it.
-	\item \textbf{Chapter 4 - Robustness Analysis:} Chapter 4 description
-	\item \textbf{Chapter 5 - FPGA Implementation:} Chapter 5 description
-	\item \textbf{Chapter 6 - Results:} Chapter 6 description
-	\item \textbf{Chapter 7 - Conclusions and Related Work:} Chapter 7 description
+    \item \textbf{Chapter 2 - Theoretical Background:} Description of the theoretical background of ML and FL.
+    \item \textbf{Chapter 3 - Related Work:} Related works on FL, optimization techniques and hardware implementations of it.
+    \item \textbf{Chapter 4 - FL architecture \& design:} Description of the FL architecture, design and implementation developed.
+    \item \textbf{Chapter 5 - Robustness Analysis:} Analysis of the quality and performance of the FL implementation.
+    \item \textbf{Chapter 6 - FPGA Implementation:} Description of the ANN architecture, design and implementation on FPGA developed.
+    \item \textbf{Chapter 7 - Results:} Analysis of the quality and performance of the complete system.
+    \item \textbf{Chapter 8 - Conclusions and Related Work:} Chapter 7 description
 \end{itemize}

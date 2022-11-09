@@ -141,7 +141,14 @@ While FederatedSGD improves the computation-to-communication ratio, a number of 
     \end{algorithmic}
 \end{algorithm}
 
-fedavg algorithm
 
 \section{The FPGA Perspective}
+In our knowledge, no prior works have attempted to merge FL and FPGAs. Modern system-on-chip (SoC) FPGAs contain all the tools required to implement FL, including running on an operating system and having an Ethernet adaptor. As such, connecting the two technologies should be feasible.
+
+FL on the FPGA shouldn't be substantially different from centralized training in terms of design or implementation. In contrast, the driver of the re-programmable hardware will differ, as it must facilitate the FL procedure. Furthermore, The FL algorithm itself is not computationally demanding and may be conveniently offloaded to the SoC's CPU.
+
 \section{Thesis Approach}
+As the thesis moves forward, conflicts in terms of design and implementation are anticipated to arise between the two technologies. Furthermore, this is an mostly unexplored field. As such, a conservative and steady approach is expected to work best. 
+
+Initially, a FL implementation that is agnostic and independent of the underlying training implementation, will be developed. Its robustness will be thoroughly validated, using TensorFlow to facilitate the local training. Subsequently, an FPGA-based CNN training implementation will be created. Finally, by combining the networking code of the FL clients with the FPGA driver,
+an intermediate layer will connect the previous two implementations.
