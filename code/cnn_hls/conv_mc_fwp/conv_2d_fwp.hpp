@@ -2,24 +2,25 @@
 
 #include <hls_stream.h>
 
-#define conv2d_32_filter_height 3
-#define conv2d_32_filter_width  3
-#define conv2d_32_num_filters  32
+#define conv_32_filter_height 3
+#define conv_32_filter_width  3
+#define conv_32_num_filters  32
 
-#define conv2d_32_in_height   14
-#define conv2d_32_in_width	  14
-#define conv2d_32_in_channels 16
+#define conv_32_in_height   14
+#define conv_32_in_width	  14
+#define conv_32_in_channels 16
 
-#define conv2d_32_out_height   14
-#define conv2d_32_out_width    14
-#define conv2d_32_out_channels 32
+#define conv_32_out_height   14
+#define conv_32_out_width    14
+#define conv_32_out_channels 32
 
 typedef unsigned int U32;
 
 
-template < typename in_type , unsigned int filter_height , unsigned int filter_width >
-struct window {
-	in_type elements[filter_height][filter_width];
+template < typename data_type , unsigned int filter_height , unsigned int filter_width >
+struct window
+{
+	data_type elements[filter_height][filter_width];
 
 	void operator=(const window& input)
 	{
@@ -29,25 +30,29 @@ struct window {
 	}
 };
 
-
-// Reads a stream and puts its data on global memory
-template < typename out_type_1 , typename out_type_2 , unsigned int num_elements >
-void write_mem ( hls::stream< out_type_1 >& in_stream_1 , out_type_1 output_1[num_elements] , hls::stream< out_type_2 >& in_stream_2 )
+template < typename data_type , unsigned int size >
+struct window_1d
 {
-	write_out_mem: for ( unsigned int i = 0 ; i < num_elements ; i++ )
+	data_type elements[size];
+
+	void operator=(const window_1d& input)
 	{
-		out_type_1 temp = in_stream_1.read();
-		output_1[i] = temp;
-		out_type_2 blackhole = in_stream_2.read();
+		for( int s = 0 ; s < size ; s++ )
+			this->elements[s] = input.elements[s];
 	}
-}
+	void operator+=(const window_1d& input)
+	{
+		for( int s = 0 ; s < size ; s++ )
+			this->elements[s] += input.elements[s];
+	}
+};
 
 
 extern "C"
 {
 void accel (
 	float* input ,
-	float conv2d_32_weights[conv2d_32_filter_height][conv2d_32_filter_width][conv2d_32_in_channels][conv2d_32_num_filters] ,
-	float* conv2d_32_biases ,
-	float* conv2d_32_feature_map );
+	float conv_32_weights[conv_32_filter_height][conv_32_filter_width][conv_32_in_channels][conv_32_num_filters] ,
+	float* conv_32_biases ,
+	float* conv_32_feature_map );
 }

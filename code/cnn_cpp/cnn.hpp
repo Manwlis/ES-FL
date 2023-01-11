@@ -13,66 +13,66 @@
 #define image_channels 1
 
 // passes through 16 3x3 filters
-#define conv2d_16_filter_height 3
-#define conv2d_16_filter_width  3
-#define conv2d_16_num_filters  16
+#define l0_conv_filter_height 3
+#define l0_conv_filter_width  3
+#define l0_conv_num_filters  16
 
-#define conv2d_16_in_height   image_height   // 28
-#define conv2d_16_in_width    image_width    // 28
-#define conv2d_16_in_channels image_channels // 1
+#define l0_conv_in_height   image_height   // 28
+#define l0_conv_in_width    image_width    // 28
+#define l0_conv_in_channels image_channels // 1
 
-#define conv2d_16_out_height   conv2d_16_in_height   // 28
-#define conv2d_16_out_width	   conv2d_16_in_width    // 28
-#define conv2d_16_out_channels conv2d_16_num_filters // 16
+#define l0_conv_out_height   l0_conv_in_height   // 28
+#define l0_conv_out_width	 l0_conv_in_width    // 28
+#define l0_conv_out_channels l0_conv_num_filters // 16
 
 // max pooling 2x2x1 with (2,2,1) stride
-#define maxp2d_16_filter_height 2
-#define maxp2d_16_filter_width  2
-#define maxp2d_16_filter_stride 2
+#define l1_maxp_filter_height 2
+#define l1_maxp_filter_width  2
+#define l1_maxp_filter_stride 2
 
-#define maxp2d_16_in_height   conv2d_16_out_height   // 28
-#define maxp2d_16_in_width    conv2d_16_out_width    // 28
-#define maxp2d_16_in_channels conv2d_16_out_channels // 16
+#define l1_maxp_in_height   l0_conv_out_height   // 28
+#define l1_maxp_in_width    l0_conv_out_width    // 28
+#define l1_maxp_in_channels l0_conv_out_channels // 16
 
-#define maxp2d_16_out_height   maxp2d_16_in_height / maxp2d_16_filter_stride // 14
-#define maxp2d_16_out_width    maxp2d_16_in_width  / maxp2d_16_filter_stride // 14
-#define maxp2d_16_out_channels maxp2d_16_in_channels                         // 16
+#define l1_maxp_out_height   l1_maxp_in_height / l1_maxp_filter_stride // 14
+#define l1_maxp_out_width    l1_maxp_in_width  / l1_maxp_filter_stride // 14
+#define l1_maxp_out_channels l1_maxp_in_channels                       // 16
 
 // 32 3x3 filters
-#define conv2d_32_filter_height 3
-#define conv2d_32_filter_width  3
-#define conv2d_32_num_filters  32
+#define l2_conv_filter_height 3
+#define l2_conv_filter_width  3
+#define l2_conv_num_filters  16
 
-#define conv2d_32_in_height   maxp2d_16_out_height   // 14
-#define conv2d_32_in_width	  maxp2d_16_out_width    // 14
-#define conv2d_32_in_channels maxp2d_16_out_channels // 16
+#define l2_conv_in_height   l1_maxp_out_height   // 14
+#define l2_conv_in_width	l1_maxp_out_width    // 14
+#define l2_conv_in_channels l1_maxp_out_channels // 16
 
-#define conv2d_32_out_height   maxp2d_16_out_height  // 14
-#define conv2d_32_out_width    maxp2d_16_out_width   // 14
-#define conv2d_32_out_channels conv2d_32_num_filters // 32
+#define l2_conv_out_height   l1_maxp_out_height  // 14
+#define l2_conv_out_width    l1_maxp_out_width   // 14
+#define l2_conv_out_channels l2_conv_num_filters // 16
 
 // max pooling 2x2x1 with (2,2,1) stride
-#define maxp2d_32_filter_height 2
-#define maxp2d_32_filter_width  2
-#define maxp2d_32_filter_stride 2
+#define l3_maxp_filter_height 2
+#define l3_maxp_filter_width  2
+#define l3_maxp_filter_stride 2
 
-#define maxp2d_32_in_height   conv2d_32_out_height   // 14
-#define maxp2d_32_in_width    conv2d_32_out_width    // 14
-#define maxp2d_32_in_channels conv2d_32_out_channels // 32
+#define l3_maxp_in_height    l2_conv_out_height   // 14
+#define l3_maxp_in_width     l2_conv_out_width    // 14
+#define l3_maxp_in_channels  l2_conv_out_channels // 16
 
-#define maxp2d_32_out_height   maxp2d_32_in_height / maxp2d_32_filter_stride // 7
-#define maxp2d_32_out_width    maxp2d_32_in_width  / maxp2d_32_filter_stride // 7
-#define maxp2d_32_out_channels maxp2d_32_in_channels                         // 32
+#define l3_maxp_out_height   l3_maxp_in_height / l3_maxp_filter_stride // 7
+#define l3_maxp_out_width    l3_maxp_in_width  / l3_maxp_filter_stride // 7
+#define l3_maxp_out_channels l3_maxp_in_channels                       // 16
 
 // fully connected layer
-#define dense_num_in      maxp2d_32_out_channels * maxp2d_32_out_height * maxp2d_32_out_width // 1568
-#define dense_num_kernels 64
-#define dense_num_out     dense_num_kernels	// 64
+#define l4_dense_num_in      l3_maxp_out_channels * l3_maxp_out_height * l3_maxp_out_width // 1568
+#define l4_dense_num_kernels 64
+#define l4_dense_num_out     l4_dense_num_kernels	// 64
 
 // softmax classification layer
-#define softmax_num_in      dense_num_out       // 64
-#define softmax_num_kernels 10
-#define softmax_num_out     softmax_num_kernels // 10
+#define l5_softmax_num_in      l4_dense_num_out       // 64
+#define l5_softmax_num_kernels 10
+#define l5_softmax_num_out     l5_softmax_num_kernels // 10
 
 #define learning_rate_const 0.01f
 

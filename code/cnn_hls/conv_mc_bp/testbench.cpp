@@ -22,7 +22,7 @@ int main ( int argc , char** argv )
 {
 	static float conv_32_out_error[conv_32_out_height][conv_32_out_width][conv_32_out_channels];
 	static bool conv_32_activations[conv_32_out_height][conv_32_out_width][conv_32_out_channels];
-	static float conv_32_weights[conv_32_num_filters][conv_32_filter_height][conv_32_filter_width][conv_32_in_channels];
+	static float conv_32_weights[conv_32_filter_height][conv_32_filter_width][conv_32_in_channels][conv_32_num_filters];
 
 	std::ifstream file;
 	std::string line;
@@ -56,7 +56,7 @@ int main ( int argc , char** argv )
 				for ( int kernel = 0 ; kernel < conv_32_num_filters ; kernel++ )
 				{
 					getline( file , line );
-					conv_32_weights[kernel][y][x][channel] = std::stof( line );
+					conv_32_weights[y][x][channel][kernel] = std::stof( line );
 				}
 	file.close();
 
@@ -67,6 +67,5 @@ int main ( int argc , char** argv )
 			conv_32_weights , reinterpret_cast<float*>(conv_32_in_error) );
 
 	/*********** Print Results ***********/
-	save_array < conv_32_in_height * conv_32_in_width * conv_32_in_channels >
-		( reinterpret_cast<float*>(conv_32_in_error) , "data/l1_out_grads_hls.txt" , 4 );
+	save_array < conv_32_in_height * conv_32_in_width * conv_32_in_channels > ( reinterpret_cast<float*>(conv_32_in_error) , "data/l1_out_grads_hls.txt" , 4 );
 }

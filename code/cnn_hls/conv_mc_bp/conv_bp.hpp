@@ -34,6 +34,23 @@ struct window {
 	}
 };
 
+template < typename data_type , unsigned int size >
+struct window_1d
+{
+	data_type elements[size];
+
+	void operator=(const window_1d& input)
+	{
+		for( int s = 0 ; s < size ; s++ )
+			this->elements[s] = input.elements[s];
+	}
+	void operator+=(const window_1d& input)
+	{
+		for( int s = 0 ; s < size ; s++ )
+			this->elements[s] += input.elements[s];
+	}
+};
+
 template < typename data_type , unsigned int array_size >
 void array_to_stream( data_type array[array_size] , hls::stream < data_type >& stream )
 {
@@ -56,6 +73,6 @@ extern "C"
 void accel (
 	float conv_32_out_error[conv_32_out_height * conv_32_out_width * conv_32_out_channels] ,
 	bool conv_32_activations[conv_32_out_height * conv_32_out_width * conv_32_out_channels] ,
-	float gmem_conv_32_weights[conv_32_num_filters][conv_32_filter_height][conv_32_filter_width][conv_32_in_channels] ,
+	float gmem_conv_32_weights[conv_32_filter_height][conv_32_filter_width][conv_32_in_channels][conv_32_num_filters] ,
 	float conv_32_in_error[conv_32_in_height * conv_32_in_width * conv_32_in_channels] );
 }

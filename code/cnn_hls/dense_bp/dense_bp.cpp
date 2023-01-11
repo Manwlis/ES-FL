@@ -1,63 +1,64 @@
 #include "dense_bp.hpp"
 
 template < unsigned int num_kernels , unsigned int num_inputs >
-void dense_error_propagation (
-	float weights[dense_num_in][dense_num_kernels] ,
-	hls::stream< bool >& activations_stream ,
-	hls::stream< float >& out_error_stream ,
-	hls::stream< float >& in_error_stream )
+void activate_kernel_errors ( hls::stream< bool >& s_activations , hls::stream< float >& s_out_error , hls::stream< float >& s_kernel_error )
+{
+	kernel_errors: for ( unsigned int kernel = 0 ; kernel < num_kernels ; kernel++ )
+	{
+		float kernel_out_error = s_out_error.read();
+		bool kernel_activation = s_activations.read();
+		float kernel_error = kernel_activation ? kernel_out_error : 0.f;
+		s_kernel_error.write( kernel_error );
+	}
+}
+
+
+template < unsigned int num_kernels , unsigned int num_inputs >
+void dense_error_propagation ( float weights[dense_num_in][dense_num_kernels] , hls::stream< float >& s_kernel_error , hls::stream< float >& s_in_error )
 {
 	float kernel_in_errors[num_kernels];
 #pragma HLS ARRAY_PARTITION variable=kernel_in_errors type=complete
 
 	kernel_errors: for ( unsigned int kernel = 0 ; kernel < num_kernels ; kernel++ )
-	{
-		float kernel_out_error = out_error_stream.read();
-		bool kernel_activation = activations_stream.read();
-		kernel_in_errors[kernel] = kernel_activation ? kernel_out_error : 0.f;
-	}
+		kernel_in_errors[kernel] = s_kernel_error.read();
 
-	in_error: for ( unsigned int input = 0 ; input < num_inputs ; input++ )
+	input: for ( unsigned int input = 0 ; input < num_inputs ; input++ )
 	{
-#pragma HLS PIPELINE II=3
-		float in_sum = 0.f;
+#pragma HLS PIPELINE II=4
+		float input_sum = 0.f;
 		kernel: for ( unsigned int kernel = 0 ; kernel < num_kernels ; kernel++ )
-			in_sum += weights[input][kernel] * kernel_in_errors[kernel];
-		
-		in_error_stream.write( in_sum );
+			input_sum += weights[input][kernel] * kernel_in_errors[kernel];
+
+		s_in_error.write( input_sum );
 	}
 }
 
-void dataflow_region (
-	float gmem_weights[dense_num_in][dense_num_kernels] ,
-	hls::stream< bool >& activations_stream ,
-	float dense_out_error[dense_num_kernels] ,
+
+void dataflow_region ( float gmem_weights[dense_num_in][dense_num_kernels] , hls::stream < bool >& s_activations , float dense_out_error[dense_num_kernels] ,
 	float dense_in_error[dense_num_in] )
 {
 #pragma HLS DATAFLOW
-	hls::stream< float , 2 > out_error_stream;
-	array_to_stream < float , dense_num_kernels > ( dense_out_error , out_error_stream );
+	hls::stream < float , 2 > s_out_error;
+	array_to_stream < float , dense_num_kernels > ( dense_out_error , s_out_error );
 
-	hls::stream< float , 2 > in_error_stream;
-	dense_error_propagation < dense_num_kernels , dense_num_in > ( gmem_weights , activations_stream , out_error_stream , in_error_stream );
+	hls::stream < float , 2 > s_kernel_error;
+	activate_kernel_errors < dense_num_kernels , dense_num_in > ( s_activations, s_out_error, s_kernel_error );
 
-	stream_to_array < float , dense_num_in > ( in_error_stream , dense_in_error );
+	hls::stream < float , 2 > s_in_error;
+	dense_error_propagation < dense_num_kernels , dense_num_in > ( gmem_weights , s_kernel_error , s_in_error );
+
+	stream_to_array < float , dense_num_in > ( s_in_error , dense_in_error );
 }
 
 
-void accel (
-	float gmem_dense_weights[dense_num_in][dense_num_kernels] ,
-	float dense_out_error[dense_num_kernels] ,
-	bool activations[dense_num_kernels] ,
+void accel ( float gmem_dense_weights[dense_num_in][dense_num_kernels] , float dense_out_error[dense_num_kernels] , bool activations[dense_num_kernels] ,
 	float dense_in_error[dense_num_in] )
 {
-//#pragma HLS INTERFACE mode=m_axi port=gmem_dense_weights bundle=gmem_weights
 	float dense_weights[dense_num_in][dense_num_kernels];
-//#pragma HLS ARRAY_RESHAPE variable=dense_weights dim=2 type=block factor=3
 	save_variables_locally < float , dense_num_kernels , dense_num_in > ( gmem_dense_weights , dense_weights );
 
-	hls::stream< bool , dense_num_kernels > activations_stream;
-	array_to_stream < bool , dense_num_kernels > ( activations , activations_stream );
+	hls::stream< bool , dense_num_kernels > s_activations;
+	array_to_stream < bool , dense_num_kernels > ( activations , s_activations );
 
-	dataflow_region( dense_weights , activations_stream , dense_out_error , dense_in_error );
+	dataflow_region( dense_weights , s_activations , dense_out_error , dense_in_error );
 }

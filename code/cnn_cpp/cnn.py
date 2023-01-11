@@ -35,19 +35,19 @@ def share_trainable_variables( model ):
 	for dim3 in range( 0 , 3 , 1 ):
 		for dim2 in range( 0 , 3 , 1 ):
 			for dim1 in range( 0 , 16 , 1 ):
-				for dim0 in range( 0 , 32 , 1 ):
+				for dim0 in range( 0 , 16 , 1 ):
 						file.write( '{}\n'.format( np_array[dim3][dim2][dim1][dim0] ) )
 
 	###### Layer 2 biases ######
 	np_array = model.trainable_variables[3].numpy()
 	file = open( "temp/l2_biases.txt" , "w" )
-	for dim0 in range( 0 , 32 , 1 ):
+	for dim0 in range( 0 , 16 , 1 ):
 		file.write( '{}\n'.format( np_array[dim0] ) )
 
 	###### Layer 4 weights ######
 	np_array = model.trainable_variables[4].numpy()
 	file = open( "temp/l4_weights.txt" , "w" )
-	for dim1 in range( 0 , 1568 , 1 ):
+	for dim1 in range( 0 , 784 , 1 ):
 		for dim0 in range( 0 , 64 , 1 ):
 			file.write( '{}\n'.format( np_array[dim1][dim0] ) )
 			
@@ -92,7 +92,7 @@ def save_activations( activations ):
 	file = open( "activations/l2_conv32_tf.txt" , "w" )
 	for i in range( 0 , 14 , 1 ):
 		for k in range( 0 , 14 , 1 ):
-			for filter in range( 0 , 32 , 1 ):
+			for filter in range( 0 , 16 , 1 ):
 				file.write( '{:.4f}\n'.format( np_array[0][i][k][filter] ) )
 
 	###### Layer 3 activations ######
@@ -100,7 +100,7 @@ def save_activations( activations ):
 	file = open( "activations/l3_maxp32_tf.txt" , "w" )
 	for i in range( 0 , 7 , 1 ):
 		for k in range( 0 , 7 , 1 ):
-			for filter in range( 0 , 32 , 1 ):
+			for filter in range( 0 , 16 , 1 ):
 				file.write( '{:.4f}\n'.format( np_array[0][i][k][filter] ) )
 
 	###### Layer 4 activations ######
@@ -137,13 +137,13 @@ def save_output_gradients( output_gradients ):
 	file = open( "output_gradients/l2_conv32_tf.txt" , "w" )
 	for i in range( 0 , 14 , 1 ):
 		for k in range( 0 , 14 , 1 ):
-			for filter in range( 0 , 32 , 1 ):
+			for filter in range( 0 , 16 , 1 ):
 				file.write( '{:.4f}\n'.format( np_array[0][i][k][filter] ) )
 
 	###### Layer 3 output gradients ######
 	np_array = np.copy( output_gradients[4] )
 	file = open( "output_gradients/l3_maxp32_tf.txt" , "w" )
-	for filter in range( 0 , 1568 , 1 ):
+	for filter in range( 0 , 784 , 1 ):
 		file.write( '{:.4f}\n'.format( np_array[0][filter] ) )
 
 	###### Layer 4 output gradients ######
@@ -175,19 +175,19 @@ def save_variable_gradients( gradients ):
 	for dim3 in range( 0 , 3 , 1 ):
 		for dim2 in range( 0 , 3 , 1 ):
 			for dim1 in range( 0 , 16 , 1 ):
-				for dim0 in range( 0 , 32 , 1 ):
+				for dim0 in range( 0 , 16 , 1 ):
 						file.write( '{:.4f}\n'.format( np_array[dim3][dim2][dim1][dim0] ) )
 
 	###### Layer 2 biases ######
 	np_array = np.copy( gradients[3] )
 	file = open( "variable_gradients/l2_biases_tf.txt" , "w" )
-	for dim0 in range( 0 , 32 , 1 ):
+	for dim0 in range( 0 , 16 , 1 ):
 		file.write( '{:.4f}\n'.format( np_array[dim0] ) )
 
 	###### Layer 4 weights ######
 	np_array = np.copy( gradients[4] )
 	file = open( "variable_gradients/l4_weights_tf.txt" , "w" )
-	for dim1 in range( 0 , 1568 , 1 ):
+	for dim1 in range( 0 , 784 , 1 ):
 		for dim0 in range( 0 , 64 , 1 ):
 			file.write( '{:.4f}\n'.format( np_array[dim1][dim0] ) )
 			
@@ -232,19 +232,19 @@ def save_trained_variables( variables ):
 	for dim3 in range( 0 , 3 , 1 ):
 		for dim2 in range( 0 , 3 , 1 ):
 			for dim1 in range( 0 , 16 , 1 ):
-				for dim0 in range( 0 , 32 , 1 ):
+				for dim0 in range( 0 , 16 , 1 ):
 						file.write( '{:.6f}\n'.format( np_array[dim3][dim2][dim1][dim0] ) )
 
 	###### Layer 2 biases ######
 	np_array = np.copy( variables[3] )
 	file = open( "variables/l2_biases_tf.txt" , "w" )
-	for dim0 in range( 0 , 32 , 1 ):
+	for dim0 in range( 0 , 16 , 1 ):
 		file.write( '{:.6f}\n'.format( np_array[dim0] ) )
 
 	###### Layer 4 weights ######
 	np_array = np.copy( variables[4] )
 	file = open( "variables/l4_weights_tf.txt" , "w" )
-	for dim1 in range( 0 , 1568 , 1 ):
+	for dim1 in range( 0 , 784 , 1 ):
 		for dim0 in range( 0 , 64 , 1 ):
 			file.write( '{:.6f}\n'.format( np_array[dim1][dim0] ) )
 			
@@ -283,21 +283,26 @@ def main():
 	train_dataset =  train_dataset.map(normalize)
 	test_dataset  =  test_dataset.map(normalize)
 
-	BATCH_SIZE = 16
-	train_dataset = train_dataset.cache().repeat().shuffle(num_train_examples).batch(BATCH_SIZE)
+	image_list = []
+	label_list = []
+	
+	with open( "temp/array.txt" , "a" ) as f:
+		for image , label in train_dataset.take( 2 ):
+			image_list.append( [image] )
+			label_list.append( [label] )
+			image_out = image.numpy().reshape( ( 28 , 28 ) )
+			np.savetxt( f , image_out , fmt = '%1.18f' )
 
-	# save one sample to expose it to the C++ code
-	for image , label in test_dataset.take(1):
-		break
-	image_out = image.numpy().reshape( ( 28 , 28 ) )
-	np.savetxt( 'temp/array.txt' , image_out , fmt = '%1.18f' )
+	image_batch = np.concatenate( image_list )
+	label_batch = np.concatenate( label_list )
+		
 
 	##### create & train model #####
 	# create model
 	cnn = tf.keras.Sequential([
 		tf.keras.layers.Conv2D( 16, ( 3 , 3 ) , padding = 'same', activation = 'relu', input_shape = ( 28 , 28 , 1 ) , kernel_initializer=GlorotUniform( seed=0 ) ),
 		tf.keras.layers.MaxPool2D( ( 2 , 2 ) , strides = 2 ),
-		tf.keras.layers.Conv2D( 32, ( 3 , 3 ) , padding = 'same', activation = 'relu' , kernel_initializer=GlorotUniform( seed=0 ) ),
+		tf.keras.layers.Conv2D( 16, ( 3 , 3 ) , padding = 'same', activation = 'relu' , kernel_initializer=GlorotUniform( seed=0 ) ),
 		tf.keras.layers.MaxPool2D( ( 2 , 2 ) , strides = 2 ),
 		tf.keras.layers.Flatten(),
 		tf.keras.layers.Dense( 64 , activation= 'relu' , kernel_initializer=GlorotUniform( seed=0 ) ),
@@ -308,25 +313,21 @@ def main():
 	optimizer = tf.keras.optimizers.SGD(  )
 	cnn.compile( optimizer , loss=tf.keras.losses.SparseCategoricalCrossentropy() , metrics=['accuracy'] )
 
-	# train
-	# cnn.fit(train_dataset , epochs=1 , steps_per_epoch=math.ceil( num_train_examples / BATCH_SIZE ) )
-
 	# share model variables with c++ code and distinct layer
 	share_trainable_variables( cnn )
 
 	##### evaluate model and save outputs #####
-	test_image = np.array([image])
-	test_label = np.array([label])
-	
 	# keep tracks of the outputs of all layers
 	heatmap_model = tf.keras.Model( cnn.inputs , [layer.output for layer in cnn.layers] )
-	# pass an image through forward, back prop and variable update
-	with tf.GradientTape( persistent=True ) as g:
-		# forward prop
-		features = heatmap_model( test_image )
 
-		# get total error
-		loss = cnn.loss( y_true = test_label , y_pred = features[-1] )
+	for i in range( 0 , 1 ):
+		# pass an image through forward, back prop and variable update
+		with tf.GradientTape( persistent=True ) as g:
+			# forward prop
+			features = heatmap_model( image_batch )
+
+			# get total error
+			loss = cnn.loss( y_true = label_batch , y_pred = features[-1] )
 
 		# back prop
 		output_gradients = g.gradient( loss , features )
@@ -334,10 +335,11 @@ def main():
 
 		# apply gradients
 		optimizer.apply_gradients( zip( variable_gradients , cnn.trainable_variables ) )
+	
+		print( "\nTF entropy:  {:.8f}".format( loss ) )
 
 	##### Print stuff #####
 	save_activations( features )
-	print( "\nTF entropy:  {:.8f}".format( loss ) )
 	save_output_gradients( output_gradients )
 	save_variable_gradients( variable_gradients )
 	save_trained_variables( cnn.trainable_variables )

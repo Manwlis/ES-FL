@@ -98,7 +98,7 @@ def setup_train_data():
 	#Federated Learning
 	# splits data evenly between clients
 	elif( sys.argv[1] == "IID" ):
-		train_shard_unshafled = train_dataset.shard( num_shards=int(sys.argv[2]) , index=int(sys.argv[3]) ) # shard is deterministic
+		train_shard_unshafled = train_dataset.shard( num_shards=int(sys.argv[2] ) , index=int(sys.argv[3]) ) # shard is deterministic
 	# split data by label, extreme case of non IID data. Need Num_clients MOD 5 = 0 to use all data
 	elif( sys.argv[1] == "nonIID" ):
 		@tf.function

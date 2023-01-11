@@ -28,7 +28,7 @@ int main ( int argc , char** argv )
 	std::ifstream file;
 	std::string line;
 
-	file.open("data/l4_dense_cpp.txt");
+	file.open("data/l4_fmap.txt");
 	for ( int i = 0 ; i < softmax_num_in ; i++ )
 	{
 		getline( file , line );
