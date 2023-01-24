@@ -185,7 +185,7 @@ void fp_bp_cg (
 	hls::stream < float , 2 > s_l2_conv_fmap_fp;
 	hls::stream < float , 3 > s_l3_maxp_fmap_fp;
 	hls::stream < float , 3 > s_l4_dens_fmap_fp;
-	hls::stream < float , 4 > s_l5_soft_fmap_fp;
+	hls::stream < float , 5 > s_l5_soft_fmap_fp;
 
 	hls::stream < float , 2 > s_err_bp;
 	hls::stream < float , 2 > s_l5_soft_in_err;
@@ -323,7 +323,7 @@ void fp_bp_cg (
 	hls::stream < window < float , l2_conv_f_h , l2_conv_f_w > , 2 > s_l2_conv_out_err_wnd;
 	hls::stream < window < float , l2_conv_f_h , l2_conv_f_w > , 2 > s_l2_conv_out_err_pad_wnd;
 	hls::stream < window_1d < float , l2_conv_in_c > , 1 > s_l2_c_err_per_f;
-	hls::stream < window_1d < float , l2_conv_in_c > , 1 > s_l2_c_err;
+	hls::stream < window_1d < float , l2_conv_in_c > , 2 > s_l2_c_err;
 
 	// filter unactivated errors
 	conv_bp_activate_error < batch_size , l2_conv_out_h , l2_conv_out_w , l2_conv_out_c >

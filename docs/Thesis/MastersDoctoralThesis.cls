@@ -559,7 +559,9 @@ breaklinks=true,
     \end{tabular}
     \par\vspace{\belowdisplayskip}
 }
-  
+%----------------------------------------------------------------------------------------
+\newcommand{\pluseq}{\mathrel{{+}{=}}}
+\newcommand{\minuseq}{\mathrel{{-}{=}}}
 %----------------------------------------------------------------------------------------
 \endinput
 % lazyLizardTracer

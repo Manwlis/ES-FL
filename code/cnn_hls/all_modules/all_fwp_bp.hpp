@@ -7,7 +7,7 @@
 
 /***** Size definitions *****/
 #define num_batches			1
-#define batch_size			10
+#define batch_size			2
 #define learning_rate_const 0.01f
 
 // 28x28x1 image
