@@ -5,28 +5,26 @@
 #include "conv_layer.hpp"
 
 
-void input_to_stream ( float input_data[batch_size][input_h][input_w] , hls::stream < float >& s_input )
+void maxi_data_to_stream ( uint batch ,
+	float input_data[num_batches][batch_size][input_h][input_w] , hls::stream < float >& s_input )
 {
-	batch: for ( uint b = 0 ; b < batch_size ; b++ )
+	stream_batch:
+	for ( uint s = 0 ; s < batch_size ; s++ )
 		for ( uint h = 0 ; h < input_h ; h++ )
 			for ( uint w = 0 ; w < input_w ; w++ )
-				s_input.write( input_data[b][h][w] );
+#pragma HLS PIPELINE II=1
+				s_input.write( input_data[batch][s][h][w] );
 }
 
-void read_batch ( uint batch ,
-	float gmem_input_data[num_batches][batch_size][input_h][input_w] , float input_batch[batch_size][input_h][input_w] ,
-	uint gmem_label[num_batches][batch_size] , t_label label_batch[batch_size] )
+void maxi_labels_to_stream ( uint batch ,
+	t_label input_labels[num_batches][batch_size] , hls::stream < t_label >& s_input )
 {
-	store_images: for ( uint b = 0 ; b < batch_size ; b++ )
-		for ( uint h = 0 ; h < input_h ; h++ )
-			for ( uint w = 0 ; w < input_w ; w++ )
-#pragma HLS PIPELINE off
-				input_batch[b][h][w] = gmem_input_data[batch][b][h][w];
-
-	store_labels: for ( uint b = 0 ; b < batch_size ; b++ )
-#pragma HLS PIPELINE off
-		label_batch[b] = gmem_label[batch][b];
+	stream_labels:
+	for ( uint s = 0 ; s < batch_size ; s++ )
+#pragma HLS PIPELINE II=1
+		s_input.write( input_labels[batch][s] );
 }
+
 
 void save_variables_locally (
 	float gmem_l0_conv_weights[l0_conv_f_h][l0_conv_f_w][l0_conv_f] , float gmem_l0_conv_biases[l0_conv_f] ,
@@ -138,7 +136,11 @@ void save_variables_globally (
 
 
 void fp_bp_cg (
-	float input_batch[batch_size][input_h][input_w] , t_label label_batch[batch_size] ,
+	float gmem_input_data_fp[num_batches][batch_size][input_h][input_w] ,
+	float gmem_input_data_cg[num_batches][batch_size][input_h][input_w] ,
+	t_label gmem_labels[num_batches][batch_size] ,
+	uint batch ,
+
 	float l0_conv_weights[l0_conv_f_h][l0_conv_f_w][l0_conv_f] , float l0_conv_biases[l0_conv_f] ,
 	float l2_conv_weights_fp[l2_conv_f_h][l2_conv_f_w][l2_conv_in_c][l2_conv_f] , float l2_conv_weights_bp[l2_conv_f_h][l2_conv_f_w][l2_conv_in_c][l2_conv_f] ,
 	float l2_conv_biases[l2_conv_f] ,
@@ -150,7 +152,7 @@ void fp_bp_cg (
 	float l2_conv_weight_grad[l2_conv_f_h][l2_conv_f_w][l2_conv_in_c][l2_conv_f] , float l2_conv_bias_grad[l2_conv_f] ,
 	float l0_conv_weight_grad[l0_conv_f_h][l0_conv_f_w][l0_conv_f] , float l0_conv_bias_grad[l0_conv_f] )
 {
-#pragma HLS STABLE variable=input_batch
+#pragma HLS STABLE variable=batch
 #pragma HLS STABLE variable=l0_conv_weights
 #pragma HLS STABLE variable=l0_conv_biases
 #pragma HLS STABLE variable=l2_conv_weights_fp
@@ -161,23 +163,22 @@ void fp_bp_cg (
 #pragma HLS STABLE variable=l5_soft_weights
 #pragma HLS STABLE variable=l5_soft_biases
 
-// TODO: make sure this is correct. In csim work fine. Have to check in real hardware. No change in synthesis, kinda spooky.
-#pragma HLS STABLE variable=l0_conv_weight_grad
-#pragma HLS STABLE variable=l0_conv_bias_grad
-#pragma HLS STABLE variable=l2_conv_weight_grad
-#pragma HLS STABLE variable=l2_conv_bias_grad
-#pragma HLS STABLE variable=l4_dens_weight_grad
-#pragma HLS STABLE variable=l4_dens_bias_grad
-#pragma HLS STABLE variable=l5_soft_weight_grad
-#pragma HLS STABLE variable=l5_soft_bias_grad
+// cosim sometimes works, other times not. TODO: Try on real hardware
+//#pragma HLS STABLE variable=l0_conv_weight_grad
+//#pragma HLS STABLE variable=l0_conv_bias_grad
+//#pragma HLS STABLE variable=l2_conv_weight_grad
+//#pragma HLS STABLE variable=l2_conv_bias_grad
+//#pragma HLS STABLE variable=l4_dens_weight_grad
+//#pragma HLS STABLE variable=l4_dens_bias_grad
+//#pragma HLS STABLE variable=l5_soft_weight_grad
+//#pragma HLS STABLE variable=l5_soft_bias_grad
 
 #pragma HLS DATAFLOW
 
-	// stream input
-	hls::stream < float , 2 > s_input_fp;
-	input_to_stream( input_batch , s_input_fp );
-	hls::stream < float , 2 > s_input_cg;
-	input_to_stream( input_batch , s_input_cg );
+	// input streams. maxi inputs, TODO: play with their sizes when in real hardware.
+	hls::stream < float , 3 > s_input_fp;
+	hls::stream < float , 3 > s_input_cg;
+	hls::stream< t_label , 3 > s_labels("s_labels");
 
 	/* Streams between the layers */
 	hls::stream < float , 20 > s_l0_conv_fmap_fp;
@@ -213,6 +214,8 @@ void fp_bp_cg (
 	/************************************************/
 	/***************** Forward prop *****************/
 	/************************************************/
+	maxi_data_to_stream( batch , gmem_input_data_fp , s_input_fp );
+
 /***** Layer 0, 28x28x1 -> conv 16 filters of 3x3, padded, stride 1 -> 28x28x16 *****/
 	// internal data streams
 	hls::stream < window < float , l0_conv_f_h , l0_conv_f_w > , 2 > s_l0_conv_in_wnd_fp;
@@ -298,8 +301,9 @@ void fp_bp_cg (
 	/****************** Back prop *******************/
 	/************************************************/
 /***** Loss function *****/
-	sparce_categorical_cross_entropy < batch_size , l5_soft_k >
-		( s_l5_soft_fmap_fp , label_batch , s_err_bp , s_err_cg );
+	maxi_labels_to_stream( batch, gmem_labels , s_labels );
+	sparce_categorical_cross_entropy < num_batches , batch_size , l5_soft_k >
+		( s_l5_soft_fmap_fp , s_labels , s_err_bp , s_err_cg );
 
 /***** layer 5, 10 -> fully connected softmax 10 backprop -> 64 *****/
 	softmax_bp < batch_size , l5_soft_k , l5_soft_in_size >
@@ -384,6 +388,8 @@ void fp_bp_cg (
 	hls::stream < window < float , l0_conv_f_h , l0_conv_f_w > , 2 > s_l0_conv_in_pad_wnd_cg;
 	hls::stream < float , 2 > s_l0_conv_out_error;
 
+	maxi_data_to_stream( batch , gmem_input_data_cg , s_input_cg );
+
 	conv_create_window_stream < float , batch_size , l0_conv_in_h , l0_conv_in_w , l0_conv_in_c , l0_conv_f_h , l0_conv_f_w >
 		( s_input_cg , s_l0_conv_in_wnd_cg );
 	conv_pad_windows < float , batch_size , l0_conv_in_h , l0_conv_in_w , l0_conv_in_c , l0_conv_f_h , l0_conv_f_w >
@@ -407,11 +413,7 @@ void update_variables( float learning_rate ,
 	float l5_soft_weight_grad[l5_soft_in_size][l5_soft_k] , float l5_soft_bias_grad[l5_soft_k] ,
 	float l4_dens_weight_grad[l4_dens_in_size][l4_dens_k] , float l4_dens_bias_grad[l4_dens_k] ,
 	float l2_conv_weight_grad[l2_conv_f_h][l2_conv_f_w][l2_conv_in_c][l2_conv_f] , float l2_conv_bias_grad[l2_conv_f] ,
-	float l0_conv_weight_grad[l0_conv_f_h][l0_conv_f_w][l0_conv_f] , float l0_conv_bias_grad[l0_conv_f] ,
-
-	float gmem_input_data[num_batches][batch_size][input_h][input_w] , float input_batch[batch_size][input_h][input_w] ,
-	uint gmem_label[num_batches][batch_size] , t_label label_batch[batch_size] ,
-	uint batch )
+	float l0_conv_weight_grad[l0_conv_f_h][l0_conv_f_w][l0_conv_f] , float l0_conv_bias_grad[l0_conv_f] )
 {
 #pragma HLS DATAFLOW
 
@@ -499,22 +501,22 @@ void update_variables( float learning_rate ,
 		l5_soft_biases[k] -= batch_lr * l5_soft_bias_grad[k];
 		l5_soft_bias_grad[k] = 0.f;
 	}
-
-	// read next batch
-	read_batch ( batch , gmem_input_data , input_batch , gmem_label , label_batch );
 }
 
 
 void accel ( float learning_rate ,
-	float gmem_input_data[num_batches][batch_size][input_h][input_w] , uint gmem_label[num_batches][batch_size] ,
+	float gmem_input_data_fp[num_batches][batch_size][input_h][input_w] ,
+	float gmem_input_data_cg[num_batches][batch_size][input_h][input_w] ,
+	uint gmem_labels[num_batches][batch_size] ,
 
 	float gmem_l0_conv_weights[l0_conv_f_h][l0_conv_f_w][l0_conv_f] , float gmem_l0_conv_biases[l0_conv_f] ,
 	float gmem_l2_conv_weights[l2_conv_f_h][l2_conv_f_w][l2_conv_in_c][l2_conv_f] , float gmem_l2_conv_biases[l2_conv_f] ,
 	float gmem_l4_dens_weights[l4_dens_in_size][l4_dens_k] , float gmem_l4_dens_biases[l4_dens_k] ,
 	float gmem_l5_soft_weights[l5_soft_in_size][l5_soft_k] , float gmem_l5_soft_biases[l5_soft_k] )
 {
-	float input_batch[batch_size][input_h][input_w];
-	t_label label_batch[batch_size];
+#pragma HLS INTERFACE mode=m_axi port=gmem_labels
+#pragma HLS INTERFACE mode=m_axi port=gmem_input_data_fp bundle=gmem1
+#pragma HLS INTERFACE mode=m_axi port=gmem_input_data_cg bundle=gmem2
 
 	/***** Save variables locally. *****/
 	float l0_conv_weights[l0_conv_f_h][l0_conv_f_w][l0_conv_f];
@@ -537,7 +539,6 @@ void accel ( float learning_rate ,
 	float l0_conv_bias_grad[l0_conv_f];
 
 // data that are needed in multiple processes must be shared
-#pragma HLS STREAM variable=input_batch type=shared depth=3
 #pragma HLS STREAM variable=l4_dens_weights type=shared depth=3
 #pragma HLS STREAM variable=l5_soft_weights type=shared depth=3
 
@@ -554,12 +555,9 @@ void accel ( float learning_rate ,
 		l0_conv_weights , l0_conv_biases , l2_conv_weights_fp , l2_conv_weights_bp , l2_conv_biases ,
 		l4_dens_weights , l4_dens_biases , l5_soft_weights , l5_soft_biases );
 
-	// store first batch
-	read_batch ( 0 , gmem_input_data , input_batch , gmem_label , label_batch );
-
 	for ( uint num_batch = 0 ; num_batch < num_batches ; num_batch++ )
 	{
-		fp_bp_cg ( input_batch , label_batch ,
+		fp_bp_cg ( gmem_input_data_fp , gmem_input_data_cg , gmem_labels , num_batch ,
 			l0_conv_weights , l0_conv_biases , l2_conv_weights_fp , l2_conv_weights_bp , l2_conv_biases ,
 			l4_dens_weights , l4_dens_biases , l5_soft_weights , l5_soft_biases ,
 			l5_soft_weight_grad , l5_soft_bias_grad , l4_dens_weight_grad , l4_dens_bias_grad ,
@@ -569,8 +567,7 @@ void accel ( float learning_rate ,
 			l0_conv_weights , l0_conv_biases , l2_conv_weights_fp , l2_conv_weights_bp , l2_conv_biases ,
 			l4_dens_weights , l4_dens_biases , l5_soft_weights , l5_soft_biases ,
 			l5_soft_weight_grad , l5_soft_bias_grad , l4_dens_weight_grad , l4_dens_bias_grad ,
-			l2_conv_weight_grad , l2_conv_bias_grad , l0_conv_weight_grad , l0_conv_bias_grad ,
-			gmem_input_data , input_batch , gmem_label , label_batch , num_batch );
+			l2_conv_weight_grad , l2_conv_bias_grad , l0_conv_weight_grad , l0_conv_bias_grad );
 	}
 
 	save_variables_globally (

@@ -1,87 +1,20 @@
-#include "all_fwp_bp.hpp"
+#include "host.hpp"
 
-#include <iostream>
-#include <iomanip>
-#include <fstream>
+// XRT includes
+#include "xrt/xrt_bo.h"
+#include <experimental/xrt_xclbin.h>
+#include "xrt/xrt_device.h"
+#include "xrt/xrt_kernel.h"
 
-template < uint num_elements >
-void save_array( float array[num_elements] , const char* file_name , const uint precision )
-{
-	std::ofstream file;
-	file.open( file_name );
-	file.precision( precision );
-
-	for ( uint element = 0 ; element < num_elements ; element++ )
-		file << std::fixed << array[element] << "\n";
-	
-	file.close();
-}
-
-template < typename data_type , uint dim0 >
-void file_to_1d_array ( data_type array[dim0] , std::string filename )
-{
-	std::ifstream file( filename );
-	std::string line;
-
-	for ( int c0  = 0 ; c0 < dim0 ; c0++ )
-	{
-		getline( file , line );
-		array[c0] = std::stof( line );
-	}
-	file.close();
-}
-
-template < typename data_type , uint dim1 , uint dim0 >
-void file_to_2d_array ( data_type array[dim1][dim0] , std::string filename )
-{
-	std::ifstream file( filename );
-	std::string line;
-
-	for ( uint c1  = 0 ; c1 < dim1 ; c1++ )
-		for ( uint c0  = 0 ; c0 < dim0 ; c0++ )
-		{
-			getline( file , line );
-			array[c1][c0] = std::stof( line );
-		}
-	file.close();
-}
-
-template < typename data_type , uint dim2 , uint dim1 , uint dim0 >
-void file_to_3d_array ( data_type array[dim2][dim1][dim0] , std::string filename )
-{
-	std::ifstream file( filename );
-	std::string line;
-
-	for ( uint c2  = 0 ; c2 < dim2 ; c2++ )
-		for ( uint c1  = 0 ; c1 < dim1 ; c1++ )
-			for ( uint c0  = 0 ; c0 < dim0 ; c0++ )
-			{
-				getline( file , line );
-				array[c2][c1][c0] = std::stof( line );
-			}
-	file.close();
-}
-
-template < typename data_type , uint dim3 , uint dim2 , uint dim1 , uint dim0 >
-void file_to_4d_array ( data_type array[dim3][dim2][dim1][dim0] , std::string filename )
-{
-	std::ifstream file( filename );
-	std::string line;
-
-	for ( uint c3  = 0 ; c3 < dim2 ; c3++ )
-		for ( uint c2  = 0 ; c2 < dim2 ; c2++ )
-			for ( uint c1  = 0 ; c1 < dim1 ; c1++ )
-				for ( uint c0  = 0 ; c0 < dim0 ; c0++ )
-				{
-					getline( file , line );
-					array[c3][c2][c1][c0] = std::stof( line );
-				}
-	file.close();
-}
 
 int main ( int argc , char** argv )
 {
+/***********************************************************************************/
+/************************************ Read data ************************************/
+/***********************************************************************************/
 	/*********** Get variables ***********/
+	std::cout << "Reading variables." << std::endl;
+
 	static float l0_conv_weights[l0_conv_f_h][l0_conv_f_w][l0_conv_f];
 	static float l0_conv_biases[l0_conv_f];
 
@@ -119,6 +52,8 @@ int main ( int argc , char** argv )
 		( l5_soft_biases , "data/l5_biases.txt" );
 
 	/*********** Get input ***********/
+	std::cout << "Reading inputs." << std::endl;
+
 	static float input_data[num_batches][batch_size][input_h][input_w];
 	static uint input_labels[num_batches][batch_size];
 
@@ -137,21 +72,30 @@ int main ( int argc , char** argv )
 	file.close();
 
 	// TODO: get labels from file
-//	for ( uint n = 0 ; n < num_batches ; n++ )
-//		for ( uint b = 0 ; b < batch_size ; b++ )
-//			input_labels[n][b] = 4;
+	//	for ( uint n = 0 ; n < num_batches ; n++ )
+	//		for ( uint b = 0 ; b < batch_size ; b++ )
+	//			input_labels[n][b] = 4;
 
 	input_labels[0][0] = 2;
 	input_labels[0][1] = 1;
-//	input_labels[1][0] = 2;
-//	input_labels[1][1] = 1;
 
-	/*********** Call IP ***********/
-	accel( learning_rate_const , input_data , input_data , input_labels ,
-		l0_conv_weights , l0_conv_biases , l2_conv_weights , l2_conv_biases ,
-		l4_dens_weights , l4_dens_biases , l5_soft_weights , l5_soft_biases );
+/***********************************************************************************/
+/*********** Load XCLBIN file, create OpenCL context, device and program ***********/
+/***********************************************************************************/
+	std::cout << "Programming FPGA device." << std::endl;
+
+	auto device = xrt::device( c_device_index );
+	auto uuid = device.load_xclbin( binaryFile );
+
+	auto kernel = xrt::kernel( device , uuid , "vadd" );
+
+
+
+
 
 	/*********** Print Results ***********/
+	std::cout << "Saving weights." << std::endl;
+
 	save_array < l0_conv_f_h * l0_conv_f_w * l0_conv_f > ( reinterpret_cast<float*>(l0_conv_weights) , "variables/l0_weights_hls.txt" , 6 );
 	save_array < l0_conv_f > ( l0_conv_biases , "variables/l0_biases_hls.txt" , 6 );
 

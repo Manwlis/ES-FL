@@ -74,18 +74,21 @@ void softmax_fp ( hls::stream < float >& s_input , float weights[_num_in][_num_k
  * @param uint, true label
  * @param stream< float >, prediction errors
  */
-template < uint _batch_size , uint _num_k >
-void sparce_categorical_cross_entropy ( hls::stream < float >& s_prediction , t_label label_batch[_batch_size] ,
+template < uint _num_batches , uint _batch_size , uint _num_k >
+void sparce_categorical_cross_entropy ( hls::stream < float >& s_prediction , hls::stream < t_label >& s_labels ,
 	hls::stream < float >& s_total_out_error_bp , hls::stream < float >& s_total_out_error_gc )
 {
 	t_label correct_label;
-	batch: for ( uint batch = 0 ; batch < _batch_size ; batch++ )
+	batch: for ( uint batch_elem = 0 ; batch_elem < _batch_size ; batch_elem++ )
 		output_error: for ( uint kernel = 0 ; kernel < _num_k ; kernel++ )
 		{
 #pragma HLS PIPELINE II=1 style=frp
+			// read correct label. Axi read, if large batch maybe becomes too wide? TODO: check with large batch
+			if ( kernel == 0 )
+				correct_label = s_labels.read();
 
 			float kernel_prediction = s_prediction.read();
-			float temp_out_error = - float( label_batch[batch] == kernel ) + kernel_prediction ;
+			float temp_out_error = - float( correct_label == kernel ) + kernel_prediction ;
 			s_total_out_error_bp.write( temp_out_error );
 			s_total_out_error_gc.write( temp_out_error );
 		}

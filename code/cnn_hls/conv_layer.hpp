@@ -34,7 +34,7 @@ void conv_create_window_stream ( hls::stream< _in_type >& s_input , hls::stream<
 	const uint ramp_up = _in_w * ( ( _f_w - 1 ) / 2 ) + ( ( _f_h - 1 ) / 2 );
 	const uint num_pixels = _in_w * _in_h;
 
-	uint col_ptr = 0; // TODO: check this is not needed inside the batch loop
+	uint col_ptr = 0;
 	batch: for ( uint batch = 0 ; batch < _batch_size ; batch++ )
 		pixel: for ( uint pixel_counter = 0 ; pixel_counter < num_pixels + ramp_up ; pixel_counter++ )
 			in_c: for ( uint in_c = 0 ; in_c < _in_c ; in_c++ )
@@ -131,7 +131,7 @@ void conv_pad_windows (
  * @param stream< float >, kernel sums
  */
 template < typename _in_type , uint _batch_size , uint _in_h , uint _in_w , uint _f_h , uint _f_w , uint _num_f >
-void conv_fp_1c_sum ( hls::stream < window < float , _f_h , _f_w > >& s_in_pad_wnd ,
+void conv_fp_1c_sum ( hls::stream < window < float , _f_h , _f_w > >& s_in_wnd ,
 	float weights[_f_h][_f_w][_num_f] , float biases[_num_f] , hls::stream < float >& s_kernel_sums )
 {
 	batch: for ( uint batch = 0 ; batch < _batch_size ; batch++ )
@@ -139,7 +139,7 @@ void conv_fp_1c_sum ( hls::stream < window < float , _f_h , _f_w > >& s_in_pad_w
 		{
 #pragma HLS PIPELINE II=16 style=frp
 
-			window < _in_type , _f_h , _f_w > temp_window  = s_in_pad_wnd.read();
+			window < _in_type , _f_h , _f_w > temp_window  = s_in_wnd.read();
 
 			filter: for ( uint filter = 0 ; filter < _num_f ; filter++ )
 			{
@@ -214,14 +214,15 @@ void conv_fp_mc_aggregate_channels (
 	hls::stream < window_1d< float , _num_f > >& s_kernel_sums )
 {
 	window_1d< float , _num_f > kernel_sums;
+	window_1d< float , _num_f > temp;
 
 	batch: for ( uint batch = 0 ; batch < _batch_size ; batch++ )
 		in_y: for ( uint in_y = 0 ; in_y < _in_h ; in_y++ )
 			in_x: for ( uint in_x = 0 ; in_x < _in_w ; in_x++ )
 				in_c: for ( uint in_c = 0 ; in_c < _in_c ; in_c++ )
 				{
-#pragma HLS PIPELINE II=3 style=frp
-					window_1d< float , _num_f > temp = s_kernel_sums_per_channel.read();
+#pragma HLS PIPELINE II=3 style=frp // achievable at 100 Mhz, II=4 at 150 Mhz
+					temp = s_kernel_sums_per_channel.read();
 					if ( in_c == 0 )
 						kernel_sums = temp;
 					else

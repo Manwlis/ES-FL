@@ -1,13 +1,19 @@
 #pragma once
 
-#include <hls_stream.h>
-#include <hls_math.h>
 #include <stdio.h>
 #include <string.h>
 
+#include <iostream>
+#include <iomanip>
+#include <fstream>
+
+/***** Host definitions *****/
+#define c_device_index 0
+#define c_binary_file_name "kernel.xclbin" // TODO: find correct name
+
 /***** Size definitions *****/
 #define num_batches			1
-#define batch_size			4
+#define batch_size			5
 #define learning_rate_const 0.01f
 
 // 28x28x1 image
@@ -87,75 +93,79 @@
 
 /***** Datatypes definitions *****/
 typedef unsigned int uint;
-typedef unsigned int t_label; // change this to ap_uint 4 bits
-
 
 /***** Helper functions & structs *****/
-template < typename in_type , uint filter_height , uint filter_width >
-struct window {
-	in_type elements[filter_height][filter_width];
-
-	void operator=(const window& input)
-	{
-		for( int h = 0 ; h < filter_height ; h++ )
-			for( int w = 0 ; w < filter_width ; w++ )
-				this->elements[h][w] = input.elements[h][w];
-	}
-};
-
-template < typename data_type , uint size >
-struct window_1d
+template < uint num_elements >
+void save_array( float array[num_elements] , const char* file_name , const uint precision )
 {
-	data_type elements[size];
+	std::ofstream file;
+	file.open( file_name );
+	file.precision( precision );
 
-	void operator=( const window_1d& in )
-	{
-		for( int s = 0 ; s < size ; s++ )
-			this->elements[s] = in.elements[s];
-	}
-	void operator+=( const window_1d& in )
-	{
-		for( int s = 0 ; s < size ; s++ )
-			this->elements[s] += in.elements[s];
-	}
-};
+	for ( uint element = 0 ; element < num_elements ; element++ )
+		file << std::fixed << array[element] << "\n";
 
-
-// Reads a stream and puts its data on global memory
-template < typename out_type , uint num_elements >
-void write_mem ( hls::stream< out_type >& s_input , out_type output[num_elements] )
-{
-	write_out_mem: for ( uint i = 0 ; i < num_elements ; i++ )
-	{
-		out_type temp = s_input.read();
-		output[i] = temp;
-	}
+	file.close();
 }
 
-
-template < typename out_type , uint _batch_size , uint size >
-void duplicate_stream ( hls::stream< out_type >& s_in , hls::stream< out_type >& s_out_1 , hls::stream< out_type >& s_out_2 )
+template < typename data_type , uint dim0 >
+void file_to_1d_array ( data_type array[dim0] , std::string filename )
 {
+	std::ifstream file( filename );
+	std::string line;
 
-	batch: for ( uint batch = 0 ; batch < _batch_size ; batch++ )
-		dup_stream: for( uint i = 0 ; i < size ; i++ )
+	for ( int c0  = 0 ; c0 < dim0 ; c0++ )
+	{
+		getline( file , line );
+		array[c0] = std::stof( line );
+	}
+	file.close();
+}
+
+template < typename data_type , uint dim1 , uint dim0 >
+void file_to_2d_array ( data_type array[dim1][dim0] , std::string filename )
+{
+	std::ifstream file( filename );
+	std::string line;
+
+	for ( uint c1  = 0 ; c1 < dim1 ; c1++ )
+		for ( uint c0  = 0 ; c0 < dim0 ; c0++ )
 		{
-#pragma HLS PIPELINE II=1 style=frp
-			out_type temp = s_in.read();
-			s_out_1.write( temp );
-			s_out_2.write( temp );
+			getline( file , line );
+			array[c1][c0] = std::stof( line );
 		}
+	file.close();
 }
 
-
-extern "C"
+template < typename data_type , uint dim2 , uint dim1 , uint dim0 >
+void file_to_3d_array ( data_type array[dim2][dim1][dim0] , std::string filename )
 {
-void accel ( float learning_rate ,
-	float gmem_input_data_fp[num_batches][batch_size][input_h][input_w] ,
-	float gmem_input_data_cg[num_batches][batch_size][input_h][input_w] ,
-	uint gmem_labels[num_batches][batch_size] ,
-	float gmem_l0_conv_weights[l0_conv_f_h][l0_conv_f_w][l0_conv_f] , float gmem_l0_conv_biases[l0_conv_f] ,
-	float gmem_l2_conv_weights[l2_conv_f_h][l2_conv_f_w][l2_conv_in_c][l2_conv_f] , float gmem_l2_conv_biases[l2_conv_f] ,
-	float gmem_l4_dens_weights[l4_dens_in_size][l4_dens_k] , float gmem_l4_dens_biases[l4_dens_k] ,
-	float gmem_l5_soft_weights[l5_soft_in_size][l5_soft_k] , float gmem_l5_soft_biases[l5_soft_k] );
+	std::ifstream file( filename );
+	std::string line;
+
+	for ( uint c2  = 0 ; c2 < dim2 ; c2++ )
+		for ( uint c1  = 0 ; c1 < dim1 ; c1++ )
+			for ( uint c0  = 0 ; c0 < dim0 ; c0++ )
+			{
+				getline( file , line );
+				array[c2][c1][c0] = std::stof( line );
+			}
+	file.close();
+}
+
+template < typename data_type , uint dim3 , uint dim2 , uint dim1 , uint dim0 >
+void file_to_4d_array ( data_type array[dim3][dim2][dim1][dim0] , std::string filename )
+{
+	std::ifstream file( filename );
+	std::string line;
+
+	for ( uint c3  = 0 ; c3 < dim2 ; c3++ )
+		for ( uint c2  = 0 ; c2 < dim2 ; c2++ )
+			for ( uint c1  = 0 ; c1 < dim1 ; c1++ )
+				for ( uint c0  = 0 ; c0 < dim0 ; c0++ )
+				{
+					getline( file , line );
+					array[c3][c2][c1][c0] = std::stof( line );
+				}
+	file.close();
 }
