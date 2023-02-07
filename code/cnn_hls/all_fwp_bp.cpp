@@ -164,52 +164,77 @@ void fp_bp_cg (
 #pragma HLS STABLE variable=l5_soft_biases
 
 // cosim sometimes works, other times not. TODO: Try on real hardware
-//#pragma HLS STABLE variable=l0_conv_weight_grad
-//#pragma HLS STABLE variable=l0_conv_bias_grad
-//#pragma HLS STABLE variable=l2_conv_weight_grad
-//#pragma HLS STABLE variable=l2_conv_bias_grad
-//#pragma HLS STABLE variable=l4_dens_weight_grad
-//#pragma HLS STABLE variable=l4_dens_bias_grad
-//#pragma HLS STABLE variable=l5_soft_weight_grad
-//#pragma HLS STABLE variable=l5_soft_bias_grad
+#pragma HLS STABLE variable=l0_conv_weight_grad
+#pragma HLS STABLE variable=l0_conv_bias_grad
+#pragma HLS STABLE variable=l2_conv_weight_grad
+#pragma HLS STABLE variable=l2_conv_bias_grad
+#pragma HLS STABLE variable=l4_dens_weight_grad
+#pragma HLS STABLE variable=l4_dens_bias_grad
+#pragma HLS STABLE variable=l5_soft_weight_grad
+#pragma HLS STABLE variable=l5_soft_bias_grad
 
 #pragma HLS DATAFLOW
 
 	// input streams. maxi inputs, TODO: play with their sizes when in real hardware.
-	hls::stream < float , 3 > s_input_fp;
-	hls::stream < float , 3 > s_input_cg;
-	hls::stream< t_label , 3 > s_labels("s_labels");
+	hls::stream <   float , 3 > s_input_fp("s_input_fp");
+	hls::stream <   float , 3 > s_input_cg("s_input_cg");
+	hls::stream < t_label , 3 > s_labels("s_labels");
 
-	/* Streams between the layers */
-	hls::stream < float , 20 > s_l0_conv_fmap_fp;
-	hls::stream < float , 20 > s_l1_maxp_fmap_fp;
-	hls::stream < float , 2 > s_l2_conv_fmap_fp;
-	hls::stream < float , 3 > s_l3_maxp_fmap_fp;
-	hls::stream < float , 3 > s_l4_dens_fmap_fp;
-	hls::stream < float , 5 > s_l5_soft_fmap_fp;
+	/* forward propagation streams */
+	hls::stream < window < float , l0_conv_f_h , l0_conv_f_w > ,  3 > s_l0_conv_in_wnd_fp;
+	hls::stream < window < float , l0_conv_f_h , l0_conv_f_w > ,  2 > s_l0_conv_in_pad_wnd_fp;
+	hls::stream <                                        float ,  3 > s_l0_conv_k_sums;
+	hls::stream <                                        float , 20 > s_l0_conv_fmap_fp;
+	hls::stream < window < float , l1_maxp_f_h , l1_maxp_f_w > ,  2 > s_l1_maxp_in_wnd;
+	hls::stream <                                        float ,  3 > s_l1_maxp_fmap;
+	hls::stream <                                        float , 20 > s_l1_maxp_fmap_fp;
+	hls::stream < window < float , l2_conv_f_h , l2_conv_f_w > ,  2 > s_l2_conv_in_wnd_fp;
+	hls::stream < window < float , l2_conv_f_h , l2_conv_f_w > ,  2 > s_l2_conv_in_pad_wnd_fp;
+	hls::stream <              window_1d < float , l2_conv_f > ,  1 > s_l2_conv_k_sums_per_c;
+	hls::stream <              window_1d < float , l2_conv_f > ,  1 > s_l2_conv_k_sums;
+	hls::stream <                                        float ,  3 > s_l3_maxp_fmap;
+	hls::stream <                                        float ,  2 > s_l2_conv_fmap_fp;
+	hls::stream < window < float , l3_maxp_f_h , l3_maxp_f_w > ,  2 > s_l3_maxp_in_window;
+	hls::stream <                                        float ,  3 > s_l3_maxp_fmap_fp;
+	hls::stream <                                        float ,  3 > s_l4_dens_fmap_fp;
+	hls::stream <                                        float , 10 > s_l5_soft_fmap_fp;
 
-	hls::stream < float , 2 > s_err_bp;
-	hls::stream < float , 2 > s_l5_soft_in_err;
-	hls::stream < float , 3 > s_l4_dens_in_err;
-	hls::stream < float , 3 > s_l3_maxp_in_err;
-	hls::stream < float , 20 > s_l2_conv_in_err;
-	hls::stream < float , 2 > s_l1_maxp_in_err;
+	/* back propagation streams */
+	hls::stream <                                        float ,  2 > s_err_bp;
+	hls::stream <                                        float ,  2 > s_l5_soft_in_err;
+	hls::stream <                                        float ,  2 > s_l4_dens_bp_k_err;
+	hls::stream <                                        float ,  3 > s_l4_dens_in_err;
+	hls::stream <                                        float ,  3 > s_l3_maxp_in_err;
+	hls::stream <                                        float , 20 > s_l2_conv_act_out_err;
+	hls::stream <                                        float ,  5 > s_l2_conv_act_out_err_bp;
+	hls::stream < window < float , l2_conv_f_h , l2_conv_f_w > ,  3 > s_l2_conv_out_err_wnd;
+	hls::stream < window < float , l2_conv_f_h , l2_conv_f_w > ,  2 > s_l2_conv_out_err_pad_wnd;
+	hls::stream <           window_1d < float , l2_conv_in_c > ,  2 > s_l2_c_err_per_f;
+	hls::stream <           window_1d < float , l2_conv_in_c > ,  3 > s_l2_c_err;
+	hls::stream <                                        float , 20 > s_l2_conv_in_err;
+	hls::stream <                                        float ,  3 > s_l1_maxp_in_err;
 
-	hls::stream < float , 2 > s_err_cg;
-	hls::stream < float , 2 > s_l4_dens_k_err_cg;
-	hls::stream < float , 20 > s_l2_conv_act_out_err_cg;
+	/* calculate gradients streams */
+	hls::stream <                                        float ,  2 > s_err_cg;
+	hls::stream <                                        float ,  2 > s_l4_dens_k_err_cg;
+	hls::stream < window < float , l2_conv_f_h , l2_conv_f_w > ,  1 > s_l2_conv_in_wnd_cg; // 1 so data is saved in the float stream "s_l1_maxp_fmap_cg"
+	hls::stream < window < float , l2_conv_f_h , l2_conv_f_w > ,  1 > s_l2_conv_in_pad_wnd_cg;
+	hls::stream <                                        float , 20 > s_l2_conv_act_out_err_cg;
+	hls::stream <          window_1d < float , l2_conv_out_c > ,  2 > s_l2_cg_grouped_k_err;
+	hls::stream < window < float , l0_conv_f_h , l0_conv_f_w > ,  1 > s_l0_conv_in_wnd_cg; // 1 so data is saved in the float stream "s_input_cg"
+	hls::stream < window < float , l0_conv_f_h , l0_conv_f_w > ,  1 > s_l0_conv_in_pad_wnd_cg;
+	hls::stream <                                        float ,  2 > s_l0_conv_out_error;
 
 	/* Red streams */
-#define size_factor 2
-	hls::stream < bool , size_factor * l0_conv_out_h * l0_conv_out_w * l0_conv_f > s_l0_conv_acts;
-	hls::stream < window < bool , l1_maxp_f_h , l1_maxp_f_w > , size_factor * l1_maxp_num_wnd > s_l1_maxp_acts_wnd;
-	hls::stream < bool , size_factor * l2_conv_out_h * l2_conv_out_w * l2_conv_f > s_l2_conv_acts;
-	hls::stream < window < bool , l3_maxp_f_h , l3_maxp_f_w > , size_factor * l3_maxp_num_wnd > s_l3_maxp_acts_wnd;
-	hls::stream < bool , size_factor * l4_dens_k > s_l4_dens_acts;
-
-	hls::stream < float , size_factor * l4_dens_k > s_l4_dens_fmap_cg;
-	hls::stream < float , size_factor * l3_maxp_out_h * l3_maxp_out_w * l3_maxp_out_c > s_l3_maxp_fmap_cg;
-	hls::stream < float , size_factor * l1_maxp_out_h * l1_maxp_out_w * l1_maxp_out_c > s_l1_maxp_fmap_cg; // needs just depth 2886 in cosim
+#define s_f 2
+	hls::stream <                                        bool ,           s_f * l0_conv_out_h * l0_conv_out_w * l0_conv_f > s_l0_conv_acts;
+	hls::stream < window < bool , l1_maxp_f_h , l1_maxp_f_w > ,                                     s_f * l1_maxp_num_wnd > s_l1_maxp_acts_wnd;
+	hls::stream <                                        bool ,           s_f * l2_conv_out_h * l2_conv_out_w * l2_conv_f > s_l2_conv_acts;
+	hls::stream < window < bool , l3_maxp_f_h , l3_maxp_f_w > ,                                     s_f * l3_maxp_num_wnd > s_l3_maxp_acts_wnd;
+	hls::stream <                                        bool ,                                     /* s_f * */ l4_dens_k > s_l4_dens_acts;
+	hls::stream <                                       float ,                                     /* s_f * */ l4_dens_k > s_l4_dens_fmap_cg;
+	hls::stream <                                       float , /* s_f * */ l3_maxp_out_h * l3_maxp_out_w * l3_maxp_out_c > s_l3_maxp_fmap_cg; // that one is spooky
+	hls::stream <                                       float ,       s_f * l1_maxp_out_h * l1_maxp_out_w * l1_maxp_out_c > s_l1_maxp_fmap_cg; // needs just depth 2886 in cosim
 
 	/************************************************/
 	/***************** Forward prop *****************/
@@ -217,11 +242,6 @@ void fp_bp_cg (
 	maxi_data_to_stream( batch , gmem_input_data_fp , s_input_fp );
 
 /***** Layer 0, 28x28x1 -> conv 16 filters of 3x3, padded, stride 1 -> 28x28x16 *****/
-	// internal data streams
-	hls::stream < window < float , l0_conv_f_h , l0_conv_f_w > , 2 > s_l0_conv_in_wnd_fp;
-	hls::stream < window < float , l0_conv_f_h , l0_conv_f_w > , 2 > s_l0_conv_in_pad_wnd_fp;
-	hls::stream < float , 3 > s_l0_conv_k_sums;
-
 	// create windows
 	conv_create_window_stream < float , batch_size , l0_conv_in_h , l0_conv_in_w , l0_conv_in_c , l0_conv_f_h , l0_conv_f_w >
 		( s_input_fp , s_l0_conv_in_wnd_fp );
@@ -235,15 +255,11 @@ void fp_bp_cg (
 		( s_l0_conv_k_sums , s_l0_conv_fmap_fp , s_l0_conv_acts );
 
 /***** layer 1, 28x28x16 -> maxpool 2x2, stride 2,2 -> 14x14x16 *****/
-	// internal data streams
-	hls::stream < window < float , l1_maxp_f_h , l1_maxp_f_w > , 2 > s_l1_maxp_in_wnd;
-
 	// create windows
 	maxp_create_window_stream < batch_size , l1_maxp_in_h , l1_maxp_in_w , l1_maxp_in_c , l1_maxp_f_h , l1_maxp_f_w >
 		( s_l0_conv_fmap_fp , s_l1_maxp_in_wnd );
 
 	// maxpool
-	hls::stream < float , 3 > s_l1_maxp_fmap;
 	maxp_fp < batch_size , l1_maxp_num_wnd , l1_maxp_f_h , l1_maxp_f_w >
 		( s_l1_maxp_in_wnd , s_l1_maxp_fmap , s_l1_maxp_acts_wnd );
 
@@ -252,13 +268,6 @@ void fp_bp_cg (
 		( s_l1_maxp_fmap , s_l1_maxp_fmap_fp , s_l1_maxp_fmap_cg );
 
 /***** layer 2, 14x14x16 -> conv 32 filters of 3x3, padded, stride 1 -> 14x14x32 *****/
-	// internal data streams
-	hls::stream < window < float , l2_conv_f_h , l2_conv_f_w > , 2 > s_l2_conv_in_wnd_fp;
-	hls::stream < window < float , l2_conv_f_h , l2_conv_f_w > , 2 > s_l2_conv_in_pad_wnd_fp;
-	hls::stream < window_1d < float , l2_conv_f > , 1 > s_l2_conv_k_sums_per_c;
-	hls::stream < window_1d < float , l2_conv_f > , 1 > s_l2_conv_k_sums;
-	hls::stream < float , 3 > s_l3_maxp_fmap;
-
 	// create windows
 	conv_create_window_stream < float , batch_size , l2_conv_in_h , l2_conv_in_w , l2_conv_in_c , l2_conv_f_h , l2_conv_f_w >
 		( s_l1_maxp_fmap_fp , s_l2_conv_in_wnd_fp );
@@ -274,9 +283,6 @@ void fp_bp_cg (
 		( s_l2_conv_k_sums , l2_conv_biases , s_l2_conv_fmap_fp , s_l2_conv_acts );
 
 /***** layer 3, 14x14x32 -> maxpool 2x2, stride 2,2 -> 7x7x32 *****/
-	// internal data streams
-	hls::stream < window < float , l3_maxp_f_h , l3_maxp_f_w > , 2 > s_l3_maxp_in_window;
-
 	// create windows
 	maxp_create_window_stream < batch_size , l3_maxp_in_h , l3_maxp_in_w , l3_maxp_in_c , l3_maxp_f_h , l3_maxp_f_w >
 		( s_l2_conv_fmap_fp , s_l3_maxp_in_window );
@@ -293,7 +299,7 @@ void fp_bp_cg (
 	dense_fp < batch_size , l4_dens_k , l4_dens_in_size >
 		( s_l3_maxp_fmap_fp , l4_dens_weights , l4_dens_biases , s_l4_dens_fmap_fp , s_l4_dens_fmap_cg , s_l4_dens_acts );
 
-	/***** layer 5, 64 -> fully connected softmax 10 -> 10 normalized *****/
+/***** layer 5, 64 -> fully connected softmax 10 -> 10 normalized *****/
 	softmax_fp < batch_size , l5_soft_k , l5_soft_in_size >
 		( s_l4_dens_fmap_fp , l5_soft_weights , l5_soft_biases , s_l5_soft_fmap_fp );
 
@@ -310,7 +316,6 @@ void fp_bp_cg (
 		( s_err_bp , l5_soft_weights , s_l5_soft_in_err );
 
 /***** layer 4, 64 -> fully connected relu 64 backprop -> 1568 *****/
-	hls::stream < float , 2 > s_l4_dens_bp_k_err;
 	activate_kernel_errors < batch_size , l4_dens_k , l4_dens_in_size >
 		( s_l4_dens_acts , s_l5_soft_in_err , s_l4_dens_bp_k_err , s_l4_dens_k_err_cg );
 	dense_bp < batch_size , l4_dens_k , l4_dens_in_size >
@@ -321,14 +326,6 @@ void fp_bp_cg (
 		( s_l4_dens_in_err , s_l3_maxp_acts_wnd , s_l3_maxp_in_err );
 
 /***** layer 2, 14x14x32 -> conv 3x3 backprop -> 14x14x16 *****/
-	// internal data streams
-	hls::stream < float , 20 > s_l2_conv_act_out_err;
-	hls::stream < float , 5 > s_l2_conv_act_out_err_bp;
-	hls::stream < window < float , l2_conv_f_h , l2_conv_f_w > , 2 > s_l2_conv_out_err_wnd;
-	hls::stream < window < float , l2_conv_f_h , l2_conv_f_w > , 2 > s_l2_conv_out_err_pad_wnd;
-	hls::stream < window_1d < float , l2_conv_in_c > , 1 > s_l2_c_err_per_f;
-	hls::stream < window_1d < float , l2_conv_in_c > , 2 > s_l2_c_err;
-
 	// filter unactivated errors
 	conv_bp_activate_error < batch_size , l2_conv_out_h , l2_conv_out_w , l2_conv_out_c >
 		( s_l3_maxp_in_err , s_l2_conv_acts , s_l2_conv_act_out_err );
@@ -367,11 +364,6 @@ void fp_bp_cg (
 		( s_l3_maxp_fmap_cg , s_l4_dens_k_err_cg , l4_dens_weight_grad, l4_dens_bias_grad );
 
 /***** layer 2, 14*14*16->14*14*32 -> conv regression -> 14*14*16*32 , 32 *****/
-	// prepare data
-	hls::stream < window < float , l2_conv_f_h , l2_conv_f_w > , 1 > s_l2_conv_in_wnd_cg; // 1 so data is saved in the float stream "s_l1_maxp_fmap_cg"
-	hls::stream < window < float , l2_conv_f_h , l2_conv_f_w > , 1 > s_l2_conv_in_pad_wnd_cg;
-	hls::stream < window_1d < float , l2_conv_out_c > , 2 > s_l2_cg_grouped_k_err;
-
 	conv_create_window_stream < float , batch_size , l2_conv_in_h , l2_conv_in_w , l2_conv_in_c , l2_conv_f_h , l2_conv_f_w >
 		( s_l1_maxp_fmap_cg , s_l2_conv_in_wnd_cg );
 	conv_pad_windows < float , batch_size , l2_conv_in_h , l2_conv_in_w , l2_conv_in_c , l2_conv_f_h , l2_conv_f_w >
@@ -384,12 +376,7 @@ void fp_bp_cg (
 		( s_l2_conv_in_pad_wnd_cg , s_l2_cg_grouped_k_err , l2_conv_weight_grad , l2_conv_bias_grad );
 
 /***** layer 0, 28*28->28*28*16 -> conv regression -> 28*28*32 , 16 *****/
-	hls::stream < window < float , l0_conv_f_h , l0_conv_f_w > , 2 > s_l0_conv_in_wnd_cg; // 1 so data is saved in the float stream "s_input_cg"
-	hls::stream < window < float , l0_conv_f_h , l0_conv_f_w > , 2 > s_l0_conv_in_pad_wnd_cg;
-	hls::stream < float , 2 > s_l0_conv_out_error;
-
 	maxi_data_to_stream( batch , gmem_input_data_cg , s_input_cg );
-
 	conv_create_window_stream < float , batch_size , l0_conv_in_h , l0_conv_in_w , l0_conv_in_c , l0_conv_f_h , l0_conv_f_w >
 		( s_input_cg , s_l0_conv_in_wnd_cg );
 	conv_pad_windows < float , batch_size , l0_conv_in_h , l0_conv_in_w , l0_conv_in_c , l0_conv_f_h , l0_conv_f_w >
@@ -459,7 +446,7 @@ void update_variables( float learning_rate ,
 			for ( uint c = 0 ; c < l2_conv_in_c ; c++ )
 				for ( uint f = 0 ; f < l2_conv_f ; f++ )
 				{
-#pragma HLS PIPELINE off
+#pragma HLS PIPELINE II=11
 					float temp = batch_lr * l2_conv_weight_grad[h][w][c][f];
 					l2_conv_weights_fp[h][w][c][f] -= temp;
 					l2_conv_weights_bp[h][w][c][f] = l2_conv_weights_fp[h][w][c][f];
@@ -545,9 +532,13 @@ void accel ( float learning_rate ,
 #pragma HLS ARRAY_PARTITION variable=l2_conv_weights_fp dim=4 type=cyclic factor=4
 #pragma HLS ARRAY_PARTITION variable=l2_conv_weights_bp dim=3 type=cyclic factor=4
 #pragma HLS ARRAY_PARTITION variable=l4_dens_weights dim=2 type=cyclic factor=8
+#pragma HLS ARRAY_PARTITION variable=l5_soft_weights dim=2 type=complete
 
+#pragma HLS ARRAY_PARTITION variable=l0_conv_weight_grad dim=2 type=complete
+#pragma HLS ARRAY_PARTITION variable=l2_conv_bias_grad dim=1 type=cyclic factor=2
 #pragma HLS ARRAY_PARTITION variable=l2_conv_weight_grad dim=4 type=cyclic factor=16
 #pragma HLS ARRAY_PARTITION variable=l4_dens_weight_grad dim=2 type=cyclic factor=8
+#pragma HLS ARRAY_PARTITION variable=l5_soft_weight_grad dim=2 type=complete
 
 	save_variables_locally (
 		gmem_l0_conv_weights , gmem_l0_conv_biases , gmem_l2_conv_weights , gmem_l2_conv_biases ,
