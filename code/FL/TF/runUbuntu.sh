@@ -7,7 +7,7 @@ make all
 echo ""
 
 # Uncomment to divert server's output to a file.
-# IO_file=~/ES-FL/code/IO_files/out.bin
+# IO_file=IO_files/out.bin
 
 # run server
 command="/usr/bin/time -v ./server ${IO_file}; make clean; printf '\7'"
