@@ -7,13 +7,15 @@
 
 /***** Size definitions *****/
 #define num_batches			1
-#define batch_size			4
+#define batch_size			2
 #define learning_rate_const 0.01f
 
 // 28x28x1 image
 #define input_h				28
 #define input_w				28
 #define input_c				 1
+
+#define maxi_buffer_size	16
 
 // passes through 16 3x3 filters
 #define l0_conv_f_h			 3
@@ -151,11 +153,15 @@ void duplicate_stream ( hls::stream< out_type >& s_in , hls::stream< out_type >&
 extern "C"
 {
 void accel ( float learning_rate ,
-	float gmem_input_data_fp[num_batches][batch_size][input_h][input_w] ,
-	float gmem_input_data_cg[num_batches][batch_size][input_h][input_w] ,
+	float gmem_input_data_fp[num_batches][batch_size][input_h * input_w] ,
+	float gmem_input_data_cg[num_batches][batch_size][input_h * input_w] ,
 	uint gmem_labels[num_batches][batch_size] ,
-	float gmem_l0_conv_weights[l0_conv_f_h][l0_conv_f_w][l0_conv_f] , float gmem_l0_conv_biases[l0_conv_f] ,
-	float gmem_l2_conv_weights[l2_conv_f_h][l2_conv_f_w][l2_conv_in_c][l2_conv_f] , float gmem_l2_conv_biases[l2_conv_f] ,
-	float gmem_l4_dens_weights[l4_dens_in_size][l4_dens_k] , float gmem_l4_dens_biases[l4_dens_k] ,
-	float gmem_l5_soft_weights[l5_soft_in_size][l5_soft_k] , float gmem_l5_soft_biases[l5_soft_k] );
+	float gmem_l0_conv_weights[l0_conv_f_h][l0_conv_f_w][l0_conv_f] ,
+	float gmem_l0_conv_biases[l0_conv_f] ,
+	float gmem_l2_conv_weights[l2_conv_f_h][l2_conv_f_w][l2_conv_in_c][l2_conv_f] ,
+	float gmem_l2_conv_biases[l2_conv_f] ,
+	float gmem_l4_dens_weights[l4_dens_in_size][l4_dens_k] ,
+	float gmem_l4_dens_biases[l4_dens_k] ,
+	float gmem_l5_soft_weights[l5_soft_in_size][l5_soft_k] ,
+	float gmem_l5_soft_biases[l5_soft_k] );
 }

@@ -79,6 +79,22 @@ void file_to_4d_array ( data_type array[dim3][dim2][dim1][dim0] , std::string fi
 	file.close();
 }
 
+template < typename data_type , uint dim2 , uint dim1 , uint dim0 >
+void read_input_data ( data_type array[dim2][dim1][dim0] , std::string filename )
+{
+	std::ifstream file( filename );
+	std::string num;
+
+	for ( uint c2 = 0 ; c2 < dim2 ; c2++ )
+		for ( uint c1 = 0 ; c1 < dim1 ; c1++ )
+				for ( uint c0 = 0 ; c0 < dim0 ; c0++ )
+				{
+					file >> num; // stored as array in the file.
+					array[c2][c1][c0] = std::stof( num );
+				}
+	file.close();
+}
+
 int main ( int argc , char** argv )
 {
 	/*********** Get variables ***********/
@@ -119,28 +135,14 @@ int main ( int argc , char** argv )
 		( l5_soft_biases , "data/l5_biases.txt" );
 
 	/*********** Get input ***********/
-	static float input_data[num_batches][batch_size][input_h][input_w];
+	static float input_data[num_batches][batch_size][ input_h * input_w ];
 	static uint input_labels[num_batches][batch_size];
 
-	std::ifstream file("data/array.txt");
-	std::string line;
 
-	for ( uint n = 0 ; n < num_batches ; n++ )
-		for ( uint b = 0 ; b < batch_size ; b++ )
-			for( int y = 0 ; y < input_h ; y++ )
-				for ( int x = 0 ; x < input_w ; x++ )
-				{
-					file >> line; // stored as array in the file.
-					float temp = std::stof( line );
-					input_data[n][b][y][x] = temp;
-				}
-	file.close();
+	read_input_data < float , num_batches , batch_size , input_h * input_w > ( input_data , "data/array.txt" );
 
-	// TODO: get labels from file
-//	for ( uint n = 0 ; n < num_batches ; n++ )
-//		for ( uint b = 0 ; b < batch_size ; b++ )
-//			input_labels[n][b] = 4;
-
+	// TODO: get labels from file:
+	// file_to_2d_array < uint , num_batches * batch_size > ( input_labels , "data/labels.txt" );
 	input_labels[0][0] = 2;
 	input_labels[0][1] = 1;
 //	input_labels[1][0] = 2;

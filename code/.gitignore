@@ -15,7 +15,10 @@ cnn/TF/temp/
 cnn/hls/data
 cnn/hls/variables
 
-FL/FPGA/host/data/
+cnn/vitis/host/data
+cnn/vitis/host/variables
+
+FL/FPGA/IO_files/
 
 FL/TF/nn/__pycache__/
 FL/TF/IO_files/

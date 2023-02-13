@@ -5,17 +5,6 @@
 #include "conv_layer.hpp"
 
 
-void maxi_data_to_stream ( uint batch ,
-	float input_data[num_batches][batch_size][input_h][input_w] , hls::stream < float >& s_input )
-{
-	stream_batch:
-	for ( uint s = 0 ; s < batch_size ; s++ )
-		for ( uint h = 0 ; h < input_h ; h++ )
-			for ( uint w = 0 ; w < input_w ; w++ )
-#pragma HLS PIPELINE II=1
-				s_input.write( input_data[batch][s][h][w] );
-}
-
 void maxi_labels_to_stream ( uint batch ,
 	t_label input_labels[num_batches][batch_size] , hls::stream < t_label >& s_input )
 {
@@ -23,6 +12,47 @@ void maxi_labels_to_stream ( uint batch ,
 	for ( uint s = 0 ; s < batch_size ; s++ )
 #pragma HLS PIPELINE II=1
 		s_input.write( input_labels[batch][s] );
+}
+
+
+// read inputs in chunks to minimize global memory accesses.
+template  < uint _buf_size >
+void maxi_data_to_stream_part1 ( uint batch ,
+	float input_data[num_batches][batch_size][ input_h * input_w ] ,
+	hls::stream < window_1d< float , _buf_size > >& s_input_buffered )
+{
+	window_1d < float , _buf_size > local_buffer;
+
+	stream_batch_get_buffer:
+	for ( uint s = 0 ; s < batch_size ; s++ )
+		for ( uint hw = 0 ; hw < input_h * input_w / _buf_size ; hw++ )
+		{
+#pragma HLS PIPELINE II=1
+			for( int b = 0 ; b < _buf_size ; b++ )
+				local_buffer.elements[b] = input_data[batch][s][ hw * _buf_size + b ];
+
+			s_input_buffered.write( local_buffer);
+		}
+}
+
+template  < uint _buf_size >
+void maxi_data_to_stream_part2 (
+	hls::stream < window_1d< float , _buf_size > >& s_input_buffered ,
+	hls::stream < float >& s_input )
+{
+	window_1d < float , _buf_size > local_buffer;
+
+	stream_batch_unbuffer:
+	for ( uint s = 0 ; s < batch_size ; s++ )
+		for ( uint hw = 0 ; hw < input_h * input_w / _buf_size ; hw++ )
+			for( int b = 0 ; b < _buf_size ; b++ )
+			{
+#pragma HLS PIPELINE II=1 style=frp
+				if ( b == 0 )
+					local_buffer = s_input_buffered.read();
+
+				s_input.write( local_buffer.elements[b] );
+			}
 }
 
 
@@ -136,8 +166,8 @@ void save_variables_globally (
 
 
 void fp_bp_cg (
-	float gmem_input_data_fp[num_batches][batch_size][input_h][input_w] ,
-	float gmem_input_data_cg[num_batches][batch_size][input_h][input_w] ,
+	float gmem_input_data_fp[num_batches][batch_size][input_h * input_w] ,
+	float gmem_input_data_cg[num_batches][batch_size][input_h * input_w] ,
 	t_label gmem_labels[num_batches][batch_size] ,
 	uint batch ,
 
@@ -164,21 +194,23 @@ void fp_bp_cg (
 #pragma HLS STABLE variable=l5_soft_biases
 
 // cosim sometimes works, other times not. TODO: Try on real hardware
-#pragma HLS STABLE variable=l0_conv_weight_grad
-#pragma HLS STABLE variable=l0_conv_bias_grad
-#pragma HLS STABLE variable=l2_conv_weight_grad
-#pragma HLS STABLE variable=l2_conv_bias_grad
-#pragma HLS STABLE variable=l4_dens_weight_grad
-#pragma HLS STABLE variable=l4_dens_bias_grad
-#pragma HLS STABLE variable=l5_soft_weight_grad
-#pragma HLS STABLE variable=l5_soft_bias_grad
+//#pragma HLS STABLE variable=l0_conv_weight_grad
+//#pragma HLS STABLE variable=l0_conv_bias_grad
+//#pragma HLS STABLE variable=l2_conv_weight_grad
+//#pragma HLS STABLE variable=l2_conv_bias_grad
+//#pragma HLS STABLE variable=l4_dens_weight_grad
+//#pragma HLS STABLE variable=l4_dens_bias_grad
+//#pragma HLS STABLE variable=l5_soft_weight_grad
+//#pragma HLS STABLE variable=l5_soft_bias_grad
 
 #pragma HLS DATAFLOW
 
-	// input streams. maxi inputs, TODO: play with their sizes when in real hardware.
-	hls::stream <   float , 3 > s_input_fp("s_input_fp");
-	hls::stream <   float , 3 > s_input_cg("s_input_cg");
-	hls::stream < t_label , 3 > s_labels("s_labels");
+	// input streams. maxi inputs
+	hls::stream < window_1d < float , maxi_buffer_size > ,  1 > s_input_fp_buffered ("s_input_fp_buffered");
+	hls::stream <                                  float , 16 > s_input_fp ("s_input_fp");
+	hls::stream < window_1d < float , maxi_buffer_size > ,  1 > s_input_cg_buffered ("s_input_cg_buffered");
+	hls::stream <                                  float , 16 > s_input_cg ("s_input_cg");
+	hls::stream <                                t_label ,  3 > s_labels ("s_labels");
 
 	/* forward propagation streams */
 	hls::stream < window < float , l0_conv_f_h , l0_conv_f_w > ,  3 > s_l0_conv_in_wnd_fp;
@@ -239,7 +271,8 @@ void fp_bp_cg (
 	/************************************************/
 	/***************** Forward prop *****************/
 	/************************************************/
-	maxi_data_to_stream( batch , gmem_input_data_fp , s_input_fp );
+	maxi_data_to_stream_part1 < maxi_buffer_size > ( batch , gmem_input_data_fp , s_input_fp_buffered );
+	maxi_data_to_stream_part2 < maxi_buffer_size > ( s_input_fp_buffered , s_input_fp );
 
 /***** Layer 0, 28x28x1 -> conv 16 filters of 3x3, padded, stride 1 -> 28x28x16 *****/
 	// create windows
@@ -376,7 +409,9 @@ void fp_bp_cg (
 		( s_l2_conv_in_pad_wnd_cg , s_l2_cg_grouped_k_err , l2_conv_weight_grad , l2_conv_bias_grad );
 
 /***** layer 0, 28*28->28*28*16 -> conv regression -> 28*28*32 , 16 *****/
-	maxi_data_to_stream( batch , gmem_input_data_cg , s_input_cg );
+	maxi_data_to_stream_part1 < maxi_buffer_size > ( batch , gmem_input_data_cg , s_input_cg_buffered );
+	maxi_data_to_stream_part2 < maxi_buffer_size > ( s_input_cg_buffered , s_input_cg );
+
 	conv_create_window_stream < float , batch_size , l0_conv_in_h , l0_conv_in_w , l0_conv_in_c , l0_conv_f_h , l0_conv_f_w >
 		( s_input_cg , s_l0_conv_in_wnd_cg );
 	conv_pad_windows < float , batch_size , l0_conv_in_h , l0_conv_in_w , l0_conv_in_c , l0_conv_f_h , l0_conv_f_w >
@@ -492,8 +527,8 @@ void update_variables( float learning_rate ,
 
 
 void accel ( float learning_rate ,
-	float gmem_input_data_fp[num_batches][batch_size][input_h][input_w] ,
-	float gmem_input_data_cg[num_batches][batch_size][input_h][input_w] ,
+	float gmem_input_data_fp[num_batches][batch_size][input_h * input_w] ,
+	float gmem_input_data_cg[num_batches][batch_size][input_h * input_w] ,
 	uint gmem_labels[num_batches][batch_size] ,
 
 	float gmem_l0_conv_weights[l0_conv_f_h][l0_conv_f_w][l0_conv_f] , float gmem_l0_conv_biases[l0_conv_f] ,
