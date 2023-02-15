@@ -433,8 +433,12 @@ int main( int argc , char** argv )
 			// create new global model
 			create_average_model( accumulated_variables , completed_clients_num , announcement_msg.variables );
 
-			// TODO: save it
-
+			// save it
+			std::string filename = std:: string( "IO_files/global_model_epoch_" ) + std::to_string( current_epoch ) + std::string( ".bin" );
+			std::ofstream new_global_model_file ( filename , std::ofstream::out | std::ofstream::binary | std::ofstream::trunc );
+			
+			new_global_model_file.write( reinterpret_cast<char*>(announcement_msg.variables) , VARIABLES_NUM * sizeof(MSG_VARIABLE_DATATYPE) );
+			new_global_model_file.close();
 
 			/**************************************************************************************************/
 			/* Create metadata of the message.                                                                */
@@ -474,16 +478,6 @@ int main( int argc , char** argv )
 		if ( shutdown_ready( current_epoch , connected_clients_num ) )
 			server_shutdown = 1;	
 	} /* End of server running */
-
-	/**************************************************************************************************/
-	/* Save model.                                                                                    */
-	/**************************************************************************************************/ // TODO: move this to previous todo
-	std::ofstream trained_model_file( OUTPUT_FILE , std::ofstream::out | std::ofstream::binary | std::ofstream::trunc );
-
-	trained_model_file.write( reinterpret_cast<char*>(announcement_msg.variables) , VARIABLES_NUM * sizeof(MSG_VARIABLE_DATATYPE) );
-	trained_model_file.close();
-
-	LOGGING( Logger::Level::warning , "Saved model to " << OUTPUT_FILE );
 }
 
 /**************************************************************************************************/

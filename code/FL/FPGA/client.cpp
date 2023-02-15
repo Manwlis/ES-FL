@@ -132,7 +132,9 @@ int main ( int argc , char** argv )
 		/**************************************************************************************************/
 		/* Calculate variables.                                                                           */
 		/**************************************************************************************************/
-		// call hardware accelerator
+		// TODO: call hardware accelerator
+		for( int i = 0 ; i < VARIABLES_NUM ; i++ )
+			send_message.variables[i] = received_message.variables[i];
 
 		// calculate deltas
 		#if MSG_VARIABLE_MODE == DELTAS
@@ -142,11 +144,6 @@ int main ( int argc , char** argv )
 		
 		send_message.accuracy = 0;
 		send_message.loss = 0;
-		
-		/**************************************************************************************************/
-		/* Compress / quantize variables.                                                                 */
-		/**************************************************************************************************/
-		// quantize_variables();
 
 		/**************************************************************************************************/
 		/* Send local variables. Blocking.                                                                */

@@ -320,7 +320,7 @@ def main():
 	# keep tracks of the outputs of all layers
 	heatmap_model = tf.keras.Model( cnn.inputs , [layer.output for layer in cnn.layers] )
 
-	for i in range( 0 , 1 ):
+	for i in range( 0 , 2 ):
 		# pass an image through forward, back prop and variable update
 		with tf.GradientTape( persistent=True ) as g:
 			# forward prop

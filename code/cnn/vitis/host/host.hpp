@@ -7,97 +7,65 @@
 #include <iomanip>
 #include <fstream>
 
-/***** Host definitions *****/
-#define c_device_index 0
-#define c_binary_file_name "binary_container_1.xclbin" // TODO: find correct name
-#define c_kernel_name "accel"
+/***********************************************************************************/
+/* Info for the host to find and execute the accelerator.                          */
+/***********************************************************************************/
+#define c_device_index     0
+#define c_binary_file_name "binary_container_1.xclbin"
+#define c_kernel_name      "accel"
 
-/***** Size definitions *****/
-#define num_batches			1
+/***********************************************************************************/
+/* Size definitions                                                                */
+/***********************************************************************************/
+#define num_batches			2 // !!! Needs to change in both host.hpp and all_fwp_bp.hpp
 #define batch_size			2
 #define c_learning_rate 0.01f
 
-// 28x28x1 image
+/***********************************************************************************/
+/* Input: 28x28x1 array.                                                           */
+/***********************************************************************************/
 #define input_h				28
 #define input_w				28
 #define input_c				 1
 
-// passes through 16 3x3 filters
+/***********************************************************************************/
+/* Layer 0: Convolution with 16 3x3 filters.                                       */
+/***********************************************************************************/
 #define l0_conv_f_h			 3
 #define l0_conv_f_w			 3
 #define l0_conv_f			16
 
-#define l0_conv_in_h		input_h	// 28
-#define l0_conv_in_w		input_w	// 28
-#define l0_conv_in_c		input_c	// 1
-
-#define l0_conv_out_h		l0_conv_in_h	// 28
-#define l0_conv_out_w		l0_conv_in_w	// 28
-#define l0_conv_out_c		l0_conv_f		// 16
-
-#define l0_conv_num_wnd		l0_conv_in_h * l0_conv_in_w * l0_conv_in_c
-
-// max pooling 2x2x1 with (2,2,1) stride
-#define l1_maxp_f_h			 2
-#define l1_maxp_f_w			 2
-#define l1_maxp_f_st		 2
-
-#define l1_maxp_in_h		l0_conv_out_h	// 28
-#define l1_maxp_in_w		l0_conv_out_w	// 28
-#define l1_maxp_in_c		l0_conv_out_c	// 16
-
-#define l1_maxp_out_h		l1_maxp_in_h / l1_maxp_f_st		// 14
-#define l1_maxp_out_w		l1_maxp_in_w / l1_maxp_f_st		// 14
-#define l1_maxp_out_c		l1_maxp_in_c					// 16
-
-#define l1_maxp_num_wnd 	(l1_maxp_in_h * l1_maxp_in_w * l1_maxp_in_c) / (l1_maxp_f_h * l1_maxp_f_w)
-
-// 32 3x3 filters
+/***********************************************************************************/
+/* Layer 2: Convolution with 16 3x3 filters.                                       */
+/***********************************************************************************/
 #define l2_conv_f_h			 3
 #define l2_conv_f_w			 3
 #define l2_conv_f			16
+#define l2_conv_in_c		16
 
-#define l2_conv_in_h		l1_maxp_out_h	// 14
-#define l2_conv_in_w		l1_maxp_out_w	// 14
-#define l2_conv_in_c		l1_maxp_out_c	// 16
-
-#define l2_conv_out_h		l1_maxp_out_h	// 14
-#define l2_conv_out_w		l1_maxp_out_w	// 14
-#define l2_conv_out_c		l2_conv_f		// 16
-
-#define l2_conv_num_wnd		l2_conv_in_h * l2_conv_in_w * l2_conv_in_c
-
-// max pooling 2x2x1 with (2,2,1) stride
-#define l3_maxp_f_h			 2
-#define l3_maxp_f_w			 2
-#define l3_maxp_f_st		 2
-
-#define l3_maxp_in_h		l2_conv_out_h	// 14
-#define l3_maxp_in_w		l2_conv_out_w	// 14
-#define l3_maxp_in_c		l2_conv_out_c	// 16
-
-#define l3_maxp_out_h		l3_maxp_in_h / l3_maxp_f_st	// 7
-#define l3_maxp_out_w		l3_maxp_in_w / l3_maxp_f_st	// 7
-#define l3_maxp_out_c		l3_maxp_in_c				// 16
-
-#define l3_maxp_num_wnd		(l3_maxp_in_h * l3_maxp_in_w * l3_maxp_in_c) / (l3_maxp_f_h * l3_maxp_f_w )
-
-// fully connected layer
-#define l4_dens_in_size		l3_maxp_out_c * l3_maxp_out_h * l3_maxp_out_w	// 784
+/***********************************************************************************/
+/* Layer 4: Fully connected ReLU layer with 64 kernels.                            */
+/***********************************************************************************/
+#define l4_dens_in_size		784
 #define l4_dens_k			64
-#define l4_dens_out_size	l4_dens_k										// 64
 
-// softmax classification layer
-#define l5_soft_in_size		l4_dens_out_size	// 64
+/***********************************************************************************/
+/* Layer 5: Fully connected Softmax layer with 10 kernels.                         */
+/***********************************************************************************/
+#define l5_soft_in_size		64
 #define l5_soft_k			10
-#define l5_soft_out_size	l5_soft_k			// 10
 
-/***** Datatypes definitions *****/
+/***********************************************************************************/
+/* Datatype definitions.                                                           */
+/***********************************************************************************/
 typedef unsigned int uint;
 typedef float t_data;
-typedef unsigned int t_label; // change this to ap_uint 4 bits
+typedef unsigned int t_label; // change this to ap_uint 4 bits?
 
-/***** Helper functions & structs *****/
+/***********************************************************************************/
+/* Auxiliary functions.                                                            */
+/***********************************************************************************/
+// Saves array to file.
 template < uint num_elements >
 void save_array( float array[num_elements] , const char* file_name , const uint precision )
 {
@@ -111,6 +79,7 @@ void save_array( float array[num_elements] , const char* file_name , const uint 
 	file.close();
 }
 
+// Reads array from file.
 template < typename data_type , uint dim0 >
 void file_to_1d_array ( data_type array[dim0] , std::string filename )
 {

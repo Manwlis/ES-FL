@@ -2,22 +2,24 @@
 
 #include <hls_stream.h>
 #include <hls_math.h>
-#include <stdio.h>
-#include <string.h>
 
-/***** Size definitions *****/
-#define num_batches			1
+/***********************************************************************************/
+/* Size definitions                                                                */
+/***********************************************************************************/
+#define num_batches			2 // !!! Needs to change in both host.hpp and all_fwp_bp.hpp
 #define batch_size			2
-#define learning_rate_const 0.01f
+#define maxi_buffer_size	16
 
-// 28x28x1 image
+/***********************************************************************************/
+/* Input: 28x28x1 array.                                                           */
+/***********************************************************************************/
 #define input_h				28
 #define input_w				28
 #define input_c				 1
 
-#define maxi_buffer_size	16
-
-// passes through 16 3x3 filters
+/***********************************************************************************/
+/* Layer 0: Convolution with 16 3x3 filters.                                       */
+/***********************************************************************************/
 #define l0_conv_f_h			 3
 #define l0_conv_f_w			 3
 #define l0_conv_f			16
@@ -32,7 +34,9 @@
 
 #define l0_conv_num_wnd		l0_conv_in_h * l0_conv_in_w * l0_conv_in_c
 
-// max pooling 2x2x1 with (2,2,1) stride
+/***********************************************************************************/
+/* Layer 1: Max pooling  with 2x2x1 filter (2,2,1) stride.                         */
+/***********************************************************************************/
 #define l1_maxp_f_h			 2
 #define l1_maxp_f_w			 2
 #define l1_maxp_f_st		 2
@@ -47,7 +51,9 @@
 
 #define l1_maxp_num_wnd 	(l1_maxp_in_h * l1_maxp_in_w * l1_maxp_in_c) / (l1_maxp_f_h * l1_maxp_f_w)
 
-// 32 3x3 filters
+/***********************************************************************************/
+/* Layer 2: Convolution with 16 3x3 filters.                                       */
+/***********************************************************************************/
 #define l2_conv_f_h			 3
 #define l2_conv_f_w			 3
 #define l2_conv_f			16
@@ -62,7 +68,9 @@
 
 #define l2_conv_num_wnd		l2_conv_in_h * l2_conv_in_w * l2_conv_in_c
 
-// max pooling 2x2x1 with (2,2,1) stride
+/***********************************************************************************/
+/* Layer 3: Max pooling  with 2x2x1 filter (2,2,1) stride.                         */
+/***********************************************************************************/
 #define l3_maxp_f_h			 2
 #define l3_maxp_f_w			 2
 #define l3_maxp_f_st		 2
@@ -77,27 +85,35 @@
 
 #define l3_maxp_num_wnd		(l3_maxp_in_h * l3_maxp_in_w * l3_maxp_in_c) / (l3_maxp_f_h * l3_maxp_f_w )
 
-// fully connected layer
+/***********************************************************************************/
+/* Layer 4: Fully connected ReLU layer with 64 kernels.                            */
+/***********************************************************************************/
 #define l4_dens_in_size		l3_maxp_out_c * l3_maxp_out_h * l3_maxp_out_w	// 784
 #define l4_dens_k			64
 #define l4_dens_out_size	l4_dens_k										// 64
 
-// softmax classification layer
+/***********************************************************************************/
+/* Layer 5: Fully connected Softmax layer with 10 kernels.                         */
+/***********************************************************************************/
 #define l5_soft_in_size		l4_dens_out_size	// 64
 #define l5_soft_k			10
 #define l5_soft_out_size	l5_soft_k			// 10
 
-/***** Datatypes definitions *****/
+/***********************************************************************************/
+/* Datatype definitions.                                                           */
+/***********************************************************************************/
 typedef unsigned int uint;
-typedef unsigned int t_label; // change this to ap_uint 4 bits
+typedef unsigned int t_label; // change this to ap_uint 4 bits?
 
-
-/***** Helper functions & structs *****/
+/***********************************************************************************/
+/* HLS tools can't pass primitive arrays through streams.                          */
+/* Instead, these structs are used.                                                */
+/***********************************************************************************/
 template < typename in_type , uint filter_height , uint filter_width >
 struct window {
 	in_type elements[filter_height][filter_width];
 
-	void operator=(const window& input)
+	void operator=( const window& input )
 	{
 		for( int h = 0 ; h < filter_height ; h++ )
 			for( int w = 0 ; w < filter_width ; w++ )
@@ -122,19 +138,10 @@ struct window_1d
 	}
 };
 
-
-// Reads a stream and puts its data on global memory
-template < typename out_type , uint num_elements >
-void write_mem ( hls::stream< out_type >& s_input , out_type output[num_elements] )
-{
-	write_out_mem: for ( uint i = 0 ; i < num_elements ; i++ )
-	{
-		out_type temp = s_input.read();
-		output[i] = temp;
-	}
-}
-
-
+/***********************************************************************************/
+/* Auxiliary functions.                                                            */
+/***********************************************************************************/
+// Duplicates a stream.
 template < typename out_type , uint _batch_size , uint size >
 void duplicate_stream ( hls::stream< out_type >& s_in , hls::stream< out_type >& s_out_1 , hls::stream< out_type >& s_out_2 )
 {
@@ -149,7 +156,9 @@ void duplicate_stream ( hls::stream< out_type >& s_in , hls::stream< out_type >&
 		}
 }
 
-
+/***********************************************************************************/
+/* Expose top function of the design to the host.                                  */
+/***********************************************************************************/
 extern "C"
 {
 void accel ( float learning_rate ,

@@ -134,23 +134,23 @@ template < typename _in_type , uint _batch_size , uint _in_h , uint _in_w , uint
 void conv_fp_1c_sum ( hls::stream < window < float , _f_h , _f_w > >& s_in_wnd ,
 	float weights[_f_h][_f_w][_num_f] , float biases[_num_f] , hls::stream < float >& s_kernel_sums )
 {
-	batch: for ( uint batch = 0 ; batch < _batch_size ; batch++ )
-		inputs: for ( uint input_counter = 0 ; input_counter < _in_h * _in_w ; input_counter++ )
+	window < _in_type , _f_h , _f_w > temp_window;
+
+	inputs: for ( uint input_counter = 0 ; input_counter < _batch_size * _in_h * _in_w ; input_counter++ )
+		filter: for ( uint filter = 0 ; filter < _num_f ; filter++ )
 		{
-#pragma HLS PIPELINE II=16 style=frp
+#pragma HLS PIPELINE II=1 style=frp
 
-			window < _in_type , _f_h , _f_w > temp_window  = s_in_wnd.read();
+			if ( filter == 0 )
+				temp_window  = s_in_wnd.read();
 
-			filter: for ( uint filter = 0 ; filter < _num_f ; filter++ )
-			{
-				float temp_sum = biases[filter];
+			float temp_sum = biases[filter];
 
-				filt_y: for ( uint filter_y = 0 ; filter_y < _f_h ; filter_y++ )
-					filt_x: for ( uint filter_x = 0 ; filter_x < _f_w ; filter_x++ )
-						temp_sum += temp_window.elements[filter_y][filter_x] * weights[filter_y][filter_x][filter];
+			filt_y: for ( uint filter_y = 0 ; filter_y < _f_h ; filter_y++ )
+				filt_x: for ( uint filter_x = 0 ; filter_x < _f_w ; filter_x++ )
+					temp_sum += temp_window.elements[filter_y][filter_x] * weights[filter_y][filter_x][filter];
 
-				s_kernel_sums.write( temp_sum );
-			}
+			s_kernel_sums.write( temp_sum );
 		}
 }
 

@@ -145,11 +145,14 @@ int main ( int argc , char** argv )
 	// file_to_2d_array < uint , num_batches * batch_size > ( input_labels , "data/labels.txt" );
 	input_labels[0][0] = 2;
 	input_labels[0][1] = 1;
-//	input_labels[1][0] = 2;
-//	input_labels[1][1] = 1;
+	input_labels[1][0] = 2;
+	input_labels[1][1] = 1;
+
+	/******* Get learning rate *******/
+	float learning_rate = learning_rate_const / float(batch_size);
 
 	/*********** Call IP ***********/
-	accel( learning_rate_const , input_data , input_data , input_labels ,
+	accel( learning_rate , input_data , input_data , input_labels ,
 		l0_conv_weights , l0_conv_biases , l2_conv_weights , l2_conv_biases ,
 		l4_dens_weights , l4_dens_biases , l5_soft_weights , l5_soft_biases );
 

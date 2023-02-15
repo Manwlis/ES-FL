@@ -5,13 +5,12 @@
 #include <xrt/xrt_device.h>				// xrt device API
 #include <xrt/xrt_kernel.h>				// xrt kernel API
 #include <xrt/xrt_bo.h>					// xrt buffer API
-#include <experimental/xrt_error.h>		// xrt error API
 
 
-int main ( int argc , char** argv )
+int main ( )
 {
 /***********************************************************************************/
-/*********** Load XCLBIN file, create OpenCL context, device and program ***********/
+/* Load XCLBIN file, create OpenCL context, device and program.                    */
 /***********************************************************************************/
 	std::cout << "Opening FPGA device." << std::endl;
 	auto device = xrt::device( c_device_index );
@@ -23,7 +22,7 @@ int main ( int argc , char** argv )
 	auto kernel = xrt::kernel( device , xclbin_uuid , c_kernel_name );
 
 /***********************************************************************************/
-/****************************** Prepare Global Memory ******************************/
+/* Prepare Global Memory.                                                          */
 /***********************************************************************************/
 	std::cout << "Allocating buffers in Global Memory." << std::endl;
 	auto buf_input_data_fp   = xrt::bo( device ,         num_batches * batch_size * input_h * input_w * sizeof(float) , kernel.group_id( 1 ) );
@@ -56,6 +55,8 @@ int main ( int argc , char** argv )
 
 	input_labels[0][0] = 2;
 	input_labels[0][1] = 1;
+	input_labels[1][0] = 2;
+	input_labels[1][1] = 1;
 	// TODO: get labels from file: file_to_2d_array < uint , num_batches * batch_size > ( input_labels , "data/labels.txt" );
 
 	/*********** Get variables ***********/
@@ -102,32 +103,21 @@ int main ( int argc , char** argv )
 	buf_l5_soft_biases.sync( XCL_BO_SYNC_BO_TO_DEVICE );
 
 /***********************************************************************************/
-/******************************* Execute the kernel. *******************************/
+/* Execute the kernel.                                                             */
 /***********************************************************************************/
-	try{
+	float learning_rate = c_learning_rate / float(batch_size);
+
 	std::cout << "Executing the kernel." << std::endl;
-	auto run = kernel(	c_learning_rate ,
+	auto run = kernel(	learning_rate ,
 						buf_input_data_fp , buf_input_data_cg , buf_labels ,
 						buf_l0_conv_weights , buf_l0_conv_biases ,
 						buf_l2_conv_weights , buf_l2_conv_biases ,
 						buf_l4_dens_weights , buf_l4_dens_biases ,
 						buf_l5_soft_weights , buf_l5_soft_biases );
 	run.wait();
-	} catch ( const std::system_error& ex )
-	{
-		if ( ex.code().value() == ETIME )
-		{
-			xrt::error error( device , XRT_ERROR_CLASS_AIE );
-
-			auto errCode = error.get_error_code();
-			auto err_str = error.to_string();
-
-			std::cout << errCode << " " << err_str << std::endl;
-		}
-	}
 
 /***********************************************************************************/
-/*********************************** Get output. ***********************************/
+/* Get output.                                                                     */
 /***********************************************************************************/
 	std::cout << "Synchronizing the output buffer data from the device." << std::endl;
 	buf_l0_conv_weights.sync( XCL_BO_SYNC_BO_FROM_DEVICE );
