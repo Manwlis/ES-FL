@@ -23,7 +23,10 @@ Vitis supports hardware acceleration kernels controlled by PS or x86 kernels. Th
 \end{figure}
 
 \subsection{Xilinx Runtime library (XRT)}
-The Xilinx Runtime library\cite{Xilinx_Runtime_Library} (XRT) facilitates communication between the application code (running on an embedded Arm or x86 host) and the accelerators deployed on the reconfigurable portion of PCIe interface-based AMD Xilinx accelerator cards, MPSoC-based embedded platforms, or ACAPs. It is flexible with modifiable libraries and drivers, enabling different levels of abstractions, from high-level Python bindings to low-level C++ APIs. Its APIs are common across all platforms and require no hardware expertise, eliminating the need to implement hardware communication layers from scratch.
+The Xilinx Runtime library\cite{Xilinx_Runtime_Library} (XRT) facilitates communication between the application code (running on an embedded Arm or x86 host) and the accelerators deployed on the reconfigurable portion of PCIe interface-based AMD Xilinx accelerator cards, MPSoC-based embedded platforms, or ACAPs. It is flexible with modifiable libraries and drivers, enabling different levels of abstractions, from high-level Python bindings to low-level C++ APIs. These APIs are common across all platforms and eliminate the need to implement hardware communication layers from scratch. % what is XRT
+
+A widely used alternative are the OpenCL libraries. TBy abstracting the underlying implementations of numerous APIs, including the XRT, they offer a standard interface for managing heterogeneous devices. As a result, they enable portability across multiple devices from various providers, albeit with increased complexity due to the extra layer of abstraction. As this work is not indented to transition to other devices, the XRT is preferred. % why I chose XRT over OpenCL
+
 \begin{figure}[H]
     \centering
         \includegraphics[width=1\textwidth]{Images/Platform/xrt.png}
@@ -88,10 +91,8 @@ The ZCU102 Evaluation Board features a Zynq\textsuperscript{\textregistered} Ult
 
 Given that the thesis is based on an edge application, this platform seems to be an ideal fit for it. During the hardware design phase, the constrains and resource limitation were placed according to the specifications of this board. Nevertheless, transferring the final design to devices of similar families should require minimal effort.
 
-\section{Hardware Implementation}
-
-\subsection{C++ CNN Implementation}
-During the preceding phase, TF with Python was utilized to implement all ANNs and training. Due to the Vitis Kernel Toolchain requires C/C++ code, these implementations can not be synthesized to hardware by the aforementioned tools. As such, the most used CNN, the third in the model library, has been re-implemented on C++.
+\section{Preparing the CNN for Hardware}
+In the preceding phase, TF with Python was utilized to implement all ANNs and training. As the Vitis Kernel Toolchain is aimed to C/C++ code, these implementations can not be synthesized to hardware by the aforementioned tools. As such, a simplified version of the most used CNN, the third in the model library, has been re-implemented with C++.
 
 Migrating from TF to a hardware synthesizable CNN is a fairly challenging task riddled with pitfalls. This implementation is not optimized for hardware, but rather serves as a stepping stone between TF and synthesizable code. Certain practices are adopted to facilitate future transition to hardware targeted code:
 
@@ -111,10 +112,10 @@ Migrating from TF to a hardware synthesizable CNN is a fairly challenging task r
 
 Figure \ref{fig: CNN dataflow} depicts the basic structure of the implementation. Tasks are represented by cycles, whereas data are represented by squares. Inputs, labels, weights and any other data that must to be saved in memory have greyed-out squares. The majority of internal data are consumed immediately after being produced. Some of them, marked by red arrows, skip parts of the chain and must be temporally stored.
 
-\subsection{Vitis HLS Implementation}
+\section{Vitis HLS Hardware Implementation}
 Even with the aforementioned techniques, adapting the code to be compatible with FPGAs is not a trivial task. To build an efficient implementation, resource usage, data access patterns, and other factors must be taken into account. All parts of the CNN are modified accordingly.
 
-\subsubsection{2D Convolutional Layers}
+\subsection{2D Convolutional Layers}
 Due to their non-serial data access patterns, multi-dimensional filter algorithms frequently conflict with FPGA design; 2-D convolution is no exception. At its core, it carries out some form of data averaging around a pixel, necessitating the access of nearby input values as seen in figure \ref{fig: convolution access pattern}. Additionally, when calculating the adjacent outputs, some inputs are accessed again.
 
 \begin{figure}[H]
@@ -275,7 +276,7 @@ The processing element of the gradient calculation differs more. Instead of usin
         \label{fig: Conv2D back propagation block diagram}
 \end{figure}
 
-\subsubsection{2D Max-Pooling Layers}
+\subsection{2D Max-Pooling Layers}
 The 2D Max-Pooling layers are implemented using the same logic as the 2D convolutional layers, albeit with a few major differences. First of all the window is 2x2 is size, and with a stride of 2. As a result, each window contains exclusive data, and an output can only be obtained with four inputs.
 
 \begin{figure}[H]
@@ -290,12 +291,12 @@ Figure \ref{fig: Line Buffers Max-Pool} demonstrates the Max-Pool layer's uneven
 
 The processing component of forward propagation is quite simple, as the output is the highest value in each window. It is important to note that the output's spatial dimensions are two times smaller than those of the input. Even more straightforward is back-propagation, in which the error back-propagates towards the maximum of each window. All other connections are assigned zero error gradients.
 
-\subsubsection{Dense \& Softmax Layers}
+\subsection{Dense \& Softmax Layers}
 The implementations of the dense and Softmax layers are simple and fairly similar. They are made up of two components: matrix multiplication of their inputs and weights and their respective activation function. In back-propagation and gradient calculation, the output error is activated before used as the input, with the input and variable gradients being the outputs.
 
 The most crucial aspect of their design is ensuring that the hardware functions are constantly operating. To accomplish this, a streaming architecture, that reads and writes inputs and outputs serially and only once, is used. Important to note is that the Softmax activation requires all the inputs to be received before calculating any output, meaning that for an example back-propagation can not start until forward propagation is fully completed.
 
-\subsubsection{Gradients Calculation Pipeline} % TODO: find better title
+\subsection{Gradients Calculation Pipeline} % TODO: find better title
 A major advantage of FPGA accelerators is that multiple hardware functions operate simultaneously, if the implemented algorithm allows. This holds true for most of the design. As an example, The first maxpool layer requires four inputs to generate the first output. These inputs have being generated by the first convolutional layer before a training data-point is fully loaded and processed. Thus the first two layers can operate simultaneously. % hardware function can operate simutanusly
 
 On the other hand, the Softmax layer, which is the last step of the forward propagation, operates like a barrier. Due to the nature of the algorithm, to produce its feature map, all inputs must first be collected. As a result, for a single training data-point, the forward propagation must be completed before the back propagation begins. % softmax is a barrier
@@ -314,7 +315,7 @@ Figure \ref{fig: Gradients Calculation Pipeline Block Diagram} shows in detail t
         \label{fig: Gradients Calculation Pipeline Block Diagram}
 \end{figure}
 
-\subsubsection{Hardware Streams}
+\subsection{Hardware Streams}
 All communication between the hardware functions is facilitated with the stream implementation provided by the Vitis HLS library "hls\_stream.h". Hardware functions stall when an output stream is full, making the overall architecture inefficient. It is crucial to prevent this by determining the proper depth of the streams.
 
 In most cases, this is trivial as they link sequential functions in a dataflow region where the consumer can instantly begin utilizing any data written by the producer. Then the major factor of the depth is the II of the connected functions. For most stream, a depth of two is sufficient.
@@ -323,12 +324,12 @@ More consideration is required about the streams that skip parts of the function
 
 To determine the ideal depths, an iterative optimization approach has typically been used. The Vitis HLS environment offers a variety of simulation tools that generate a number of useful statistics, such as the amount of clock cycles that each function stalls and whether or not a stream becomes full. Monitoring these when testing, enables calibrating the depths to ensure the stable flow of the pipeline, while not wasting hardware space in unnecessarily large streams.
 
-\subsubsection{Batching Inputs}
+\subsection{Batching Inputs}
 As already explained, not all hardware functions can run concurrently for a single input sample. This issue is mitigated through batching input samples, where while an input runs through back-propagation, the next one is used in forward propagation. % description
 
 \begin{figure}[H]
     \centering
-        \includegraphics[width=0.83\textwidth]{Images/diagrams/pipeline_under_batching.png}
+        \includegraphics[width=0.8\textwidth]{Images/diagrams/pipeline_under_batching.png}
         \decoRule
         \caption[Pipeline with batching latency]{ Latency of the pipeline under batching.}
         \label{fig: Batching Pipeline latency}
@@ -354,10 +355,10 @@ With Vitis HLS, implementing batching on each individual hardware function is qu
 
 Further though must be given to the size of the streams connecting functions of the forward propagation with functions after the barrier. The producer functions will block until the consumer functions clear some space in the stream if the minimal depth is used as mentioned in the preceding section. Depending on the minimal latency between the producer and the consumer, this can be avoided by increasing the depth by 0.5 to 1 times.
 
-\subsubsection{Updating Variables}
+\subsection{Updating Variables}
 Based on the produced gradients, the variables of the ANN are updated in a second dataflow region. Due to the independence of all weights and gradients, the process is relatively straightforward. The basic gradient descend algorithm is used and the learning rate is supplied by the driver program. Thus, latency and hardware usage are the only criteria for the applied parallelism.
 
-\subsubsection{Data Movement \& Storage}
+\subsection{Data Movement \& Storage}
 Under the Vitis flow, AXI streams are unavailable for the ZCU102, thus memory mapping is used to transfer data from general memory to the PL and vice versa. These data are the input samples and labels, as well as the variables of the ANN. Appropriate data mover functions have been developed. % gmem <-> accel, which data
 
 In Vitis HLS, arrays are implemented as continuous memory spaces with one or two ports, and only a limited amount of data can be read or written per cycle. To increase data accesses per cycle, the arrays are partitioned with the appropriate HLS directive \emph{ARRAY\_PARTITION}. The HLS tool splits the initial arrays to smaller ones, whose size and shape depend on the parameters of the corresponding directives. % array partition
@@ -366,17 +367,35 @@ The weights of the ANN are accessed in multiple functions of the first dataflow 
 
 For the weights of the second convolutional layer, this is insufficient. They are accessed by two functions with different access patterns. This issue can be resolved in two ways. The first one is satisfying both access patterns by increasing the partition factor and dimensions. This solution generate a huge amount of access ports, increasing hardware consumption unacceptably. More appropriate solution is creating two arrays with unique partitioning each. Albeit more memory is needed, the overall hardware usage is lower. % double arrays for layer 2 weights
 
-To conserve memory space in the PL, only one batch is stored at any time. The first batch is fetched during the startup of the accelerator. After utilizing a batch to generate gradients, it is no longer useful and is replaced by the next one during the variable updating phase. % batch fetching
+When generating the gradients, the ANN's inputs ,data and labels, are sent from global memory to the PL via AXI Master Adapter ports. In a dataflow region, each channel must have a single consumer, thus two ports are needed to propagate the input data to the two hardware functions that consume it. All ports are independent from one another by having their own dedicated bundles, thus enabling the simultaneous reading of all inputs. % dataflow inputs
 
-The variable gradients are produced in the first dataflow region and consumed in the second, thus persistent saving in memory is necessary. The related arrays are not shared since their producers and consumers are in different regions, therefore the number of ports is solely increased to accomplish the desired data consumption. % gradients
+The variable gradients are produced in the first dataflow region and consumed in the second, thus persistent saving in on-chip memory is necessary. The related arrays are not shared since their producers and consumers are in different regions, therefore the number of ports is increased to accomplish the desired data consumption. % gradients
 
-\subsubsection{Top function}
+\subsection{Minimizing Global Memory Accesses}
+bursting / port widening
+
+\subsection{Top function}
 To hold everything together, a top level function has been developed, whose signature operates as the API between PL and PS. Furthermore, it contains all the definitions of the memory structures, as well as the instantiations of the data movers and dataflow regions. Finally, to train on multiple batches, the dataflow regions are enclosed in a loop.
 
-\begin{figure}[H]
+\begin{figure}[H] % TODO: remove the batch fetching
     \centering
         \includegraphics[height=0.5\textheight]{Images/block_diagrams/accel_top.png}
         \decoRule
         \caption[Top function]{Block diagram of the accelerator's top function.}
         \label{fig: top function}
 \end{figure}
+
+\section{Host Program}
+The overall application uses Linux system calls, such as socket read and write. Thus a bare metal implementation is inadequate and a host program in the PS is required to drive the developed hardware design in the PL. This is achieved with the use of the XRT native C++ APIs \cite{XRT_Native_APIs}.
+
+The flow of the driver code is as follows:
+\begin{itemize}
+    \item Open the device.
+    \item Load the compiled and linked binary (XCLBIN) onto the device.
+    \item Open the kernel loaded to the device with the XCLBIN.
+    \item Create Buffer objects to transfer data to kernel inputs and outputs.
+    \item Write data to the input buffers.
+    \item Execute the kernel.
+    \item Read data from the outputs buffers.
+    
+\end{itemize}

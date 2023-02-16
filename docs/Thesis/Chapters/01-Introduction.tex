@@ -9,9 +9,9 @@ Due to growing privacy concerns, recent legislation like General Data Protection
 
 \section{Motivation}
 
-Most FL research, to our knowledge, focuses on simulations and treats edge devices as black boxes; generally ignoring their nature and constrains. Taking in consideration the complexities from implementing ML on hardware, recent advancements in FL might be diminished or invalidated. The main motivation of this thesis is to identify, explore and possibly overcome the intrinsic conflicts that exist between FL and Artificial Neural Network (ANN) training in Field Programmable Gate Arrays (FPGA)s. % Such conflicts can be the batch size, where in FL tends to be minimized.
+Most FL research, to our knowledge, focuses on simulations and treats edge devices as black boxes; generally ignoring their nature and constrains. Taking in consideration the complexities of implementing ML on hardware, recent advancements in FL might be diminished or invalidated. The main motivation of this thesis is to identify, explore and possibly overcome the intrinsic conflicts that exist between FL and Artificial Neural Network (ANN) training in Field Programmable Gate Arrays (FPGA)s. % Such conflicts can be the batch size, where in FL tends to be minimized.
 
-Beside being incompatible, these two technologies may complement each other, which is something worth investigating. Frequently in FL, transformations are applied on the generated ANN variables to reduce network utilization and enhance privacy. These transformations, which include quantization \cite{Mills2020}, adding Gaussian noise \cite{Wei2020} and others, tend to be spatially independent and could be implemented highly efficiently in hardware accelerators like FPGAs.
+Instead of being incompatible, these two technologies may complement each other, which is worth investigating. Frequently in FL, transformations are applied on the generated ANN variables to reduce network utilization and enhance privacy. These transformations, which include quantization \cite{Mills2020}, adding Gaussian noise \cite{Wei2020} and others, tend to be spatially independent and could be implemented highly efficiently in hardware accelerators like FPGAs.
 
 Finally, FL literature is almost devoid of wall-clock time examples. This thesis aims to provide a real world FL implementation that may be considered as a benchmark for future research. Furthermore, in order to be extendable and utilized in future works, the FL implementation is modular and platform independent.
 
@@ -29,5 +29,5 @@ The main focus of this thesis is combining FL training with FPGA based ANN imple
     \item \textbf{Chapter 5 - Robustness Analysis:} Analysis of the quality and performance of the FL implementation.
     \item \textbf{Chapter 6 - FPGA Implementation:} Description of the ANN architecture, design and implementation on FPGA developed.
     \item \textbf{Chapter 7 - Results:} Analysis of the quality and performance of the complete system.
-    \item \textbf{Chapter 8 - Conclusions and Related Work:} Chapter 7 description
+    \item \textbf{Chapter 8 - Conclusions and Related Work:} Chapter 8 description % TODO: this
 \end{itemize}
