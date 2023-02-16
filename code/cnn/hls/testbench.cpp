@@ -1,4 +1,4 @@
-#include "all_fwp_bp.hpp"
+#include "cnn_accelerator.hpp"
 
 #include <iostream>
 #include <iomanip>

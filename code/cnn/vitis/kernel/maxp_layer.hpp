@@ -8,7 +8,7 @@
  * Developed with Vitis HLS 2022.1.
  */
 
-#include "all_fwp_bp.hpp"
+#include "cnn_accelerator.hpp"
 
 /***********************************************************************************/
 /******************************* Forward Propagation *******************************/

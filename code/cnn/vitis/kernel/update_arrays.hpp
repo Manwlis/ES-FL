@@ -8,7 +8,7 @@
  * Developed with Vitis HLS 2022.1.
  */
 
-#include "all_fwp_bp.hpp"
+#include "cnn_accelerator.hpp"
 
 void update_l0_conv_weights ( float lr , 
 	float l0_conv_weight_grad[l0_conv_f_h][l0_conv_f_w][l0_conv_f] ,

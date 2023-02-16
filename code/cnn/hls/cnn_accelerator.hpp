@@ -116,7 +116,7 @@ template < typename in_type , uint filter_height , uint filter_width >
 struct window {
 	in_type elements[filter_height][filter_width];
 
-	void operator=(const window& input)
+	void operator=( const window& input )
 	{
 		for( int h = 0 ; h < filter_height ; h++ )
 			for( int w = 0 ; w < filter_width ; w++ )
@@ -142,7 +142,7 @@ struct window_1d
 };
 
 /***********************************************************************************/
-/* Helpful functions.                                                              */
+/* Auxiliary functions.                                                            */
 /***********************************************************************************/
 // Duplicates a stream.
 template < typename out_type , uint _batch_size , uint size >
