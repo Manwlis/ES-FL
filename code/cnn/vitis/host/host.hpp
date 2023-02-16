@@ -12,7 +12,7 @@
 /***********************************************************************************/
 #define c_device_index     0
 #define c_binary_file_name "binary_container_1.xclbin"
-#define c_kernel_name      "accel"
+#define c_kernel_name      "cnn_accelerator"
 
 /***********************************************************************************/
 /* Size definitions                                                                */

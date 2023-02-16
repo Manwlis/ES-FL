@@ -152,7 +152,7 @@ int main ( int argc , char** argv )
 	float learning_rate = learning_rate_const / float(batch_size);
 
 	/*********** Call IP ***********/
-	accel( learning_rate , input_data , input_data , input_labels ,
+	cnn_accelerator ( learning_rate , input_data , input_data , input_labels ,
 		l0_conv_weights , l0_conv_biases , l2_conv_weights , l2_conv_biases ,
 		l4_dens_weights , l4_dens_biases , l5_soft_weights , l5_soft_biases );
 

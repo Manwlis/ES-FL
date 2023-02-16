@@ -108,7 +108,7 @@ int main ( )
 	float learning_rate = c_learning_rate / float(batch_size);
 
 	std::cout << "Executing the kernel." << std::endl;
-	auto run = kernel(	learning_rate ,
+	auto run = kernel (	learning_rate ,
 						buf_input_data_fp , buf_input_data_cg , buf_labels ,
 						buf_l0_conv_weights , buf_l0_conv_biases ,
 						buf_l2_conv_weights , buf_l2_conv_biases ,

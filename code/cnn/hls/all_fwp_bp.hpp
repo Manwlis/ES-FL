@@ -164,7 +164,7 @@ void duplicate_stream ( hls::stream< out_type >& s_in , hls::stream< out_type >&
 /***********************************************************************************/
 extern "C"
 {
-void accel ( float learning_rate ,
+void cnn_accelerator ( float learning_rate ,
 	float gmem_input_data_fp[num_batches][batch_size][input_h * input_w] ,
 	float gmem_input_data_cg[num_batches][batch_size][input_h * input_w] ,
 	uint gmem_labels[num_batches][batch_size] ,

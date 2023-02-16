@@ -178,7 +178,7 @@ void save_variables_globally (
 }
 
 
-void fp_bp_cg (
+void process_batch (
 	float gmem_input_data_fp[num_batches][batch_size][input_h * input_w] ,
 	float gmem_input_data_cg[num_batches][batch_size][input_h * input_w] ,
 	t_label gmem_labels[num_batches][batch_size] ,
@@ -485,7 +485,7 @@ void update_variables ( float batch_lr ,
 }
 
 
-void accel ( float learning_rate ,
+void cnn_accelerator ( float learning_rate ,
 	float gmem_input_data_fp[num_batches][batch_size][input_h * input_w] ,
 	float gmem_input_data_cg[num_batches][batch_size][input_h * input_w] ,
 	uint gmem_labels[num_batches][batch_size] ,
@@ -544,13 +544,13 @@ void accel ( float learning_rate ,
 
 	for ( uint num_batch = 0 ; num_batch < num_batches ; num_batch++ )
 	{
-		fp_bp_cg ( gmem_input_data_fp , gmem_input_data_cg , gmem_labels , num_batch ,
+		process_batch ( gmem_input_data_fp , gmem_input_data_cg , gmem_labels , num_batch ,
 			l0_conv_weights , l0_conv_biases , l2_conv_weights_fp , l2_conv_weights_bp , l2_conv_biases ,
 			l4_dens_weights , l4_dens_biases , l5_soft_weights , l5_soft_biases ,
 			l5_soft_weight_grad , l5_soft_bias_grad , l4_dens_weight_grad , l4_dens_bias_grad ,
 			l2_conv_weight_grad , l2_conv_bias_grad , l0_conv_weight_grad , l0_conv_bias_grad );
 
-		update_variables( learning_rate ,
+		update_variables ( learning_rate ,
 			l0_conv_weights , l0_conv_biases , l2_conv_weights_fp , l2_conv_weights_bp , l2_conv_biases ,
 			l4_dens_weights , l4_dens_biases , l5_soft_weights , l5_soft_biases ,
 			l5_soft_weight_grad , l5_soft_bias_grad , l4_dens_weight_grad , l4_dens_bias_grad ,

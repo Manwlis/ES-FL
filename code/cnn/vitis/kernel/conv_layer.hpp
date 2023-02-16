@@ -16,12 +16,12 @@
 /**
  * @brief Put input in windows specified for the convolutional layer.
  * @tparam typename, type of inputs
+ * @tparam uint, batch size
  * @tparam uint, height of inputs
  * @tparam uint, width of inputs
  * @tparam uint, number of input channels
  * @tparam uint, height of filters
  * @tparam uint, width of filters
- * @tparam uint, partition factor for width dimension of local line_buffers array
  * @param stream< float >, layer inputs
  * @param stream< window< float > >, layer inputs in windows
  */
@@ -78,12 +78,12 @@ void conv_create_window_stream ( hls::stream< _in_type >& s_input , hls::stream<
 /**
  * @brief "Same" padding on a window stream.
  * @tparam typename, type of inputs
+ * @tparam uint, batch size
  * @tparam uint, height of inputs
  * @tparam uint, width of inputs
  * @tparam uint, number of input channels
  * @tparam uint, height of filters
  * @tparam uint, width of filters
- * @tparam uint, number of filters
  * @param stream< window< float > >, layer inputs in windows
  * @param stream< window< float > >, padded layer inputs in windows
  */
@@ -118,15 +118,16 @@ void conv_pad_windows (
 /******************************* Forward Propagation *******************************/
 /***********************************************************************************/
 /**
- * @brief Calculate the 2d matrix multiplication sums for each kernel of the layer with a single channel input.
+ * @brief 2d matrix multiplication for each filter of the layer with a single channel input.
  * @tparam typename, type of inputs
+ * @tparam uint, batch size
  * @tparam uint, height of inputs
  * @tparam uint, width of inputs
  * @tparam uint, height of filters
  * @tparam uint, width of filters
  * @tparam uint, number of filters
  * @param stream< window< float > >, layer inputs in windows
- * @param float [num_inputs][num_kernels], layer weights
+ * @param float [input_height][input_width][num_kernels], layer weights
  * @param float [num_kernels], layer biases
  * @param stream< float >, kernel sums
  */
@@ -156,14 +157,15 @@ void conv_fp_1c_sum ( hls::stream < window < float , _f_h , _f_w > >& s_in_wnd ,
 
 /**
  * @brief ReLU activation of the convolutional layer with one input channel.
- * @tparam typename, type of inputs
+ * @tparam uint, batch size
+ * @tparam uint, height of inputs
  * @tparam uint, width of inputs
  * @tparam uint, height of filters
  * @tparam uint, width of filters
  * @tparam uint, number of filters
  * @param stream< window< float > >, kernel sums
  * @param stream< float >, layer outputs
- * @param stream< float >, layer outputs
+ * @param stream< bool >, layer activations
  */
 template < uint _batch_size , uint _in_h , uint _in_w , uint _f_h , uint _f_w , uint _num_f >
 void conv_fp_1c_activate ( hls::stream < float >& s_kernel_sums , hls::stream < float >& s_output , hls::stream < bool >& s_activations )
@@ -182,6 +184,22 @@ void conv_fp_1c_activate ( hls::stream < float >& s_kernel_sums , hls::stream < 
 			}
 }
 
+/**
+ * @brief 2d matrix multiplication for each kernel of the layer with a multi channel input.
+ * Each filterXchannel has separate output.
+ * @tparam typename, type of inputs
+ * @tparam uint, batch size
+ * @tparam uint, height of inputs
+ * @tparam uint, width of inputs
+ * @tparam uint, number of input channels
+ * @tparam uint, height of filters
+ * @tparam uint, width of filters
+ * @tparam uint, number of filters
+ * @param stream< window< float > >, layer inputs in windows
+ * @param float [input_height][input_width][num_kernels], layer weights
+ * @param float [num_kernels], layer biases
+ * @param stream< window_1d< float > >, filterXchannel sums per filter.
+ */
 template < typename _in_type , uint _batch_size , uint _in_h , uint _in_w , uint _in_c , uint _f_h , uint _f_w , uint _num_f >
 void conv_fp_mc_sum (
 	hls::stream < window < _in_type , _f_h , _f_w > >& s_in_window ,
@@ -208,6 +226,16 @@ void conv_fp_mc_sum (
 				}
 }
 
+/**
+ * @brief Aggregates filterXchannel sums to make filter sums.
+ * @tparam uint , batch size
+ * @tparam uint , height of inputs
+ * @tparam uint , width of inputs
+ * @tparam uint , number of input channels
+ * @tparam uint , number of filters
+ * @param stream< window< float > > , filterXchannel sums per filter
+ * @param stream< window_1d< float > > , filter sums
+ */
 template < uint _batch_size , uint _in_h , uint _in_w , uint _in_c , uint _num_f >
 void conv_fp_mc_aggregate_channels (
 	hls::stream < window_1d< float , _num_f > >& s_kernel_sums_per_channel ,
@@ -233,6 +261,16 @@ void conv_fp_mc_aggregate_channels (
 				}
 }
 
+/**
+ * @brief ReLU activation of the convolutional layer with multiple input channels.
+ * @tparam uint, batch size
+ * @tparam uint, height of inputs
+ * @tparam uint, width of inputs
+ * @tparam uint, number of filters
+ * @param stream< window_1d< float > >, filter sums
+ * @param stream< float >, layer outputs
+ * @param stream< bool >, layer activations
+ */
 template < uint _batch_size , uint _in_h , uint _in_w , uint _num_f >
 void conv_fp_mc_activate ( hls::stream < window_1d< float , _num_f > >& s_kernel_sums  ,
 	float biases[_num_f] , hls::stream < float >& s_output , hls::stream < bool >& s_activations )
@@ -264,6 +302,7 @@ void conv_fp_mc_activate ( hls::stream < window_1d< float , _num_f > >& s_kernel
 /***********************************************************************************/
 /**
  * @brief Activates the error of the convolutional layer.
+ * @tparam uint, batch size
  * @tparam uint, height of output
  * @tparam uint, width of output
  * @tparam uint, number of output channels
@@ -289,6 +328,20 @@ void conv_bp_activate_error (
 		}
 }
 
+/**
+ * @brief 2d matrix multiplication for each input channel of the layer with a multi filter error output.
+ * Each channelXfilter has separate output.
+ * @tparam uint, batch size
+ * @tparam uint, height of inputs
+ * @tparam uint, width of inputs
+ * @tparam uint, number of input channels
+ * @tparam uint, height of filters
+ * @tparam uint, width of filters
+ * @tparam uint, number of filters
+ * @param stream< window< float > >, layer output errors in windows
+ * @param float [input_height][input_width][num_kernels], layer weights
+ * @param stream< window_1d< float > >, error of each input channel per filter
+ */
 template < uint _batch_size , uint _in_h , uint _in_w , uint _in_c , uint _f_h , uint _f_w , uint _num_f >
 void conv_bp_mc_sum (
 	hls::stream < window < float , _f_h , _f_w > >& s_in_window ,
@@ -318,6 +371,16 @@ void conv_bp_mc_sum (
 				}
 }
 
+/**
+ * @brief Aggregates channelXfilter sums to make channel error sums.
+ * @tparam uint, batch size
+ * @tparam uint, height of inputs
+ * @tparam uint, width of inputs
+ * @tparam uint, number of input channels
+ * @tparam uint, number of filters
+ * @param stream< window< float > >, channelXfilter sums per filter
+ * @param stream< window_1d< float > >, channel error sums
+ */
 template < uint _batch_size , uint _in_h , uint _in_w , uint _in_c , uint _num_f >
 void conv_bp_mc_aggregate_channels (
 	hls::stream < window_1d< float , _in_c > >& s_channel_error_per_filter ,
@@ -341,6 +404,15 @@ void conv_bp_mc_aggregate_channels (
 				}
 }
 
+/**
+ * @brief De-aggregate channel errors to make the stream compatible with other layers.
+ * @tparam uint, batch size
+ * @tparam uint, height of inputs
+ * @tparam uint, width of inputs
+ * @tparam uint, number of input channels
+ * @param stream< window_1d< float > >, channel error sums
+ * @param stream< float >, layer input error
+ */
 template < uint _batch_size , uint _in_h , uint _in_w , uint _in_c >
 void conv_bp_mc_stream ( hls::stream < window_1d< float , _in_c > >& s_channel_errors , hls::stream < float >& s_output )
 {
@@ -361,10 +433,25 @@ void conv_bp_mc_stream ( hls::stream < window_1d< float , _in_c > >& s_channel_e
 /***********************************************************************************/
 /****************************** Gradient Calculation *******************************/
 /***********************************************************************************/
+/**
+ * @brief Calculate gradients for the variables of a convolutional layer with one input channel.
+ * @tparam typename, type of inputs
+ * @tparam uint, batch size
+ * @tparam uint, height of inputs
+ * @tparam uint, width of inputs
+ * @tparam uint, number of input channels
+ * @tparam uint, height of filters
+ * @tparam uint, width of filters
+ * @tparam uint, number of filters
+ * @param stream< window< float > >, layer inputs in windows
+ * @param stream< float >, layer kernel errors
+ * @param float [filter_height][filter_width][num_filters], layer weight gradients
+ * @param float [num_kernels], layer bias gradients
+ */
 template < typename _in_type , uint _batch_size , uint _in_h , uint _in_w , uint _in_c , uint _f_h , uint _f_w , uint _num_f >
 void conv_cg_sc (
-	hls::stream < window < float , _f_h , _f_w > >& s_in_pad_wnd ,	// in_height * in_width
-	hls::stream < float >& s_kernel_error ,							// out_height * out_width * num_filters
+	hls::stream < window < float , _f_h , _f_w > >& s_in_wnd ,	// in_height * in_width
+	hls::stream < float >& s_kernel_error ,						// out_height * out_width * num_filters
 	float weight_grads[_f_h][_f_w][_num_f] , float bias_grads[_num_f] )
 {
 	window < _in_type , _f_h , _f_w >  in_wnd;
@@ -377,7 +464,7 @@ void conv_cg_sc (
 				{
 #pragma HLS PIPELINE II=3 style=frp
 					if ( filter == 0 )
-						in_wnd = s_in_pad_wnd.read();
+						in_wnd = s_in_wnd.read();
 
 					float out_grad = s_kernel_error.read();
 					bias_grads[filter] += out_grad;
@@ -390,6 +477,15 @@ void conv_cg_sc (
 			}
 }
 
+/**
+ * @brief Aggregates kernel error in per filter stream.
+ * @tparam uint, batch size
+ * @tparam uint, height of output
+ * @tparam uint, width of output
+ * @tparam uint, number of filters
+ * @param stream< float >, layer kernel errors
+ * @param stream< window< float > >, layer kernel errors per filter
+ */
 template < uint _batch_size , uint _out_h , uint _out_w , uint _out_c >
 void conv_cg_mc_group_kernel_errors ( hls::stream < float >& s_kernel_error ,	// out_height * out_width * out_channels
 	hls::stream < window_1d < float , _out_c > >& s_grouped_kernel_errors )		// out_height * out_width
@@ -408,9 +504,24 @@ void conv_cg_mc_group_kernel_errors ( hls::stream < float >& s_kernel_error ,	//
 				}
 }
 
+/**
+ * @brief Calculate gradients for the variables of a convolutional layer with multiple input channels.
+ * @tparam typename, type of inputs
+ * @tparam uint, batch size
+ * @tparam uint, height of inputs
+ * @tparam uint, width of inputs
+ * @tparam uint, number of input channels
+ * @tparam uint, height of filters
+ * @tparam uint, width of filters
+ * @tparam uint, number of filters
+ * @param stream< window< float > >, layer inputs in windows
+ * @param stream< window< float > >, layer kernel errors per filter
+ * @param float [filter_height][filter_width][num_in_channels][num_filters], layer weight gradients
+ * @param float [num_filters], layer bias gradients
+ */
 template < typename _in_type , uint _batch_size , uint _in_h , uint _in_w , uint _in_c , uint _f_h , uint _f_w , uint _num_f >
 void conv_cg_mc (
-hls::stream < window < _in_type , _f_h , _f_w > >& s_in_window ,			// in_height * in_width * num_inputs
+	hls::stream < window < _in_type , _f_h , _f_w > >& s_in_window ,		// in_height * in_width * num_inputs
 	hls::stream < window_1d < float , _num_f > >& s_grouped_kernel_errors ,	// out_height * out_width
 	float weight_grads[_f_h][_f_w][_in_c][_num_f] , float bias_grads[_num_f] )
 {
