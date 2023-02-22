@@ -17,7 +17,7 @@
 /***********************************************************************************/
 /* Size definitions                                                                */
 /***********************************************************************************/
-#define num_batches			2 // !!! Needs to change in both host.hpp and all_fwp_bp.hpp
+#define c_num_batches		2 // !!! Needs to change in both host.hpp and all_fwp_bp.hpp
 #define batch_size			2
 #define c_learning_rate 0.01f
 
@@ -142,18 +142,19 @@ void file_to_4d_array ( data_type array[dim3][dim2][dim1][dim0] , std::string fi
 	file.close();
 }
 
-template < typename data_type , uint dim2 , uint dim1 , uint dim0 >
-void read_input_data ( data_type array[dim2][dim1][dim0] , std::string filename )
+template < typename data_type , uint dim3 , uint dim2 , uint dim1 , uint dim0 >
+void read_input_data ( data_type array[dim3][dim2][dim1][dim0] , std::string filename )
 {
 	std::ifstream file( filename );
 	std::string line;
 
+	for ( uint c3 = 0 ; c3 < dim3 ; c3++ )
 		for ( uint c2 = 0 ; c2 < dim2 ; c2++ )
 			for( uint c1 = 0 ; c1 < dim1 ; c1++ )
 				for ( uint c0 = 0 ; c0 < dim0 ; c0++ )
 				{
 					file >> line; // stored as array in the file.
-					array[c2][c1][c0] = std::stof( line );
+					array[c3][c2][c1][c0] = std::stof( line );
 				}
 	file.close();
 }

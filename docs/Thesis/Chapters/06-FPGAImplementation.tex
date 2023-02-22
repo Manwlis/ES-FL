@@ -305,15 +305,18 @@ As such, the sequential semantics must be preserved, and the pipeline is impleme
 
 In this paradigm, the task with the highest latency typically determines the overall latency. Due to the existence of the Softmax barrier, for a single data input, forward propagation tasks can not operate simultaneously with tasks after it. As a result, the minimum overall latency equals the highest task latency before the barrier plus the highest task latency after it. % implementation barrier clash, overall latency
 
-Figure \ref{fig: Gradients Calculation Pipeline Block Diagram} shows in detail the developed pipeline that generates the weight and bias gradients. The heavy use of auxiliary data transformation functions, such as create windows and stream, is evident. These functions consume almost no hardware when synthesized, and add near zero latency. Finally, the produced gradients are stored in memory arrays. % auxiliary functions
+Figure \ref{fig: Gradients Calculation Pipeline Block Diagram} shows in detail the developed dataflow region that generates the weight and bias gradients. The heavy use of auxiliary data transformation functions, such as create windows and stream, is evident. These functions consume almost no hardware when synthesized, and add near zero latency. % auxiliary functions
+
+Furthermore, several data streams skip hardware functions and layers. This could introduce stalls and ultimately deadlocks. To address this issue, hardware functions are implemented as free running pipelines $($FRPs$)$, when possible. Such implementations significantly reduce the possibility of a stall, by continuing to operate even when no input data are available or the output streams are full. % using frp and what they are
 
 \begin{figure}[H]
     \centering
-        \includegraphics[height=0.95\textheight]{Images/block_diagrams/fp_bp_cg.png}
+        \includegraphics[height=0.95\textheight]{Images/block_diagrams/process_batch.png}
         \decoRule
-        \caption[Gradients Calculation Pipeline Block Diagram]{Block diagram of the pipeline that generates the gradients. Weights and biases are not shown.}
+        \caption[Gradients Calculation Pipeline Block Diagram]{Block diagram of the pipeline that generates the gradients. Inputs/Outpouts are not shown. Arrows represent data streams.}
         \label{fig: Gradients Calculation Pipeline Block Diagram}
 \end{figure}
+Using FRPs comes with multiple restrictions, a strict coding style is required, and MAXI ports are not supported. For hardware functions that read or write data from MAXI ports or can not adhere to other restrictions, flushable pipelines (FLPs) are used instead. They achieve the same goal as FRPs, but by instantiating multiple copies of the pipeline and executing them independently. As a result, the design is robust against any unpredictable stalls that MAXI ports may introduce. % FLPs and result
 
 \subsection{Hardware Streams}
 All communication between the hardware functions is facilitated with the stream implementation provided by the Vitis HLS library "hls\_stream.h". Hardware functions stall when an output stream is full, making the overall architecture inefficient. It is crucial to prevent this by determining the proper depth of the streams.
@@ -329,7 +332,7 @@ As already explained, not all hardware functions can run concurrently for a sing
 
 \begin{figure}[H]
     \centering
-        \includegraphics[width=0.8\textwidth]{Images/diagrams/pipeline_under_batching.png}
+        \includegraphics[width=\textwidth]{Images/diagrams/pipeline_under_batching.png}
         \decoRule
         \caption[Pipeline with batching latency]{ Latency of the pipeline under batching.}
         \label{fig: Batching Pipeline latency}
@@ -367,12 +370,13 @@ The weights of the ANN are accessed in multiple functions of the first dataflow 
 
 For the weights of the second convolutional layer, this is insufficient. They are accessed by two functions with different access patterns. This issue can be resolved in two ways. The first one is satisfying both access patterns by increasing the partition factor and dimensions. This solution generate a huge amount of access ports, increasing hardware consumption unacceptably. More appropriate solution is creating two arrays with unique partitioning each. Albeit more memory is needed, the overall hardware usage is lower. % double arrays for layer 2 weights
 
-When generating the gradients, the ANN's inputs ,data and labels, are sent from global memory to the PL via AXI Master Adapter ports. In a dataflow region, each channel must have a single consumer, thus two ports are needed to propagate the input data to the two hardware functions that consume it. All ports are independent from one another by having their own dedicated bundles, thus enabling the simultaneous reading of all inputs. % dataflow inputs
+When generating the gradients, the ANN's inputs, data and labels, are sent from global memory to the PL via AXI Master Adapter ports. In a dataflow region, each channel must have a single consumer, thus two ports are needed to propagate the input data to the two hardware functions that consume it. All ports are independent from one another by having their own dedicated bundles, thus enabling the simultaneous reading of all inputs. % dataflow inputs
 
-The variable gradients are produced in the first dataflow region and consumed in the second, thus persistent saving in on-chip memory is necessary. The related arrays are not shared since their producers and consumers are in different regions, therefore the number of ports is increased to accomplish the desired data consumption. % gradients
+The variable gradients are produced in the first dataflow region and consumed in the second, thus persistent saving in on-chip memory is necessary. The related arrays are not shared since their producers and consumers are in different regions, and can be implemented as streams or arrays, whichever is more convenient. % gradients
 
-\subsection{Minimizing Global Memory Accesses}
-bursting / port widening
+% \subsection{Minimizing Global Memory Accesses}
+% bursting / port widening
+% Rejected
 
 \subsection{Top function}
 To hold everything together, a top level function has been developed, whose signature operates as the API between PL and PS. Furthermore, it contains all the definitions of the memory structures, as well as the instantiations of the data movers and dataflow regions. Finally, to train on multiple batches, the dataflow regions are enclosed in a loop.
@@ -397,5 +401,4 @@ The flow of the driver code is as follows:
     \item Write data to the input buffers.
     \item Execute the kernel.
     \item Read data from the outputs buffers.
-    
 \end{itemize}

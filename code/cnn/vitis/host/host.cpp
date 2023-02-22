@@ -25,9 +25,9 @@ int main ( )
 /* Prepare Global Memory.                                                          */
 /***********************************************************************************/
 	std::cout << "Allocating buffers in Global Memory." << std::endl;
-	auto buf_input_data_fp   = xrt::bo( device ,         num_batches * batch_size * input_h * input_w * sizeof(float) , kernel.group_id( 1 ) );
-	auto buf_input_data_cg   = xrt::bo( device ,         num_batches * batch_size * input_h * input_w * sizeof(float) , kernel.group_id( 2 ) );
-	auto buf_labels          = xrt::bo( device ,         num_batches * batch_size                     * sizeof(uint) ,  kernel.group_id( 3 ) );
+	auto buf_input_data_fp   = xrt::bo( device ,       c_num_batches * batch_size * input_h * input_w * sizeof(float) , kernel.group_id( 1 ) );
+	auto buf_input_data_cg   = xrt::bo( device ,       c_num_batches * batch_size * input_h * input_w * sizeof(float) , kernel.group_id( 2 ) );
+	auto buf_labels          = xrt::bo( device ,       c_num_batches * batch_size                   * sizeof(t_label) , kernel.group_id( 3 ) );
 	auto buf_l0_conv_weights = xrt::bo( device ,                l0_conv_f_h * l0_conv_f_w * l0_conv_f * sizeof(float) , kernel.group_id( 4 ) );
 	auto buf_l0_conv_biases  = xrt::bo( device ,                                            l0_conv_f * sizeof(float) , kernel.group_id( 5 ) );
 	auto buf_l2_conv_weights = xrt::bo( device , l2_conv_f_h * l2_conv_f_w * l2_conv_in_c * l2_conv_f * sizeof(float) , kernel.group_id( 6 ) );
@@ -39,8 +39,8 @@ int main ( )
 
 	std::cout << "Preparing the input data." << std::endl;
 // TODO: change allocations to be 4k aligned.
-	static float input_data[num_batches][batch_size][input_h * input_w];
-	static uint input_labels[num_batches][batch_size];
+	static float input_data[c_num_batches][batch_size][input_h][input_w];
+	static t_label input_labels[c_num_batches][batch_size];
 	static float l0_conv_weights[l0_conv_f_h][l0_conv_f_w][l0_conv_f];
 	static float l0_conv_biases[l0_conv_f];
 	static float l2_conv_weights[l2_conv_f_h][l2_conv_f_w][l2_conv_in_c][l2_conv_f];
@@ -51,7 +51,7 @@ int main ( )
 	static float l5_soft_biases[l5_soft_k];
 
 	/******** Get inputs *********/
-	read_input_data < float , num_batches , batch_size , input_h * input_w > ( input_data , "/run/media/mmcblk0p1/data/array.txt" );
+	read_input_data < float , c_num_batches , batch_size , input_h , input_w > ( input_data , "/run/media/mmcblk0p1/data/array.txt" );
 
 	input_labels[0][0] = 2;
 	input_labels[0][1] = 1;

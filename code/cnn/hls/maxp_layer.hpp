@@ -132,51 +132,69 @@ void maxp_fp ( hls::stream < window < float , _f_h , _f_w > >& s_in_window ,
 /***********************************************************************************/
 /******************************** Back Propagation *********************************/
 /***********************************************************************************/
+template < uint _batch_size , uint _out_h , uint _out_w , uint _out_c , uint _f_h , uint _f_w >
+void maxp_activate_error (
+	hls::stream < float >& s_out_error , hls::stream < window < bool , _f_h , _f_w > >& s_activations ,
+	hls::stream < window < float , _f_h , _f_w > >& s_activated_out_error )
+{
+	float kernel_error;
+	window < bool , _f_h , _f_w > kernel_activations;
+	window < float , _f_h , _f_w > temp_activated_error;
+
+	batch: for ( uint batch = 0 ; batch < _batch_size ; batch++ )
+		kernel: for ( uint k = 0 ; k < _out_h * _out_w * _out_c ; k++ )
+		{
+#pragma HLS PIPELINE II=1 style=frp
+			kernel_error = s_out_error.read();
+			kernel_activations = s_activations.read();
+
+			for ( uint y = 0 ; y < _f_h ; y++ )
+				for ( uint x = 0 ; x < _f_w ; x++ )
+					temp_activated_error.elements[y][x] = kernel_activations.elements[y][x] ? kernel_error : 0.f;
+
+			s_activated_out_error.write( temp_activated_error );
+		}
+}
+
 /**
  * @brief Back propagation of the max pooling layer.
+ * @tparam uint, batch size
  * @tparam uint, height of inputs
  * @tparam uint, width of inputs
  * @tparam uint, number of input channels
  * @tparam uint, height of filters
  * @tparam uint, width of filters
  * @tparam uint, stride of filters
- * @tparam uint, partition factor for width dimension of local line_buffers array
- * @param stream< float >, layer output error
- * @param stream< window< bool > >, layer activations in windows
- * @param stream< float >, layer input error
+ * @tparam uint, iteration interval
+ * @param stream < window < float > >, layer's activated output error
+ * @param stream < float >, layer's input error
  */
-template < uint _batch_size , uint _in_h , uint _in_w , uint _in_c , uint _f_h , uint _f_w , uint _f_st >
+template < uint _batch_size , uint _in_h , uint _in_w , uint _in_c , uint _f_h , uint _f_w , uint _f_st , uint _II >
 void maxp_bp (
-	hls::stream< float >& s_out_error , hls::stream< window < bool , _f_h , _f_w > >& s_activations ,
-	hls::stream< float >& s_in_error )
+	hls::stream < window < float , _f_h , _f_w > >& s_activated_out_error ,
+	hls::stream < float >& s_in_error )
 {
 	float line_buffers[_f_h][_in_w][_in_c];
-	float kernel_error;
-	window < bool , _f_h , _f_w > kernel_activations;
+	window < float , _f_h , _f_w > temp_activated_error;
 
 	batch: for ( uint batch = 0 ; batch < _batch_size ; batch++ )
 		in_y: for ( uint in_y = 0 ; in_y < _in_h ; in_y++ )
 			in_x: for ( uint in_x = 0 ; in_x < _in_w ; in_x++ )
 				in_c: for ( uint channel = 0 ; channel < _in_c ; channel++ )
 				{
-#pragma HLS PIPELINE II=1 style=frp
+#pragma HLS PIPELINE II=_II style=frp
 					uint filter_y = in_y % _f_st;
 					uint filter_x = in_x % _f_st;
-					// read streams. They have output dimensions. Output dims = input_dims / stride
+					// read error stream. It has output dimensions. Output dims = input_dims / stride
 					if ( filter_y == 0 && filter_x == 0 )
-					{
-						kernel_error = s_out_error.read();
-						kernel_activations = s_activations.read();
+					{ // for layer 1, hls can't predict this in first stage of pipeline and disables frp.
+						temp_activated_error = s_activated_out_error.read();
+
+						update_line_buffers:
+						for ( uint y = 0 ; y < _f_h ; y++ )
+							for ( uint x = 0 ; x < _f_w ; x++ )
+								line_buffers[filter_y + y][in_x + x][channel] = temp_activated_error.elements[y][x];
 					}
-					update_buf: for ( uint y = 0 ; y < _f_h ; y++ )
-						for ( uint x = 0 ; x < _f_w ; x++ )
-							if ( filter_y == 0 && filter_x == 0 )
-							{
-								if( kernel_activations.elements[y][x] )
-									line_buffers[filter_y + y][in_x + x][channel] = kernel_error;
-								else
-									line_buffers[filter_y + y][in_x + x][channel] = 0.f;
-							}
 					s_in_error.write( line_buffers[filter_y][in_x][channel] );
 				}
 }

@@ -51,8 +51,8 @@ void softmax_fp ( hls::stream < float >& s_input , float weights[_num_in][_num_k
 		}
 		float softmax_sum = 0.f;
 		calc_exp_sum: for ( uint kernel = 0 ; kernel < _num_k ; kernel++ )
-#pragma HLS PIPELINE II=3
-			softmax_sum += std::exp( kernel_sum[kernel] - softmax_max ); // TODO: check hls:: instead of std::
+#pragma HLS PIPELINE II=3 // No blocking-IO, frp useless
+			softmax_sum += hls::exp( kernel_sum[kernel] - softmax_max ); // TODO: check hls:: instead of std::
 
 		float constant = softmax_max + hls::log( softmax_sum );
 		feature_map: for ( uint kernel = 0 ; kernel < _num_k ; kernel++ )
@@ -74,7 +74,7 @@ void softmax_fp ( hls::stream < float >& s_input , float weights[_num_in][_num_k
  * @param uint, true label
  * @param stream< float >, prediction errors
  */
-template < uint _num_batches , uint _batch_size , uint _num_k >
+template < uint _batch_size , uint _num_k >
 void sparce_categorical_cross_entropy ( hls::stream < float >& s_prediction , hls::stream < t_label >& s_labels ,
 	hls::stream < float >& s_total_out_error_bp , hls::stream < float >& s_total_out_error_gc )
 {

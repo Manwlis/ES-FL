@@ -275,18 +275,18 @@ def main():
 	train_dataset, test_dataset = dataset['train'], dataset['test']
 	num_train_examples = metadata.splits['train'].num_examples
 
-	def normalize(images, labels):
-		images = tf.cast(images, tf.float16)
+	def normalize( images , labels ):
+		images = tf.cast( images , tf.float32 )
 		images /= 255
-		return images, labels
+		return images , labels
 
-	train_dataset =  train_dataset.map(normalize)
-	test_dataset  =  test_dataset.map(normalize)
+	train_dataset = train_dataset.map( normalize )
+	test_dataset  = test_dataset.map( normalize )
 
 	image_list = []
 	label_list = []
 	
-	with open( "temp/array.txt" , "a" ) as f:
+	with open( "temp/array.txt" , "w" ) as f:
 		for image , label in train_dataset.take( 2 ):
 			image_list.append( [image] )
 			label_list.append( [label] )

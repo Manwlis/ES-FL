@@ -79,18 +79,19 @@ void file_to_4d_array ( data_type array[dim3][dim2][dim1][dim0] , std::string fi
 	file.close();
 }
 
-template < typename data_type , uint dim2 , uint dim1 , uint dim0 >
-void read_input_data ( data_type array[dim2][dim1][dim0] , std::string filename )
+template < typename data_type , uint dim3 , uint dim2 , uint dim1 , uint dim0 >
+void read_input_data ( data_type array[dim3][dim2][dim1][dim0] , std::string filename )
 {
 	std::ifstream file( filename );
 	std::string num;
 
-	for ( uint c2 = 0 ; c2 < dim2 ; c2++ )
-		for ( uint c1 = 0 ; c1 < dim1 ; c1++ )
+	for( uint c3 = 0 ; c3 < dim3 ; c3++ )
+		for ( uint c2 = 0 ; c2 < dim2 ; c2++ )
+			for ( uint c1 = 0 ; c1 < dim1 ; c1++ )
 				for ( uint c0 = 0 ; c0 < dim0 ; c0++ )
 				{
 					file >> num; // stored as array in the file.
-					array[c2][c1][c0] = std::stof( num );
+					array[c3][c2][c1][c0] = std::stof( num );
 				}
 	file.close();
 }
@@ -135,11 +136,11 @@ int main ( int argc , char** argv )
 		( l5_soft_biases , "data/l5_biases.txt" );
 
 	/*********** Get input ***********/
-	static float input_data[num_batches][batch_size][ input_h * input_w ];
-	static uint input_labels[num_batches][batch_size];
+	static float input_data[c_num_batches][batch_size][input_h][input_w];
+	static uint input_labels[c_num_batches][batch_size];
 
 
-	read_input_data < float , num_batches , batch_size , input_h * input_w > ( input_data , "data/array.txt" );
+	read_input_data < float , c_num_batches , batch_size , input_h , input_w > ( input_data , "data/array.txt" );
 
 	// TODO: get labels from file:
 	// file_to_2d_array < uint , num_batches * batch_size > ( input_labels , "data/labels.txt" );
@@ -149,7 +150,7 @@ int main ( int argc , char** argv )
 	input_labels[1][1] = 1;
 
 	/******* Get learning rate *******/
-	float learning_rate = learning_rate_const / float(batch_size);
+	float learning_rate = c_learning_rate / float(batch_size);
 
 	/*********** Call IP ***********/
 	cnn_accelerator ( learning_rate , input_data , input_data , input_labels ,

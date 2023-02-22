@@ -8,9 +8,9 @@
 /***********************************************************************************/
 /* Size definitions                                                                */
 /***********************************************************************************/
-#define num_batches			1
-#define batch_size			6
-#define learning_rate_const 0.01f
+#define c_num_batches		 2
+#define batch_size			 2
+#define c_learning_rate  0.01f
 #define maxi_buffer_size	16
 
 /***********************************************************************************/
@@ -165,9 +165,9 @@ void duplicate_stream ( hls::stream< out_type >& s_in , hls::stream< out_type >&
 extern "C"
 {
 void cnn_accelerator ( float learning_rate ,
-	float gmem_input_data_fp[num_batches][batch_size][input_h * input_w] ,
-	float gmem_input_data_cg[num_batches][batch_size][input_h * input_w] ,
-	uint gmem_labels[num_batches][batch_size] ,
+	float gmem_input_data_fp[c_num_batches][batch_size][input_h][input_w] ,
+	float gmem_input_data_cg[c_num_batches][batch_size][input_h][input_w] ,
+	uint gmem_labels[c_num_batches][batch_size] ,
 	float gmem_l0_conv_weights[l0_conv_f_h][l0_conv_f_w][l0_conv_f] ,
 	float gmem_l0_conv_biases[l0_conv_f] ,
 	float gmem_l2_conv_weights[l2_conv_f_h][l2_conv_f_w][l2_conv_in_c][l2_conv_f] ,
