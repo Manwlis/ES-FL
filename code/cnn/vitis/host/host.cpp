@@ -51,30 +51,25 @@ int main ( )
 	static float l5_soft_biases[l5_soft_k];
 
 	/******** Get inputs *********/
-	read_input_data < float , c_num_batches , batch_size , input_h , input_w > ( input_data , "/run/media/mmcblk0p1/data/array.txt" );
-
-	input_labels[0][0] = 2;
-	input_labels[0][1] = 1;
-	input_labels[1][0] = 2;
-	input_labels[1][1] = 1;
-	// TODO: get labels from file: file_to_2d_array < uint , num_batches * batch_size > ( input_labels , "data/labels.txt" );
+	file_to_4d_array < float , c_num_batches , batch_size , input_h , input_w > ( input_data , "data/images.bin" );
+	file_to_2d_array < t_label , c_num_batches , batch_size > ( input_labels , "data/labels.bin" );
 
 	/*********** Get variables ***********/
 	/********** layer 0 **********/
-	file_to_3d_array < float , l0_conv_f_h , l0_conv_f_w , l0_conv_f > ( l0_conv_weights , "data/l0_weights.txt" );
-	file_to_1d_array < float , l0_conv_f > ( l0_conv_biases , "data/l0_biases.txt" );
+	file_to_3d_array < float , l0_conv_f_h , l0_conv_f_w , l0_conv_f > ( l0_conv_weights , "data/l0_weights.bin" );
+	file_to_1d_array < float , l0_conv_f > ( l0_conv_biases , "data/l0_biases.bin" );
 
 	/********** layer 2 **********/
-	file_to_4d_array < float , l2_conv_f_h , l2_conv_f_w , l2_conv_in_c , l2_conv_f > ( l2_conv_weights , "data/l2_weights.txt" );
-	file_to_1d_array < float , l2_conv_f > ( l2_conv_biases , "data/l2_biases.txt" );
+	file_to_4d_array < float , l2_conv_f_h , l2_conv_f_w , l2_conv_in_c , l2_conv_f > ( l2_conv_weights , "data/l2_weights.bin" );
+	file_to_1d_array < float , l2_conv_f > ( l2_conv_biases , "data/l2_biases.bin" );
 
 	/********** layer 4 **********/
-	file_to_2d_array < float , l4_dens_in_size , l4_dens_k > ( l4_dens_weights , "data/l4_weights.txt" );
-	file_to_1d_array < float , l4_dens_k > ( l4_dens_biases , "data/l4_biases.txt" );
+	file_to_2d_array < float , l4_dens_in_size , l4_dens_k > ( l4_dens_weights , "data/l4_weights.bin" );
+	file_to_1d_array < float , l4_dens_k > ( l4_dens_biases , "data/l4_biases.bin" );
 
 	/********** layer 5 **********/
-	file_to_2d_array < float , l5_soft_in_size , l5_soft_k > ( l5_soft_weights , "data/l5_weights.txt" );
-	file_to_1d_array < float , l5_soft_k > ( l5_soft_biases , "data/l5_biases.txt" );
+	file_to_2d_array < float , l5_soft_in_size , l5_soft_k > ( l5_soft_weights , "data/l5_weights.bin" );
+	file_to_1d_array < float , l5_soft_k > ( l5_soft_biases , "data/l5_biases.bin" );
 
 	std::cout << "Writing the input data in Global Memory." << std::endl;
 	buf_input_data_fp.write( input_data );

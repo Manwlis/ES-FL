@@ -7,15 +7,6 @@ expect ">>"
 send "connect -host 127.0.0.1 -port 1440\n"
 
 expect ">>"
-send "tfile copy -to-host /run/media/mmcblk0p1/xrt.run_summary /media/msi/SSD/vitis-workspace/cnn/emulator_reports/xrt.run_summary\n"
-
-expect ">>"
-send "tfile copy -to-host /run/media/mmcblk0p1/native_trace.csv /media/msi/SSD/vitis-workspace/cnn/emulator_reports/native_trace.csv\n"
-
-expect ">>"
-send "tfile copy -to-host /run/media/mmcblk0p1/summary.csv /media/msi/SSD/vitis-workspace/cnn/emulator_reports/summary.csv\n"
-
-expect ">>"
 send "tfile copy -to-host /run/media/mmcblk0p1/data/l0_biases_vitis.txt ~/ES-FL/code/cnn/vitis/host/variables/l0_biases_vitis.txt\n"
 
 expect ">>"

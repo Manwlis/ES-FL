@@ -208,7 +208,7 @@ void conv_fp_mc_sum (
 	input: for( uint input = 0 ; input < _batch_size * _in_h *_in_w ; input++ )
 		in_c: for ( uint in_c = 0 ; in_c < _in_c ; in_c++ )
 		{
-#pragma HLS PIPELINE II=12 style=frp
+#pragma HLS PIPELINE II=9 style=frp
 			window < _in_type , _f_h , _f_w > temp_window = s_in_window.read();
 			window_1d < float , _num_f > filter_sums;
 
@@ -347,7 +347,7 @@ void conv_bp_mc_sum (
 	input: for( uint input = 0 ; input < _batch_size * _in_h *_in_w ; input++ )
 		filter: for ( uint filter = 0 ; filter < _num_f ; filter++ )
 		{
-#pragma HLS PIPELINE II=12 style=frp
+#pragma HLS PIPELINE II=9 style=frp
 			temp_window = s_in_window.read();
 
 			in_c: for ( uint in_c = 0 ; in_c < _in_c ; in_c++ )
@@ -449,6 +449,7 @@ void conv_cg_sc (
 	float weight_grads_temp[_f_h][_f_w][_num_f];
 	float bias_grads_temp[_num_f];
 
+#pragma HLS ARRAY_PARTITION variable=weight_grads_temp dim=1 type=complete
 #pragma HLS ARRAY_PARTITION variable=weight_grads_temp dim=2 type=complete
 
 	init_weight_grads:
@@ -467,7 +468,7 @@ void conv_cg_sc (
 	for( uint input = 0 ; input < _batch_size * _in_h *_in_w ; input++ )
 		for ( uint filter = 0 ; filter < _num_f ; filter++ )
 		{
-#pragma HLS PIPELINE II=3 style=frp
+#pragma HLS PIPELINE II=1 style=frp
 			// read inputs
 			float out_grad = s_kernel_error.read();
 			if ( filter == 0 )
@@ -548,7 +549,7 @@ void conv_cg_mc (
 	float weight_grads_temp[_in_c][_f_h][_f_w][_num_f];
 	float bias_grads_temp[_num_f];
 
-#pragma HLS ARRAY_PARTITION variable=weight_grads_temp dim=4 type=cyclic factor=16
+#pragma HLS ARRAY_PARTITION variable=weight_grads_temp dim=4 type=complete
 
 	init_weight_grads:
 	for ( uint in_c = 0 ; in_c < _in_c ; in_c++ )
@@ -566,7 +567,7 @@ void conv_cg_mc (
 	for( uint input = 0 ; input < _batch_size * _in_h *_in_w ; input++ )
 		for ( uint in_c = 0 ; in_c < _in_c ; in_c++ )
 		{
-#pragma HLS PIPELINE II=12 style=frp
+#pragma HLS PIPELINE II=9 style=frp
 			// get inputs
 			in_window = s_in_window.read();
 			if ( in_c == 0 )

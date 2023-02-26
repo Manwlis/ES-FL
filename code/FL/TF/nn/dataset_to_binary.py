@@ -30,8 +30,7 @@ train_shard = train_shard.cache()
 
 x_numpy = np.asarray( list( map( lambda x : x[0] , tfds.as_numpy( train_shard ) ) ) )
 y_numpy = np.asarray( list( map( lambda x : x[1] , tfds.as_numpy( train_shard ) ) ) )
-
-print (x_numpy.shape)
+y_numpy = y_numpy.astype( 'uint32' )
 
 x_output_file = open( 'images.bin' , 'wb' )
 x_numpy.tofile( x_output_file )

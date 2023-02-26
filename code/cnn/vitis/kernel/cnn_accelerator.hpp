@@ -6,8 +6,8 @@
 /***********************************************************************************/
 /* Size definitions                                                                */
 /***********************************************************************************/
-#define c_num_batches		 2 // !!! Needs to change in both host.hpp and all_fwp_bp.hpp
-#define batch_size			 2
+#define c_num_batches		 1000 // !!! Needs to change in both host.hpp and all_fwp_bp.hpp
+#define batch_size			 20
 #define maxi_buffer_size	16
 
 /***********************************************************************************/

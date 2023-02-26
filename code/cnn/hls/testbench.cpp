@@ -20,13 +20,13 @@ void save_array( float array[num_elements] , const char* file_name , const uint 
 template < typename data_type , uint dim0 >
 void file_to_1d_array ( data_type array[dim0] , std::string filename )
 {
-	std::ifstream file( filename );
-	std::string line;
+	std::ifstream file( filename , std::ios::binary );
+	data_type temp;
 
-	for ( int c0  = 0 ; c0 < dim0 ; c0++ )
+	for ( uint c0  = 0 ; c0 < dim0 ; c0++ )
 	{
-		getline( file , line );
-		array[c0] = std::stof( line );
+		file.read( reinterpret_cast<char*>(&temp) , sizeof(data_type) );
+		array[c0] = temp;
 	}
 	file.close();
 }
@@ -34,14 +34,14 @@ void file_to_1d_array ( data_type array[dim0] , std::string filename )
 template < typename data_type , uint dim1 , uint dim0 >
 void file_to_2d_array ( data_type array[dim1][dim0] , std::string filename )
 {
-	std::ifstream file( filename );
-	std::string line;
+	std::ifstream file( filename , std::ios::binary );
+	data_type temp;
 
 	for ( uint c1  = 0 ; c1 < dim1 ; c1++ )
 		for ( uint c0  = 0 ; c0 < dim0 ; c0++ )
 		{
-			getline( file , line );
-			array[c1][c0] = std::stof( line );
+			file.read( reinterpret_cast<char*>(&temp) , sizeof(data_type) );
+			array[c1][c0] = temp;
 		}
 	file.close();
 }
@@ -49,15 +49,15 @@ void file_to_2d_array ( data_type array[dim1][dim0] , std::string filename )
 template < typename data_type , uint dim2 , uint dim1 , uint dim0 >
 void file_to_3d_array ( data_type array[dim2][dim1][dim0] , std::string filename )
 {
-	std::ifstream file( filename );
-	std::string line;
+	std::ifstream file( filename , std::ios::binary );
+	data_type temp;
 
 	for ( uint c2  = 0 ; c2 < dim2 ; c2++ )
 		for ( uint c1  = 0 ; c1 < dim1 ; c1++ )
 			for ( uint c0  = 0 ; c0 < dim0 ; c0++ )
 			{
-				getline( file , line );
-				array[c2][c1][c0] = std::stof( line );
+				file.read( reinterpret_cast<char*>(&temp) , sizeof(data_type) );
+				array[c2][c1][c0] = temp;
 			}
 	file.close();
 }
@@ -65,33 +65,16 @@ void file_to_3d_array ( data_type array[dim2][dim1][dim0] , std::string filename
 template < typename data_type , uint dim3 , uint dim2 , uint dim1 , uint dim0 >
 void file_to_4d_array ( data_type array[dim3][dim2][dim1][dim0] , std::string filename )
 {
-	std::ifstream file( filename );
-	std::string line;
+	std::ifstream file( filename , std::ios::binary );
+	data_type temp;
 
-	for ( uint c3  = 0 ; c3 < dim2 ; c3++ )
+	for ( uint c3  = 0 ; c3 < dim3 ; c3++ )
 		for ( uint c2  = 0 ; c2 < dim2 ; c2++ )
 			for ( uint c1  = 0 ; c1 < dim1 ; c1++ )
 				for ( uint c0  = 0 ; c0 < dim0 ; c0++ )
 				{
-					getline( file , line );
-					array[c3][c2][c1][c0] = std::stof( line );
-				}
-	file.close();
-}
-
-template < typename data_type , uint dim3 , uint dim2 , uint dim1 , uint dim0 >
-void read_input_data ( data_type array[dim3][dim2][dim1][dim0] , std::string filename )
-{
-	std::ifstream file( filename );
-	std::string num;
-
-	for( uint c3 = 0 ; c3 < dim3 ; c3++ )
-		for ( uint c2 = 0 ; c2 < dim2 ; c2++ )
-			for ( uint c1 = 0 ; c1 < dim1 ; c1++ )
-				for ( uint c0 = 0 ; c0 < dim0 ; c0++ )
-				{
-					file >> num; // stored as array in the file.
-					array[c3][c2][c1][c0] = std::stof( num );
+					file.read( reinterpret_cast<char*>(&temp) , sizeof(data_type) );
+					array[c3][c2][c1][c0] = temp;
 				}
 	file.close();
 }
@@ -99,6 +82,7 @@ void read_input_data ( data_type array[dim3][dim2][dim1][dim0] , std::string fil
 int main ( int argc , char** argv )
 {
 	/*********** Get variables ***********/
+	std::cout << "Get variables" << std::endl;
 	static float l0_conv_weights[l0_conv_f_h][l0_conv_f_w][l0_conv_f];
 	static float l0_conv_biases[l0_conv_f];
 
@@ -112,47 +96,34 @@ int main ( int argc , char** argv )
 	static float l5_soft_biases[l5_soft_k];
 
 	/********** layer 0 **********/
-	file_to_3d_array < float , l0_conv_f_h , l0_conv_f_w , l0_conv_f >
-		( l0_conv_weights , "data/l0_weights.txt" );
-	file_to_1d_array < float , l0_conv_f >
-		( l0_conv_biases , "data/l0_biases.txt" );
+	file_to_3d_array < float , l0_conv_f_h , l0_conv_f_w , l0_conv_f > ( l0_conv_weights , "data/l0_weights.bin" );
+	file_to_1d_array < float , l0_conv_f > ( l0_conv_biases , "data/l0_biases.bin" );
 
 	/********** layer 2 **********/
-	file_to_4d_array < float , l2_conv_f_h , l2_conv_f_w , l2_conv_in_c , l2_conv_f >
-		( l2_conv_weights , "data/l2_weights.txt" );
-	file_to_1d_array < float , l2_conv_f >
-		( l2_conv_biases , "data/l2_biases.txt" );
+	file_to_4d_array < float , l2_conv_f_h , l2_conv_f_w , l2_conv_in_c , l2_conv_f > ( l2_conv_weights , "data/l2_weights.bin" );
+	file_to_1d_array < float , l2_conv_f > ( l2_conv_biases , "data/l2_biases.bin" );
 
 	/********** layer 4 **********/
-	file_to_2d_array < float , l4_dens_in_size , l4_dens_k >
-		( l4_dens_weights , "data/l4_weights.txt" );
-	file_to_1d_array < float , l4_dens_k >
-		( l4_dens_biases , "data/l4_biases.txt" );
+	file_to_2d_array < float , l4_dens_in_size , l4_dens_k > ( l4_dens_weights , "data/l4_weights.bin" );
+	file_to_1d_array < float , l4_dens_k > ( l4_dens_biases , "data/l4_biases.bin" );
 
 	/********** layer 5 **********/
-	file_to_2d_array < float , l5_soft_in_size , l5_soft_k >
-		( l5_soft_weights , "data/l5_weights.txt" );
-	file_to_1d_array < float , l5_soft_k >
-		( l5_soft_biases , "data/l5_biases.txt" );
+	file_to_2d_array < float , l5_soft_in_size , l5_soft_k > ( l5_soft_weights , "data/l5_weights.bin" );
+	file_to_1d_array < float , l5_soft_k > ( l5_soft_biases , "data/l5_biases.bin" );
 
 	/*********** Get input ***********/
+	std::cout << "Get inputs" << std::endl;
 	static float input_data[c_num_batches][batch_size][input_h][input_w];
 	static uint input_labels[c_num_batches][batch_size];
 
-
-	read_input_data < float , c_num_batches , batch_size , input_h , input_w > ( input_data , "data/array.txt" );
-
-	// TODO: get labels from file:
-	// file_to_2d_array < uint , num_batches * batch_size > ( input_labels , "data/labels.txt" );
-	input_labels[0][0] = 2;
-	input_labels[0][1] = 1;
-	input_labels[1][0] = 2;
-	input_labels[1][1] = 1;
+	file_to_4d_array < float , c_num_batches , batch_size , input_h , input_w > ( input_data , "data/images.bin" );
+	file_to_2d_array < uint , c_num_batches , batch_size > ( input_labels , "data/labels.bin" );
 
 	/******* Get learning rate *******/
 	float learning_rate = c_learning_rate / float(batch_size);
 
 	/*********** Call IP ***********/
+	std::cout << "Call accel" << std::endl;
 	cnn_accelerator ( learning_rate , input_data , input_data , input_labels ,
 		l0_conv_weights , l0_conv_biases , l2_conv_weights , l2_conv_biases ,
 		l4_dens_weights , l4_dens_biases , l5_soft_weights , l5_soft_biases );

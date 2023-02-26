@@ -52,13 +52,13 @@ void softmax_fp ( hls::stream < float >& s_input , float weights[_num_in][_num_k
 		float softmax_sum = 0.f;
 		calc_exp_sum: for ( uint kernel = 0 ; kernel < _num_k ; kernel++ )
 #pragma HLS PIPELINE II=3 // No blocking-IO, frp useless
-			softmax_sum += hls::exp( kernel_sum[kernel] - softmax_max ); // TODO: check hls:: instead of std::
+			softmax_sum += hls::exp( kernel_sum[kernel] - softmax_max );
 
 		float constant = softmax_max + hls::log( softmax_sum );
 		feature_map: for ( uint kernel = 0 ; kernel < _num_k ; kernel++ )
 		{
 #pragma HLS PIPELINE II=1 style=frp
-			float temp_out = std::exp( kernel_sum[kernel] - constant );
+			float temp_out = hls::exp( kernel_sum[kernel] - constant );
 			s_output.write( temp_out );
 		}
 	}

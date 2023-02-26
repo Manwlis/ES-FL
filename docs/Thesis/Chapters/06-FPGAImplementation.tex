@@ -146,9 +146,19 @@ Two output streams are produced, one float and one bool. The first one consists 
 
 \begin{figure}[H]
     \centering
+        \includegraphics[width=1\textwidth]{Images/block_diagrams/conv_mc_order_calculations.png}
+        \decoRule
+        \caption[Conv2D order of calculations]{Order of calculations when computing the pixel [1][1] of a single filter. Iterates through all channels of the input (c).}
+        \label{fig: Conv2D order of calculations}
+\end{figure}
+
+Figures \ref{fig: Conv2D order of calculations} and \ref{fig: Conv2D forward propagation block diagram} illustrate the same operation, from a different point of view. The first focus on the flow of the algorithm, while the second focus on the structure of the hardware functions. The additions and multiplications tree corresponds to the dot product function, the accumulator represent the sum channels function, and the ReLU is the activation function. In figure \ref{fig: Conv2D order of calculations}, the input is already windowed and padded.
+
+\begin{figure}[H]
+    \centering
         \includegraphics[width=0.406\textwidth]{Images/block_diagrams/conv2d_fp_mc.png}
         \decoRule
-        \caption[Conv2D forward propagation block diagram]{Block diagram of the 2D convolution forward propagation. F is the number of filters. The data types of the internal streams with the total data passed are shown. }
+        \caption[Conv2D forward propagation block diagram]{Block diagram of the 2D convolution forward propagation. F is the number of filters. The data types of the internal streams with the total data passed are shown.}
         \label{fig: Conv2D forward propagation block diagram}
 \end{figure}
 

@@ -17,8 +17,8 @@
 /***********************************************************************************/
 /* Size definitions                                                                */
 /***********************************************************************************/
-#define c_num_batches		2 // !!! Needs to change in both host.hpp and all_fwp_bp.hpp
-#define batch_size			2
+#define c_num_batches		1000 // !!! Needs to change in both host.hpp and all_fwp_bp.hpp
+#define batch_size			20
 #define c_learning_rate 0.01f
 
 /***********************************************************************************/
@@ -79,17 +79,16 @@ void save_array( float array[num_elements] , const char* file_name , const uint 
 	file.close();
 }
 
-// Reads array from file.
 template < typename data_type , uint dim0 >
 void file_to_1d_array ( data_type array[dim0] , std::string filename )
 {
-	std::ifstream file( filename );
-	std::string line;
+	std::ifstream file( filename , std::ios::binary );
+	data_type temp;
 
 	for ( uint c0  = 0 ; c0 < dim0 ; c0++ )
 	{
-		getline( file , line );
-		array[c0] = std::stof( line );
+		file.read( reinterpret_cast<char*>(&temp) , sizeof(data_type) );
+		array[c0] = temp;
 	}
 	file.close();
 }
@@ -97,14 +96,14 @@ void file_to_1d_array ( data_type array[dim0] , std::string filename )
 template < typename data_type , uint dim1 , uint dim0 >
 void file_to_2d_array ( data_type array[dim1][dim0] , std::string filename )
 {
-	std::ifstream file( filename );
-	std::string line;
+	std::ifstream file( filename , std::ios::binary );
+	data_type temp;
 
 	for ( uint c1  = 0 ; c1 < dim1 ; c1++ )
 		for ( uint c0  = 0 ; c0 < dim0 ; c0++ )
 		{
-			getline( file , line );
-			array[c1][c0] = std::stof( line );
+			file.read( reinterpret_cast<char*>(&temp) , sizeof(data_type) );
+			array[c1][c0] = temp;
 		}
 	file.close();
 }
@@ -112,15 +111,15 @@ void file_to_2d_array ( data_type array[dim1][dim0] , std::string filename )
 template < typename data_type , uint dim2 , uint dim1 , uint dim0 >
 void file_to_3d_array ( data_type array[dim2][dim1][dim0] , std::string filename )
 {
-	std::ifstream file( filename );
-	std::string line;
+	std::ifstream file( filename , std::ios::binary );
+	data_type temp;
 
 	for ( uint c2  = 0 ; c2 < dim2 ; c2++ )
 		for ( uint c1  = 0 ; c1 < dim1 ; c1++ )
 			for ( uint c0  = 0 ; c0 < dim0 ; c0++ )
 			{
-				getline( file , line );
-				array[c2][c1][c0] = std::stof( line );
+				file.read( reinterpret_cast<char*>(&temp) , sizeof(data_type) );
+				array[c2][c1][c0] = temp;
 			}
 	file.close();
 }
@@ -128,33 +127,16 @@ void file_to_3d_array ( data_type array[dim2][dim1][dim0] , std::string filename
 template < typename data_type , uint dim3 , uint dim2 , uint dim1 , uint dim0 >
 void file_to_4d_array ( data_type array[dim3][dim2][dim1][dim0] , std::string filename )
 {
-	std::ifstream file( filename );
-	std::string line;
+	std::ifstream file( filename , std::ios::binary );
+	data_type temp;
 
-	for ( uint c3  = 0 ; c3 < dim2 ; c3++ )
+	for ( uint c3  = 0 ; c3 < dim3 ; c3++ )
 		for ( uint c2  = 0 ; c2 < dim2 ; c2++ )
 			for ( uint c1  = 0 ; c1 < dim1 ; c1++ )
 				for ( uint c0  = 0 ; c0 < dim0 ; c0++ )
 				{
-					getline( file , line );
-					array[c3][c2][c1][c0] = std::stof( line );
-				}
-	file.close();
-}
-
-template < typename data_type , uint dim3 , uint dim2 , uint dim1 , uint dim0 >
-void read_input_data ( data_type array[dim3][dim2][dim1][dim0] , std::string filename )
-{
-	std::ifstream file( filename );
-	std::string line;
-
-	for ( uint c3 = 0 ; c3 < dim3 ; c3++ )
-		for ( uint c2 = 0 ; c2 < dim2 ; c2++ )
-			for( uint c1 = 0 ; c1 < dim1 ; c1++ )
-				for ( uint c0 = 0 ; c0 < dim0 ; c0++ )
-				{
-					file >> line; // stored as array in the file.
-					array[c3][c2][c1][c0] = std::stof( line );
+					file.read( reinterpret_cast<char*>(&temp) , sizeof(data_type) );
+					array[c3][c2][c1][c0] = temp;
 				}
 	file.close();
 }
