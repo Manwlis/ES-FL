@@ -186,15 +186,15 @@ void maxp_bp (
 					uint filter_y = in_y % _f_st;
 					uint filter_x = in_x % _f_st;
 					// read error stream. It has output dimensions. Output dims = input_dims / stride
-					if ( filter_y == 0 && filter_x == 0 )
-					{ // for layer 1, hls can't predict this in first stage of pipeline and disables frp.
+					if ( filter_y == 0 && filter_x == 0 ) // for layer 1, hls can't predict this in first stage of pipeline and disables frp.
 						temp_activated_error = s_activated_out_error.read();
 
-						update_line_buffers:
-						for ( uint y = 0 ; y < _f_h ; y++ )
-							for ( uint x = 0 ; x < _f_w ; x++ )
+					update_line_buffers:
+					for ( uint y = 0 ; y < _f_h ; y++ )
+						for ( uint x = 0 ; x < _f_w ; x++ )
+							if ( filter_y == 0 && filter_x == 0 )
 								line_buffers[filter_y + y][in_x + x][channel] = temp_activated_error.elements[y][x];
-					}
+
 					s_in_error.write( line_buffers[filter_y][in_x][channel] );
 				}
 }

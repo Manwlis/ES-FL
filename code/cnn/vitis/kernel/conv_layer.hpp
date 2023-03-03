@@ -208,7 +208,7 @@ void conv_fp_mc_sum (
 	input: for( uint input = 0 ; input < _batch_size * _in_h *_in_w ; input++ )
 		in_c: for ( uint in_c = 0 ; in_c < _in_c ; in_c++ )
 		{
-#pragma HLS PIPELINE II=9 style=frp
+#pragma HLS PIPELINE II=10 style=frp
 			window < _in_type , _f_h , _f_w > temp_window = s_in_window.read();
 			window_1d < float , _num_f > filter_sums;
 
@@ -244,7 +244,7 @@ void conv_fp_mc_aggregate_channels (
 	input: for( uint input = 0 ; input < _batch_size * _in_h *_in_w ; input++ )
 		in_c: for ( uint in_c = 0 ; in_c < _in_c ; in_c++ )
 		{
-#pragma HLS PIPELINE II=3 style=frp // achievable at 100 Mhz, II=4 at 150 Mhz
+#pragma HLS PIPELINE II=5 style=frp // achievable II=3 at 100 Mhz, II=4 at 150 Mhz
 			temp = s_kernel_sums_per_channel.read();
 			if ( in_c == 0 )
 				kernel_sums = temp;
@@ -308,17 +308,16 @@ void conv_bp_activate_error (
 	hls::stream < float >& s_out_error , hls::stream < bool >& s_activations ,
 	hls::stream < float >& s_activated_out_error )
 {
-	batch: for ( uint batch = 0 ; batch < _batch_size ; batch++ )
-		outputs: for ( uint kernel = 0 ; kernel < _out_h * _out_w * _out_c ; kernel++ )
-		{
+	input: for ( uint input = 0 ; input < _batch_size * _out_h * _out_w * _out_c ; input++ )
+	{
 #pragma HLS PIPELINE II=1 style=frp
-			bool kernel_activation = s_activations.read();
-			float kernel_error = s_out_error.read();
+		bool kernel_activation = s_activations.read();
+		float kernel_error = s_out_error.read();
 
-			float activated_kernel_error = kernel_activation ? kernel_error : 0.f;
+		float activated_kernel_error = kernel_activation ? kernel_error : 0.f;
 
-			s_activated_out_error.write( activated_kernel_error );
-		}
+		s_activated_out_error.write( activated_kernel_error );
+	}
 }
 
 /**
@@ -347,7 +346,7 @@ void conv_bp_mc_sum (
 	input: for( uint input = 0 ; input < _batch_size * _in_h *_in_w ; input++ )
 		filter: for ( uint filter = 0 ; filter < _num_f ; filter++ )
 		{
-#pragma HLS PIPELINE II=9 style=frp
+#pragma HLS PIPELINE II=5 style=frp
 			temp_window = s_in_window.read();
 
 			in_c: for ( uint in_c = 0 ; in_c < _in_c ; in_c++ )
@@ -382,7 +381,7 @@ void conv_bp_mc_aggregate_channels (
 	input: for( uint input = 0 ; input < _batch_size * _in_h *_in_w ; input++ )
 		filter: for ( uint filter = 0 ; filter < _num_f ; filter++ )
 		{
-#pragma HLS PIPELINE II=3 style=frp
+#pragma HLS PIPELINE II=5 style=frp
 			window_1d< float , _in_c > temp = s_channel_error_per_filter.read();
 			if ( filter == 0 )
 				channel_sums = temp;
@@ -549,7 +548,8 @@ void conv_cg_mc (
 	float weight_grads_temp[_in_c][_f_h][_f_w][_num_f];
 	float bias_grads_temp[_num_f];
 
-#pragma HLS ARRAY_PARTITION variable=weight_grads_temp dim=4 type=complete
+#pragma HLS ARRAY_PARTITION variable=weight_grads_temp dim=4 type=complete // TODO: play with this
+#pragma HLS ARRAY_PARTITION variable=bias_grads_temp dim=1 type=cyclic factor=2 // TODO: me II=10 isws dn xreiazetai
 
 	init_weight_grads:
 	for ( uint in_c = 0 ; in_c < _in_c ; in_c++ )
@@ -567,7 +567,7 @@ void conv_cg_mc (
 	for( uint input = 0 ; input < _batch_size * _in_h *_in_w ; input++ )
 		for ( uint in_c = 0 ; in_c < _in_c ; in_c++ )
 		{
-#pragma HLS PIPELINE II=9 style=frp
+#pragma HLS PIPELINE II=10 style=frp
 			// get inputs
 			in_window = s_in_window.read();
 			if ( in_c == 0 )

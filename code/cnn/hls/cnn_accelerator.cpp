@@ -376,7 +376,7 @@ void process_batch (
 	maxp_activate_error < batch_size , l3_maxp_out_h , l3_maxp_out_w , l3_maxp_out_c , l3_maxp_f_h , l3_maxp_f_w >
 		( s_l4_dens_in_err , s_l3_maxp_acts_wnd , s_l3_activated_out_error );
 
-	maxp_bp < batch_size , l3_maxp_in_h , l3_maxp_in_w , l3_maxp_in_c , l3_maxp_f_h , l3_maxp_f_w , l3_maxp_f_st , 2 >
+	maxp_bp < batch_size , l3_maxp_in_h , l3_maxp_in_w , l3_maxp_in_c , l3_maxp_f_h , l3_maxp_f_w , l3_maxp_f_st , 1 >
 		( s_l3_activated_out_error , s_l3_maxp_in_err );
 
 /***** layer 2, 14x14x32 -> conv 3x3 backprop -> 14x14x16 *****/
@@ -406,7 +406,7 @@ void process_batch (
 	maxp_activate_error < batch_size , l1_maxp_out_h , l1_maxp_out_w , l1_maxp_out_c , l1_maxp_f_h , l1_maxp_f_w >
 		( s_l2_conv_in_err , s_l1_maxp_acts_wnd , s_l1_activated_out_error );
 
-	maxp_bp < batch_size , l1_maxp_in_h , l1_maxp_in_w , l1_maxp_in_c , l1_maxp_f_h , l1_maxp_f_w , l1_maxp_f_st , 2 >
+	maxp_bp < batch_size , l1_maxp_in_h , l1_maxp_in_w , l1_maxp_in_c , l1_maxp_f_h , l1_maxp_f_w , l1_maxp_f_st , 1 >
 		( s_l1_activated_out_error , s_l1_maxp_in_err );
 
 	/************************************************/

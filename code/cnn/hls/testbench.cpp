@@ -140,4 +140,17 @@ int main ( int argc , char** argv )
 
 	save_array < l5_soft_in_size * l5_soft_k > ( reinterpret_cast<float*>(l5_soft_weights) ,"variables/l5_weights_hls.txt" , 6 );
 	save_array < l5_soft_k > ( l5_soft_biases , "variables/l5_biases_hls.txt" , 6 );
+
+   std::ofstream file( "variables/model.bin" , std::ios::out | std::ios::binary );
+
+   file.write( (char*) &l0_conv_weights[0][0][0] , l0_conv_f_h * l0_conv_f_w * l0_conv_f * sizeof(float) );
+   file.write( (char*) &l0_conv_biases[0] , l0_conv_f * sizeof(float) );
+   file.write( (char*) &l2_conv_weights[0][0][0][0] , l2_conv_f_h * l2_conv_f_w * l2_conv_in_c * l2_conv_f * sizeof(float) );
+   file.write( (char*) &l2_conv_biases[0] , l2_conv_f * sizeof(float) );
+   file.write( (char*) &l4_dens_weights[0][0] , l4_dens_in_size * l4_dens_k * sizeof(float) );
+   file.write( (char*) &l4_dens_biases[0] , l4_dens_k * sizeof(float) );
+   file.write( (char*) &l5_soft_weights[0][0] , l5_soft_in_size * l5_soft_k * sizeof(float) );
+   file.write( (char*) &l4_dens_biases[0] , l5_soft_k * sizeof(float) );
+
+   file.close();
 }

@@ -48,8 +48,8 @@
 #define l1_maxp_in_w		l0_conv_out_w	// 28
 #define l1_maxp_in_c		l0_conv_out_c	// 16
 
-#define l1_maxp_out_h		l1_maxp_in_h / l1_maxp_f_st		// 14
-#define l1_maxp_out_w		l1_maxp_in_w / l1_maxp_f_st		// 14
+#define l1_maxp_out_h		( l1_maxp_in_h / l1_maxp_f_st )	// 14
+#define l1_maxp_out_w		( l1_maxp_in_w / l1_maxp_f_st )	// 14
 #define l1_maxp_out_c		l1_maxp_in_c					// 16
 
 #define l1_maxp_num_wnd 	(l1_maxp_in_h * l1_maxp_in_w * l1_maxp_in_c) / (l1_maxp_f_h * l1_maxp_f_w)
@@ -59,7 +59,7 @@
 /***********************************************************************************/
 #define l2_conv_f_h			 3
 #define l2_conv_f_w			 3
-#define l2_conv_f			16
+#define l2_conv_f			32
 
 #define l2_conv_in_h		l1_maxp_out_h	// 14
 #define l2_conv_in_w		l1_maxp_out_w	// 14
@@ -67,7 +67,7 @@
 
 #define l2_conv_out_h		l1_maxp_out_h	// 14
 #define l2_conv_out_w		l1_maxp_out_w	// 14
-#define l2_conv_out_c		l2_conv_f		// 16
+#define l2_conv_out_c		l2_conv_f		// 32
 
 #define l2_conv_num_wnd		l2_conv_in_h * l2_conv_in_w * l2_conv_in_c
 
@@ -80,18 +80,18 @@
 
 #define l3_maxp_in_h		l2_conv_out_h	// 14
 #define l3_maxp_in_w		l2_conv_out_w	// 14
-#define l3_maxp_in_c		l2_conv_out_c	// 16
+#define l3_maxp_in_c		l2_conv_out_c	// 32
 
-#define l3_maxp_out_h		l3_maxp_in_h / l3_maxp_f_st	// 7
-#define l3_maxp_out_w		l3_maxp_in_w / l3_maxp_f_st	// 7
-#define l3_maxp_out_c		l3_maxp_in_c				// 16
+#define l3_maxp_out_h		( l3_maxp_in_h / l3_maxp_f_st )	// 7
+#define l3_maxp_out_w		( l3_maxp_in_w / l3_maxp_f_st )	// 7
+#define l3_maxp_out_c		l3_maxp_in_c					// 32
 
 #define l3_maxp_num_wnd		(l3_maxp_in_h * l3_maxp_in_w * l3_maxp_in_c) / (l3_maxp_f_h * l3_maxp_f_w )
 
 /***********************************************************************************/
 /* Layer 4: Fully connected ReLU layer with 64 kernels.                            */
 /***********************************************************************************/
-#define l4_dens_in_size		l3_maxp_out_c * l3_maxp_out_h * l3_maxp_out_w	// 784
+#define l4_dens_in_size		l3_maxp_out_c * l3_maxp_out_h * l3_maxp_out_w	// 1568
 #define l4_dens_k			64
 #define l4_dens_out_size	l4_dens_k										// 64
 

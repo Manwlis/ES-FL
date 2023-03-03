@@ -7,6 +7,9 @@ expect ">>"
 send "connect -host 127.0.0.1 -port 1440\n"
 
 expect ">>"
+send "tfile copy -to-host /run/media/mmcblk0p1/data/model.bin ~/ES-FL/code/cnn/vitis/host/variables/model.bin\n"
+
+expect ">>"
 send "tfile copy -to-host /run/media/mmcblk0p1/data/l0_biases_vitis.txt ~/ES-FL/code/cnn/vitis/host/variables/l0_biases_vitis.txt\n"
 
 expect ">>"

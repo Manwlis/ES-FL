@@ -6,6 +6,7 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
+#include <chrono>
 
 /***********************************************************************************/
 /* Info for the host to find and execute the accelerator.                          */
@@ -17,8 +18,8 @@
 /***********************************************************************************/
 /* Size definitions                                                                */
 /***********************************************************************************/
-#define c_num_batches		1000 // !!! Needs to change in both host.hpp and all_fwp_bp.hpp
-#define batch_size			20
+#define c_num_batches		2000 // !!! Needs to change in both host.hpp and all_fwp_bp.hpp
+#define batch_size			30
 #define c_learning_rate 0.01f
 
 /***********************************************************************************/
@@ -40,13 +41,13 @@
 /***********************************************************************************/
 #define l2_conv_f_h			 3
 #define l2_conv_f_w			 3
-#define l2_conv_f			16
+#define l2_conv_f			32
 #define l2_conv_in_c		16
 
 /***********************************************************************************/
 /* Layer 4: Fully connected ReLU layer with 64 kernels.                            */
 /***********************************************************************************/
-#define l4_dens_in_size		784
+#define l4_dens_in_size		1568
 #define l4_dens_k			64
 
 /***********************************************************************************/
@@ -139,4 +140,40 @@ void file_to_4d_array ( data_type array[dim3][dim2][dim1][dim0] , std::string fi
 					array[c3][c2][c1][c0] = temp;
 				}
 	file.close();
+}
+
+/***********************************************************************************/
+/* Timer class.                                                                    */
+/***********************************************************************************/
+class Timer
+{
+private:
+	std::chrono::steady_clock::time_point start_time;
+public:
+	Timer();
+	void rewind();
+	int64_t since() const;
+};
+
+/**
+ * @brief Construct a new Timer object. Sets current time as starting time.
+ */
+Timer::Timer() { this->rewind(); }
+
+/**
+ * @brief Zeroes timer
+ */
+void Timer::rewind()
+{
+	start_time = std::chrono::steady_clock::now();
+}
+
+/**
+ * @brief Calculates and returns elapsed time.
+ *
+ * @return int64_t elapsed time in milliseconds
+ */
+int64_t Timer::since() const
+{
+	return std::chrono::duration_cast<std::chrono::milliseconds> ( std::chrono::steady_clock::now() - start_time ).count();
 }

@@ -38,7 +38,7 @@ void dense_fp (
 
 		inputs: for ( uint input = 0 ; input < _num_in ; input++ )
 		{
-	#pragma HLS PIPELINE II=9 style=frp
+	#pragma HLS PIPELINE II=10 style=frp
 			float temp_input = s_input.read();
 
 			kernels: for ( uint kernel = 0 ; kernel < _num_k ; kernel++ )
@@ -99,7 +99,7 @@ void dense_bp ( float weights[_num_in][_num_k] , hls::stream< float >& s_kernel_
 
 		input: for ( uint input = 0 ; input < _num_in ; input++ )
 		{
-#pragma HLS PIPELINE II=9 style=frp
+#pragma HLS PIPELINE II=10 style=frp
 			float input_sum = 0.f;
 			kernel: for ( uint kernel = 0 ; kernel < _num_k ; kernel++ )
 				input_sum += weights[input][kernel] * kernel_in_errors[kernel];
@@ -128,7 +128,7 @@ void dense_cg ( hls::stream < float >& s_input , hls::stream < float >& s_kernel
 		}
 		weight_grads: for ( uint input = 0 ; input < _num_in ; input++ )
 		{
-#pragma HLS PIPELINE II=9 style=frp
+#pragma HLS PIPELINE II=10 style=frp
 			float temp_input = s_input.read();
 			for ( uint kernel = 0 ; kernel < _num_k ; kernel++ )
 				weight_grads[input][kernel] += kernel_errors[kernel] * temp_input;
