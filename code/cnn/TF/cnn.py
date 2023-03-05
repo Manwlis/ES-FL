@@ -1,5 +1,4 @@
 import os
-from telnetlib import NOP
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' # suppress tensorflow warnings
 import tensorflow as tf
 import numpy as np
@@ -216,10 +215,9 @@ def main():
 	image_list = []
 	label_list = []
 	
-	with open( "temp/array.txt" , "w" ) as f:
-		for image , label in train_dataset.take( num_batches * batch_size ):
-			image_list.append( [image] )
-			label_list.append( [label] )
+	for image , label in train_dataset.take( num_batches * batch_size ):
+		image_list.append( [image] )
+		label_list.append( [label] )
 
 	image_batch = []
 	label_batch = []
@@ -247,8 +245,8 @@ def main():
 	# share model variables with c++ code and distinct layer
 	share_trainable_variables( cnn )
 
-	##### evaluate model and save outputs #####
-	# keep tracks of the outputs of all layers
+	##### train model #####
+	# tracks the outputs of all layers
 	heatmap_model = tf.keras.Model( cnn.inputs , [layer.output for layer in cnn.layers] )
 
 	for i in range( 0 , num_batches ):
@@ -269,43 +267,19 @@ def main():
 	
 		print( "TF entropy: {:.8f}".format( loss ) )
 
-	#### Print stuff #####
+	##### save outputs #####
 	save_activations( features )
 	save_output_gradients( output_gradients )
 	save_variable_gradients( variable_gradients )
 	save_trained_variables( cnn.trainable_variables )
 
+	##### evaluate model #####
+	# test_dataset = test_dataset.cache().shuffle( num_test_examples , seed = 0 ).batch( batch_size )
+	# test_dataset = test_dataset.prefetch( tf.data.AUTOTUNE ).repeat()
 
-	test_dataset = test_dataset.cache().shuffle( num_test_examples ).batch( batch_size )
-	test_dataset = test_dataset.prefetch( tf.data.AUTOTUNE ).repeat()
+	# loss , accuracy = cnn.evaluate( test_dataset , verbose = 1 , batch_size=batch_size , steps=num_test_examples/batch_size )
+	# print( 'TF Accuracy:' , accuracy )
+	# print( 'TF Loss:' , loss )
 
-	loss , accuracy = cnn.evaluate( test_dataset , verbose = 1 , batch_size=batch_size , steps=num_test_examples/batch_size )
-	print( 'TF Accuracy:' , accuracy )
-	print( 'TF Loss:' , loss )
-
-	cpp_variables = np.zeros( ( 105866 , ) , dtype=np.float32 )
-
-	file = open( "model.bin" , "rb" )
-	cpp_variables = np.fromfile( file , dtype=np.float32 )
-
-	pos = 0
-	for tr_var in cnn.trainable_variables:
-		temp = tf.convert_to_tensor( np.asarray( cpp_variables[ pos : pos + tr_var.numpy().size ] ).reshape( tr_var.shape ) , np.float32 )
-		tr_var.assign( temp )
-		
-		pos += tr_var.numpy().size
-
-	loss , accuracy = cnn.evaluate( test_dataset , verbose = 1 , batch_size=batch_size , steps=num_test_examples/batch_size )
-	print( 'File Accuracy:' , accuracy )
-	print( 'File Loss:' , loss )
-
-	# cnn.summary()
-	# print("")
-	# print("_________________________________________________________________")
-	# print( '%-28s' % "Trainable variables" , '%-25s' % "Shape" , "Param #" )
-	# print("=================================================================")
-	# for tr_var in cnn.trainable_variables: 
-	# 	print( '%-28s' % tr_var.name , '%-25s' %tr_var.shape , tr_var.numpy().size )
-	# print("")
 
 if __name__ == "__main__": main()
