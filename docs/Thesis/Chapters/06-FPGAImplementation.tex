@@ -400,6 +400,8 @@ To hold everything together, a top level function has been developed, whose sign
 \end{figure}
 
 \section{Host Program}
+
+\subsection{Driver Architecture}
 The overall application uses Linux system calls, such as socket read and write. Thus a bare metal implementation is inadequate and a host program in the PS is required to drive the developed hardware design in the PL. This is achieved with the use of the XRT native C++ APIs \cite{XRT_Native_APIs}.
 
 The flow of the driver code is as follows:
@@ -407,8 +409,15 @@ The flow of the driver code is as follows:
     \item Open the device.
     \item Load the compiled and linked binary (XCLBIN) onto the device.
     \item Open the kernel loaded to the device with the XCLBIN.
-    \item Create Buffer objects to transfer data to kernel inputs and outputs.
+    \item Create buffer objects to transfer data to and from the inputs and outputs of the kernel.
     \item Write data to the input buffers.
     \item Execute the kernel.
     \item Read data from the outputs buffers.
 \end{itemize}
+
+\subsection{Memory Management}
+Since the target device is a SoC, both host and kernel programs can read and write in the same memory space. By facilitating all data transfers between PL and PS through the map API provided by the XRT library, no data movements are necessary other than filling the global buffers. As an example, the training dataset is stored in binary files and is directly transfered in the global buffers; no intermediately buffers are used in the user space of the host program.
+
+Diagram \ref{fig: Gradients Calculation Pipeline Block Diagram} demonstrates how the image inputs are needed twice. They are stored twice in global memory, in two distinct memory banks, to prevent any bus or AXI conflicts. As a result, both hardware functions can read them concurrently without experiencing any additional latency.
+
+\subsection{Incorporating the driver in the FL client}

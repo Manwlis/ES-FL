@@ -15,7 +15,7 @@ from keras.initializers import GlorotUniform
 
 ##### Set up constants #####
 batch_size = 30
-filename = "variables/model.bin"
+filename = "variables/model_1.bin"
 
 ##### Set up model #####
 # create model
