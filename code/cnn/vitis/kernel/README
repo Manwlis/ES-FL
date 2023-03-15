@@ -27,7 +27,7 @@ id=4:cnn_accelerator_1
 
 #### Important: Host applications using the XRT native API must be compiled with -std=c++17.
 https://docs.xilinx.com/r/en-US/ug1393-vitis-application-acceleration/G-Host-Compiler-and-Linker-Settings
-Go to: Explorer > host program [xrt] > RMB > C/C++ Build Settings
+Go to: Explorer > host program [xrt] > (RMB) C/C++ Build Settings
 C/C++ Build > Settings > GCC Host Compiler > Dialect
 Set other dialect flags: -std=c++17
 

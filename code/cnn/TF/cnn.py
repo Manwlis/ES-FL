@@ -11,47 +11,47 @@ from keras.initializers import GlorotUniform
 
 # exposes the initialized variables to the C++ code by writing them to temp files.
 def share_trainable_variables( model ):
-	###### Layer 0 weights ######
+	##### distinct layers #####
 	# get variables
 	np_array = model.trainable_variables[0].numpy()
 	#save to file
 	file = open( "temp/l0_weights.bin" , "wb" )
 	np_array.tofile( file )
 
-	###### Layer 0 biases ######
 	np_array = model.trainable_variables[1].numpy()
 	file = open( "temp/l0_biases.bin" , "wb" )
 	np_array.tofile( file )
 
-	###### Layer 2 weights ######
 	np_array = model.trainable_variables[2].numpy()
 	file = open( "temp/l2_weights.bin" , "wb" )
 	np_array.tofile( file )
 
-	###### Layer 2 biases ######
 	np_array = model.trainable_variables[3].numpy()
 	file = open( "temp/l2_biases.bin" , "wb" )
 	np_array.tofile( file )
 
-	###### Layer 4 weights ######
 	np_array = model.trainable_variables[4].numpy()
 	file = open( "temp/l4_weights.bin" , "wb" )
 	np_array.tofile( file )
-			
-	###### Layer 4 biases ######
+
 	np_array = model.trainable_variables[5].numpy()
 	file = open( "temp/l4_biases.bin" , "wb" )
 	np_array.tofile( file )
 
-	###### Layer 5 weights ######
 	np_array = model.trainable_variables[6].numpy()
 	file = open( "temp/l5_weights.bin" , "wb" )
 	np_array.tofile( file )
 			
-	###### Layer 5 biases ######
 	np_array = model.trainable_variables[7].numpy()
 	file = open( "temp/l5_biases.bin" , "wb" )
 	np_array.tofile( file )
+
+	##### Full model #####
+	file = open( "temp/init_model.bin" , "wb" )
+	for tr_var in model.trainable_variables:
+		np_array = tr_var.numpy()
+		np_array.tofile( file )
+
 
 def save_activations( activations ):
 	###### Layer 0 activations ######

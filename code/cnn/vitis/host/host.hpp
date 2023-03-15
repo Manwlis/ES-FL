@@ -8,6 +8,12 @@
 #include <fstream>
 #include <chrono>
 
+// XRT includes
+#include <experimental/xrt_xclbin.h>	// xrt XCLBIN API
+#include <xrt/xrt_device.h>				// xrt device API
+#include <xrt/xrt_kernel.h>				// xrt kernel API
+#include <xrt/xrt_bo.h>					// xrt buffer API
+
 /***********************************************************************************/
 /* Info for the host to find and execute the accelerator.                          */
 /***********************************************************************************/
@@ -18,6 +24,7 @@
 /***********************************************************************************/
 /* Size definitions                                                                */
 /***********************************************************************************/
+#define c_num_epochs		10
 #define c_num_batches		2000 // !!! Needs to change in both host.hpp and all_fwp_bp.hpp
 #define batch_size			30
 #define c_learning_rate 0.01f
@@ -141,7 +148,6 @@ void file_to_4d_array ( data_type array[dim3][dim2][dim1][dim0] , std::string fi
 				}
 	file.close();
 }
-
 /***********************************************************************************/
 /* Timer class.                                                                    */
 /***********************************************************************************/
@@ -177,3 +183,36 @@ int64_t Timer::since() const
 {
 	return std::chrono::duration_cast<std::chrono::milliseconds> ( std::chrono::steady_clock::now() - start_time ).count();
 }
+
+/***********************************************************************************/
+/* Driver Functions.                                                               */
+/***********************************************************************************/
+class Driver
+{
+private:
+	xrt::device device;
+	xrt::uuid xclbin_uuid;
+	xrt::kernel kernel;
+
+	// buffers of the inputs
+	xrt::bo buf_images_fp;
+	xrt::bo buf_images_cg;
+	xrt::bo buf_labels;
+
+	// buffers of the CNN's variables
+	xrt::bo buf_l0_conv_weights;
+	xrt::bo buf_l0_conv_biases;
+	xrt::bo buf_l2_conv_weights;
+	xrt::bo buf_l2_conv_biases;
+	xrt::bo buf_l4_dens_weights;
+	xrt::bo buf_l4_dens_biases;
+	xrt::bo buf_l5_soft_weights;
+	xrt::bo buf_l5_soft_biases;
+
+public:
+	Driver( unsigned int device_id , const std::string& xclbin_name , const std::string& device_name , const std::string& images_filename , const std::string& labels_filename );
+
+	void call_accelerator(
+		float* l0_conv_weights , float* l0_conv_biases , float* l2_conv_weights , float* l2_conv_biases ,
+		float* l4_dens_weights , float* l4_dens_biases , float* l5_soft_weights , float* l5_soft_biases );
+};
