@@ -24,7 +24,6 @@ lib.a : utils.o
 	$(CC) $(CFLAGS) -c server.cpp           -o server.o
 
 	$(CC) $(CFLAGS) -c utils.cpp            -o utils.o
-#	$(CC) $(CFLAGS) -I/usr/include/python3.10/ -c $< -o $@
 
 # clean up
 clean : 

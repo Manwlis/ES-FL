@@ -3,10 +3,9 @@
 #include <numpy/core/include/numpy/arrayobject.h>
 
 Computation_unit::Computation_unit( Server_to_client_msg* input_message , Client_to_server_msg* output_message )
-	: m_input_message( input_message ) , m_output_message( output_message )
-{ }
+	: m_input_message( input_message ) , m_output_message( output_message ) { }
 
-Computation_unit::~Computation_unit(){}
+Computation_unit::~Computation_unit() {}
 
 Python_with_TF::Python_with_TF( Server_to_client_msg* input_message , Client_to_server_msg* output_message , int argc , char** argv )
 	: Computation_unit( input_message , output_message ) , m_py_flags( nullptr ) , m_py_epoch( nullptr ) // nullptr to supress warning 'may be used uninitialized in dealloc()'

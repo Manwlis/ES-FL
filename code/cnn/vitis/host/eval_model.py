@@ -12,10 +12,12 @@ logging.getLogger('tensorflow').setLevel(logging.ERROR)
 
 from keras.initializers import GlorotUniform
 
+physical_devices = tf.config.list_physical_devices('GPU')
+print("Num GPUs:", len(physical_devices))
 
 ##### Set up constants #####
-batch_size = 30
-filename = "variables/model_1.bin"
+batch_size = 32
+filename = "variables/model_0.bin"
 
 ##### Set up model #####
 # create model

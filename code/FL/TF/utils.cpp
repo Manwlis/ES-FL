@@ -2,8 +2,6 @@
  * @file utils.cpp
  * @author Emmanouil Petrakos
  * @brief File with generic helper functions
- * @version 0.1
- * @date 2021-07-11
  * 
  * @copyright None
  * 
@@ -22,79 +20,6 @@ namespace Utils{
 	{
 		perror( msg );
 		exit( EXIT_FAILURE );
-	}
-
-
-	#include "stdlib.h"
-	#include "stdio.h"
-	#include "string.h"
-
-	/**
-	 * @brief Gets a number from a line of the /proc/self/status file
-	 * 
-	 * @param char* the line
-	 * @return int the number
-	 */
-	int parseLine( char* line )
-	{
-		// This assumes that a digit will be found and the line ends in " Kb".
-		int i = strlen( line );
-
-		const char* p = line;
-		while ( *p < '0' || *p > '9' )
-			p++;
-
-		line[i-3] = '\0';
-		
-		return atoi(p);
-	}
-
-	/**
-	 * @brief Get the virtual memory currently used by the program
-	 * 
-	 * @return int virtual memory in kb
-	 */
-	int get_virtual_mem_used()
-	{
-		FILE* file = fopen( "/proc/self/status" , "r" );
-
-		int result = -1;
-		char line[128];
-
-		while ( fgets( line , 128 , file ) != NULL )
-		{
-			if ( strncmp( line , "VmSize:" , 7 ) == 0 )
-			{
-				result = parseLine( line );
-				break;
-			}
-		}
-		fclose(file);
-		return result;
-	}
-
-	/**
-	 * @brief Get the physical memory currently used by the program
-	 * 
-	 * @return int physical memory in kb
-	 */
-	int get_physical_mem_used()
-	{
-		FILE* file = fopen( "/proc/self/status" , "r" );
-
-		int result = -1;
-		char line[128];
-
-		while ( fgets( line , 128 , file ) != NULL )
-		{
-			if ( strncmp( line , "VmRSS:" , 6 ) == 0 )
-			{
-				result = parseLine( line );
-				break;
-			}
-		}
-		fclose(file);
-		return result;
 	}
 }
 /**************************************************************************************************/
@@ -119,11 +44,18 @@ int64_t Timer::since() const
 /* Loger                                                                                          */
 /**************************************************************************************************/
 /**
- * @brief Construct a new Logger object
+ * @brief Construct a new Logger object that outputs in terminal
  * 
- * @param std::ostream* target output stream, defaults at std::cout
  */
-Logger::Logger( std::ostream& target ) : output_sink( target ) {}
+Logger::Logger() : output_sink( std::cout ) , timer() {}
+
+/**
+ * @brief Construct a new Logger object that outputs in a file
+ * 
+ * @param std::string target output file
+ */
+Logger::Logger( std::string filename ) : output_file( filename ) , output_sink( output_file ) , timer() {}
+
 
 /**
  * @brief Overide of the () operator. Used to log events
@@ -138,7 +70,7 @@ void Logger::operator()( Level level , const std::string& description, const cha
 {
 	output_sink
 		<< "[" << static_cast<int>(level) <<  "]"
-		<< GREEN << std::setw(10) << g_timer.since() << RESET << "	"
+		<< GREEN << std::setw(10) << timer.since() << RESET << "	"
 		//<< description.length() << " "
 		<< std::setw(80) << std::left << description << std::right 
 		#if VERDOSE_LOGGING

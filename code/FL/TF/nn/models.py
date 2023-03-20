@@ -243,6 +243,18 @@ def residual_model_declaration():
 
 residual = residual_model_declaration()
 
+final_model = tf.keras.Sequential([
+				Conv2D( 16, ( 3 , 3 ) , padding='same' , activation=tf.nn.relu , input_shape=( 28 , 28 , 1 ) , kernel_initializer=initializer ),
+				MaxPool2D( ( 2 , 2 ) , strides=2 ),
+
+				Conv2D( 32 , ( 3 , 3 ) , padding='same' , activation=tf.nn.relu , kernel_initializer=initializer ),
+				MaxPool2D( ( 2 , 2 ) , strides=2 ),
+
+				Flatten(),
+				Dense( 64 , activation=tf.nn.relu , kernel_initializer=initializer ),
+				Dense( 10 , activation=tf.nn.softmax , kernel_initializer=initializer )
+			])
+
 model_dict = { 
 	"cnn_model"			: cnn_model,			#    421,642
 	"dnn_model"			: dnn_model,			#    365,066
@@ -256,6 +268,7 @@ model_dict = {
 	"double_inception"	: double_inception,		#  4,275,914
 	"inception"			: inception,			#    277,082
 	"residual"			: residual,				#    539,466
+	"final_model"		: final_model			#    105,866
 	}
 
 def get_model( model_name ):

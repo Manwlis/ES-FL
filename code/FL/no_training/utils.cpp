@@ -44,11 +44,18 @@ int64_t Timer::since() const
 /* Loger                                                                                          */
 /**************************************************************************************************/
 /**
- * @brief Construct a new Logger object
+ * @brief Construct a new Logger object that outputs in terminal
  * 
- * @param std::ostream* target output stream, defaults at std::cout
  */
-Logger::Logger( std::ostream& target ) : output_sink( target ) {}
+Logger::Logger() : output_sink( std::cout ) , timer() {}
+
+/**
+ * @brief Construct a new Logger object that outputs in a file
+ * 
+ * @param std::string target output file
+ */
+Logger::Logger( std::string filename ) : output_file( filename ) , output_sink( output_file ) , timer() {}
+
 
 /**
  * @brief Overide of the () operator. Used to log events
@@ -63,7 +70,7 @@ void Logger::operator()( Level level , const std::string& description, const cha
 {
 	output_sink
 		<< "[" << static_cast<int>(level) <<  "]"
-		<< GREEN << std::setw(10) << g_timer.since() << RESET << "	"
+		<< GREEN << std::setw(10) << timer.since() << RESET << "	"
 		//<< description.length() << " "
 		<< std::setw(80) << std::left << description << std::right 
 		#if VERDOSE_LOGGING

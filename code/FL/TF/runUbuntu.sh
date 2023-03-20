@@ -6,7 +6,7 @@ make clean
 make all
 echo ""
 
-# Uncomment to divert server's output to a file.
+# Uncomment to use initial variables set by server
 # IO_file=IO_files/out.bin
 
 # run server

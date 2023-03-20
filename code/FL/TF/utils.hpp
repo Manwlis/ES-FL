@@ -2,8 +2,6 @@
  * @file utils.h
  * @author Emmanouil Petrakos
  * @brief Header file for utils.cpp which contains generic helper functions
- * @version 0.1
- * @date 2021-07-11
  * 
  * @copyright None
  * 
@@ -13,8 +11,7 @@
 #include "definitions.hpp"
 
 #include <iostream>	/* cout */
-#include <ostream>	/* cout */
-#include <string>	/*  */
+#include <fstream>	/* ofstream */
 #include <iomanip>	/* setw */
 #include <chrono>	/* time_point, durration */
 
@@ -32,39 +29,13 @@
 namespace Utils
 {
 	void error( const char* msg );
-
-	int get_virtual_mem_used();
-	int get_physical_mem_used();
-
-	// wrong and useless, leave them alone till moving code in device. Then check about endianess and float ieee structure
-	/**
-	 * @brief Reverses the byte order of the input float. Used when comunicating with machines of different endianess.
-	 * In the .h file so it can be inline
-	 * 
-	 * @param float 
-	 * @return float 
-	 */
-	inline float reverse_float( const float input_float )
-	{
-		float reversed_float;
-		unsigned char* input_bytes = (unsigned char*) &input_float;
-		unsigned char* output_bytes = (unsigned char*) &reversed_float;
-
-		// swap the bytes into a temporary buffer
-		output_bytes[0] = input_bytes[3];
-		output_bytes[1] = input_bytes[2];
-		output_bytes[2] = input_bytes[1];
-		output_bytes[3] = input_bytes[0];
-
-		return reversed_float;
-	}
 }
 
 /**************************************************************************************************/
 /* Timer                                                                                          */
 /**************************************************************************************************/
 /**
- * @brief Ever
+ * @brief Timer class
  * 
  */
 class Timer
@@ -75,9 +46,6 @@ public:
 	Timer();
 	int64_t since() const;
 };
-
-// Global timer that starts ticking at program start. Needs to be used in multiple files, so define it here with extern.
-extern Timer g_timer;
 
 /**************************************************************************************************/
 /* Logger                                                                                         */
@@ -101,14 +69,15 @@ public:
 		error
 	};
 
-	Logger( std::ostream& target );
-
+	Logger();
+	Logger( std::string filename );
 
 	void operator()( Level level , const std::string& description, const char* function , const char* file , int line ) const;
 
 private:
-	// Output stream, can be anything with a write() function.
-	std::ostream& output_sink;
+	std::ofstream output_file;
+	std::ostream& output_sink; // Output stream, can be anything with a write() function. File, std::cout etc.
+	Timer timer;
 };
 
 // Hacky macro to add logger functionality with minimum code. Blocks unwanted messages.

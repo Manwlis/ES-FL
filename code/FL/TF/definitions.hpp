@@ -8,7 +8,7 @@
 #define MAX_CONNECTED_CLIENTS 10
 
 // message variables and their types
-#define VARIABLES_NUM 421642 
+#define VARIABLES_NUM 105866 
 #define MSG_VARIABLE_DATATYPE float
 
 //defines the type of the transfered data
@@ -23,9 +23,9 @@
 #define NUM_EPOCHS 3
 
 // model
-#define MODEL "cnn_model" 
-// model:     cnn_model , dnn_model , large_cnn_model , cnn_fedAvg , alexnet , OverFeat_AlexNet , LeNet_5 , double_inception , inception , residual
-// variables:    421642 ,    365066 ,          803240 ,    1663370 , 46764746 ,        56906954 ,   61706 ,          4275914 ,    277082 ,   539466
+#define MODEL "final_model" 
+// model:     cnn_model , dnn_model , large_cnn_model , cnn_fedAvg , alexnet , OverFeat_AlexNet , LeNet_5 , double_inception , inception , residual , final_model
+// variables:    421642 ,    365066 ,          803240 ,    1663370 , 46764746 ,        56906954 ,   61706 ,          4275914 ,    277082 ,   539466 ,      105866
 
 // optimizer
 #define OPTIMIZER "SGD"	// SGD or Adam
@@ -39,13 +39,13 @@
 #define LEARNING_RATE_DECAY_PERIOD 1
 
 // local training
-#define LOCAL_EPOCHS 3
-#define STEPS_PER_EPOCH 20
-#define BATCH_SIZE 600
+#define LOCAL_EPOCHS 1
+#define BATCH_SIZE 32
+#define STEPS_PER_EPOCH 625
 
 // evaluation
-#define NUM_EVALUATIONS 3 // must be =< NUM_EPOCHS // TODO: somehow automate this
-#define EVALUATION_INTERVAL (NUM_EPOCHS/NUM_EVALUATIONS)
+#define NUM_EVALUATIONS 3 // must be =< NUM_EPOCHS
+#define EVALUATION_INTERVAL ( NUM_EPOCHS / NUM_EVALUATIONS )
 
 // python module & function names
 #define py_script "fashion_mnist"
@@ -65,3 +65,31 @@
 #define VERDOSE_LOGGING 0		// shows code line, function and file
 #define DISABLE_MESSAGE_INFO 1	// disables messages about communication
 #define DISABLE_NON_CRITICAL 1	// disables all messages except warnings/errors
+
+
+/********** Message structs **********/
+#define SERVER_TO_CLIENT_BUF_SIZE sizeof(Server_to_client_msg)
+#define CLIENT_TO_SERVER_BUF_SIZE sizeof(Client_to_server_msg)
+
+struct Server_to_client_msg
+{
+	// Server_to_client_msg.flag values
+	enum flag
+	{
+		normal_op,
+		no_pretrained_model,
+		final_epoch
+	};
+
+	int flags;
+	int epoch;
+	float variables[VARIABLES_NUM];
+};
+
+struct Client_to_server_msg
+{
+	int epoch;
+	float loss;
+	float accuracy;
+	float variables[VARIABLES_NUM];
+};

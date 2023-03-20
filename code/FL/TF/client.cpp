@@ -8,7 +8,6 @@
  */
 
 #include <iostream>			/* cout */
-#include <bit>				/* endian */
 
 #include <unistd.h>			/* close */
 #include <string.h>			/* memset */
@@ -16,21 +15,15 @@
 #include <netdb.h>			/* addrinfo, getaddrinfo */
 
 #include "definitions.hpp"
-
 #include "utils.hpp"		/* error, Timer, Logging */
-#include "messages.hpp"		/* msg structs, change message endianess */
-#include "fake_data.hpp"	/* check_fake_server_data, create_fake_client_data */
 #include "computation_unit.hpp"
 
 
 struct sockaddr_in find_server( const char* server_name , const char* server_port );
-
-int quantize_variables();
 int send_variables( int socket_fd , Client_to_server_msg& send_message );
 
-// Global timer that starts ticking at program start.
-Timer g_timer;
-Logger g_logger( std::cout );
+
+Logger g_logger;
 
 int main ( int argc , char** argv )
 {
@@ -126,10 +119,6 @@ int main ( int argc , char** argv )
 
 		received_bytes = 0; // reset received bytes counter for use on the next message
 
-		// server uses little endian encoding, need to change received message to host endian
-		if constexpr ( std::endian::native == std::endian::big ) // requires c++20, dangerous !!!!
-			server_to_client_msg_big_endianess( received_message ); // maybe move this to the server side if needed
-
 		if ( received_message.flags == Server_to_client_msg::flag::final_epoch ) // finished training
 		{
 			LOGGING( Logger::Level::warning , RED << "Received final message." << RESET );
@@ -152,11 +141,6 @@ int main ( int argc , char** argv )
 		
 		send_message.accuracy = 0;
 		send_message.loss = 0;
-		
-		/**************************************************************************************************/
-		/* Compress / quantize variables.                                                                 */
-		/**************************************************************************************************/
-		// quantize_variables();
 
 		/**************************************************************************************************/
 		/* Send local variables. Blocking.                                                                */
@@ -213,26 +197,15 @@ sockaddr_in find_server( const char* server_name , const char* server_port )
 }
 
 
-// white box for now
-int quantize_variables()
-{
-	return 0;
-}
-
-
 /**
- * @brief Serialize and send local variables to target socket. Blocking
+ * @brief Send local variables to target socket. Blocking
  * 
  * @param int target socket's fd  
  * @param Client_to_server_msg* message to be send
  * @return send(2) return value
  */
 int send_variables( int socket_fd , Client_to_server_msg& send_message )
-{
-	// serialize local variables
-	if constexpr ( std::endian::native == std::endian::big ) // requires c++20, dangerous !!!!
-		client_to_server_msg_big_endianess( send_message ); // maybe move this to the server side if needed
-	
+{	
 	int rv = send( socket_fd , &send_message , CLIENT_TO_SERVER_BUF_SIZE , 0 );
 
 	LOGGING( Logger::Level::message_info , "sended bytes: " << rv << "	total: " << CLIENT_TO_SERVER_BUF_SIZE << "\n" );

@@ -20,5 +20,7 @@ cnn/vitis/host/variables
 
 FL/FPGA/IO_files/
 
+FL/no_training/IO_files/
+
 FL/TF/nn/__pycache__/
 FL/TF/IO_files/

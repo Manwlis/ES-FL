@@ -11,8 +11,7 @@
 #include "definitions.hpp"
 
 #include <iostream>	/* cout */
-#include <ostream>	/* cout */
-#include <string>	/*  */
+#include <fstream>	/* ofstream */
 #include <iomanip>	/* setw */
 #include <chrono>	/* time_point, durration */
 
@@ -36,7 +35,7 @@ namespace Utils
 /* Timer                                                                                          */
 /**************************************************************************************************/
 /**
- * @brief Ever
+ * @brief Timer class
  * 
  */
 class Timer
@@ -47,9 +46,6 @@ public:
 	Timer();
 	int64_t since() const;
 };
-
-// Global timer that starts ticking at program start. Needs to be used in multiple files, so define it here with extern.
-extern Timer g_timer;
 
 /**************************************************************************************************/
 /* Logger                                                                                         */
@@ -73,14 +69,15 @@ public:
 		error
 	};
 
-	Logger( std::ostream& target );
-
+	Logger();
+	Logger( std::string filename );
 
 	void operator()( Level level , const std::string& description, const char* function , const char* file , int line ) const;
 
 private:
-	// Output stream, can be anything with a write() function.
-	std::ostream& output_sink;
+	std::ofstream output_file;
+	std::ostream& output_sink; // Output stream, can be anything with a write() function. File, std::cout etc.
+	Timer timer;
 };
 
 // Hacky macro to add logger functionality with minimum code. Blocks unwanted messages.

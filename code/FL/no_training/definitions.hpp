@@ -8,7 +8,7 @@
 #define MAX_CONNECTED_CLIENTS 10
 
 // message variables and their types
-#define VARIABLES_NUM 421642 
+#define VARIABLES_NUM 105866 
 #define MSG_VARIABLE_DATATYPE float
 
 //defines the type of the transfered data
@@ -16,37 +16,10 @@
 #define DELTAS 2
 #define MSG_VARIABLE_MODE WEIGHTS
 
-
 /********** Federated training parameters **********/
 // server loop
 #define MIN_CLIENTS_PER_EPOCH 3
-#define NUM_EPOCHS 3
-
-// model
-#define MODEL "cnn_model" 
-// model:     cnn_model , dnn_model , large_cnn_model , cnn_fedAvg , alexnet , OverFeat_AlexNet , LeNet_5 , double_inception , inception , residual
-// variables:    421642 ,    365066 ,          803240 ,    1663370 , 46764746 ,        56906954 ,   61706 ,          4275914 ,    277082 ,   539466
-
-// optimizer
-#define OPTIMIZER "SGD"	// SGD or Adam
-#define LEARNING_RATE_INITIAL "1e-2"
-#define MOMENTUM "0.9"
-#define LEARNING_RATE_DECAY_FLAG 1
-#define LEARNING_RATE_DECAY "0.999235967" // Can't pass rationals to python directy. Use string and convert it there
-// base 0.977331125
-// root_2 = 0.988600589 , root_4 = 0.994283958 , root_5 = 0.995424547 , root_15 = 0.998472517 , root_30 = 0.999235967 , root_60 = 0.99961791
-// pow_2 = 0.955176128
-#define LEARNING_RATE_DECAY_PERIOD 1
-
-// local training
-#define LOCAL_EPOCHS 3
-#define STEPS_PER_EPOCH 20
-#define BATCH_SIZE 600
-
-// evaluation
-#define NUM_EVALUATIONS 3 // must be =< NUM_EPOCHS // TODO: somehow automate this
-#define EVALUATION_INTERVAL (NUM_EPOCHS/NUM_EVALUATIONS)
-
+#define NUM_EPOCHS 10
 
 /********** Utilities **********/
 // server output file
@@ -60,7 +33,6 @@
 
 #define SERVER_TO_CLIENT_BUF_SIZE sizeof(Server_to_client_msg)
 #define CLIENT_TO_SERVER_BUF_SIZE sizeof(Client_to_server_msg)
-
 
 /********** Message structs **********/
 struct Server_to_client_msg

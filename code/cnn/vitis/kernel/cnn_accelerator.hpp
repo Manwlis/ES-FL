@@ -6,10 +6,11 @@
 /***********************************************************************************/
 /* Size definitions                                                                */
 /***********************************************************************************/
-#define c_num_batches		 2000 // !!! Needs to change in both host.hpp and all_fwp_bp.hpp
-#define batch_size			 30
-#define c_learning_rate  0.01f
-#define maxi_buffer_size	16
+#define LOCAL_EPOCHS	1
+#define NUM_BATCHES		2//1875 // !!! Needs to change in both host.hpp and all_fwp_bp.hpp
+#define BATCH_SIZE		2//32
+#define NUM_VARIABLES	105866
+#define MOMENTUM_CONSTANT 0.9f
 
 /***********************************************************************************/
 /* Input: 28x28x1 array.                                                           */
@@ -143,11 +144,11 @@ struct window_1d
 /* Auxiliary functions.                                                            */
 /***********************************************************************************/
 // Duplicates a stream.
-template < typename out_type , uint _batch_size , uint size >
+template < typename out_type , uint _BATCH_SIZE , uint size >
 void duplicate_stream ( hls::stream< out_type >& s_in , hls::stream< out_type >& s_out_1 , hls::stream< out_type >& s_out_2 )
 {
 
-	batch: for ( uint batch = 0 ; batch < _batch_size ; batch++ )
+	batch: for ( uint batch = 0 ; batch < _BATCH_SIZE ; batch++ )
 		dup_stream: for( uint i = 0 ; i < size ; i++ )
 		{
 #pragma HLS PIPELINE II=1 style=frp
@@ -163,15 +164,8 @@ void duplicate_stream ( hls::stream< out_type >& s_in , hls::stream< out_type >&
 extern "C"
 {
 void cnn_accelerator ( float learning_rate ,
-	float gmem_input_data_fp[c_num_batches][batch_size][input_h][input_w] ,
-	float gmem_input_data_cg[c_num_batches][batch_size][input_h][input_w] ,
-	t_label gmem_labels[c_num_batches][batch_size] ,
-	float gmem_l0_conv_weights[l0_conv_f_h][l0_conv_f_w][l0_conv_f] ,
-	float gmem_l0_conv_biases[l0_conv_f] ,
-	float gmem_l2_conv_weights[l2_conv_f_h][l2_conv_f_w][l2_conv_in_c][l2_conv_f] ,
-	float gmem_l2_conv_biases[l2_conv_f] ,
-	float gmem_l4_dens_weights[l4_dens_in_size][l4_dens_k] ,
-	float gmem_l4_dens_biases[l4_dens_k] ,
-	float gmem_l5_soft_weights[l5_soft_in_size][l5_soft_k] ,
-	float gmem_l5_soft_biases[l5_soft_k] );
+	float gmem_input_data_fp[NUM_BATCHES][BATCH_SIZE][input_h][input_w] ,
+	float gmem_input_data_cg[NUM_BATCHES][BATCH_SIZE][input_h][input_w] ,
+	t_label gmem_labels[NUM_BATCHES][BATCH_SIZE] ,
+	float trainable_variables[NUM_VARIABLES] );
 }

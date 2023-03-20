@@ -8,10 +8,14 @@
 /***********************************************************************************/
 /* Size definitions                                                                */
 /***********************************************************************************/
-#define c_num_batches		 2
-#define batch_size			 2
+#define LOCAL_EPOCHS		 2
+#define NUM_BATCHES			 2
+#define BATCH_SIZE			 2
+#define NUM_INPUTS		NUM_BATCHES * BATCH_SIZE
+#define NUM_VARIABLES	105866
 #define c_learning_rate  0.01f
 #define maxi_buffer_size	16
+#define MOMENTUM_CONSTANT 0.9f
 
 /***********************************************************************************/
 /* Input: 28x28x1 array.                                                           */
@@ -165,15 +169,8 @@ void duplicate_stream ( hls::stream< out_type >& s_in , hls::stream< out_type >&
 extern "C"
 {
 void cnn_accelerator ( float learning_rate ,
-	float gmem_input_data_fp[c_num_batches][batch_size][input_h][input_w] ,
-	float gmem_input_data_cg[c_num_batches][batch_size][input_h][input_w] ,
-	uint gmem_labels[c_num_batches][batch_size] ,
-	float gmem_l0_conv_weights[l0_conv_f_h][l0_conv_f_w][l0_conv_f] ,
-	float gmem_l0_conv_biases[l0_conv_f] ,
-	float gmem_l2_conv_weights[l2_conv_f_h][l2_conv_f_w][l2_conv_in_c][l2_conv_f] ,
-	float gmem_l2_conv_biases[l2_conv_f] ,
-	float gmem_l4_dens_weights[l4_dens_in_size][l4_dens_k] ,
-	float gmem_l4_dens_biases[l4_dens_k] ,
-	float gmem_l5_soft_weights[l5_soft_in_size][l5_soft_k] ,
-	float gmem_l5_soft_biases[l5_soft_k] );
+	float gmem_input_data_fp[NUM_BATCHES][BATCH_SIZE][input_h][input_w] ,
+	float gmem_input_data_cg[NUM_BATCHES][BATCH_SIZE][input_h][input_w] ,
+	t_label gmem_labels[NUM_BATCHES][BATCH_SIZE] ,
+	float trainable_variables[NUM_VARIABLES] );
 }

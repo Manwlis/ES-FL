@@ -17,17 +17,20 @@
 /***********************************************************************************/
 /* Info for the host to find and execute the accelerator.                          */
 /***********************************************************************************/
-#define c_device_index     0
-#define c_binary_file_name "binary_container_1.xclbin"
-#define c_kernel_name      "cnn_accelerator"
+#define DEVICE_INDEX	0
+#define BIN_FILENAME	"binary_container_1.xclbin"
+#define KERNEL_NAME		"cnn_accelerator"
 
 /***********************************************************************************/
 /* Size definitions                                                                */
 /***********************************************************************************/
-#define c_num_epochs		10
-#define c_num_batches		2000 // !!! Needs to change in both host.hpp and all_fwp_bp.hpp
-#define batch_size			30
-#define c_learning_rate 0.01f
+#define GLOBAL_EPOCHS	1
+#define NUM_BATCHES		2//1875 // !!! Needs to change in both host.hpp and all_fwp_bp.hpp
+#define BATCH_SIZE		2//32
+#define NUM_INPUTS		NUM_BATCHES * BATCH_SIZE
+#define INITIAL_LR		0.01f
+#define LR_DECAY		0.977331125f
+#define NUM_VARIABLES	105866
 
 /***********************************************************************************/
 /* Input: 28x28x1 array.                                                           */
@@ -75,7 +78,7 @@ typedef unsigned int t_label; // change this to ap_uint 4 bits?
 /***********************************************************************************/
 // Saves array to file.
 template < uint num_elements >
-void save_array( float array[num_elements] , const char* file_name , const uint precision )
+void save_array_txt( float array[num_elements] , const char* file_name , const uint precision )
 {
 	std::ofstream file;
 	file.open( file_name );
@@ -87,67 +90,6 @@ void save_array( float array[num_elements] , const char* file_name , const uint 
 	file.close();
 }
 
-template < typename data_type , uint dim0 >
-void file_to_1d_array ( data_type array[dim0] , std::string filename )
-{
-	std::ifstream file( filename , std::ios::binary );
-	data_type temp;
-
-	for ( uint c0  = 0 ; c0 < dim0 ; c0++ )
-	{
-		file.read( reinterpret_cast<char*>(&temp) , sizeof(data_type) );
-		array[c0] = temp;
-	}
-	file.close();
-}
-
-template < typename data_type , uint dim1 , uint dim0 >
-void file_to_2d_array ( data_type array[dim1][dim0] , std::string filename )
-{
-	std::ifstream file( filename , std::ios::binary );
-	data_type temp;
-
-	for ( uint c1  = 0 ; c1 < dim1 ; c1++ )
-		for ( uint c0  = 0 ; c0 < dim0 ; c0++ )
-		{
-			file.read( reinterpret_cast<char*>(&temp) , sizeof(data_type) );
-			array[c1][c0] = temp;
-		}
-	file.close();
-}
-
-template < typename data_type , uint dim2 , uint dim1 , uint dim0 >
-void file_to_3d_array ( data_type array[dim2][dim1][dim0] , std::string filename )
-{
-	std::ifstream file( filename , std::ios::binary );
-	data_type temp;
-
-	for ( uint c2  = 0 ; c2 < dim2 ; c2++ )
-		for ( uint c1  = 0 ; c1 < dim1 ; c1++ )
-			for ( uint c0  = 0 ; c0 < dim0 ; c0++ )
-			{
-				file.read( reinterpret_cast<char*>(&temp) , sizeof(data_type) );
-				array[c2][c1][c0] = temp;
-			}
-	file.close();
-}
-
-template < typename data_type , uint dim3 , uint dim2 , uint dim1 , uint dim0 >
-void file_to_4d_array ( data_type array[dim3][dim2][dim1][dim0] , std::string filename )
-{
-	std::ifstream file( filename , std::ios::binary );
-	data_type temp;
-
-	for ( uint c3  = 0 ; c3 < dim3 ; c3++ )
-		for ( uint c2  = 0 ; c2 < dim2 ; c2++ )
-			for ( uint c1  = 0 ; c1 < dim1 ; c1++ )
-				for ( uint c0  = 0 ; c0 < dim0 ; c0++ )
-				{
-					file.read( reinterpret_cast<char*>(&temp) , sizeof(data_type) );
-					array[c3][c2][c1][c0] = temp;
-				}
-	file.close();
-}
 /***********************************************************************************/
 /* Timer class.                                                                    */
 /***********************************************************************************/
@@ -200,19 +142,10 @@ private:
 	xrt::bo buf_labels;
 
 	// buffers of the CNN's variables
-	xrt::bo buf_l0_conv_weights;
-	xrt::bo buf_l0_conv_biases;
-	xrt::bo buf_l2_conv_weights;
-	xrt::bo buf_l2_conv_biases;
-	xrt::bo buf_l4_dens_weights;
-	xrt::bo buf_l4_dens_biases;
-	xrt::bo buf_l5_soft_weights;
-	xrt::bo buf_l5_soft_biases;
+	xrt::bo buf_variables;
 
 public:
 	Driver( unsigned int device_id , const std::string& xclbin_name , const std::string& device_name , const std::string& images_filename , const std::string& labels_filename );
 
-	void call_accelerator(
-		float* l0_conv_weights , float* l0_conv_biases , float* l2_conv_weights , float* l2_conv_biases ,
-		float* l4_dens_weights , float* l4_dens_biases , float* l5_soft_weights , float* l5_soft_biases );
+	void call_accelerator( float* trainable_variables , float learning_rate );
 };

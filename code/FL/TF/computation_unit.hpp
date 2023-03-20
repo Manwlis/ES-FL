@@ -1,5 +1,5 @@
-#include "messages.hpp"		/* msg structs */
-#include "definitions.hpp"	/*  */
+#include "definitions.hpp"
+#include "utils.hpp"
 
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>

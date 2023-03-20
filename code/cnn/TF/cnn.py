@@ -52,7 +52,6 @@ def share_trainable_variables( model ):
 		np_array = tr_var.numpy()
 		np_array.tofile( file )
 
-
 def save_activations( activations ):
 	###### Layer 0 activations ######
 	np_array = np.copy( activations[0] )
@@ -153,50 +152,51 @@ def save_variable_gradients( gradients ):
 	np_array.tofile( file , sep='\n' , format='%.6f')
 
 def save_trained_variables( variables ):
-	###### Layer 0 weights ######
-	np_array = np.copy( variables[0] )
-	file = open( "variables/l0_weights_tf.txt" , "w" )
-	np_array.tofile( file , sep='\n' , format='%.6f')
+	# ##### distinct layers #####
+	# np_array = np.copy( variables[0] )
+	# file = open( "variables/l0_weights_tf.txt" , "w" )
+	# np_array.tofile( file , sep='\n' , format='%.6f')
 
-	###### Layer 0 biases ######
-	np_array = np.copy( variables[1] )
-	file = open( "variables/l0_biases_tf.txt" , "w" )
-	np_array.tofile( file , sep='\n' , format='%.6f')
+	# np_array = np.copy( variables[1] )
+	# file = open( "variables/l0_biases_tf.txt" , "w" )
+	# np_array.tofile( file , sep='\n' , format='%.6f')
 
-	###### Layer 2 weights ######
-	np_array = np.copy( variables[2] )
-	file = open( "variables/l2_weights_tf.txt" , "w" )
-	np_array.tofile( file , sep='\n' , format='%.6f')
+	# np_array = np.copy( variables[2] )
+	# file = open( "variables/l2_weights_tf.txt" , "w" )
+	# np_array.tofile( file , sep='\n' , format='%.6f')
 
-	###### Layer 2 biases ######
-	np_array = np.copy( variables[3] )
-	file = open( "variables/l2_biases_tf.txt" , "w" )
-	np_array.tofile( file , sep='\n' , format='%.6f')
+	# np_array = np.copy( variables[3] )
+	# file = open( "variables/l2_biases_tf.txt" , "w" )
+	# np_array.tofile( file , sep='\n' , format='%.6f')
 
-	###### Layer 4 weights ######
-	np_array = np.copy( variables[4] )
-	file = open( "variables/l4_weights_tf.txt" , "w" )
-	np_array.tofile( file , sep='\n' , format='%.6f')
-			
-	###### Layer 4 biases ######
-	np_array = np.copy( variables[5] )
-	file = open( "variables/l4_biases_tf.txt" , "w" )
-	np_array.tofile( file , sep='\n' , format='%.6f')
+	# np_array = np.copy( variables[4] )
+	# file = open( "variables/l4_weights_tf.txt" , "w" )
+	# np_array.tofile( file , sep='\n' , format='%.6f')
 
-	###### Layer 5 weights ######
-	np_array = np.copy( variables[6] )
-	file = open( "variables/l5_weights_tf.txt" , "w" )
-	np_array.tofile( file , sep='\n' , format='%.6f')
+	# np_array = np.copy( variables[5] )
+	# file = open( "variables/l4_biases_tf.txt" , "w" )
+	# np_array.tofile( file , sep='\n' , format='%.6f')
 
-	###### Layer 5 biases ######
-	np_array = np.copy( variables[7] )
-	file = open( "variables/l5_biases_tf.txt" , "w" )
-	np_array.tofile( file , sep='\n' , format='%.6f')
+	# np_array = np.copy( variables[6] )
+	# file = open( "variables/l5_weights_tf.txt" , "w" )
+	# np_array.tofile( file , sep='\n' , format='%.6f')
 
+	# np_array = np.copy( variables[7] )
+	# file = open( "variables/l5_biases_tf.txt" , "w" )
+	# np_array.tofile( file , sep='\n' , format='%.6f')
+
+	##### Full model #####
+	file = open( "variables/tf.txt" , "w" )
+	for tr_var in variables:
+		np_array = np.copy( tr_var )
+		np_array.tofile( file , sep='\n' , format='%.6f')
+		file.write("\n")
 
 def main():
-	num_batches = 2000
-	batch_size = 30
+	num_epochs = 1
+	num_batches = 2
+	batch_size = 2
+	
 	##### Set up datasets #####
 	# set up training dataset
 	dataset, metadata = tfds.load('fashion_mnist', as_supervised=True, with_info=True)
@@ -226,6 +226,10 @@ def main():
 		image_batch.append( np.concatenate( image_list[ i * batch_size : i * batch_size + batch_size ] ) )
 		label_batch.append( np.concatenate( label_list[ i * batch_size : i * batch_size + batch_size ] ) )
 
+	# set up testing dataset
+	test_dataset = test_dataset.cache().shuffle( num_test_examples , seed = 0 ).batch( batch_size )
+	test_dataset = test_dataset.prefetch( tf.data.AUTOTUNE ).repeat()
+
 	##### create & train model #####
 	# create model
 	cnn = tf.keras.Sequential([
@@ -239,7 +243,7 @@ def main():
 		])
 
 	# compile model
-	optimizer = tf.keras.optimizers.SGD( learning_rate=0.01 )
+	optimizer = tf.keras.optimizers.SGD( learning_rate=0.01 , momentum=0.9 )
 	cnn.compile( optimizer , loss=tf.keras.losses.SparseCategoricalCrossentropy() , metrics=['accuracy'] )
 
 	# share model variables with c++ code and distinct layer
@@ -249,37 +253,35 @@ def main():
 	# tracks the outputs of all layers
 	heatmap_model = tf.keras.Model( cnn.inputs , [layer.output for layer in cnn.layers] )
 
-	for i in range( 0 , num_batches ):
-		# pass an image through forward, back prop and variable update
-		with tf.GradientTape( persistent = True ) as g:
-			# forward prop
-			features = heatmap_model( image_batch[i] )
+	for e in range( 0 , num_epochs ):
+		for i in range( 0 , num_batches ):
+			# pass an image through forward, back prop and variable update
+			with tf.GradientTape( persistent = True ) as g:
+				# forward prop
+				features = heatmap_model( image_batch[i] )
 
-			# get total error
-			loss = cnn.loss( y_true = label_batch[i] , y_pred = features[-1] )
+				# get total error
+				loss = cnn.loss( y_true = label_batch[i] , y_pred = features[-1] )
 
-		# back prop
-		output_gradients = g.gradient( loss , features )
-		variable_gradients = g.gradient( loss , cnn.trainable_variables )
+			# back prop
+			output_gradients = g.gradient( loss , features )
+			variable_gradients = g.gradient( loss , cnn.trainable_variables )
 
-		# apply gradients
-		optimizer.apply_gradients( zip( variable_gradients , cnn.trainable_variables ) )
-	
-		print( "TF entropy: {:.8f}".format( loss ) )
+			# apply gradients
+			optimizer.apply_gradients( zip( variable_gradients , cnn.trainable_variables ) )
+		
+			# print( "TF entropy: {:.8f}".format( loss ) )
+
+		##### evaluate model #####
+		loss , accuracy = cnn.evaluate( test_dataset , verbose = 1 , batch_size=batch_size , steps=num_test_examples/batch_size )
+		print( 'TF Accuracy:' , accuracy )
+		print( 'TF Loss:' , loss )
 
 	##### save outputs #####
-	save_activations( features )
-	save_output_gradients( output_gradients )
-	save_variable_gradients( variable_gradients )
+	# save_activations( features )
+	# save_output_gradients( output_gradients )
+	# save_variable_gradients( variable_gradients )
 	save_trained_variables( cnn.trainable_variables )
-
-	##### evaluate model #####
-	# test_dataset = test_dataset.cache().shuffle( num_test_examples , seed = 0 ).batch( batch_size )
-	# test_dataset = test_dataset.prefetch( tf.data.AUTOTUNE ).repeat()
-
-	# loss , accuracy = cnn.evaluate( test_dataset , verbose = 1 , batch_size=batch_size , steps=num_test_examples/batch_size )
-	# print( 'TF Accuracy:' , accuracy )
-	# print( 'TF Loss:' , loss )
 
 
 if __name__ == "__main__": main()

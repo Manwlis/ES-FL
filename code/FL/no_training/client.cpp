@@ -8,7 +8,6 @@
  */
 
 #include <iostream>			/* cout */
-#include <bit>				/* endian */
 
 #include <unistd.h>			/* close */
 #include <string.h>			/* memset */
@@ -16,18 +15,14 @@
 #include <netdb.h>			/* addrinfo, getaddrinfo */
 
 #include "definitions.hpp"
-
 #include "utils.hpp"		/* error, Timer, Logging */
 
 
 struct sockaddr_in find_server( const char* server_name , const char* server_port );
-
-int quantize_variables();
 int send_variables( int socket_fd , Client_to_server_msg& send_message );
 
-// Global timer that starts ticking at program start.
-Timer g_timer;
-Logger g_logger( std::cout );
+
+Logger g_logger;
 
 int main ( int argc , char** argv )
 {
@@ -56,10 +51,6 @@ int main ( int argc , char** argv )
 	rv = connect( socket_fd , (struct sockaddr*) &server , sizeof( server ) );
 	if ( rv < 0 )
 		Utils::error( "Connect failed." );
-
-	/**************************************************************************************************/
-	/* Set up training environment, neural network and numpy wrappers.                                */
-	/**************************************************************************************************/
 
 	/**************************************************************************************************/
 	/* Main loop.                                                                                     */
@@ -163,8 +154,6 @@ int main ( int argc , char** argv )
 	/**************************************************************************************************/
 	/* Clean up and exit.                                                                             */
 	/**************************************************************************************************/
-	// destroy FPGA environment
-
 	// close socket properly
 	shutdown( socket_fd , SHUT_RDWR );
 }

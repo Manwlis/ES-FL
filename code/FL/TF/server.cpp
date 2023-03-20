@@ -8,7 +8,7 @@
  */
 
 // C++ standard libraries
-#include <iostream>			/* << */
+#include <iostream>			/* cout */
 #include <fstream>			/* ifstream, ofstream */
 #include <vector>			/* vector */
 #include <numeric>			/* iota */
@@ -28,11 +28,7 @@
 #include <signal.h>			/* signal */
 
 #include "definitions.hpp"
-
 #include "utils.hpp"		/* error, Timer, Logging */
-#include "messages.hpp"		/* msg structs */
-#include "fake_data.hpp"	/* check_fake_client_data, create_fake_server_data */
-
 #include "computation_unit.hpp"	/* Python_with_TF */
 
 // systemic definitions
@@ -88,8 +84,6 @@ enum class Read_socket_rv
 };
 Read_socket_rv read_socket( int fd , Polled_fds_info& fd_info , size_t bytes_to_read );
 
-void dequintize_received_variables( MSG_VARIABLE_DATATYPE message_variables[VARIABLES_NUM] , float local_variables[VARIABLES_NUM] );
-
 void accumulate_variables( float local_variables[VARIABLES_NUM] , float accumulated_variables[VARIABLES_NUM] );
 void create_average_model( float accumulated_variables[VARIABLES_NUM] , int num_models , float global_model[VARIABLES_NUM] );
 
@@ -100,20 +94,11 @@ bool shutdown_ready( int epoch , unsigned int connected_clients_num );
 // Lambda that catches ctrl+C interrupts and shows accuracy history. Used to show history when manually ending training.
 std::function<void(int)> interrupt_trap;
 // interrupt_trap is a lambda capturing local variables, must be wrapped to a simple function in order to be used as an interrupt handling function.
-void interrupt_trap_function_wrapper(int signal) { interrupt_trap(signal); }
+void interrupt_trap_function_wrapper( int signal ) { interrupt_trap( signal ); }
 
-std::ofstream myfile;
-std::ofstream& pick_sink()
-{
-  	myfile.open ("IO_files/server_out.txt");
-	//return myfile;
-	return myfile;
-}
 
-// Global timer that starts ticking at program start.
-Timer g_timer;
-//Logger g_logger( pick_sink() );
-Logger g_logger( std::cout );
+// Logger g_logger("IO_files/server_out.txt");
+Logger g_logger;
 
 
 int main( int argc , char** argv )
@@ -405,11 +390,6 @@ int main( int argc , char** argv )
 
 				LOGGING( Logger::Level::fl_info , 
 					"Fd: " << polled_fds[i].fd << "    IP: " << inet_ntoa( peer_addr.sin_addr ) << "    Port: " << ntohs( peer_addr.sin_port ) << "    Local variables received." );
-
-				/**************************************************************************************************/
-				/* Decompress / dequantize received variables.                                                    */
-				/**************************************************************************************************/
-				//dequintize_received_variables();
 
 				/**************************************************************************************************/
 				/* Increment received variables to global diff.                                                   */
@@ -705,21 +685,6 @@ Read_socket_rv read_socket( int fd , Polled_fds_info& fd_info , size_t bytes_to_
 /**************************************************************************************************/
 /* Calculations functions. Dequintize, accumulate,etc variables, create average model.            */
 /**************************************************************************************************/
-/**
- * @brief Received variables may be in a smaller data type to reduce comunication.
- * In order to achieve better accuracy, they need to be reverted back to float.
- * Mayde remove this fuction and do the conversion in accumulate_variables() to avoid extra memory use.
- * @param message_variables 
- * @param local_variables 
- */
-void dequintize_received_variables( MSG_VARIABLE_DATATYPE message_variables[VARIABLES_NUM] , float local_variables[VARIABLES_NUM] )
-{
-	for( int i = 0 ; i < VARIABLES_NUM ; i++ )
-	{
-		local_variables[i] = (float) message_variables[i];
-	}
-}
-
 /**
  * @brief Adds local variables to cumulative variables
  * 
