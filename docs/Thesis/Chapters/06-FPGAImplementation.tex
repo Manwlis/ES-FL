@@ -369,7 +369,7 @@ With Vitis HLS, implementing batching on each individual hardware function is qu
 Further though must be given to the size of the streams connecting functions of the forward propagation with functions after the barrier. The producer functions will block until the consumer functions clear some space in the stream if the minimal depth is used as mentioned in the preceding section. Depending on the minimal latency between the producer and the consumer, this can be avoided by increasing the depth by 0.5 to 1 times.
 
 \subsection{Updating Variables}
-Based on the produced gradients, the variables of the ANN are updated in a second dataflow region. Due to the independence of all weights and gradients, the process is relatively straightforward. The basic gradient descend algorithm is used and the learning rate is supplied by the driver program. Thus, latency and hardware usage are the only criteria for the applied parallelism.
+Based on the produced gradients, the variables of the ANN are updated in a second dataflow region. Due to the independence of all weights and gradients, this process is relatively straightforward. The classic SGD with momentum optimization algorithm is used and the learning rate is supplied by the driver program. Thus, latency and hardware usage are the only criteria for the applied parallelism in this specific region.
 
 \subsection{Data Movement \& Storage}
 Under the Vitis flow, AXI streams are unavailable for the ZCU102, thus memory mapping is used to transfer data from general memory to the PL and vice versa. These data are the input samples and labels, as well as the variables of the ANN. Appropriate data mover functions have been developed. % gmem <-> accel, which data
@@ -378,11 +378,11 @@ In Vitis HLS, arrays are implemented as continuous memory spaces with one or two
 
 The weights of the ANN are accessed in multiple functions of the first dataflow region and require special treatment. These arrays must be designated as shared using the directive \emph{STREAM} with the type parameter set to \emph{SHARED} in order for the design to be syntesizable. The tool then recognizes there are numerous consumers and multiplies the ports accordingly, without duplicating the array data. % shared arrays
 
-For the weights of the second convolutional layer, this is insufficient. They are accessed by two functions with different access patterns. This issue can be resolved in two ways. The first one is satisfying both access patterns by increasing the partition factor and dimensions. This solution generate a huge amount of access ports, increasing hardware consumption unacceptably. More appropriate solution is creating two arrays with unique partitioning each. Albeit more memory is needed, the overall hardware usage is lower. % double arrays for layer 2 weights
+For the weights of the second convolutional layer, this is insufficient. They are accessed by two functions with different access patterns. To resolve this, both access patterns could be satisfied by increasing the partition factor and dimensions. This solution generate a huge amount of access ports, increasing hardware consumption unacceptably. More appropriate solution is creating two arrays with unique partitioning each. Albeit more memory is needed, the overall hardware usage is lower. % double arrays for layer 2 weights
 
-When generating the gradients, the ANN's inputs, data and labels, are sent from global memory to the PL via AXI Master Adapter ports. In a dataflow region, each channel must have a single consumer, thus two ports are needed to propagate the input data to the two hardware functions that consume it. All ports are independent from one another by having their own dedicated bundles, thus enabling the simultaneous reading of all inputs. % dataflow inputs
+To generate the gradients, the ANN's inputs, data and labels, are sent from global memory to the PL via AXI Master Adapter ports. In a dataflow region, each channel must have a single consumer, thus two ports are needed to propagate the input data to the two hardware functions that consume it. All ports are independent from one another by having their own dedicated bundles, thus enabling the simultaneous reading of all inputs. % dataflow inputs
 
-The variable gradients are produced in the first dataflow region and consumed in the second, thus persistent saving in on-chip memory is necessary. The related arrays are not shared since their producers and consumers are in different regions, and can be implemented as streams or arrays, whichever is more convenient. % gradients
+The gradients are produced in the first dataflow region and consumed in the second, thus persistent saving in on-chip memory is necessary. The related memory is not shared since their producers and consumers are in different regions, and can be implemented as streams or arrays, whichever is more convenient. The same applies for the momenta of the gradients, as they may be produced and consumed in same dataflow region, but in different iterations of it. % persistent memory
 
 % \subsection{Minimizing Global Memory Accesses}
 % bursting / port widening
@@ -393,7 +393,7 @@ To hold everything together, a top level function has been developed, whose sign
 
 \begin{figure}[H] % TODO: remove the batch fetching
     \centering
-        \includegraphics[height=0.5\textheight]{Images/block_diagrams/accel_top.png}
+        \includegraphics[height=0.45\textheight]{Images/block_diagrams/accel_top.png}
         \decoRule
         \caption[Top function]{Block diagram of the accelerator's top function.}
         \label{fig: top function}
@@ -416,8 +416,10 @@ The flow of the driver code is as follows:
 \end{itemize}
 
 \subsection{Memory Management}
-Since the target device is a SoC, both host and kernel programs can read and write in the same memory space. By facilitating all data transfers between PL and PS through the map API provided by the XRT library, no data movements are necessary other than filling the global buffers. As an example, the training dataset is stored in binary files and is directly transfered in the global buffers; no intermediately buffers are used in the user space of the host program.
+Since the target device is a SoC, both host and kernel programs can read and write in the same memory space. By facilitating data transfers between PL and PS through the map API provided by the XRT library, no data movements are necessary other than filling the global buffers. The training dataset is stored in binary files and is directly transferred in global memory; no intermediately buffers are used in the user space of the host program. % moving inputs
 
-Diagram \ref{fig: Gradients Calculation Pipeline Block Diagram} demonstrates how the image inputs are needed twice. They are stored twice in global memory, in two distinct memory banks, to prevent any bus or AXI conflicts. As a result, both hardware functions can read them concurrently without experiencing any additional latency.
+While the same methodology could be used when moving the ANN's weights and biases, the codebase would get too inflexible and brittle. They are a part of the byte-stream that is received from the socket connected to the FL server; copying it immediately in the global memory may introduce issues regarding endianess and alignment. Thus, an intermediary buffer is utilized to contain the incoming byte-stream, and the relevant sections of it are copied to the global memory using the write API of the XRT library. % moving variables
+
+Diagram \ref{fig: Gradients Calculation Pipeline Block Diagram} demonstrates how the image inputs are needed twice. They are stored twice in global memory, in two distinct memory banks, to prevent any bus or AXI conflicts. As a result, both hardware functions can read them concurrently without experiencing any additional latency. % two buffers for images
 
 \subsection{Incorporating the driver in the FL client}
