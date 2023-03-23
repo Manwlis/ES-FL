@@ -36,7 +36,7 @@ int main ( int argc , char** argv )
 	static uint input_labels[NUM_BATCHES][BATCH_SIZE];
 
 	file.open( "data/images.bin" , std::ios::binary );
-	file.read( reinterpret_cast<char*>(input_data) , NUM_INPUTS * sizeof(float) );
+	file.read( reinterpret_cast<char*>(input_data) , NUM_INPUTS * input_h * input_w * sizeof(float) );
 	file.close();
 
 	file.open( "data/labels.bin" , std::ios::binary );

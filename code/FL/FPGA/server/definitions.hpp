@@ -13,7 +13,7 @@ typedef float t_variable;
 
 /********** Federated training parameters **********/
 // server loop
-#define MIN_CLIENTS_PER_EPOCH 3
+#define MIN_CLIENTS_PER_EPOCH 1
 #define NUM_EPOCHS 10
 
 //defines the type of the transfered data
@@ -23,8 +23,8 @@ typedef float t_variable;
 
 /********** Utilities **********/
 // server output files
-#define TERMINAL_OUTPUT_FILENAME	"IO_files/server_output.txt"
-#define MODEL_OUTPUT_FILENAME		"IO_files/global_model_epoch_"
+#define TERMINAL_OUTPUT_FILENAME	"data/output.txt"
+#define MODEL_OUTPUT_FILENAME		"data/global_model_epoch_"
 #define MODEL_OUTPUT_FILE_EXT		".bin"
 
 // logging

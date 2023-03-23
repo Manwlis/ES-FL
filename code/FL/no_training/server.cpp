@@ -90,8 +90,8 @@ int client_selection( int connected_clients_num , pollfd fds[] , Polled_fds_info
 bool shutdown_ready( int epoch , unsigned int connected_clients_num );
 
 
-// Logger g_logger("IO_files/server_out.txt");
-Logger g_logger;
+Logger g_logger( TERMINAL_OUTPUT_FILENAME );
+// Logger g_logger;
 
 
 int main( int argc , char** argv )
@@ -116,7 +116,7 @@ int main( int argc , char** argv )
 			Utils::error( "Failed to open pretrained model file" );
 
 		// load model
-		pretrained_model_file.read( reinterpret_cast<char*>(announcement_msg.variables) , VARIABLES_NUM * sizeof(MSG_VARIABLE_DATATYPE) );
+		pretrained_model_file.read( reinterpret_cast<char*>(announcement_msg.variables) , VARIABLES_NUM * sizeof(t_variable) );
 		if ( !pretrained_model_file )
 			Utils::error( "Failed to read requested number of data" );
 
@@ -412,10 +412,10 @@ int main( int argc , char** argv )
 			create_average_model( accumulated_variables , completed_clients_num , announcement_msg.variables );
 
 			// save it
-			std::string filename = std:: string( "IO_files/global_model_epoch_" ) + std::to_string( current_epoch ) + std::string( ".bin" );
+			std::string filename = std::string( MODEL_OUTPUT_FILENAME ) + std::to_string( current_epoch ) + std::string( MODEL_OUTPUT_FILE_EXT );
 			std::ofstream new_global_model_file ( filename , std::ofstream::out | std::ofstream::binary | std::ofstream::trunc );
 			
-			new_global_model_file.write( reinterpret_cast<char*>(announcement_msg.variables) , VARIABLES_NUM * sizeof(MSG_VARIABLE_DATATYPE) );
+			new_global_model_file.write( reinterpret_cast<char*>(announcement_msg.variables) , VARIABLES_NUM * sizeof(t_variable) );
 			new_global_model_file.close();
 
 			/**************************************************************************************************/
@@ -643,9 +643,7 @@ Read_socket_rv read_socket( int fd , Polled_fds_info& fd_info , size_t bytes_to_
 void accumulate_variables( float local_variables[VARIABLES_NUM] , float accumulated_variables[VARIABLES_NUM] )
 {
 	for( int i = 0 ; i < VARIABLES_NUM ; i++ )
-	{
 		accumulated_variables[i] += local_variables[i];
-	}
 }
 
 /**
@@ -702,7 +700,6 @@ bool next_epoch_ready( int connected_clients_num , int working_clients_num , int
 		return true;
 
 	return false;
-	// an exei ginei timeout kai uparxei kapoios teleiwmenos nea epoch?
 }
 
 /**

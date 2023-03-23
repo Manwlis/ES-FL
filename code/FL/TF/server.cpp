@@ -97,7 +97,7 @@ std::function<void(int)> interrupt_trap;
 void interrupt_trap_function_wrapper( int signal ) { interrupt_trap( signal ); }
 
 
-// Logger g_logger("IO_files/server_out.txt");
+// Logger g_logger( TERMINAL_OUTPUT_FILENAME );
 Logger g_logger;
 
 
@@ -501,12 +501,12 @@ int main( int argc , char** argv )
 	/**************************************************************************************************/
 	/* Save model.                                                                                    */
 	/**************************************************************************************************/
-	std::ofstream trained_model_file( OUTPUT_FILE , std::ofstream::out | std::ofstream::binary | std::ofstream::trunc );
+	std::ofstream trained_model_file( MODEL_OUTPUT_FILENAME , std::ofstream::out | std::ofstream::binary | std::ofstream::trunc );
 
 	trained_model_file.write( reinterpret_cast<char*>(announcement_msg.variables) , VARIABLES_NUM * sizeof(MSG_VARIABLE_DATATYPE) );
 	trained_model_file.close();
 
-	LOGGING( Logger::Level::warning , "Saved model to " << OUTPUT_FILE );
+	LOGGING( Logger::Level::warning , "Saved model to " << MODEL_OUTPUT_FILENAME );
 }
 
 /**************************************************************************************************/

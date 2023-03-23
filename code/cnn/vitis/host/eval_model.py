@@ -13,11 +13,10 @@ logging.getLogger('tensorflow').setLevel(logging.ERROR)
 from keras.initializers import GlorotUniform
 
 physical_devices = tf.config.list_physical_devices('GPU')
-print("Num GPUs:", len(physical_devices))
+print( "Num GPUs:" , len(physical_devices) )
 
 ##### Set up constants #####
 batch_size = 32
-filename = "variables/model_0.bin"
 
 ##### Set up model #####
 # create model
@@ -50,17 +49,22 @@ test_dataset = test_dataset.cache().shuffle( num_test_examples , seed = 0 ).batc
 test_dataset = test_dataset.prefetch( tf.data.AUTOTUNE ).repeat()
 
 ##### Evaluate model #####
-file = open( filename , "rb" )
-cpp_variables = np.zeros( ( 105866 , ) , dtype=np.float32 )
-cpp_variables = np.fromfile( file , dtype=np.float32 )
+for i in range( 0 , 20 ) :
+	filename = "variables/model_" + str(i) + ".bin"
 
-pos = 0
-for tr_var in cnn.trainable_variables:
-	temp = tf.convert_to_tensor( np.asarray( cpp_variables[ pos : pos + tr_var.numpy().size ] ).reshape( tr_var.shape ) , np.float32 )
-	tr_var.assign( temp )
-	
-	pos += tr_var.numpy().size
+	file = open( filename , "rb" )
+	cpp_variables = np.zeros( ( 105866 , ) , dtype=np.float32 )
+	cpp_variables = np.fromfile( file , dtype=np.float32 )
 
-loss , accuracy = cnn.evaluate( test_dataset , verbose = 1 , batch_size=batch_size , steps=num_test_examples/batch_size )
-print( 'File Accuracy:' , accuracy )
-print( 'File Loss:' , loss )
+	pos = 0
+	for tr_var in cnn.trainable_variables:
+		temp = tf.convert_to_tensor( np.asarray( cpp_variables[ pos : pos + tr_var.numpy().size ] ).reshape( tr_var.shape ) , np.float32 )
+		tr_var.assign( temp )
+		
+		pos += tr_var.numpy().size
+
+	loss , accuracy = cnn.evaluate( test_dataset , verbose = 1 , batch_size=batch_size , steps=num_test_examples/batch_size )
+	print( filename )
+	print( 'File Accuracy:' , accuracy )
+	print( 'File Loss:' , loss )
+	print()

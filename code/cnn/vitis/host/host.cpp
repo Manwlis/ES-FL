@@ -35,10 +35,10 @@ Driver::Driver( unsigned int device_id , const std::string& xclbin_name , const 
 	buf_labels.sync( XCL_BO_SYNC_BO_TO_DEVICE );
 }
 
-void Driver::call_accelerator( float* trainable_variables , float learning_rate )
+void Driver::call_accelerator( float* input_variables , float learning_rate , float* output_variables )
 {
 	// Set inputs
-	buf_variables.write( trainable_variables );
+	buf_variables.write( input_variables );
 	buf_variables.sync( XCL_BO_SYNC_BO_TO_DEVICE );
 
 	// Call kernel
@@ -47,7 +47,7 @@ void Driver::call_accelerator( float* trainable_variables , float learning_rate 
 
 	// Get outputs
 	buf_variables.sync( XCL_BO_SYNC_BO_FROM_DEVICE );
-	buf_variables.read( trainable_variables );
+	buf_variables.read( output_variables );
 }
 
 int main ( )
@@ -72,7 +72,7 @@ int main ( )
 		std::cout << "Calling Accel	";
 		timer.rewind();
 
-		driver.call_accelerator( trainable_variables , learning_rate );
+		driver.call_accelerator( trainable_variables , learning_rate , trainable_variables );
 		std::cout << timer.since() << " ms" << std::endl;
 
 		std::cout << "Saving Output	";

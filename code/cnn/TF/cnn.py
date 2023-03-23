@@ -270,12 +270,12 @@ def main():
 			# apply gradients
 			optimizer.apply_gradients( zip( variable_gradients , cnn.trainable_variables ) )
 		
-			# print( "TF entropy: {:.8f}".format( loss ) )
+			print( "TF entropy: {:.8f}".format( loss ) )
 
-		##### evaluate model #####
-		loss , accuracy = cnn.evaluate( test_dataset , verbose = 1 , batch_size=batch_size , steps=num_test_examples/batch_size )
-		print( 'TF Accuracy:' , accuracy )
-		print( 'TF Loss:' , loss )
+	# 	##### evaluate model #####
+	# 	loss , accuracy = cnn.evaluate( test_dataset , verbose = 1 , batch_size=batch_size , steps=num_test_examples/batch_size )
+	# 	print( 'TF Accuracy:' , accuracy )
+	# 	print( 'TF Loss:' , loss )
 
 	##### save outputs #####
 	# save_activations( features )

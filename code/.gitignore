@@ -18,7 +18,7 @@ cnn/hls/variables
 cnn/vitis/host/data
 cnn/vitis/host/variables
 
-FL/FPGA/IO_files/
+FL/FPGA/data
 
 FL/no_training/IO_files/
 

@@ -57,8 +57,9 @@
 
 
 /********** Utilities **********/
-// server output file
-#define OUTPUT_FILE "./IO_files/out.bin"
+// server output files
+#define TERMINAL_OUTPUT_FILENAME	"IO_files/server_output.txt"
+#define MODEL_OUTPUT_FILENAME		"IO_files/model.bin"
 
 // logging
 #define ENABLE_LOGGING 1		// enable/disable all messages

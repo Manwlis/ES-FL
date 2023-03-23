@@ -14,7 +14,7 @@ Go to: Assistant > Settings... > system > kernels > Emulation-SW / Emulation-HW 
 Add to V++ configuration settings:
 ```
 [hls]
-clock=200000000:cnn_accelerator
+clock=240000000:cnn_accelerator
 ```
 
 #### Link a clock to a kernel
@@ -22,7 +22,7 @@ Assistant > Settings... > system > system_hw_link > Emulation-SW / Emulation-HW 
 Add to V++ configuration settings:
 ```
 [clock]
-id=4:cnn_accelerator_1
+freqHz=240000000:cnn_accelerator_1
 ```
 
 #### Important: Host applications using the XRT native API must be compiled with -std=c++17.

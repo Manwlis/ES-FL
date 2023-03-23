@@ -8,7 +8,7 @@
  */
 
 // C++ standard libraries
-#include <iostream>			/* << */
+#include <iostream>			/* cout */
 #include <fstream>			/* ifstream, ofstream */
 #include <vector>			/* vector */
 #include <numeric>			/* iota */
@@ -25,11 +25,9 @@
 #include <arpa/inet.h>		/* inet_ntoa */
 #include <poll.h>			/* poll */
 #include <fcntl.h>			/* fcntl */
-#include <signal.h>			/* signal */
 
 #include "definitions.hpp"
-
-#include "utils.hpp"		/* error, Timer, Logging */
+#include "utils.hpp"		/* error, Logging */
 
 // systemic definitions
 #define FD_NUM_MAX MAX_CONNECTED_CLIENTS+1 // +1 for the listening socket
@@ -84,7 +82,6 @@ enum class Read_socket_rv
 };
 Read_socket_rv read_socket( int fd , Polled_fds_info& fd_info , size_t bytes_to_read );
 
-
 void accumulate_variables( float local_variables[VARIABLES_NUM] , float accumulated_variables[VARIABLES_NUM] );
 void create_average_model( float accumulated_variables[VARIABLES_NUM] , int num_models , float global_model[VARIABLES_NUM] );
 
@@ -93,18 +90,8 @@ int client_selection( int connected_clients_num , pollfd fds[] , Polled_fds_info
 bool shutdown_ready( int epoch , unsigned int connected_clients_num );
 
 
-std::ofstream myfile;
-std::ofstream& pick_sink()
-{
-  	myfile.open ("IO_files/server_out.txt");
-	//return myfile;
-	return myfile;
-}
-
-// Global timer that starts ticking at program start.
-Timer g_timer;
-//Logger g_logger( pick_sink() );
-Logger g_logger( std::cout );
+Logger g_logger( TERMINAL_OUTPUT_FILENAME );
+// Logger g_logger;
 
 
 int main( int argc , char** argv )
@@ -129,7 +116,7 @@ int main( int argc , char** argv )
 			Utils::error( "Failed to open pretrained model file" );
 
 		// load model
-		pretrained_model_file.read( reinterpret_cast<char*>(announcement_msg.variables) , VARIABLES_NUM * sizeof(MSG_VARIABLE_DATATYPE) );
+		pretrained_model_file.read( reinterpret_cast<char*>(announcement_msg.variables) , VARIABLES_NUM * sizeof(t_variable) );
 		if ( !pretrained_model_file )
 			Utils::error( "Failed to read requested number of data" );
 
@@ -377,11 +364,6 @@ int main( int argc , char** argv )
 					"Fd: " << polled_fds[i].fd << "    IP: " << inet_ntoa( peer_addr.sin_addr ) << "    Port: " << ntohs( peer_addr.sin_port ) << "    Local variables received." );
 
 				/**************************************************************************************************/
-				/* Decompress / dequantize received variables.                                                    */
-				/**************************************************************************************************/
-				//dequintize_received_variables();
-
-				/**************************************************************************************************/
 				/* Increment received variables to global diff.                                                   */
 				/**************************************************************************************************/
 				accumulate_variables( polled_fds_info[i].received_message->variables , accumulated_variables );
@@ -417,10 +399,6 @@ int main( int argc , char** argv )
 				}
 			}
 		}
-		// for ( int i = 0 ; i < FD_NUM_MAX ; i++ ) // shows what the structures hold
-		// 	std::cout << polled_fds[i].fd << " " << polled_fds[i].events << " " << polled_fds[i].revents << " " 
-		// 		<< polled_fds_info[i].received_bytes << " " <<  polled_fds_info[i].sended_bytes <<  " " <<  polled_fds_info[i].received_message <<  " " <<  polled_fds_info[i].working 
-		// 		<< std::endl;
 
 		/**************************************************************************************************/
 		/* Check next epoch requirements.                                                                 */
@@ -434,10 +412,10 @@ int main( int argc , char** argv )
 			create_average_model( accumulated_variables , completed_clients_num , announcement_msg.variables );
 
 			// save it
-			std::string filename = std:: string( "IO_files/global_model_epoch_" ) + std::to_string( current_epoch ) + std::string( ".bin" );
+			std::string filename = std::string( MODEL_OUTPUT_FILENAME ) + std::to_string( current_epoch ) + std::string( MODEL_OUTPUT_FILE_EXT );
 			std::ofstream new_global_model_file ( filename , std::ofstream::out | std::ofstream::binary | std::ofstream::trunc );
 			
-			new_global_model_file.write( reinterpret_cast<char*>(announcement_msg.variables) , VARIABLES_NUM * sizeof(MSG_VARIABLE_DATATYPE) );
+			new_global_model_file.write( reinterpret_cast<char*>(announcement_msg.variables) , VARIABLES_NUM * sizeof(t_variable) );
 			new_global_model_file.close();
 
 			/**************************************************************************************************/
@@ -665,9 +643,7 @@ Read_socket_rv read_socket( int fd , Polled_fds_info& fd_info , size_t bytes_to_
 void accumulate_variables( float local_variables[VARIABLES_NUM] , float accumulated_variables[VARIABLES_NUM] )
 {
 	for( int i = 0 ; i < VARIABLES_NUM ; i++ )
-	{
 		accumulated_variables[i] += local_variables[i];
-	}
 }
 
 /**
@@ -681,7 +657,7 @@ void create_average_model( float accumulated_variables[VARIABLES_NUM] , int num_
 {
 	if( num_models == 0 )
 		return;
-		
+
 	for( int i = 0 ; i < VARIABLES_NUM ; i++ )
 	{
 		float temp_average_variable = accumulated_variables[i] / num_models;
@@ -707,9 +683,9 @@ void create_average_model( float accumulated_variables[VARIABLES_NUM] , int num_
 bool next_epoch_ready( int connected_clients_num , int working_clients_num , int completed_clients_num )
 {
 	LOGGING( Logger::Level::message_info , "						"
-		<< "	connected = " << connected_clients_num
-		<< "	working  = " << working_clients_num
-		<< "	completed = " << completed_clients_num );
+		<< "    connected = " << connected_clients_num
+		<< "    working  = " << working_clients_num
+		<< "    completed = " << completed_clients_num );
 
 	// not enough connected client, no point to start a new epoch
 	if( connected_clients_num < MIN_CLIENTS_PER_EPOCH )
@@ -724,13 +700,12 @@ bool next_epoch_ready( int connected_clients_num , int working_clients_num , int
 		return true;
 
 	return false;
-	// an exei ginei timeout kai uparxei kapoios teleiwmenos nea epoch?
 }
 
 /**
  * @brief Selects the clients that are going to partake in the next epoch.
  * The number of the selected clients is set by the MIN_CLIENTS_PER_EPOCH constant.
- * In final epoch all clients are selected in order to use them for evaluation.
+ * In final epoch all clients are selected to alert them of end of training.
  * 
  * @param int number of connected clients 
  * @param pollfd[] fds of the connected clients

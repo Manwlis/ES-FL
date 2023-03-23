@@ -21,7 +21,7 @@
 struct sockaddr_in find_server( const char* server_name , const char* server_port );
 int send_variables( int socket_fd , Client_to_server_msg& send_message );
 
-
+// Global timer that starts ticking at program start.
 Logger g_logger;
 
 int main ( int argc , char** argv )

@@ -1,4 +1,4 @@
-/**
+	/**
  * @file client.cpp
  * @author Emmanouil Petrakos
  * @brief Client taking part in federated learning.
@@ -8,7 +8,6 @@
  */
 
 #include <iostream>			/* cout */
-#include <bit>				/* endian */
 
 #include <unistd.h>			/* close */
 #include <string.h>			/* memset */
@@ -16,18 +15,16 @@
 #include <netdb.h>			/* addrinfo, getaddrinfo */
 
 #include "definitions.hpp"
-
 #include "utils.hpp"		/* error, Timer, Logging */
+#include "driver.hpp"
 
 
 struct sockaddr_in find_server( const char* server_name , const char* server_port );
 
-int quantize_variables();
 int send_variables( int socket_fd , Client_to_server_msg& send_message );
 
 // Global timer that starts ticking at program start.
-Timer g_timer;
-Logger g_logger( std::cout );
+Logger g_logger;
 
 int main ( int argc , char** argv )
 {
@@ -58,8 +55,9 @@ int main ( int argc , char** argv )
 		Utils::error( "Connect failed." );
 
 	/**************************************************************************************************/
-	/* Set up training environment, neural network and numpy wrappers.                                */
+	/* Set up training environment.                                                                   */
 	/**************************************************************************************************/
+	Driver driver( DEVICE_INDEX , BIN_FILENAME , KERNEL_NAME , IMAGES_FILENAME , LABELS_FILENAME );
 
 	/**************************************************************************************************/
 	/* Main loop.                                                                                     */
@@ -132,18 +130,10 @@ int main ( int argc , char** argv )
 		/**************************************************************************************************/
 		/* Calculate variables.                                                                           */
 		/**************************************************************************************************/
-		// TODO: call hardware accelerator
-		for( int i = 0 ; i < VARIABLES_NUM ; i++ )
-			send_message.variables[i] = received_message.variables[i];
+		float learning_rate = INITIAL_LR / float(BATCH_SIZE);
 
-		// calculate deltas
-		#if MSG_VARIABLE_MODE == DELTAS
-			for( int i = 0 ; i < VARIABLES_NUM ; i++ )
-				send_message.variables[i] = send_message.variables[i] - received_message.variables[i];
-		#endif
-		
-		send_message.accuracy = 0;
-		send_message.loss = 0;
+		driver.call_accelerator( received_message.variables , learning_rate , send_message.variables );
+
 
 		/**************************************************************************************************/
 		/* Send local variables. Blocking.                                                                */
@@ -163,8 +153,6 @@ int main ( int argc , char** argv )
 	/**************************************************************************************************/
 	/* Clean up and exit.                                                                             */
 	/**************************************************************************************************/
-	// destroy FPGA environment
-
 	// close socket properly
 	shutdown( socket_fd , SHUT_RDWR );
 }

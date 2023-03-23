@@ -8,13 +8,12 @@
 /***********************************************************************************/
 /* Size definitions                                                                */
 /***********************************************************************************/
-#define LOCAL_EPOCHS		 2
+#define LOCAL_EPOCHS		 1
 #define NUM_BATCHES			 2
 #define BATCH_SIZE			 2
 #define NUM_INPUTS		NUM_BATCHES * BATCH_SIZE
 #define NUM_VARIABLES	105866
 #define c_learning_rate  0.01f
-#define maxi_buffer_size	16
 #define MOMENTUM_CONSTANT 0.9f
 
 /***********************************************************************************/

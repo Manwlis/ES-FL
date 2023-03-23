@@ -25,8 +25,8 @@
 /* Size definitions                                                                */
 /***********************************************************************************/
 #define GLOBAL_EPOCHS	1
-#define NUM_BATCHES		2//1875 // !!! Needs to change in both host.hpp and all_fwp_bp.hpp
-#define BATCH_SIZE		2//32
+#define NUM_BATCHES		1875 // !!! Needs to change in both host.hpp and all_fwp_bp.hpp
+#define BATCH_SIZE		32
 #define NUM_INPUTS		NUM_BATCHES * BATCH_SIZE
 #define INITIAL_LR		0.01f
 #define LR_DECAY		0.977331125f
@@ -147,5 +147,5 @@ private:
 public:
 	Driver( unsigned int device_id , const std::string& xclbin_name , const std::string& device_name , const std::string& images_filename , const std::string& labels_filename );
 
-	void call_accelerator( float* trainable_variables , float learning_rate );
+	void call_accelerator( float* input_variables , float learning_rate , float* output_variables );
 };
