@@ -344,7 +344,7 @@ As already explained, not all hardware functions can run concurrently for a sing
     \centering
         \includegraphics[width=\textwidth]{Images/diagrams/pipeline_under_batching.png}
         \decoRule
-        \caption[Pipeline with batching latency]{ Latency of the pipeline under batching.}
+        \caption[Pipeline with batching latency]{Latency of the pipeline under batching.}
         \label{fig: Batching Pipeline latency}
 \end{figure}
 
@@ -423,3 +423,14 @@ While the same methodology could be used when moving the ANN's weights and biase
 Diagram \ref{fig: Gradients Calculation Pipeline Block Diagram} demonstrates how the image inputs are needed twice. They are stored twice in global memory, in two distinct memory banks, to prevent any bus or AXI conflicts. As a result, both hardware functions can read them concurrently without experiencing any additional latency. % two buffers for images
 
 \subsection{Incorporating the driver in the FL client}
+Uniting the Federated Learning and the driver codebases is trivial. First off, the server is, by design, agnostic to the implementation of the training. As it does not interface with any hardware kernel, there is no need for any code changes when compiled for another device, such as the ZCU102.
+
+In the case of the client, all that is required is swapping the calls to the integrated Python interpreter with those to the aforementioned driver. The following diagram shows the architecture of the FL client on the ZCU102, with an emphasis on data transfers.
+
+\begin{figure}[H]
+    \centering
+        \includegraphics[width=\textwidth]{Images/block_diagrams/zcu_FL_client.png}
+        \decoRule
+        \caption[ZCU102 FL client]{Architecture of the FL client on the ZCU102.}
+        \label{fig: ZCU102 FL client}
+\end{figure}
