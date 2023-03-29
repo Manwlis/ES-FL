@@ -10,7 +10,7 @@
 #include <xrt/xrt_bo.h>					// xrt buffer API
 
 #include "definitions.hpp"
-
+#include "utils.hpp"		/* Logging */
 
 /***********************************************************************************/
 /* Driver Class.                                                                   */
@@ -82,14 +82,19 @@ Driver::Driver( unsigned int device_id , const std::string& xclbin_name , const 
 void Driver::call_accelerator( float* input_variables , float learning_rate , float* output_variables )
 {
 	// Set inputs
+	LOGGING( Logger::Level::warning , "Writing variables to Gmem." );
 	buf_variables.write( input_variables );
+	LOGGING( Logger::Level::warning , "Syncing variables to Gmem." );
 	buf_variables.sync( XCL_BO_SYNC_BO_TO_DEVICE );
 
 	// Call kernel
+	LOGGING( Logger::Level::warning , "Calling kernel." );
 	auto run = kernel (	learning_rate , buf_images_fp , buf_images_cg , buf_labels , buf_variables );
 	run.wait();
 
 	// Get outputs
+	LOGGING( Logger::Level::warning , "Syncing variables from Gmem." );
 	buf_variables.sync( XCL_BO_SYNC_BO_FROM_DEVICE );
+	LOGGING( Logger::Level::warning , "Reading variables from Gmem." );
 	buf_variables.read( output_variables );
 }

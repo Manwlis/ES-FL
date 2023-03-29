@@ -6,14 +6,13 @@ typedef float t_variable;
 
 /********** Networking and communication parameters **********/
 // networking
-#define SERVER_IP "127.0.0.1"
-#define SERVER_PORT 12345
+#define SERVER_INFO_FILENAME "IO_files/server_info.txt"
 #define LISTEN_MAX_BACKLOG 10
 #define MAX_CONNECTED_CLIENTS 10
 
 /********** Federated training parameters **********/
 // server loop
-#define MIN_CLIENTS_PER_EPOCH 3
+#define MIN_CLIENTS_PER_EPOCH 1
 #define NUM_EPOCHS 10
 
 //defines the type of the transfered data

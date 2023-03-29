@@ -540,7 +540,7 @@ void cnn_accelerator ( float learning_rate ,
 #pragma HLS ARRAY_PARTITION variable=l4_dens_weight_grad dim=2 type=cyclic factor=8
 #pragma HLS ARRAY_PARTITION variable=l5_soft_weight_grad dim=2 type=complete
 
-#pragma HLS ARRAY_PARTITION variable=l4_dens_weight_momentum dim=2 type=cyclic factor=8
+#pragma HLS ARRAY_PARTITION variable=l4_dens_weight_momentum dim=2 type=cyclic factor=16
 
 	initialize_arrays ( gmem_trainable_variables ,
 		l0_conv_weights , l0_conv_biases , l2_conv_weights_fp , l2_conv_weights_bp , l2_conv_biases ,

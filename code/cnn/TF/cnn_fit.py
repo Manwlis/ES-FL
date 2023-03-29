@@ -11,8 +11,9 @@ from keras.initializers import GlorotUniform
 
 
 def main():
+	# tf.config.set_visible_devices([], 'GPU')
 	##### Set up datasets #####
-	batch_size = 32
+	batch_size = 4
 
 	dataset, metadata = tfds.load('fashion_mnist', as_supervised=True, with_info=True)
 	train_dataset, test_dataset = dataset['train'], dataset['test']
@@ -25,18 +26,16 @@ def main():
 		return images , labels
 
 	train_dataset = train_dataset.map( normalize )
-	test_dataset  = test_dataset.map( normalize )
-
 	train_dataset.cache()
 	train_dataset = train_dataset.shuffle( num_train_examples )
-	train_dataset = train_dataset.batch( batch_size )
-	train_dataset = train_dataset.prefetch( tf.data.AUTOTUNE )
 
 
-	test_dataset.cache()
-	test_dataset = test_dataset.shuffle( num_test_examples )
-	test_dataset = test_dataset.batch( batch_size )
-	test_dataset = test_dataset.prefetch( tf.data.AUTOTUNE )
+
+	# test_dataset  = test_dataset.map( normalize )
+	# test_dataset.cache()
+	# test_dataset = test_dataset.shuffle( num_test_examples )
+	# test_dataset = test_dataset.batch( batch_size )
+	# test_dataset = test_dataset.prefetch( tf.data.AUTOTUNE )
 
 
 	# create model
@@ -53,11 +52,19 @@ def main():
 	# compile model
 	optimizer = tf.keras.optimizers.SGD( learning_rate=0.01 , momentum=0.9 )
 	cnn.compile( optimizer , loss=tf.keras.losses.SparseCategoricalCrossentropy() , metrics=['accuracy'] )
-	
-	for epoch in range ( 0 , 20 ):
-		print(epoch)
-		cnn.fit( train_dataset , batch_size=batch_size , verbose=0 )
-		cnn.evaluate( test_dataset , batch_size=batch_size )
+
+	for batch_size in [ 1,2,3,4,5,6,8,10,12,15,16,20,24,25,30,32,40,48,50,60,75,80,96,100,
+						120,125,150,160,200,240,250,300,375,400,480,500,600,625,750,800,1000,
+						1200,1250,1500,1875,2000,2400,2500,3000,3750,4000,5000,6000,7500,12000,10000,15000,20000,30000,]:
+
+		train_dataset = train_dataset.batch( batch_size )
+		train_dataset = train_dataset.prefetch( tf.data.AUTOTUNE )
+
+		print(batch_size)
+		cnn.fit( train_dataset , batch_size=batch_size , verbose=1 )
+
+
+		# cnn.evaluate( test_dataset , batch_size=batch_size )
 
 
 if __name__ == "__main__": main()

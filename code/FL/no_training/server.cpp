@@ -105,6 +105,13 @@ int main( int argc , char** argv )
 	static Server_to_client_msg announcement_msg; // holds global model
 
 	/**************************************************************************************************/
+	/* Get server's ip and port.                                                                      */
+	/**************************************************************************************************/
+	std::string SERVER_IP;
+	uint16_t SERVER_PORT;
+	Utils::read_server_info( SERVER_INFO_FILENAME , SERVER_IP , SERVER_PORT );
+
+	/**************************************************************************************************/
 	/* Check if pretrained model file exists and set it up.                                           */
 	/**************************************************************************************************/
 	bool pretrained_model_flag = false;
@@ -497,7 +504,7 @@ Accept_connection_rv accept_connection( int listening_socket_fd , int num_polled
 		return Accept_connection_rv::error;
 	}
 	// new client
-	LOGGING( Logger::Level::initialization , "New client IP: " << inet_ntoa( client_addr.sin_addr ) << "	Port: " << ntohs( client_addr.sin_port ) );
+	LOGGING( Logger::Level::initialization , "New client: " << inet_ntoa( client_addr.sin_addr ) << ":" << ntohs( client_addr.sin_port ) );
 
 	// add the new socket in the polled fd set.
 	polled_fds[num_polled_fds].fd = new_fd;

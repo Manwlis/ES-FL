@@ -37,16 +37,19 @@ void maxp_create_window_stream ( hls::stream < float >& s_input , hls::stream < 
 				float line_buffer[_f_h][_in_w][_in_c];
 				window < float , _f_h , _f_w > temp_window;
 
-				line_buffer[col_ptr][row_ptr][channel] = s_input.read();
+				float temp_input = s_input.read();
+				line_buffer[col_ptr][row_ptr][channel] = temp_input;
 
 				get_window: for ( uint filter_y = 0 ; filter_y < _f_h ; filter_y++ )
 					for ( uint filter_x = 0 ; filter_x < _f_w ; filter_x++ )
 					{
-						int pos_y = static_cast<int>( col_ptr - 1 + filter_y );
-						int pos_x = static_cast<int>( row_ptr - 1 + filter_x );
+						float buffer_out = line_buffer[static_cast<int>( col_ptr - 1 + filter_y )]
+													   [static_cast<int>( row_ptr - 1 + filter_x )][channel];
 
-						if ( pos_y >= 0 && pos_x >= 0 )
-							temp_window.elements[filter_y][filter_x] = line_buffer[pos_y][pos_x][channel];
+						if( filter_y == 1 && filter_x == 1 )
+							temp_window.elements[filter_y][filter_x] = temp_input; // bypass buffer
+						else // if ( pos_y >= 0 && pos_x >= 0 )
+							temp_window.elements[filter_y][filter_x] = buffer_out;
 					}
 				if( col_ptr == _f_h - 1 && row_ptr % _f_w == 1 ) // legal pos
 					s_in_window.write( temp_window );
@@ -58,9 +61,11 @@ void maxp_create_window_stream ( hls::stream < float >& s_input , hls::stream < 
 					if (row_ptr == _in_w )
 					{
 						row_ptr = 0;
-						col_ptr++;
-						if( col_ptr == _f_h )
+
+						if( col_ptr == 1 ) // ugly hack to increase clock speed, work only for current filter sizes
 							col_ptr = 0;
+						else
+							col_ptr = 1;
 					}
 				}
 			}

@@ -47,7 +47,7 @@ void update_l2_conv_weights ( float lr , hls::stream < float >& l2_conv_weight_g
 			for ( uint c = 0 ; c < l2_conv_in_c ; c++ )
 				for ( uint f = 0 ; f < l2_conv_f ; f++ )
 				{
-#pragma HLS PIPELINE II=11
+#pragma HLS PIPELINE II=5
 					float change = lr * l2_conv_weight_grad.read() + MOMENTUM_CONSTANT * l2_conv_weight_momentum[h][w][c][f];
 					l2_conv_weights_fp[h][w][c][f] -= change;
 					l2_conv_weights_bp[h][w][c][f] = l2_conv_weights_fp[h][w][c][f];
@@ -71,7 +71,7 @@ void update_l4_dens_weights ( float lr , float l4_dens_weight_grad[l4_dens_in_si
 	float l4_dens_weights[l4_dens_in_size][l4_dens_k] , float l4_dens_weight_momentum[l4_dens_in_size][l4_dens_k] )
 {
 	for ( uint i = 0 ; i < l4_dens_in_size ; i++ )
-#pragma HLS PIPELINE II=32
+#pragma HLS PIPELINE II=16
 		for ( uint k = 0 ; k < l4_dens_k ; k++ )
 		{
 			float change = lr * l4_dens_weight_grad[i][k] + MOMENTUM_CONSTANT * l4_dens_weight_momentum[i][k];

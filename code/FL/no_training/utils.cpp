@@ -21,6 +21,18 @@ namespace Utils{
 		perror( msg );
 		exit( EXIT_FAILURE );
 	}
+
+	void read_server_info ( std::string filename , std::string& SERVER_IP , uint16_t& SERVER_PORT )
+	{
+		std::ifstream file( filename );
+		std::string line;
+
+		std::getline( file , SERVER_IP );
+		std::getline( file , line );
+		SERVER_PORT = static_cast<uint16_t>( stoi( line ) );
+
+		file.close();
+	}
 }
 /**************************************************************************************************/
 /* Timer                                                                                          */

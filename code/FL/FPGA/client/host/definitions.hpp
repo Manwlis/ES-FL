@@ -6,8 +6,7 @@ typedef float t_variable;
 
 /********** Networking and communication parameters **********/
 // networking
-#define SERVER_IP "127.0.0.1"
-#define SERVER_PORT 12345
+#define SERVER_INFO_FILENAME "data/server_info.txt"
 
 /********** Device & driver parameters **********/
 // device
@@ -21,8 +20,8 @@ typedef float t_variable;
 #define LR_DECAY	0.977331125f
 
 // dataset
-#define BATCHES_NUM		1875 // !!! Needs to change in both host.hpp and all_fwp_bp.hpp
-#define BATCH_SIZE		32
+#define BATCHES_NUM		600 // !!! Needs to change in both host.hpp and all_fwp_bp.hpp
+#define BATCH_SIZE		100
 #define NUM_INPUTS		BATCHES_NUM * BATCH_SIZE
 
 #define INPUT_H 28
@@ -41,6 +40,8 @@ typedef unsigned int t_label;
 #define VERDOSE_LOGGING			0	// shows code line, function and file
 #define DISABLE_MESSAGE_INFO	0	// disables messages about communication
 #define DISABLE_NON_CRITICAL	0	// disables all messages except warnings/errors
+
+#define TERMINAL_OUTPUT_FILENAME	"data/client_out.txt"
 
 /********** Message structs **********/
 struct Server_to_client_msg

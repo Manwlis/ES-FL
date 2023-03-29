@@ -30,6 +30,7 @@
 namespace Utils
 {
 	void error( const char* msg );
+	void read_server_info ( std::string filename , std::string& SERVER_IP , uint16_t& SERVER_PORT );
 }
 
 /**************************************************************************************************/

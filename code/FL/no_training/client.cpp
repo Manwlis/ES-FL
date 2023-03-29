@@ -33,6 +33,13 @@ int main ( int argc , char** argv )
 	static unsigned char buffer[SERVER_TO_CLIENT_BUF_SIZE];
 
 	/**************************************************************************************************/
+	/* Get server's ip and port.                                                                      */
+	/**************************************************************************************************/
+	std::string SERVER_IP;
+	uint16_t SERVER_PORT;
+	Utils::read_server_info( SERVER_INFO_FILENAME , SERVER_IP , SERVER_PORT );
+
+	/**************************************************************************************************/
 	/* Set up a socket to communicate with server and connect.                                        */
 	/**************************************************************************************************/
 	int socket_fd;
@@ -43,11 +50,11 @@ int main ( int argc , char** argv )
 		Utils::error( "Client socket creation failed." );
 
 	// find server
-	struct sockaddr_in server = find_server( SERVER_IP , std::to_string(SERVER_PORT).c_str() );
+	LOGGING( Logger::Level::initialization , "Searching for server at: " << SERVER_IP << ":" << SERVER_PORT );
+	struct sockaddr_in server = find_server( SERVER_IP.c_str() , std::to_string( SERVER_PORT ).c_str() );
 
 	// Initiate Connection
 	LOGGING( Logger::Level::initialization , "Initiating connection with server." );
-
 	rv = connect( socket_fd , (struct sockaddr*) &server , sizeof( server ) );
 	if ( rv < 0 )
 		Utils::error( "Connect failed." );
@@ -123,7 +130,6 @@ int main ( int argc , char** argv )
 		/**************************************************************************************************/
 		/* Calculate variables.                                                                           */
 		/**************************************************************************************************/
-		// TODO: call hardware accelerator
 		for( int i = 0 ; i < VARIABLES_NUM ; i++ )
 			send_message.variables[i] = received_message.variables[i];
 

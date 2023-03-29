@@ -2,9 +2,9 @@
  * @file client.cpp
  * @author Emmanouil Petrakos
  * @brief Client taking part in federated learning.
- * 
+ *
  * @copyright None
- * 
+ *
  */
 
 #include <iostream>			/* cout */
@@ -13,9 +13,10 @@
 #include <string.h>			/* memset */
 #include <sys/socket.h>		/* accept, bind, connect, listen, recv, send, getpeername */
 #include <netdb.h>			/* addrinfo, getaddrinfo */
+#include <stdlib.h>     	/* exit */
 
 #include "definitions.hpp"
-#include "utils.hpp"		/* error, Timer, Logging */
+#include "utils.hpp"		/* error, Logging */
 #include "driver.hpp"
 
 
@@ -23,8 +24,10 @@ struct sockaddr_in find_server( const char* server_name , const char* server_por
 
 int send_variables( int socket_fd , Client_to_server_msg& send_message );
 
+
 // Global timer that starts ticking at program start.
-Logger g_logger;
+Logger g_logger( TERMINAL_OUTPUT_FILENAME );
+//Logger g_logger;
 
 int main ( int argc , char** argv )
 {
@@ -34,6 +37,42 @@ int main ( int argc , char** argv )
 	static Client_to_server_msg send_message;
 	static unsigned char buffer[SERVER_TO_CLIENT_BUF_SIZE];
 
+	/**************************************************************************************************/
+	/* Get server's IP and port.                                                                      */
+	/**************************************************************************************************/
+	std::string SERVER_IP;
+	uint16_t SERVER_PORT;
+	Utils::read_server_info( SERVER_INFO_FILENAME , SERVER_IP , SERVER_PORT );
+
+
+	// run solo
+	if ( SERVER_PORT == 0 )
+	{
+		std::ifstream pretrained_model_file( "data/init_model.bin" , std::ifstream::in | std::ifstream::binary );
+		pretrained_model_file.read( reinterpret_cast<char*>(received_message.variables) , VARIABLES_NUM * sizeof(t_variable) );
+		pretrained_model_file.close();
+		LOGGING( Logger::Level::initialization , "Loaded pretrained model" );
+
+		Driver driver( DEVICE_INDEX , BIN_FILENAME , KERNEL_NAME , IMAGES_FILENAME , LABELS_FILENAME );
+
+		for ( int current_epoch = 0 ; current_epoch < 20 ; current_epoch++ )
+		{
+			LOGGING( Logger::Level::warning , "Calling driver." );
+			float learning_rate = INITIAL_LR / float(BATCH_SIZE);
+
+			driver.call_accelerator( received_message.variables , learning_rate , received_message.variables );
+			LOGGING( Logger::Level::warning , "Returned from driver." );
+
+
+			// save it
+			std::string filename = std::string( "data/model_" ) + std::to_string( current_epoch ) + std::string( ".bin" );
+			std::ofstream new_global_model_file ( filename , std::ofstream::out | std::ofstream::binary | std::ofstream::trunc );
+
+			new_global_model_file.write( reinterpret_cast<char*>(received_message.variables) , VARIABLES_NUM * sizeof(t_variable) );
+			new_global_model_file.close();
+		}
+		exit(0);
+	}
 	/**************************************************************************************************/
 	/* Set up a socket to communicate with server and connect.                                        */
 	/**************************************************************************************************/
@@ -45,11 +84,11 @@ int main ( int argc , char** argv )
 		Utils::error( "Client socket creation failed." );
 
 	// find server
-	struct sockaddr_in server = find_server( SERVER_IP , std::to_string(SERVER_PORT).c_str() );
+	LOGGING( Logger::Level::initialization , "Searching for server at: " << SERVER_IP << ":" << SERVER_PORT );
+	struct sockaddr_in server = find_server( SERVER_IP.c_str() , std::to_string( SERVER_PORT ).c_str() );
 
 	// Initiate Connection
 	LOGGING( Logger::Level::initialization , "Initiating connection with server." );
-
 	rv = connect( socket_fd , (struct sockaddr*) &server , sizeof( server ) );
 	if ( rv < 0 )
 		Utils::error( "Connect failed." );
@@ -130,10 +169,12 @@ int main ( int argc , char** argv )
 		/**************************************************************************************************/
 		/* Calculate variables.                                                                           */
 		/**************************************************************************************************/
+		LOGGING( Logger::Level::warning , "Calling driver." );
 		float learning_rate = INITIAL_LR / float(BATCH_SIZE);
 
 		driver.call_accelerator( received_message.variables , learning_rate , send_message.variables );
 
+		LOGGING( Logger::Level::warning , "Returned from driver." );
 
 		/**************************************************************************************************/
 		/* Send local variables. Blocking.                                                                */
@@ -181,7 +222,10 @@ sockaddr_in find_server( const char* server_name , const char* server_port )
 
 	int rv = getaddrinfo( server_name , server_port , &hints , &server_addr_info );
 	if ( rv != 0 )
-		Utils::error( "getaddrinfo failed." );
+	{
+		LOGGING( Logger::Level::error , "getaddrinfo rv: " << rv );
+//		Utils::error( "getaddrinfo failed." );
+	}
 
 	return *( (sockaddr_in *) server_addr_info->ai_addr );
 }
