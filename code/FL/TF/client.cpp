@@ -56,7 +56,7 @@ int main ( int argc , char** argv )
 	/**************************************************************************************************/
 	/* Set up python environment, neural network and numpy wrappers.                                  */
 	/**************************************************************************************************/
-	Python_with_TF python_with_TF( &received_message , &send_message , argc , argv );//TODO: rename object to computational unit
+	Python_with_TF python_with_TF( &received_message , &send_message , argc , argv );
 
 	/**************************************************************************************************/
 	/* Main loop.                                                                                     */
@@ -131,7 +131,10 @@ int main ( int argc , char** argv )
 		/* Calculate variables.                                                                           */
 		/**************************************************************************************************/
 		// call python function
+		Timer training_timer;
 		python_with_TF.train();
+		LOGGING( Logger::Level::fl_info , RED << "Training time: " << RESET << training_timer.since() );
+
 
 		// calculate deltas
 		#if MSG_VARIABLE_MODE == DELTAS

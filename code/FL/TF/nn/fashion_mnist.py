@@ -35,6 +35,7 @@ num_test_examples = 0
 
 accuracy_list = []
 
+
 #######################################################################################################################
 # Import and pre-process training data.                                                                               #
 #######################################################################################################################
@@ -61,8 +62,8 @@ def setup_test_data():
 	num_test_examples = tf.data.experimental.cardinality( test_dataset ).numpy() # doesn't work on filtered datasets
 
 	# do dataset transformations
-	test_dataset = test_dataset.cache().shuffle( num_test_examples ).batch( current_module.BATCH_SIZE )
-	test_dataset = test_dataset.prefetch( tf.data.AUTOTUNE ).repeat()
+	test_dataset = test_dataset.cache().shuffle( num_test_examples , seed=0 ).batch( 10 )
+	test_dataset = test_dataset.prefetch( tf.data.AUTOTUNE )
 	#test_dataset = test_dataset.cache().batch( current_module.BATCH_SIZE )
 
 	return num_test_examples
@@ -98,41 +99,43 @@ def setup_train_data():
 	#Federated Learning
 	# splits data evenly between clients
 	elif( sys.argv[1] == "IID" ):
-		train_shard_unshafled = train_dataset.shard( num_shards=int(sys.argv[2] ) , index=int(sys.argv[3]) ) # shard is deterministic
+		train_shard_unshafled = train_dataset.shard( num_shards=int( sys.argv[2] ) , index=int( sys.argv[3]) ) # shard is deterministic
 	# split data by label, extreme case of non IID data. Need Num_clients MOD 5 = 0 to use all data
 	elif( sys.argv[1] == "nonIID" ):
 		@tf.function
 		def predicate( image , label ):
-			if( sys.argv[2] == '0' ):
+			if( sys.argv[3] == '0' ):
 				return label == 0 or label == 1
-			elif( sys.argv[2] == '1' ):
+			elif( sys.argv[3] == '1' ):
 				return label == 2 or label == 3
-			elif( sys.argv[2] == '2' ):
+			elif( sys.argv[3] == '2' ):
 				return label == 4 or label == 5 
-			elif( sys.argv[2] == '3' ):
+			elif( sys.argv[3] == '3' ):
 				return label == 6 or label == 7
 			else:
 				return label == 8 or label == 9
 
-		train_dataset = train_dataset.filter( predicate )
-		#TODO: shard the filtered dataset
+		train_shard_unshafled = train_dataset.filter( predicate )
 	else:
 		sys.exit( "Specify mode. standalone/IID/nonIID" )
-	print( sys.argv[1] , " mode." )
 
 	num_train_examples = train_shard_unshafled.reduce( 0 , lambda x , _ : x + 1 ).numpy() #slow
 
 	# do datashet transformation
 	train_shard_unshafled = train_shard_unshafled.cache()
-	train_shard = train_shard_unshafled.shuffle( num_train_examples )
+	train_shard = train_shard_unshafled.shuffle( num_train_examples , seed=0 )
 	train_shard = train_shard.batch( current_module.BATCH_SIZE )
 	train_shard = train_shard.prefetch( tf.data.AUTOTUNE )
-	train_shard = train_shard.repeat()
 	
 # calls the apropriate functions for setting up data.
-def setup_data(): # TODO: input what data is needed and do that instead of looking sys.argv here? Program args already pass to python, propably no difference.Maybe remove that to simplify code.
+def setup_data():
 	global num_train_examples
 	global num_test_examples
+
+	# !!!!!!!! Use only with runOvernight.sh script !!!!!!!!!!!!
+	# global current_module
+	# current_module.BATCH_SIZE = int( os.environ.get( 'Batch_size' ) )
+	# current_module.LEARNING_RATE_DECAY = os.environ.get( 'LR_decay' )
 
 	# Server and standalone execution evaluate the NN. Need test dataset.
 	if( sys.argv[0] == "./server" or sys.argv[1] == "standalone" ):
@@ -193,6 +196,10 @@ def compile_nn():
 	# for tr_var in model.trainable_variables: 
 	# 	print( '%-28s' % tr_var.name , '%-25s' %tr_var.shape , tr_var.numpy().size )
 	# print("")
+
+	# !!!!!!!!  Use only with runOvernight.sh script !!!!!!!!!!!!
+	# sys.stdout = open( os.devnull , "w" )
+	# sys.stderr = open( os.devnull , "w" )
 
 #######################################################################################################################
 # Learning Rate Schedulers used to decay learning rate per global epoch / participated epoch.                         #
@@ -284,10 +291,10 @@ def train_nn( input_variables , output_variables , flags , global_epoch ):
 
 	print( "Learning Rate:" , float( tf.keras.backend.get_value( model.optimizer.lr ) ) )
 	
-	model.fit( train_shard , verbose=1 ,
+	model.fit( train_shard , verbose=0 ,
 		batch_size=current_module.BATCH_SIZE ,
 		epochs=current_module.LOCAL_EPOCHS ,
-		steps_per_epoch=current_module.STEPS_PER_EPOCH ,
+		# steps_per_epoch=current_module.STEPS_PER_EPOCH ,
 		callbacks=callback_list )
 
 	# print( "variable meta fit	" , model.trainable_variables[29].numpy()[9] )
@@ -318,10 +325,7 @@ def evaluate_nn( input_variables , global_epoch ):
 		
 		pos += tr_var.numpy().size
 
-	# print( "input			" , input_variables[803239] )
-	# print( "variable prin evaluate	" , model.trainable_variables[29].numpy()[9] )
-
-	loss , accuracy = model.evaluate( test_dataset , verbose = 1 , batch_size=current_module.BATCH_SIZE , steps=num_test_examples/current_module.BATCH_SIZE )
+	loss , accuracy = model.evaluate( test_dataset , verbose = 0 , batch_size = 10 )
 	print( 'Accuracy on test dataset:' , accuracy )
 	accuracy_list.append( ( global_epoch , accuracy ) )
 
@@ -331,8 +335,19 @@ def evaluate_nn( input_variables , global_epoch ):
 def print_accuracy_history():
 	global accuracy_list
 
+	# !!!!!!!! Use only with runOvernight.sh script !!!!!!!!!!!!
+	# sys.stdout = sys.__stdout__
+	# sys.stderr = sys.__stderr__
+	print( "BATCH_SIZE = " , current_module.BATCH_SIZE )
+	print( "LR_DECAY = " , current_module.LEARNING_RATE_DECAY )
+
+	filename = "IO_files/" + os.environ.get( 'Batch_size' ) + " " + os.environ.get( 'LR_decay' )
+	file = open( filename , 'w' )
+
 	for keys,values in accuracy_list :
-		print( keys//1 , values )
+		print( keys , round ( values , 4 ) )
+
+		file.write( str(keys) + " " + str(round ( values , 4 )) + "\n" )
 
 #######################################################################################################################
 # Standalone mode. Used to test model locally with all the data.                                                      #
@@ -385,7 +400,7 @@ try: # argv may be empty in case of only testing/ inference, like when embedded 
 			)
 			shuffle_data()
 
-			loss , accuracy = model.evaluate( test_dataset , batch_size=current_module.BATCH_SIZE , steps=num_test_examples/current_module.BATCH_SIZE )
+			loss , accuracy = model.evaluate( test_dataset , batch_size=current_module.BATCH_SIZE )
 			print( 'Accuracy on test dataset:' , accuracy )
 except:
 	pass # no-op

@@ -1,42 +1,55 @@
 import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' # suppress tensorflow warnings
+# os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' # suppress tensorflow warnings
 import tensorflow as tf
 import numpy as np
 import tensorflow_datasets as tfds
+import keras
 
 # import logging
 # logging.getLogger('tensorflow').setLevel(logging.ERROR)
 
+# tf.config.set_visible_devices([], 'GPU')
+
 from keras.initializers import GlorotUniform
 
+import time
+class etimer(keras.callbacks.Callback):
+    def __init__ (self): # initialization of the callback
+        super(etimer, self).__init__()
+    def on_epoch_begin(self,epoch, logs=None):
+        self.now= time.time()
+    def on_epoch_end(self,epoch, logs=None): 
+        later=time.time()
+        duration=later-self.now 
+        print('	', duration, '	')
 
 def main():
-	# tf.config.set_visible_devices([], 'GPU')
 	##### Set up datasets #####
-	batch_size = 4
-
+	# batch_size = 30
 	dataset, metadata = tfds.load('fashion_mnist', as_supervised=True, with_info=True)
-	train_dataset, test_dataset = dataset['train'], dataset['test']
-	num_train_examples = metadata.splits['train'].num_examples
-	num_test_examples = metadata.splits['test'].num_examples
+	train_dataset_unbatched , test_dataset = dataset['train'] , dataset['test']
+
+	train_dataset_unbatched = train_dataset_unbatched.shard( num_shards=10 , index=0 )
+
+	num_train_examples = train_dataset_unbatched.reduce( 0 , lambda x , _ : x + 1 ).numpy() #slow
+	print( num_train_examples )
+	# num_train_examples = metadata.splits['train'].num_examples
+	# num_test_examples = metadata.splits['test'].num_examples
 
 	def normalize( images , labels ):
 		images = tf.cast( images , tf.float32 )
 		images /= 255
 		return images , labels
 
-	train_dataset = train_dataset.map( normalize )
-	train_dataset.cache()
-	train_dataset = train_dataset.shuffle( num_train_examples )
-
-
+	train_dataset_unbatched = train_dataset_unbatched.map( normalize )
+	train_dataset_unbatched.cache()
+	train_dataset_unbatched = train_dataset_unbatched.shuffle( num_train_examples )
 
 	# test_dataset  = test_dataset.map( normalize )
 	# test_dataset.cache()
 	# test_dataset = test_dataset.shuffle( num_test_examples )
 	# test_dataset = test_dataset.batch( batch_size )
 	# test_dataset = test_dataset.prefetch( tf.data.AUTOTUNE )
-
 
 	# create model
 	cnn = tf.keras.Sequential([
@@ -50,19 +63,38 @@ def main():
 		])
 
 	# compile model
+	# lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
+	# 	initial_learning_rate=0.01,
+	# 	decay_steps=10 ,
+	# 	decay_rate=0.998 ,
+	# 	staircase=True )
 	optimizer = tf.keras.optimizers.SGD( learning_rate=0.01 , momentum=0.9 )
 	cnn.compile( optimizer , loss=tf.keras.losses.SparseCategoricalCrossentropy() , metrics=['accuracy'] )
 
-	for batch_size in [ 1,2,3,4,5,6,8,10,12,15,16,20,24,25,30,32,40,48,50,60,75,80,96,100,
-						120,125,150,160,200,240,250,300,375,400,480,500,600,625,750,800,1000,
-						1200,1250,1500,1875,2000,2400,2500,3000,3750,4000,5000,6000,7500,12000,10000,15000,20000,30000,]:
+	backup_vars = cnn.get_weights()
 
-		train_dataset = train_dataset.batch( batch_size )
+	for batch_size in ( 4 , 5 , 6 , 8 , 10 , 12 , 15 , 16 , 20 , 24 , 25 , 30 , 40 , 48 , 50 , 60 , 75 , 100 , 120 , 125 , 150 , 200 ):
+		print( batch_size )
+
+		train_dataset = train_dataset_unbatched.batch( batch_size )
 		train_dataset = train_dataset.prefetch( tf.data.AUTOTUNE )
 
-		print(batch_size)
-		cnn.fit( train_dataset , batch_size=batch_size , verbose=1 )
+		for i in range( 0 , 5 ):
+			now= time.time()
+			cnn.set_weights( backup_vars )
+			cnn.fit( 
+				train_dataset , 
+				batch_size=batch_size , 
+				# callbacks=[etimer()] , 
+				# verbose=1 , 
+				epochs=1 , 
+				steps_per_epoch=num_train_examples/batch_size )
+			backup_vars = cnn.get_weights()
+			later=time.time()
+			duration=later-now 
+			print('	', duration, '	')
 
+		time.sleep(10)
 
 		# cnn.evaluate( test_dataset , batch_size=batch_size )
 

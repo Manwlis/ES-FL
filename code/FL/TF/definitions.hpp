@@ -19,8 +19,8 @@
 
 /********** Federated training parameters **********/
 // server loop
-#define MIN_CLIENTS_PER_EPOCH 3
-#define NUM_EPOCHS 3
+#define MIN_CLIENTS_PER_EPOCH 5
+#define NUM_EPOCHS 200
 
 // model
 #define MODEL "final_model" 
@@ -29,10 +29,10 @@
 
 // optimizer
 #define OPTIMIZER "SGD"	// SGD or Adam
-#define LEARNING_RATE_INITIAL "1e-2"
+#define LEARNING_RATE_INITIAL "0.01"
 #define MOMENTUM "0.9"
 #define LEARNING_RATE_DECAY_FLAG 1
-#define LEARNING_RATE_DECAY "0.999235967" // Can't pass rationals to python directy. Use string and convert it there
+#define LEARNING_RATE_DECAY ".999235967" // Can't pass rationals to python directy. Use string and convert it there
 // base 0.977331125
 // root_2 = 0.988600589 , root_4 = 0.994283958 , root_5 = 0.995424547 , root_15 = 0.998472517 , root_30 = 0.999235967 , root_60 = 0.99961791
 // pow_2 = 0.955176128
@@ -43,8 +43,8 @@
 #define BATCH_SIZE 32
 #define STEPS_PER_EPOCH 625
 
-// evaluation
-#define NUM_EVALUATIONS 3 // must be =< NUM_EPOCHS
+// evaluation, how many and how frequent
+#define NUM_EVALUATIONS NUM_EPOCHS // must be =< NUM_EPOCHS
 #define EVALUATION_INTERVAL ( NUM_EPOCHS / NUM_EVALUATIONS )
 
 // python module & function names

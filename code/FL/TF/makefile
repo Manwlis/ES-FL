@@ -4,7 +4,7 @@ CFLAGS = -O3 -Wall -pedantic
 SOURCES = server.cpp client.cpp utils.cpp computation_unit.cpp
 OBJECTS = $(SOURCES:.cpp=.o)
 ARCHIVES = lib.a
-EXECUTABLES = server client tests
+EXECUTABLES = server client
 
 all: $(OBJECTS) $(EXECUTABLES)
 

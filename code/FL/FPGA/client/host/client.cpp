@@ -213,7 +213,7 @@ sockaddr_in find_server( const char* server_name , const char* server_port )
 	hints.ai_family = AF_INET;			// IPv4
 	hints.ai_socktype = SOCK_STREAM;	// connection-based protocol
 	hints.ai_protocol = IPPROTO_TCP;	// TCP
-	hints.ai_flags = (AI_V4MAPPED | AI_ADDRCONFIG); // any
+	hints.ai_flags = (AI_V4MAPPED | AI_ADDRCONFIG); // any, propably needs AI_NUMERICSERV
 	hints.ai_canonname = NULL;
 	hints.ai_addr = NULL;
 	hints.ai_next = NULL;

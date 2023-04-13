@@ -15,6 +15,7 @@
 #include <algorithm>		/* random_shuffle */
 #include <random>			/* default_random_engine */
 #include <chrono>			/* system_clock */
+#include<cstdlib>			/* srand, rand */
 
 // C/C++ standard libraries
 #include <unistd.h>			/* close */
@@ -104,12 +105,15 @@ Logger g_logger;
 int main( int argc , char** argv )
 {
 	LOGGING( Logger::Level::initialization , "Server Start" );
-	
+
 	int rv; // return value used to check if functions worked properly
 	
 	// global model data. Static variable are by default initialized to zero. No need for explicit initialization.
 	static float accumulated_variables[VARIABLES_NUM];
 	static Server_to_client_msg announcement_msg; // holds global model
+
+	// init rng
+	std::srand( 0 );
 
 	/**************************************************************************************************/
 	/* Check if pretrained model file exists and set it up.                                           */
@@ -801,8 +805,9 @@ int client_selection( int connected_clients_num , pollfd polled_fds[] , Polled_f
 		// populate the vector with numbers from 1 to connected_clients_num+1
 		std::iota( v.begin() , v.end() , 1 );
 
-		// obtain a time-based seed
-		unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+		// obtain a time-based seed if not using srand and rand
+		// unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
+		unsigned int seed = std::rand();
 
 		// shuffle the clients
 		std::shuffle( v.begin() , v.end() , std::default_random_engine( seed ) );

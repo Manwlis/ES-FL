@@ -7,7 +7,7 @@ make all
 echo ""
 
 # Uncomment to use initial variables set by server
-# IO_file=IO_files/out.bin
+IO_file=IO_files/init_model.bin
 
 # run server
 command="/usr/bin/time -v ./server ${IO_file}; make clean; printf '\7'"
