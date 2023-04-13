@@ -64,7 +64,9 @@ After exposing the parameters to the Python code, one more step is necessary to 
 \section{FL Architecture}\label{sec:FL_architecture}
 The architecture aims to offer a generalized FL loop that enables the implementation of various FL algorithms. To achieve this, it is designed to be flexible and modular, with each FL operation, such as client selection and aggregation, having its own specialized function. Additionally, all relevant training parameters and hyper-parameters, such as local epochs or participating clients per epoch, are compiled in the \texttt{definitions.hpp} file. Since the entire codebase accesses them from there, testing and experimentation are streamlined and less prone to mistakes.
 
-In FL, multiple entities are present, the orchestrating server and the clients training the global model. As the aim of this work is to implement FL with clients operating on separate devices, it is essential that each entity is a distinct process with its own private data-space. That data-space contains its private training or testing dataset, as well as its local or global models. All required communication is facilitated through POSIX sockets.
+In FL, multiple entities are present, the orchestrating server and the clients training the global model. As the aim of this work is to implement FL with clients operating on separate devices, it is essential that each entity is a distinct process with its own private data-space. This data-space contains its private training or testing dataset, as well as its local or global models.
+
+All required communication is facilitated through POSIX sockets. Furthermore, the TCP protocol is utilized to ensure robustness against communication faults, random disconnections and erroneous messages. Such problems are common in edge environments, where the clients are not always in their best possible state or their connection with the server is fickle. % TCP and why
 
 \begin{figure}[H]
     \centering

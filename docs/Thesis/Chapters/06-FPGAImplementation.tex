@@ -73,8 +73,7 @@ HLS is an automated design process that takes an abstract behavioral specificati
     \label{HLS responsibilities}
 \end{table}
 
-\section{FPGA Platforms}
-
+\section{FPGA Platform}
 \subsection{Xilinx Zynq UltraScale+ MPSoC}
 The Zynq\textsuperscript{\textregistered} UltraScale+\texttrademark{} MPSoC is a family of Xilinx products that integrates a feature-rich 64-bit quad-core or dual-core Arm® Cortex®-A53 and dual-core Arm Cortex-R5F based processing system (PS) and Xilinx programmable logic (PL) UltraScale architecture in a single device. In addition, on-chip memory, multiport external memory interfaces, and a rich set of peripheral connectivity interfaces are included. \cite{Zynq_UltraScale_overview}
 
@@ -372,7 +371,7 @@ Further though must be given to the size of the streams connecting functions of 
 Based on the produced gradients, the variables of the ANN are updated in a second dataflow region. Due to the independence of all weights and gradients, this process is relatively straightforward. The classic SGD with momentum optimization algorithm is used and the learning rate is supplied by the driver program. Thus, latency and hardware usage are the only criteria for the applied parallelism in this specific region.
 
 \subsection{Data Movement \& Storage}
-Under the Vitis flow, AXI streams are unavailable for the ZCU102, thus memory mapping is used to transfer data from general memory to the PL and vice versa. These data are the input samples and labels, as well as the variables of the ANN. Appropriate data mover functions have been developed. % gmem <-> accel, which data
+Under the Vitis flow, AXI streams are unavailable for the ZCU102, thus memory mapping is used to transfer data from general memory to the PL and vice versa. That data consists of the input samples and labels, as well as the variables of the ANN. Appropriate data mover functions have been developed. % gmem <-> accel, which data
 
 In Vitis HLS, arrays are implemented as continuous memory spaces with one or two ports, and only a limited amount of data can be read or written per cycle. To increase data accesses per cycle, the arrays are partitioned with the appropriate HLS directive \emph{ARRAY\_PARTITION}. The HLS tool splits the initial arrays to smaller ones, whose size and shape depend on the parameters of the corresponding directives. % array partition
 
@@ -389,7 +388,7 @@ The gradients are produced in the first dataflow region and consumed in the seco
 % Rejected
 
 \subsection{Top function}
-To hold everything together, a top level function has been developed, whose signature operates as the API between PL and PS. Furthermore, it contains all the definitions of the memory structures, as well as the instantiations of the data movers and dataflow regions. Finally, to train on multiple batches, the dataflow regions are enclosed in a loop.
+To hold everything together, a top level function has been developed, whose signature operates as the API between PL and PS. Furthermore, it contains all the definitions of the memory structures, as well as the instantiations of the data movers \& initializers and dataflow regions. Finally, to train on multiple batches, the dataflow regions are enclosed in a loop.
 
 \begin{figure}[H] % TODO: remove the batch fetching
     \centering
@@ -409,7 +408,7 @@ The flow of the driver code is as follows:
     \item Open the device.
     \item Load the compiled and linked binary (XCLBIN) onto the device.
     \item Open the kernel loaded to the device with the XCLBIN.
-    \item Create buffer objects to transfer data to and from the inputs and outputs of the kernel.
+    \item Create buffer objects to transfer data to and from the kernel.
     \item Write data to the input buffers.
     \item Execute the kernel.
     \item Read data from the outputs buffers.
@@ -418,19 +417,21 @@ The flow of the driver code is as follows:
 \subsection{Memory Management}
 Since the target device is a SoC, both host and kernel programs can read and write in the same memory space. By facilitating data transfers between PL and PS through the map API provided by the XRT library, no data movements are necessary other than filling the global buffers. The training dataset is stored in binary files and is directly transferred in global memory; no intermediately buffers are used in the user space of the host program. % moving inputs
 
-While the same methodology could be used when moving the ANN's weights and biases, the codebase would get too inflexible and brittle. They are a part of the byte-stream that is received from the socket connected to the FL server; copying it immediately in the global memory may introduce issues regarding endianess and alignment. Thus, an intermediary buffer is utilized to contain the incoming byte-stream, and the relevant sections of it are copied to the global memory using the write API of the XRT library. % moving variables
+The same methodology is used to move the ANN's weights and biases. As they are a part of a byte-stream that is received from the socket connected to the FL server, it is required to write that directly to the global memory. Similarly the outgoing bytestream is read directly from the global memory. % moving variables map API
+
+The previous solution is acceptable when the server and client processes operate on the same architecture, but it may introduce endianess and alignment issues over heterogeneous ecosystems. Thus, a more conservative and robust implementation is also created, in which intermediary buffers contains the incoming and outgoing byte-streams, and are appropriately copied to and from the global memory using the write API of the XRT library. % moving variables write API
 
 Diagram \ref{fig: Gradients Calculation Pipeline Block Diagram} demonstrates how the image inputs are needed twice. They are stored twice in global memory, in two distinct memory banks, to prevent any bus or AXI conflicts. As a result, both hardware functions can read them concurrently without experiencing any additional latency. % two buffers for images
 
 \subsection{Incorporating the driver in the FL client}
 Uniting the Federated Learning and the driver codebases is trivial. First off, the server is, by design, agnostic to the implementation of the training. As it does not interface with any hardware kernel, there is no need for any code changes when compiled for another device, such as the ZCU102.
 
-In the case of the client, all that is required is swapping the calls to the integrated Python interpreter with those to the aforementioned driver. The following diagram shows the architecture of the FL client on the ZCU102, with an emphasis on data transfers.
+In the case of the client with the write API, all that is required is swapping the calls to the integrated Python interpreter with those to the aforementioned driver. The following diagram shows the architecture of the FL client on the ZCU102, with an emphasis on data transfers. For the client using the map API, a tighter integration of the driver is required. The received and send messages buffers are allocated in the global memory and the socket output is written directly there. 
 
 \begin{figure}[H]
     \centering
         \includegraphics[width=\textwidth]{Images/block_diagrams/zcu_FL_client.png}
         \decoRule
-        \caption[ZCU102 FL client]{Architecture of the FL client on the ZCU102.}
+        \caption[ZCU102 FL client]{Architecture of the FL client with the write API on the ZCU102. In case of the map API, the received \& send message buffers are not required.}
         \label{fig: ZCU102 FL client}
 \end{figure}

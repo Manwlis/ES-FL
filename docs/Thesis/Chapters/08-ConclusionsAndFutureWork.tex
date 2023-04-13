@@ -2,4 +2,25 @@
 \label{Chapter-Conclusions-and-Future-Work}
 
 \section{Conclusions}
+
 \section{Future Work}
+This work sheds light on how FL and FPGA-based architectures interact with each other and cooperate. However, there is still room for improvement and more synergies are available to be explored.
+
+\subsection{Quantization}
+The majority of studies on quantization in FL have focused on communication compression, e.g. \cite{https://doi.org/10.48550/arxiv.2006.10672}, and recent works have tried to expand it to local training \cite{https://doi.org/10.48550/arxiv.2206.10844}. FPGAs have been proven that they can provide efficient and robust implementations of quantized ANNs \cite{Bacchus2020}. In our opinion, implementing FL with quantized ANNs or ANNs robust to quantization on FPGA accelerators, is the most promising area to expand this work.
+
+\subsection{Encryption \& Privacy}
+FL systems often utilize homomorphic encryption to improve security and privacy. It has been demonstrated that it can be efficiently implemented in FPGAs \cite{FPGA_encryption_for_FL}. Attaching it to an FPGA-design that accelerates training, like the one developed in this work, can present interesting challenges such resource management, efficient pipelinining between the two components etc.
+
+Techniques like differential privacy are frequently used to increase the privacy of the participating clients \cite{Wei2020}, with the cost of extra computation. These methods typically entail element-wise transformations on the generated local models, such as adding random Gaussian noise to each variable and clipping those that exceed a predetermined threshold. As there are no inner dependencies, an FPGA implementation can completely parallelize them and virtually eliminate their latency.
+
+\subsection{Platforms}
+The technology dissimilarities between the benchmarked platforms should be noted. The CPU and GPU, while consumer products, were released four years later after the FPGA. To have a more thorough understanding of the system, it is important to test with other platforms, in addition to different technologies such as TPUs.
+
+Regarding the design on the FPGA, a number of improvements can be made. Implementing it with RTL, completely or just certain of its hardware functions, can greatly increase its performance by avoiding the inefficiencies and bugs of the HLS tools.
+
+\subsection{Scale}
+This work mostly experimented with around 2 to 20 clients. It is highly likely that FL will behave differently in scenarios involving hundreds or thousands of clients. Furthermore, compared to the CPU and GPU, the FPGA-based design performed relatively better with small datasets and batches. Hence, exploring FPGA-based solutions in FL settings with a large number of clients is an intriguing direction for future development.
+
+\subsection{Models}
+As shown in chapter \ref{Chapter-Robustness-Analysis}, the behaviour of the FL algorithm heavily depends on the size and architecture of the model being trained. Furthermore, the model implemented in this work, can not be called representative of all ANNs.  Thus, more experiments should be conducted, with ANNs of different sizes and types.

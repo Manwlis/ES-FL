@@ -143,9 +143,13 @@ While FederatedSGD improves the computation-to-communication ratio, a number of 
 
 
 \section{The FPGA Perspective}
-In our knowledge, no prior works have attempted to merge FL and FPGAs. Modern system-on-chip (SoC) FPGAs contain all the tools required to implement FL, including running on an operating system and having an Ethernet adaptor. As such, connecting the two technologies should be feasible.
+Recent works have attempted to merge FL and FPGAs. Most notably, Zixiao Wang et al. have a developed PipeFL \cite{PipeFL}, an architecture to accelerate ANN training in FL with FPGAs. This work is fully focused to the datacenter settings and completely ignores problems specific with on-edge FL. Furthermore, FPGAs are able to efficiently implement complementary systems for FL, such as homomorphic encryption \cite{FPGA_encryption_for_FL}.
 
-FL on the FPGA shouldn't be substantially different from centralized training in terms of design or implementation. In contrast, the driver of the re-programmable hardware will differ, as it must facilitate the FL procedure. Furthermore, The FL algorithm itself is not computationally demanding and may be conveniently offloaded to the SoC's CPU.
+Recent works have attempted to merge FL and FPGAs. PipeFL, created by Zixiao Wang et al. \cite{PipeFL}, accelerates ANN training in FL using FPGAs. This study is entirely focused on the datacenter setting and completely disregards issues unique to on-edge FL. Moreover, FPGAs can effectively implement FL-related systems like homomorphic encryption.
+
+Modern system-on-chip (SoC) FPGAs contain all the tools required to implement FL, including running on an operating system and having an Ethernet adaptor. With those, connecting the two technologies is feasible, for both the datacenter and the on-edge settings.
+
+The training part of the FL shouldn't be substantially different from centralized training on a FPGA, in terms of design and implementation. In contrast, the driver of the re-programmable hardware will differ, as it must facilitate the FL procedure. Furthermore, The FL algorithm itself is not computationally demanding and may be conveniently offloaded to the SoC's CPU.
 
 \section{Thesis Approach}
 As the thesis moves forward, conflicts in terms of design and implementation are anticipated to arise between the two technologies. Furthermore, this is an mostly unexplored field. As such, a conservative and steady approach is expected to work best. 
