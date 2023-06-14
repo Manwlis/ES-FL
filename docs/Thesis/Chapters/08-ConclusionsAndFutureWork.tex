@@ -2,9 +2,14 @@
 \label{Chapter-Conclusions-and-Future-Work}
 
 \section{Conclusions}
+This study conducted an in-depth analysis of the behaviour of an FL system under training. It revealed that the batch size is its most important parameter, as it significantly impacts most characteristics of the training, including its convergence rate and the local training time. In more detail, it showed that, depending on data distribution, there is only a small range of small batch sizes where the algorithm can provide an acceptable solution in a reasonable time.
+
+The vast re-configuration abilities provided by FPGAs can be exploited to create an accelerator that specifically targets that narrow range. Other technologies, like the GPU, can show superior overall throughput, but they are ineffectual if they cannot provide it with the right batch sizes. While flawed, as explained in section \ref{Constrains}, the implemented architecture managed to outperform its comparisons with both IID and non-IID data distributions.
+
+Last but not least, the benchmarks presented in chapter \ref{Chapter-Results} may make the choice of the underlying platform appear inconsequential. It is quite common in on-edge settings that responsible for most of the training latency is the communication between server and clients. However, in chapter \ref{Chapter-Robustness-Analysis}, it was demonstrated that this is not always the case. Therefore, we can conclude that FPGAs are more than appropriate for accelerating Federated Learning.
 
 \section{Future Work}
-This work sheds light on how FL and FPGA-based architectures interact with each other and cooperate. However, there is still room for improvement and more synergies are available to be explored.
+This work sheds light on how FL and FPGA-based architectures interact with each other and cooperate. However, there is still room for improvement and additional synergies are available to be explored and exploited.
 
 \subsection{Quantization}
 The majority of studies on quantization in FL have focused on communication compression, e.g. \cite{https://doi.org/10.48550/arxiv.2006.10672}, and recent works have tried to expand it to local training \cite{https://doi.org/10.48550/arxiv.2206.10844}. FPGAs have been proven that they can provide efficient and robust implementations of quantized ANNs \cite{Bacchus2020}. In our opinion, implementing FL with quantized ANNs or ANNs robust to quantization on FPGA accelerators, is the most promising area to expand this work.

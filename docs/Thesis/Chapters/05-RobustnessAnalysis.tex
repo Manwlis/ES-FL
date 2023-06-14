@@ -1,10 +1,28 @@
 \chapter{Robustness Analysis}
 \label{Chapter-Robustness-Analysis}
-A number of experiments, each concentrating on a different component of the FL algorithm, have been conducted to demonstrate the robustness of the developed FL environment. Additionally, the tests begin with straightforward cases and progress to more complicated ones by building on their findings. The training problem is image recognition on the Fashion-MNIST dataset. % why the experiments, from simple cases to more complex ones, problem 
+% A number of experiments, each concentrating on a different component of the FL algorithm, have been conducted to demonstrate the robustness of the developed FL environment. Additionally, the tests begin with straightforward cases and progress to more complicated ones by building on their findings. The training problem is image recognition on the Fashion-MNIST dataset. % why the experiments, from simple cases to more complex ones, problem 
 
-As the main goal of these experiments is to prove the algorithmic soundness of the FL environment, they were carried out on a single machine. As a result, the participating processes are competing for computing resources, and communication takes place on the operating system's loopback. Thus, it is impossible to draw any meaningful real-time inferences from these experiments; instead the communication frequency is used as a benchmark value. % what looking into and why.
+% Finally, it is demonstrated how the parameters of the FL system impact its behaviour and performance metrics. As a result, the ones with the greatest effect can be identified, so they can be focused on during the development of the FPGA-based accelerator.
 
-\section{Distributed SGD with IID data}
+In this chapter a number of experiments are presented, with two goals. First, to prove the algorithmic soundness and demonstrate the robustness of the developed FL system. Second, to identify the parameter space where it is most efficient, by exploring the effects of its parameters on its behaviour and performance. This is instrumental for developing an FPGA-based accelerator that is designed to be optimal for the FL system. % aims of the experiments
+
+These experiments are carried out on a single machine. As a result, the participating processes are competing for computing resources, and communication takes place on the operating system's loopback. Thus, it is impossible to draw any meaningful real-time inferences from these experiments; instead the communication frequency is used as the benchmark value. % what looking into and why.
+
+Although more experiments have been carried out, for the sake of brevity, the ten with the most significant findings are presented. Furthermore, many of those have been repeated with different ANNs to check if their results are model specific. When this is true, it is highlighted in the conclusion of the chapter. In more detail, the experiments presented and their aims are:
+\begin{itemize}
+    \item The first experiment tests the fundamental functionality of the developed FL system by using the most straightforward possible FL case, distributed SGD with IID data.
+    \item The second one uses the same algorithm but with non-IID data, to demonstrate that the FL system can handle such a distribution.
+    \item The next one is quite similar to the first, but introduces and tests the client selection, a core FL feature.
+    \item The fourth experiment, building on the previous one, increases the computation to communication ratio by raising the data consumed per GE. It serves as a transitional stage between the earlier experiments and the subsequent FedAvg ones.
+    \item The fifth experiment tests the fault tolerance of the FL system. Early in the training, one of the clients is abruptly disconnected while communicating with the server. It is crucial to prove robustness against such situations when dealing with on-edge FL scenarios.
+    \item The sixth experiment increases data consumption per GE even further, but more importantly it compares a FL system where each client initializes its local model independently from the rest, with one where all clients have the same initialization. According to FL theory initialization has a great impact of the overall system, and thus is investigated.
+    \item The LR decay is another parameter that is well-known to have a significant impact. On experiment 7, several LR decay strategies are put to the test.
+    \item The eighth experiment finally introduces the state of the art FL algorithm, FedAvg. It utilizes the LR decay deemed best in the previous experiment with different values.
+    \item Experiment 9 builds on the previous one, and tests the importance of the number of participating clients per GE.
+    \item The final experiment increases computation per client by training multiple times over the local datasets each GE.
+\end{itemize}
+
+\section{Distributed SGD with IID Data}
 The first experiment focuses on the most straitforward case, distributed SGD with IID data. The training dataset is split equally between the participating clients. The third model in the collection is used, and for simplicity's sake, the Adam optimizer with default parameters is employed. 
 \begin{table}[H]
     \center
@@ -37,7 +55,7 @@ The aforementioned findings demonstrate that training the model via FL yields th
 
 Another observation is the re-balancing effect of the FL algorithm. In centralized training, due to overfitting, the accuracy of the model degrades after peaking. This is not true when trained under the federated setting, as overfitted parameters are regularized when averaging multiple local models.
 
-\section{Distributed SGD with non-IID data}
+\section{Distributed SGD with non-IID Data}
 In this experiment, the third model is trained with distributed SGD and a pathological non-IID dataset. It is interesting to see how the batch size affects the performance of Distributed SGD, given that it is notorious for being unable to handle non-IID datasets. Thus, the test was repeated with three distinct combinations of parameters.
 \begin{table}[H]
     \center
@@ -155,8 +173,8 @@ Although the model's final accuracy drops, the effect is manageable as training 
 
 This is achieved through proper usage of the TCP protocol. The server understands that the faulty client disconnected, discards its erroneous message and continues training without him. As a result, there are no stalls and the global model does not get corrupted.
 
-\section{Neural Network initialization}
-The initialization of an ANN can have a significant impact on the final accuracy, convergence rate, and training time, according to FL theory. It is generally accepted that the best course of action is to use the same initialization for all clients \cite{FL-original-paper}.  This major objective of this experiment is to assess this convention. To further emphasize the consequences of the initialization, the SGD optimizer with a low learning rate is employed.
+\section{Neural Network Initialization}
+The initialization of an ANN can have a significant impact on the final accuracy, convergence rate, and training time, according to FL theory. It is generally accepted that the best course of action is to use the same initialization for all clients \cite{FL-original-paper}.  This major objective of this experiment is to assess this convention. % To further emphasize the consequences of the initialization, the SGD optimizer with a low learning rate is employed.
 \begin{table}[H]
     \center
     \makebox[0pt]{
@@ -175,7 +193,7 @@ The initialization of an ANN can have a significant impact on the final accuracy
     \caption[Experiment 6 parameters]{Experiment 6 parameters}
     \label{table:Experiment 6 parameters}
 \end{table}
-The third model is used and initialized with the Glorot initializer. The model is trained twice, once initialized with the same seed across all clients, the other using random different seeds.
+The third model is used and initialized with the Glorot initializer. The model is trained twice, once using the same seed across all clients, and once using different seeds.
 \begin{figure}[H]
     \center
     \input{experiments/6.tex}
@@ -184,7 +202,7 @@ The third model is used and initialized with the Glorot initializer. The model i
 \end{figure}
 The model with a random initialization quickly approaches and settles in a suboptimal local minimum. Both centralized training and FL with seeded initialization surpass its accuracy. This behaviour is consistent with FL theory.
 
-\section{Learning Rate (LR) decay strategies}
+\section{Learning Rate (LR) Decay Strategies}
 Another aspect of FL worth investigating is learning rate (LR) decay strategies. The following three of them are implemented:
 \begin{itemize}
     \item Decay the LR every set number of GEs. All clients have the same LR at every moment.
@@ -275,7 +293,7 @@ In comparison to the previous experiment, FedAvg requires \(\times\)100-200 less
 
 Considering the different LR decay values, the more conservative options appear to perform best; decaying the LR too quickly causes the ANN to set in sub-optimal minima.
 
-\section{Client Participation and Increasing parallelism}
+\section{Client Participation and Increasing Parallelism}
 This experiment explores the amount of multi-client parallelism that can be exploited and its effect on training. The dataset is split between 10 clients, each one holding 6000 training examples. The third model is trained with different number of participating clients per GE.
 \begin{table}[H]
     \center
@@ -313,7 +331,7 @@ Training with one client per epoch serves as the baseline. The relative reductio
 \end{table}
 Using more clients per GE substantially lowers the rounds of communication needed to achieve the target accuracy. This is consistent with others works, which show even on simulations of hundreds of clients with a small dataset each, using a bit more than half of the clients in each GE yields the best results. If all the clients are used every GE, especially when under non-IID data, the model may not converge in an acceptable solution.
     
-\section{Increasing computation per client}
+\section{Increasing Computation per Client}
 To further reduce communication, clients can perform more local updates per GE. This may be accomplished by increasing the number of local epochs (LE), reducing the batch size (B), or both. The third model is trained by 5 clients, with 3 of them participating each GE. LR and its decay are amortized to maintain a consistent LR at each GE, regardless of the number of local updates. The goal of this experiment is to identify the behavior of the algorithm across different sets of parameters.
 \begin{table}[H]
     \center
@@ -332,3 +350,13 @@ To further reduce communication, clients can perform more local updates per GE. 
     \caption[Experiment 10 results]{Experiment 10 results}
 \end{table}
 According to the results of the experimental, increasing local updates directly decreases the required global updates. Unlike most works, this one concentrates on small groups of clients with large local datasets. As a result, increasing the number of local epochs produces inconsistent results due to the introduction of overfitting in the local models. Regarding the batch size, there is no cost in reducing it, providing that it is large enough to completely utilize the client's hardware parallelism.
+
+\section{Conclusions}
+From the above experiments, a number of observations can be made:
+\begin{itemize}
+    \item FedAvg require a lot less communication rounds than Distributed SGD.
+    \item By far the most important parameter is the batch size. The convergence of the training as well as the required communication rounds are directly dictated by it.
+    \item The learning rate and its decay greatly impacts convergence rate and final accuracy. They have to be tuned up depending on other parameters, such as the sizes of the training batches and the local datasets.
+    \item At least half of the clients should participate each epoch.
+    \item Increasing the number of local epochs seems to be beneficial, however it should be noted that this is heavily depended on other parameters. If the model being trained is small or the local datasets are large, then the clients overfit their local models. As a result, any benefits are negated.
+\end{itemize}

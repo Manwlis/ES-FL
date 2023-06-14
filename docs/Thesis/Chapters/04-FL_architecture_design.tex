@@ -1,8 +1,14 @@
 \chapter{FL architecture \& design} %spasimo se fl architecture
 \label{Chapter-FL-architecture-design}
+This chapter contains everything relevant regarding the FL system developed in this thesis. Section \ref{sec:software} lists the software tools used, as well as how they were utilized. The following section, \ref{sec:data_prep}, describes the prepossessing and distribution applied to the utilized Fashion-MNIST dataset.
+
+To facilitate the deployment of the FL system in platforms like an FPGA SoC, C++ is deemed as the most fitting programming language, due to the fact that most hardware vendors provide dedicated compilers for it. In contrast, during the robustness analysis phase, the underlying training is carried out using the Python API of the TF library, as its great malleability makes it easier to experiment and test with different ANNs and training settings. To connect these two component, the Python Interpreter is embedded into the C++ codebase, and that is the subject of the section \ref{sec:embedding_python}.
+
+The final section \ref{sec:fl_architecture} details the developed FL system itself. First, the layout of its processes and their memory is shown. Furthermore, it explain in depth the structure and operation of the individual processes that compose it, as well as how they are synchronized. Moreover, the communication scheme that is used to facilitate any communication between them, is also shown. Finally, the library of models utilized to test the FL system is presented.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Software %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 \section{Software}
+\label{sec:software}
 \subsection{Tensorflow \& Keras}
 TensorFlow \cite{tensorflow2015-whitepaper} is an interface for expressing ML algorithms and an implementation for executing such algorithms. It offers a complete, flexible ecosystem of tools, libraries and community resources that that facilitates the development and deployment of ML powered applications. Its main advantage is the ability to use high-level APIs like Keras with eager execution, enabling immediate model iteration and easy debugging. 
 
@@ -13,7 +19,7 @@ As the goal is to integrate FL with FPGA accelerators, the majority of the codeb
 
 With the TensorFlow C API \cite{TF_C_API}, TensorFlow could be used directly in C++, however several capabilities, like the Neural Network library, are not supported. Furthermore, quickly rotating among ANN architectures, training techniques, etc. is quite usual in FL development. With the C API that becomes tedious and slow, since it is geared more toward uniformity and simplicity than convenience, and C++ needs to be recompiled after every change. Due to these factors, integrating the Python interpreter and using TensorFlow in Python is considered as a more appropriate solution.
 
-\subsection{POSIX sockets}
+\subsection{POSIX Sockets}
 POSIX sockets \cite{POSIX_socket} is an application programming interface (API) for Internet and Unix domain sockets, used for inter-process communication (IPC). A socket is an abstract representation for the local endpoint of a network communication path. According to the Unix philosophy, the POSIX sockets API defines it as a file descriptor that offers a standard interface for input and output to data streams.
 
 The 4.2 Berkeley Software Distribution \cite{bsd} Unix operating system, which was introduced in 1983, is where the API originates from. POSIX sockets transitioned mostly unchanged from a de facto standard to a POSIX specification component. They are commonly referred to as "Berkeley sockets" or "BSD sockets" to acknowledge the Berkeley Software Distribution, where they were first implemented.
@@ -24,13 +30,14 @@ POSIX sockets can be configured for blocking or non-blocking operation. In block
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Data Preparation %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 \section{Data Preparation}
+\label{sec:data_prep}
 \subsection{Normalization}
 Dataset normalization \cite{dataset_norm}, as part of data preparation, is a standard practice in ML. Normalization transforms the features of a dataset to a common scale, without distorting discrepancies in the ranges of values or losing information. This technique prevents large scaled characteristics to dominate during training. Furthermore, many algorithms, such as ReLU non-linearities, exhibit better performance when fed with data of floating-point format.
 
 In this work, the Fashion-MNIST dataset provided by TensorFlow Datasets \cite{TFDS} collection is utilized. It is consisted of gray-scale images, where each pixel is represented by an integer in the range \([0,255]\). They are normalized to floating-point format in the range \([0,1]\) with the script \texttt{prepare\_dataset.py}. Furthermore, to avoid repeating this procedure for every experiment, the processed dataset is saved on disk.
 
 \subsection{Distribution}
-In FL, each client is meant to have their own unique, individualized dataset. Given that the provided Fashion-MNIST dataset is a single, concentrated collection, it must be distributed among the clients in order for federated training to be possible. Two approaches of partitioning the data among the clients are explored:
+In FL, each client is meant to have their own unique, individualized dataset. Given that the provided Fashion-MNIST dataset is a single, concentrated collection, it must be distributed among the clients in order for federated training to be possible. According to the theory presented in section \ref{susbsection: Data distribution} Two approaches of partitioning the data among the clients are explored:
 
 \subsubsection{IID}
 The data are randomly partitioned in equally sized shards, one for every client. For example, if there are 10 clients, each will receive a shard containing 6000 examples. Although this distribution is not IID in the strictest sense\footnote{Due the shards being mutually exclusive, knowing that an example belongs to one of them indicates that it does not exist in others shards. Thus, knowledge about the other local datasets can be inferred and independence is violated.}, it is closer to a real-world scenario and many issues, such as class underrepresentation, can be easily avoided.
@@ -43,6 +50,7 @@ The input pipeline that feeds the training data to the models is constructed usi
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Embedding Python Interpreter %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Embedding the Python Interpreter}
+\label{sec:embedding_python}
 As mentioned in section \ref{Python/C API}, the Python Interpreter is embedded on top of the C++ codebase. To make this integration as seamless as possible from both sides, an integration layer that operates as a wrapper for the C/Python API, has been developed. The C++ codebase can call Python code with simple function calls, while the Python code can access data from the C++ space like it would access data from its own space.
 
 To achieve this, A number of steps need to be completed. First of all, a strait-forward abstract class is defined, which specifies a train and an evaluate function, as well as an input and an output model. The C++ codebase is interfacing with an implementation of this class. Its tasks include initializing the Python interpreter, loading the appropriate Python module, passing the necessary data and creating C++ function wrappers for the Python function.
@@ -51,34 +59,40 @@ Moving data from one side to the other can be trickier than it first appears. Us
 
 After exposing the parameters to the Python code, one more step is necessary to enable the TesnorFlow library to be able to use them. In order to assign the received parameters to the model under training, they must be first transformed into TesnorFlow tensors with dimensions and shapes that match its layers. Likewise, to extract parameters from a model and expose them to the C++ codebase, its layers must be concated in a NumPy array.
 
+Figure \ref{fig:model_lifecycle} illustrates all the parts required to integrate training and evaluating with TF on Python, and the developed FL system. Blue squares represent the C++ side, while the yellow and orange ones represent the Python/TF side. All elements over the horizontal line and the Python API wrappers (C++) are developed in this thesis, while the rest represent the tools used.
 
 \begin{figure}[H]
     \centering
         \includegraphics[width=1\textwidth]{Images/block_diagrams/model_lifecycle.png}
         \decoRule
-        \caption[C++/Python Integration]{Overview of the C++/Python Integration. The FL protocol implementation components are represented in the top half, while the required libraries, APIs, and wrappers are shown in the bottom half.}
+        \caption[C++/Python Integration]{Overview of the C++/Python Integration. The FL implementation components are represented in the top half, while the required libraries, APIs, and wrappers are shown in the bottom half.}
         \label{fig:model_lifecycle}
 \end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% implementation %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
-\section{FL Architecture}\label{sec:FL_architecture}
+\section{FL Architecture developed in this Thesis}\label{sec:FL_architecture}
+\label{sec:fl_architecture}
 The architecture aims to offer a generalized FL loop that enables the implementation of various FL algorithms. To achieve this, it is designed to be flexible and modular, with each FL operation, such as client selection and aggregation, having its own specialized function. Additionally, all relevant training parameters and hyper-parameters, such as local epochs or participating clients per epoch, are compiled in the \texttt{definitions.hpp} file. Since the entire codebase accesses them from there, testing and experimentation are streamlined and less prone to mistakes.
 
-In FL, multiple entities are present, the orchestrating server and the clients training the global model. As the aim of this work is to implement FL with clients operating on separate devices, it is essential that each entity is a distinct process with its own private data-space. This data-space contains its private training or testing dataset, as well as its local or global models.
+\subsection{Process \& Memory Layout}
+In FL, multiple entities are present, the orchestrating server and the clients training the global model. As the aim of this work is to implement FL with clients operating on separate devices, it is essential that each entity is a distinct process with its own private data-space. This data-space contains its private training or testing dataset, as well as its local or global models. % many entities -> many processes
 
-All required communication is facilitated through POSIX sockets. Furthermore, the TCP protocol is utilized to ensure robustness against communication faults, random disconnections and erroneous messages. Such problems are common in edge environments, where the clients are not always in their best possible state or their connection with the server is fickle. % TCP and why
+All required communication is facilitated through POSIX sockets. Furthermore, the TCP protocol is utilized to ensure robustness against communication faults, random disconnections and erroneous messages. Such problems are common in edge environments, where the clients are not always in their best possible state or their connection with the server is fickle. % sockets, TCP and why
+
+Each client holds their private data, the global model and the models they produced. Meanwhile, the server holds the testing dataset, the global model and the most recent local model it received. All communication goes through dedicated sockets. This process and memory layout is illustrated in figure \ref{fig:process_mem_layout}. % layout
 
 \begin{figure}[H]
     \centering
         \includegraphics[width=0.5\textwidth]{Images/block_diagrams/memory_layout.png}
         \decoRule
-        \caption[Process \& Memory layout]{Process and memory layout of the FL architecture. Each client holds their private data, the global model and the models they produced. Meanwhile, the server holds the testing dataset, the global model and the most recent local model it received. All communication goes through dedicated sockets.}
+        \caption[Process \& Memory layout]{Process \& Memory layout of the developed FL system.}
         \label{fig:process_mem_layout}
 \end{figure}
 
 \subsection{Server}
+\label{sec:server}
 \subsubsection{Overview}
-The server generally adheres to the event-driven server paradigm. The process, while sleeping, listens for events such as new connections or messages from the clients, and reacts according to their context. This is very similar to FL in that the server receives local models, aggregates them, and then, after accumulating a sufficient number of them, creates a new global model and announces it to the clients. All these actions are triggered by client updates.
+The server adheres to the event-driven server paradigm. The process, while sleeping, listens for events such as new connections or messages from the clients, and reacts according to their context. This is very similar to FL in that the server receives local models, aggregates them, and then, after accumulating a sufficient number of them, creates a new global model and announces it to the clients. All these actions are triggered by client updates. It should be noted that the event scheduler is also the the event handler. As the handling of these is events is almost instant, there is no need for worker threads. 
 
 The server process is the focal point of FL and is responsible for several tasks, which can be distinguished between algorithmic, systemic and auxiliary. Algorithmic tasks are the components of the FL algorithm, such as model aggregation. Systemic tasks are necessary operations to implement the FL algorithm, such as connecting sockets. In addition, some tasks that are not required to implement the algorithm are included in order to enhance its utility and ease development.
 
@@ -101,8 +115,6 @@ If the contrary is true, the new global model is created by dividing the aggrega
 
 The event loop's final step is to determine whether any further training is required. If the target accuracy is achieved or a predetermined number of GEs have been completed, the server shows any relevant statistics, stores the final global model to disk, and shuts down.
 
-% \subsubsection{Memory layout}
-
 \subsection{Client}
 \subsubsection{Overview}
 During an epoch, a participating client receives a global model, goes through a few local training rounds, and then sends the updated local model back to the server. Training cannot begin until the global model is fully received. Furthermore, after sending the local model, nothing further needs to be done until a new global model is received.
@@ -114,7 +126,11 @@ At startup, the client creates a socket and connects to the server. Additionally
 
 The main loop contains three major operation. First, it receives the global model shared by the server. Then, it is trained with the local private data, creating a new local model. Finally, any required transformations, such as quantization and compression, are applied to the new model, which is then send to the server. This process is repeated until the server informs that there will be no more training with that client.
 
-% \subsubsection{Memory layout}
+\subsection{Synchronization}
+Figure \ref{fig:server_client_activity_diagram} illustrates the operation of a server-client pair. The server sleeps in the \(poll()\) system call until an event is raised as described in section \ref{sec:server}. The client is either training its local model, or wait the server to receive or send data. This typical master-slave synchronization system.
+
+In practice, more than one client is connected to server at any time. Nevertheless, the activity diagram and synchronization of both components remain the same. The server is capable to send messages to one client while receiving from another one. Furthermore, connectivity issues with a particular client, do not affect the communication with the rest.
+
 \begin{figure}[H]
     \centering
         \includegraphics[ width=\textwidth, height=\textheight, keepaspectratio]{Images/block_diagrams/top.png}
@@ -122,7 +138,6 @@ The main loop contains three major operation. First, it receives the global mode
         \caption[Server - Client Activity Diagram]{Server - Client Activity Diagram: Yellow states are modelled with TensorFlow, while grey states are not essential for FL. Blue arrows represent data movements. Error conditions and states are not displayed.}
         \label{fig:server_client_activity_diagram}
 \end{figure}
-% \subsection{Life cycle of a model?} figure 4.1
 
 \subsection{Communication Scheme}
 As stated in section \ref{sec:FL_architecture}, the server and the clients are separate processes that communicate over sockets. A concrete, predefined communication system is needed to accomplish this in a reliable manner. The server holds the barest amount of information on the clients, just what is necessary to stay in connection and communicate, to adhere to the cross-device FL setting.
@@ -162,17 +177,16 @@ Minimizing communication frequency is another strategy used for cutting down on 
         ...\\
         \hline
     \end{tabular}
-    \caption[Communication Scheme]{The format of the communication between the server and clients.}
+    \caption[Communication Scheme]{The format of the communication between the server and the clients.}
     \label{table:FL messages structure}
 \end{table}
 
-The format of the messages is shown in Table \ref{table:FL messages structure}. The flags field is intended to communicate particular instructions to clients, such as the message is the final one and no more communication will be accepted or that the client should initialize the model. The GE field is used to discard stragglers, as the server can quickly reject any messages from an earlier GE. The local loss and accuracy fields are used to facilitate complex algorithms, such as ignoring local models with poor accuracy or higher loss than the prior GE. The global and local model parameters are the last part of the format and make up the bulk of the messages.
+The format of the messages is shown in Table \ref{table:FL messages structure}. The flags field is intended to communicate particular instructions to clients, such as the message is the final one and no more communication will be accepted or that the client should initialize the model. The GE field is used to discard stragglers, as the server can quickly reject any messages from an earlier GE. The local loss and accuracy fields are used to facilitate complex algorithms, such as ignoring local models with poor accuracy or higher loss than the prior GE. The global and local model parameters are the last part of the format and make up the bulk of the messages.
 
 \subsection{Model Library}
 Most ML models, if not all of them, are meant to be trainable in a federated environment. To demonstrate the accuracy of the developed FL environment, a library of ten typical models has been created. As the training problem is image recognition, the majority of the models are CNNs. However, models of different architectures, such as deep and residual ANNs, are also included.
 
 \begin{enumerate}
-
     \item The simplest model in the library is a DNN architecture. It consists of three fully connected ReLU activated layers with 128, 1024 and 128 neurons respectively, followed by a Softmax layer. In total, it contains 365,066 weights for an approximate size of 1.46 MBytes.
     
     \item The first CNN model follows the original LeNet-5 architecture. It has two convolutional layers of 6 and 16 \(5\times5\) kernels, each one accompanied by an average pooling layer with \(2\times2\) pool size. They are followed by two fully connected layers of 120 and 84 neurons, and a Softmax layer. All layers, except the final one, are activated with the hyperbolic tangent function. In total, it contains 61,706 weights for an approximate size of 0.25 MBytes.

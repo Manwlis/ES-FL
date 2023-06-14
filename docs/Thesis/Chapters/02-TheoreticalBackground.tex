@@ -7,21 +7,21 @@ Various researchers and textbooks may provide different definitions of Artificia
 
 Machine learning (ML) is an AI field in which agents, in addition to the performance element, include a learning element that utilises their past experiences to enhance their behaviour. The core idea behind ML is that perception should be used to improve the ability to act in the future, not simply react in the present. Designing a learning element is a multi-facet problem that is affected by three major issues. \cite{russell_norvig_2003_18}
 
-\subsection{Information management}%TODO:find a better title
+\subsection{Information Management}%TODO:find a better title
 The first issue is determining what information what information is useful and how it should be utilized. Different components of the input and output data should be learnt depending on the context in which the learning actor operates. One method is to directly link the current state of the actor or the world to their actions. Sometimes it can be more appropriate to infer relevant patterns from the data while ignoring unnecessary information. Another way is to collect action-value information indicating the desirability of actions based on their effect in the world state. These and other options may need to be combined in order to extract the most meaningful knowledge from the available data.
 
-A common example is feature extraction. In ML, a feature \cite{Elgendy2020_ml_feature} is an individual measurable property or characteristic of a phenomenon being observed. They can be generic, such as edges in an image, or specialized, such as wheels and animal height. Feature extraction is the process of transforming such raw data into numerical features that can be processed.
+A common case is feature extraction. In ML, a feature \cite{Elgendy2020_ml_feature} is an individual measurable property or characteristic of a phenomenon being observed. They can be generic, such as edges in an image, or specialized, such as wheels and animal height. Feature extraction is the process of transforming such raw data into numerical features that can be processed. A classing example of this is edge detection in image processing applications, as shown in figure \ref{fig:Edge detection in greyscale images}.
 \begin{figure}[H]
     \centering
         \includegraphics[width=0.8\textwidth]{Images/edge_detection.png}
         \decoRule
-        \caption[Edge detection in greyscale images]{Edge detection in greyscale images: \href{https://aryamansharda.medium.com/how-image-edge-detection-works-b759baac01e2}{URL}.}
+        \caption[Edge detection in greyscale images]{Edge detection in greyscale images \cite{edge_detection}: \href{https://aryamansharda.medium.com/how-image-edge-detection-works-b759baac01e2}{URL}.}
         \label{fig:Edge detection in greyscale images}
 \end{figure}
 
 Another key factor when designing learning systems is the availability of prior knowledge. Researchers have extensively looked into the issue where the agent uses only information that they encounter, but ways for transferring prior knowledge have been devised to speed up learning and improve decision-making.\cite{Transfer_Learning}
 
-\subsection{Feedback mechanism}
+\subsection{Feedback Mechanism}
 The type of feedback available has a significant impact on the design and is perhaps the most crucial aspect of the learning problem. Usually three major types are distinguished: supervised, unsupervised, and reinforcement learning.
 
 Supervised learning problems involve learning functions between sets of inputs and outputs. This is the case of a fully observable environments where the effects of the actors actions are immediately visible or the existence of a third party providing the correct solutions.
@@ -34,25 +34,25 @@ In the reinforcement learning setting there is no correct output provided, inste
 The representation of the learned information is another important factor in establishing how the learning algorithm should operate. Common schemes include linear weighted polynomials for utility functions, propositional or first order logic, probabilistic representations like Bayesian Networks\cite{Probabilistic_Reasoning} and ANNs\cite{McCulloch1943}, and other methods have all been created.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Deep learning %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Deep learning}
-Deep learning is a sub-field of ML, partially overlapping with big data science. It consists of algorithms that use the perceptron as their basic building block, which is a mathematical function based on the McCulloch-Pitts model of biological neurons. They typically have hundreds of thousands to millions of perceptors with a variety of designs and topologies. Deep learning architectures include Deep Neural Networks (DNN)s, Convolutional Neural Networks (CNN)s, Recurrent Neural Networks (RNN)s and others, each one offering different capabilities and options.
+\section{Deep Learning}
+Deep learning is a sub-field of ML, partially overlapping with big data science. Their associaton is illustrated in figure \ref{fig:AI Venn Diagram}. It consists of algorithms that use the perceptron as their basic building block, which is a mathematical function based on the McCulloch-Pitts model of biological neurons. They typically have hundreds of thousands to millions of perceptors with a variety of designs and topologies. Deep learning architectures include Deep Neural Networks (DNN)s, Convolutional Neural Networks (CNN)s, Recurrent Neural Networks (RNN)s and others, each one offering different capabilities and options.
 \begin{figure}[H]
     \centering
         \includegraphics[width=0.6\textwidth]{Images/diagrams/ai_data_science.jpg}
         \decoRule
-        \caption[AI Venn Diagram]{AI, ML, DL, Data Mining, Data Science, and Big Data: \href{https://whatsthebigdata.com/2016/10/17/visually-linking-ai-machine-learning-deep-learning-big-data-and-data-science/}{URL}.}
+        \caption[AI Venn Diagram]{AI, ML, DL, Data Mining, Data Science, and Big Data \cite{AI_ven_diagram}: \href{https://whatsthebigdata.com/2016/10/17/visually-linking-ai-machine-learning-deep-learning-big-data-and-data-science/}{URL}.}
         \label{fig:AI Venn Diagram}
 \end{figure}
 
 Deep learning applications have demonstrated human-like or superior capabilities in several scientific and commercial fields such as image\cite{Alexnet} and speech\cite{limits_speech_recognition} recognition, natural language processing\cite{natural_language}, climatology\cite{Climatology} and biotechnology\cite{biotechnology}. Due to these exceptional capabilities and wide range of applications, deep learning has attracted a large number of researchers from various scientific domains, resulting in its tremendous expansion. However, the science is still young and there are a number of challenges to be overcome. Expecting deep learning combined with improved data processing being a solution to computers gaining generic human-like intelligence (human equivalent AI) is still a distant dream.\cite{dl_evolution}
 
-Historically, the field of deep learning emerged in 1943 with the inception of the aforementioned McCulloch-Pitts perceptron. In 1949, Donald Hebb noted out in his book "The Organization of Behavior" that neural pathways are strengthened each time they are utilized, a principle that is crucial to how humans learn. He claimed that when two nerves fire at the same moment, the link between them is strengthened. This progress resulted in the creation of the first real-world application of ANNs, "MADALINE" an adaptive filter that eliminates echoes on phone lines. In 1962, Widrow \& Hoff developed a learning procedure that distributed the error across the ANN, resulting in its eventual elimination. Despite these advances, deep learning research plummeted due to a variety of internal and external factor, including the widespread use of fundamentally faulty learning function and the adoption of von Neumann architecture across computer science.
+Historically, the field of deep learning emerged in 1943 with the inception of the aforementioned McCulloch-Pitts perceptron, shown in figure \ref{fig:McCulloch-Pitts Neuron}. In 1949, Donald Hebb noted out in his book "The Organization of Behavior" that neural pathways are strengthened each time they are utilized, a principle that is crucial to how humans learn. He claimed that when two nerves fire at the same moment, the link between them is strengthened. This progress resulted in the creation of the first real-world application of ANNs, "MADALINE" an adaptive filter that eliminates echoes on phone lines. In 1962, Widrow \& Hoff developed a learning procedure that distributed the error across the ANN, resulting in its eventual elimination. Despite these advances, deep learning research plummeted due to a variety of internal and external factor, including the widespread use of fundamentally faulty learning function and the adoption of von Neumann architecture across computer science.
 
 \begin{figure}[H]
     \centering
         \includegraphics[width=0.6\textwidth]{Images/ANNArchitectures/McCulloch-Pitts Neuron.png}
         \decoRule
-        \caption[McCulloch-Pitts Neuron]{The McCulloch-Pitts Neuron: \href{https://towardsdatascience.com/mcculloch-pitts-model-5fdf65ac5dd1}{URL}.}
+        \caption[McCulloch-Pitts Neuron]{The McCulloch-Pitts Neuron \cite{mc_neuron}: \href{https://towardsdatascience.com/mcculloch-pitts-model-5fdf65ac5dd1}{URL}.}
         \label{fig:McCulloch-Pitts Neuron}
 \end{figure}
 
@@ -120,35 +120,37 @@ Softmax ensures that all the outputs sums to 1 by normalizing them to a probabil
 	\label{eqn:Softmax}
 \end{equation}
 
-\subsection{Artificial Neural Network architectures}
+\subsection{Artificial Neural Network Architectures}
 ANNs are collections of artificial neurons, typically organized in layers. Different layers may utilize different activation functions and/or apply different transformations to their inputs. Generally, the outputs of one layer's neurons are connected with the inputs of the following layer's neurons. If this holds true for all neurons in the ANN, the ANN is "fully connected". Alternatively, connections can be sparser, or loops between one or more layers can be created, giving the ANN different traits and capabilities.
 
-When designing a layer, its position in the ANN is probably one of the most important variables. The input layer is the layer that accepts external data and is significantly dependent on the structure of the input; text input requires quite different management than visual input. The output layer is the layer that generates the final result, and its primary design factor is the nature of the output, which can be a yes or no answer, a classification or a set of probabilities. Usually, in order to have a human-readable output, specialized activation functions like softmax are used.
+When designing a layer, its position in the ANN is probably one of the most important variables. The input layer is the layer that accepts external data and is significantly dependent on the structure of the input; text input requires quite different management than visual input. The output layer is the layer that generates the final result, and its primary design factor is the nature of the output, which can be a yes or no answer, a classification or a set of probabilities. Usually, in order to have a human-readable output, specialized activation functions like Softmax are used.
 
 \subsubsection{Deep Neural Network (DNN)}
-Between the input and output layers, there can be zero or more "hidden" layers. Typically, the majority of the network's computation takes place in these layers, and their design is influenced by a variety of criteria such as the nature of the problem and the input, available processing resources, and the required minimum capabilities. A DNN is defined as a ANN that has multiple hidden layers.\cite{IBM_Neural_Networks}
+Between the input and output layers, there can be zero or more "hidden" layers, as shown in figure \ref{fig:Deep neural network}. Typically, the majority of the network's computation takes place in these layers, and their design is influenced by a variety of criteria such as the nature of the problem and the input, available processing resources, and the required minimum capabilities. A DNN is defined as a ANN that has multiple hidden layers.\cite{IBM_Neural_Networks}
 \begin{figure}[H]
     \centering
         \includegraphics[width=0.8\textwidth]{Images/ANNArchitectures/dnn.png}
         \decoRule
-        \caption[Deep neural network]{DNN with 5 hidden layers: \href{http://www.gabormelli.com/RKB/Multi_Hidden-Layer_(Deep)_Neural_Network}{URL}.}
+        \caption[Deep neural network]{DNN with 5 hidden layers \cite{hidden_layers}: \href{http://www.gabormelli.com/RKB/Multi_Hidden-Layer_(Deep)_Neural_Network}{URL}.}
         \label{fig:Deep neural network}
 \end{figure}
 
 \subsubsection{Convolutional Neural Network (CNN)}
 The introduction of CNNs\cite{CS231n_stanford_cnn} is arguably one of the most significant achievements in the field of Deep Learning. They excibit great performance in image and video recognition, recommender systems, image classification, image segmentation, medical image analysis, natural language processing, brain-computer interfaces, and computer vision, among other applications. They perform best when the input is an image or a succession of images, but they are also effective in other scenarios.
 
-CNNs are distinguished by their use of convolutional and subsampling layers, which enable the creation of multiple filters that can be trained in parallel. These filters are utilized to isolate and extract features from input data that would be undetectable by simpler DNNs. Subsequently, in order to get a result, the output of these filters is fed to fully connected layers. The design and depth of these filters are directly responsible for the network's feature extraction capabilities.
+CNNs are distinguished by their use of convolutional and subsampling layers, shown in figure \ref{fig:A CNN sequence to classify handwritten digits}, which enable the creation of multiple filters that can be trained in parallel. These filters are utilized to isolate and extract features from input data that would be undetectable by simpler DNNs. Subsequently, in order to get a result, the output of these filters is fed to fully connected layers. The design and depth of these filters are directly responsible for the network's feature extraction capabilities.
 
 \begin{figure}[H]
     \centering
         \includegraphics[width=1\textwidth]{Images/ANNArchitectures/cnn_2conv_layers.jpg}
         \decoRule
-        \caption[A CNN sequence to classify handwritten digits]{A CNN sequence that classifies handwritten digits using 2 convolutional layers: \href{https://towardsdatascience.com/a-comprehensive-guide-to-convolutional-neural-networks-the-eli5-way-3bd2b1164a53}{URL}.}
+        \caption[A CNN sequence to classify handwritten digits]{A CNN sequence that classifies handwritten digits using 2 convolutional layers \cite{comprehensive_cnn}: \href{https://towardsdatascience.com/a-comprehensive-guide-to-convolutional-neural-networks-the-eli5-way-3bd2b1164a53}{URL}.}
         \label{fig:A CNN sequence to classify handwritten digits}
 \end{figure}
 
-Convolutional layers carry out the convolution process with the help of small matrices known as kernels. The kernel is the beating heart of a layer, and its type and dimensionality determine how the layer functions. Typically, two-dimensional kernels are used, while their size is mainly depended on the size of the input and their position on the network. A single convolutional layer can usually only produce filters that detect generic low-level features, such as edges and color. In order to create more specialized filters that can detect high-level features, multiple layers are used.
+Convolutional layers carry out the convolution process with the help of small matrices known as kernels. The kernel is the beating heart of a layer, and its type and dimensionality determine how the layer functions. Typically, two-dimensional kernels are used, while their size is mainly depended on the size of the input and their position on the network. Figure fig:2D \ref{fig:2D convolution} shows the operation of such a kernel.
+
+A single convolutional layer can usually only produce filters that detect generic low-level features, such as edges and color. In order to create more specialized filters that can detect high-level features, multiple layers are used.
 
 \begin{figure}[H]
     \centering
@@ -158,7 +160,7 @@ Convolutional layers carry out the convolution process with the help of small ma
         \label{fig:2D convolution}
 \end{figure}
 
-The subsampling layers is the second distinguishing innovation of CNNs. Their primary task is to enable the network to recognize features without relying on their exact location. Furthermore, they simplify the network by reducing its number of parameters. Typically, they immediately follow convolutional layers in order to decrease the size of the features. Common subsambling layers include max pooling, mean pooling and others.
+The subsampling layers is the second distinguishing innovation of CNNs. Their primary task is to enable the network to recognize features without relying on their exact location. Furthermore, they simplify the network by reducing its number of parameters. Typically, they immediately follow convolutional layers in order to decrease the size of the features. Common subsambling layers include max pooling, mean pooling and others. A max pooling layer can be seen in figure \ref{fig:2D max pooling}.
 
 \begin{figure}[H]
     \centering
@@ -268,8 +270,8 @@ Where:
     x,y & points in cluster\\
 \end{conditions}
 
-\subsubsection{Reward Functions}
-Reward functions serve the same goal as loss functions in that they quantify the accuracy of an ANN in order to optimize it, but in the opposite direction. Rather than penalizing the ANN, it rewards it based on its performance, with the learning algorithm aiming to maximize this reward. This is most frequently seen in Reinforcement Learning. Reward functions specify how the agent should behave, hence their structure is heavily influenced by the problem and the laws of the universe in which the agent lives. 
+% \subsubsection{Reward Functions}
+% Reward functions serve the same goal as loss functions in that they quantify the accuracy of an ANN in order to optimize it, but in the opposite direction. Rather than penalizing the ANN, it rewards it based on its performance, with the learning algorithm aiming to maximize this reward. This is most frequently seen in Reinforcement Learning. Reward functions specify how the agent should behave, hence their structure is heavily influenced by the problem and the laws of the universe in which the agent lives. 
 
 \subsection{Backpropagation}
 Backpropagation\cite{backpropagation_original, Backpropagation_wiki} is a training algorithm for feedforward ANNs under supervised learning\footnote{Generalizations of the algorithm can be used for other network architectures and different training schemes.}. Feedforward ANNs refers to fully connected networks with no cyclical connections, most DNNs and CNNs adhere this standard. For a single example, backpropagation computes the gradient of the loss function with respect to the network weights. The gradient\cite{gradient_wiki} represent the direction and rate of fastest rise. If a function's gradient is non-zero at a point, the gradient's direction is the direction in which the function increases the fastest, and the magnitude of the gradient is the rate of growth in that direction, in respect of that point.
@@ -352,22 +354,22 @@ a_{n+1} = a_n - \gamma \nabla F \left( a_n \right)
 	\label{eqn:Gradient Descent}
 \end{equation}
 
-The learning rate parameter \(\gamma\) is the size of the step taken each time the algorithm is executed. It has a significant impact on the overall performance of the training procedure and should be fine-tuned. If it is too large, there is a high risk of overshooting the minimum of the function. If it is too small, more iterations are needed, and there is a risk too end up in a suboptimal local minimum.
+The learning rate parameter \(\gamma\) is the size of the step taken each time the algorithm is executed. It has a significant impact on the overall performance of the training procedure and should be fine-tuned. If it is too large, there is a high risk of overshooting the minimum of the function. If it is too small, more iterations are needed, and there is a risk too end up in a suboptimal local minimum. The effect of its value is shown in figure \ref{fig:Learning rate in Gradient Descent}.
 \begin{figure}[H]
     \centering
         \includegraphics[width=0.8\textwidth]{Images/diagrams/learning_rate.png}
         \decoRule
-        \caption[Effect of learning rate in Gradient Descent]{Effect of learning rate in Gradient Descent: \href{https://www.ibm.com/cloud/learn/gradient-descent}{URL}.}
+        \caption[Effect of learning rate in Gradient Descent]{Effect of different learning rate values in Gradient Descent \cite{IBM_Gradient_Descent}: \href{https://www.ibm.com/cloud/learn/gradient-descent}{URL}.}
         \label{fig:Learning rate in Gradient Descent}
 \end{figure}
 
 \subsubsection{Challenges}
-Gradient descent faces challenges with local minima and saddle points, when the gradient gets close to zero the algorithm is unable to re-adjust the network's weights. Local minima resemble the global minimum in shape, trapping the algorithm. Saddle points are stable positions with no relative maximum or minimum, making it difficult for the algorithm to decide what to do.
+Gradient descent faces challenges with local minima and saddle points, such as those in figure \ref{fig:Local minimum and saddle point}, where the gradient gets close to zero and the algorithm is unable to accurately re-adjust the weights of the ANN. Local minima resemble the global minimum in shape, trapping the algorithm. Saddle points are stable positions with no relative maximum or minimum, making it difficult for the algorithm to decide what to do.
 \begin{figure}[H]
     \centering
         \includegraphics[width=0.8\textwidth]{Images/diagrams/LocalMinimum_SaddlePoints.png}
         \decoRule
-        \caption[Local minimum and saddle point]{Local minimum and saddle point: \href{https://www.ibm.com/cloud/learn/gradient-descent}{URL}.}
+        \caption[Local minimum and saddle point]{Local minimum and saddle point \cite{IBM_Gradient_Descent}: \href{https://www.ibm.com/cloud/learn/gradient-descent}{URL}.}
         \label{fig:Local minimum and saddle point}
 \end{figure}
 
@@ -411,12 +413,12 @@ Mini-batch SGD builds on the ideas of the previous variations by splitting the t
 \subsection{Model Overfitting}
 The goal of training ANNs is to improve their performance on real-world data, i.e. to generalize its knowledge. When training, the model\footnote{Most statistical models, not just ANNs, exhibit this phenomenon.} may sometimes fit exactly against training data, severely limiting its effectiveness with previously unseen data and negating its objective.
 
-Training is typically conducted with a sample dataset. If the model trains on this for too long, or if the model is overly sophisticated, it may memorize irrelevant information, the "noise" within the training dataset. This is known as overfitting\cite{IBM_overfitting}, and the most common signs are unusually high accuracy on the training dataset and high variance within the predictions of the network.
+Training is typically conducted with a sample dataset. If the model trains on this for too long, or if the model is overly sophisticated, it may memorize irrelevant information, the "noise" within the training dataset. This is known as overfitting\cite{IBM_overfitting}, and the most common signs are unusually high accuracy on the training dataset and high variance within the predictions of the network. I visual representation of overfitting is shown in diagram \ref{fig:Model overfitting}.
 \begin{figure}[H]
     \centering
         \includegraphics[width=1\textwidth]{Images/diagrams/model-over-fitting.png}
         \decoRule
-        \caption[Model overfitting]{Model overfitting and its opposite, model underfitting: \href{https://www.ibm.com/cloud/learn/overfitting}{URL}.}
+        \caption[Model overfitting]{Model overfitting and its opposite, model underfitting \cite{IBM_overfitting}: \href{https://www.ibm.com/cloud/learn/overfitting}{URL}.}
         \label{fig:Model overfitting}
 \end{figure}
 
@@ -424,12 +426,12 @@ Multiple methods to avoid or suppress overfitting have been developed, some comm
 \begin{itemize}
     \item Early stopping
 \end{itemize}
-This method aims to stop the training before the model starts learning the noise within the model. To achieve this, a portion of the training dataset is held aside for testing rather than being used during training. This dataset is used to evaluate the ANN after each epoch, and if the accuracy is lower than before, training is terminated. There is a risk of stopping too soon and underfitting the model; a middle ground should be sought.
+This method aims to stop the training before the model starts learning the noise within the model. To achieve this, a portion of the training dataset is held aside for testing rather than being used during training. This dataset is used to evaluate the ANN after each epoch, and if the accuracy is lower than before, training is terminated. There is a risk of stopping too soon and underfitting the model; a middle ground should be sought, like in diagram \ref{fig:Model Overfitting/Underfitting}.
 \begin{figure}[H]
     \centering
         \includegraphics[width=0.6\textwidth]{Images/diagrams/classic_overfitting.png}
         \decoRule
-        \caption[Overfitting/Underfitting]{Border between overfitting and underfitting: \href{https://www.ibm.com/cloud/learn/overfitting}{URL}.}
+        \caption[Overfitting/Underfitting]{Border between overfitting and underfitting \cite{IBM_overfitting}: \href{https://www.ibm.com/cloud/learn/overfitting}{URL}.}
         \label{fig:Model Overfitting/Underfitting}
 \end{figure}
 
@@ -445,8 +447,6 @@ Multiple methods attempt to enhance the model's performance by simplifying it an
 
 The preceding methods necessitate some level of domain knowledge, which is not always available. In this scenario, regularization methods are particularly helpful, as they aim to reduce complexity by altering the model. In general they try to penalize input parameters with large coefficients, typical in examples with significant noise, in order to minimize the variance in the model. Such methods include L1 regularization, dropout and others.
 
-% \subsection{Adaptive Learning Rate?}
-% \subsection{Adaptive algoritms?}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Federated learning %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Federated Learning}
 %definition and central aim
@@ -461,7 +461,7 @@ The entities are typically configured in a hub-and-spoke topology, as shown in f
     \centering
         \includegraphics[width=0.6\textwidth]{Images/topologies/fl_topology.png}
         \decoRule
-        \caption[FL topology]{Typical FL topology: \href{https://ieeexplore.ieee.org/document/9060868}{URL}.}
+        \caption[FL topology]{Typical FL topology \cite{FL_comprehensive_survey}: \href{https://ieeexplore.ieee.org/document/9060868}{URL}.}
         \label{fig:FL topology}
 \end{figure}
 
@@ -490,7 +490,7 @@ The server collects and aggregates the local models to generate a new global mod
 	\label{eqn:FL, Objective of the server}
 \end{equation}
 
-This process is repeated until the global loss function converges, target accuracy has been achieved etc.
+This process is repeated until the global loss function converges.%, target accuracy has been achieved etc.
 
 \subsection{Federated Learning Settings} % B
 FL can be used in a broad array of applications with significantly diverse contexts and constraints \cite{survey_B, survey_D}. An example of FL across data centers could be hospitals that cooperatively train a cancer recognition model utilizing data from their patient diagnoses. Moreover, a real-world application of IoT FL is the training of a next-word prediction model for Google's Gboard \cite{GBoard_FL} utilizing users' personal text messages. Table \ref{table:FL scenarios} seeks to describe two generalized FL scenarios and compare them with data center Distributed Learning (DL).
@@ -539,75 +539,54 @@ FL can be used in a broad array of applications with significantly diverse conte
 \renewcommand{\arraystretch}{1}
 
 % problems outlook
-\subsection{Unique characteristics \& challenges of FL}
+\subsection{Unique Characteristics \& Challenges of FL}
 Aside from the standard challenges associated with ML development, there are a number of obstacles specific to FL. These issues distinguish the federated setting from more traditional problems such as private data analysis and data center DL. \cite{FL_comprehensive_survey, survey_B, survey_C, survey_D, survey_E}
 
-\subsubsection{Expensive communication} % E
-Communication is a critical bottleneck in many FL applications. In traditional data center DL, the communication environment is assumed to be perfect, with low latency, high bandwidth and negligible to no packet loss. This assumption is not appropriate to FL training, as clients are expected to be in different locations and with varying amounts of resources. This is especially true in edge FL, where the on-device datasets are small and connections are slow and unreliable, resulting to a high communication to computation ratio.
+\subsubsection{System Heterogeneity} % E
+Client computational and communication capabilities can vary greatly in FL. They may differ in architecture (CPU, GPU, FPGA) and resources. Furthermore, they may be networked using different technologies (e.g., 4G, 5G, wifi) with varying reliability and bandwidth. Finally, some of them may be less eager to participate. All this leads to random and unpredictable client disconnections, as well as the appearance of "stragglers" \cite{stragglers}, clients who take substantially longer to provide their updates than the rest and impede the entire process. Figure \ref{fig:FL protocol} exhibits the unreliability of clients in on-edge FL.
 
-\subsubsection{System heterogeneity} % E
-Client computational and communication capabilities can vary greatly in FL. They may differ in architecture (CPU, GPU, FPGA) and resources such as clock speed and RAM availability. Furthermore, they may be networked using different technologies (e.g., 4G, 5G, wifi) with varying reliability and bandwidth. Finally, some of them may be less eager to participate. All this leads to random and unpredictable client disconnections, as well as the appearance of "stragglers" \cite{stragglers}, clients who take substantially longer to provide their updates than the rest and impede the entire process.
-
-\subsubsection{Statistical heterogeneity} % E
-It is frequently assumed in distribution optimization problems that the data are independent and identically distributed (IID). This is commonly violated in the federated setting, adding complexity to problem modeling, analysis, and solution evaluation. Data generation and collection are frequently uneven between clients, and the server is unable to collect or check the quality and distribution of their data due to privacy issues.
-
-\subsubsection{Privacy and Security concerns} % E
-The primary concern of FL apps is to protect the privacy of participating customers. However, malicious participants or third parties may be able to infer sensitive information from shared parameters, defeating one of FL's key goals. Furthermore, its mostly assumed that all participants are well-intentioned, yet this is not always the case. Malicious clients may try to undermine the model's accuracy or install backdoors into it by utilizing poisonous datasets.
-    
 \begin{figure}[H]
     \centering
         \includegraphics[width=1\textwidth]{Images/fl_protocol.png}
         \decoRule
-        \caption[FL protocol]{FL protocol with stragglers, client disconnections and client selection: \href{https://ieeexplore.ieee.org/document/9060868}{URL}.}
+        \caption[FL protocol]{FL with unreliable clients \cite{FL_comprehensive_survey}: \href{https://ieeexplore.ieee.org/document/9060868}{URL}.}
         \label{fig:FL protocol}
 \end{figure}
 
-\subsection{Communication cost reduction}
-To achieve a satisfactory model in FL, multiple rounds of training and communication between the server and the clients are required. Communication can be a big bottleneck if the ANN being trained is massive and has millions of parameters, or if the clients are under slow connections. As a result, a series of techniques for improving communication efficiency have been developed, which can be classified into three groups: increasing computation, decreasing communication size, and decreasing communication frequency.
+\subsubsection{Statistical Heterogeneity} % E
+It is frequently assumed in distribution optimization problems that the data are independent and identically distributed (IID). This is commonly violated in the federated setting, adding complexity to problem modeling, analysis, and solution evaluation. Data generation and collection are frequently uneven between clients, and the server is unable to collect or check the quality and distribution of their data due to privacy issues.
 
-\subsubsection{Edge and End Computation}
-Increasing parallelism by selecting more clients each GE is an obvious technique to increase computation in edge devices. In general, client-wise parallelism is desirable, but it provides diminishing returns as the number of participating clients increases. Furthermore, if all of the connected clients are participating, this strategy is no longer applicable. Finally, there is the risk of rapidly exhausting the available datasets.
+\subsubsection{Expensive Communication} % E
+Communication is a critical bottleneck in many FL applications. In traditional data center DL, the communication environment is assumed to be perfect, with low latency, high bandwidth and negligible to no packet loss. This assumption is not appropriate to FL training, as clients are expected to be in different locations and with varying amounts of resources. This is especially true in edge FL, where the on-device datasets are small and connections are slow and unreliable, resulting to a high communication to computation ratio.
 
-The most typical technique to increase computation is to have clients perform more local model updates per GE. This can be achieved in two ways, more local epochs, i.e. more passes through the local dataset, or smaller batch size, i.e. more updates per pass through the local dataset. In traditional DL, such techniques tends to produce negative effects like overfitting. On the other hand, FL algorithms, due to their model averaging, produce regularization effects equivalent to dropout, ultimately increasing the accuracy of the model under training.
+\subsubsection{Privacy and Security Concerns} % E
+The primary concern of FL applications is to protect the privacy of the participating clients. However, malicious participants or third parties may be able to infer sensitive information from shared parameters, defeating the main goal of FL. Furthermore, it is mostly assumed that all participants are well-intentioned, yet this is not always the case. Malicious clients may try to undermine the accuracy of the model or install backdoors into it by utilizing poisonous datasets.
 
-While these techniques are effective, having too many local updates between communication rounds can have a negative impact. To begin with, local models may diverge too much from each other, especially when under non-IID data distribution, significantly decreasing the convergent rate of the global model. As a result, additional training is required, defeating the aim of these techniques.
-
-Another concern is that the likelihood of stragglers occurring is considerably increased due to client heterogeneity. Clients with fewer resources will take disproportionately longer to complete the additional computations, widening the gap between them and the faster ones. Since simulations are most often used when developing FL algorithms, researchers frequently overlook this issue.
-
-\subsubsection{Model Compression}
-These techniques, which are extensively employed in DL, attempt to decrease the amount of the communicated updates. The weights of the model under training make up the majority of the updates; applying transformations like sparification, quantization, and subsambling to them can reduce the size of the updates. In general, they are classified into two types: structured updates, which attempt to select what information is sent, and sketched updates, which attempt to compress the communicated information.
-
-Structured updates require that updates adhere to a set, reduced format. This is possible in multiple ways, like putting a predermined per-client mask on the model after training to sparsify it. Another method is to instruct a client to train and communicate only specific layers or pieces of them. A more complex alternative is for the server to apply dropout to the global model in order to create a submodel, which the clients train, and the server maps back to the global model during aggregation. In general, these methods try to shift the responsibility of compression to the server, with the aim to make it more predictable and correct its error.
-
-Sketched updates refer to techniques that encode the update in one side and decode in the other. One such method is probabilistic quantization \cite{probabilistic_quantization}, in which the update matrices are vectorized and quantized for each scalar. Another option is to use a random mask like in a structure update, with the difference that it is randomly generated by the client and communicated to the server together with the encoded local model.
-
-All these methods can be lossy and introduce error as a result of information loss. This error can be characterized as noise, which in most cases has a mean value of zero due to the nature of the compression algorithms commonly used. As such, the averaging of the FL algorithms can reduce it or even eliminate it from the accumulation of the local updates. For this to be true in practice, a large number of clients must be participating, which that is not always achievable. Moreover, as there is only one global model at any given time, any error in server-to-client communication cannot be reduced.
-
-\subsubsection{Importance-based Updating}
-By sending only what seems important, importance-based updating aims to reduce the volume of communication. Based on the observation that most parameters in an ANN are close to zero or hardly vary \cite{observation_parameters}, this can be done in a fine-grained manner by sending to the server only a small percentage of the model parameters. It can also be applied in a coarse-grained way by asking clients to review their updates and send them only if they think they would help the overall model. These techniques have demonstrated that, when applied properly, they can occasionally reduce communication while also increasing accuracy and convergence rate. In contrast, they may produce the opposite effects if used excessively.
-
-\subsection{Systems heterogeneity}
+\subsection{Systems Heterogeneity}
 The previously discussed systemic characteristics of FL aggravate issues like straggler mitigation and fault tolerance. The slowest participating client has a significant impact on the duration of a GE. They can substantially impede training speed, thus removing them from the process is generally considered. Furthermore, if the server waits indefinitely for the client updates and a client disconnects without notifying, the entire system would hang. These issues are especially prevalent in on-edge setting where there is little information or control over the clients' resources.
 
 FL algorithms must be able to handle heterogeneous hardware and resist against random and unpredictable client drops. A frequent option is to disconnect clients who have not responded within a predetermined amount of time. Additionally, using more clients per epoch than necessary and accepting updates from those who respond first can help to eliminate stragglers. While effective, such strategies can induce biases in favour of the datasets of the fastest clients, reducing the overall accuracy of the model.
 
 More sophisticated proposed solutions include intelligent client selection by only accepting clients that report their resources prior participating or tracking statistics on their overall performance. Such methods are not always feasible since they may jeopardize the privacy of the clients. A major portion of FL research employs simulations and avoid these problems, letting these challenges the least explored.
 
-\subsection{Data distribution}
-A dataset is independent and identically distributed (iid) if each example in it has the same probability distribution as the others and all are mutually independent. Models' accuracy, convergence rate, and fairness can all be degraded by training on non-iid datasets. Traditional ML avoids these issues by using a single, massive dataset that the designer is allowed to manipulate. On the other hand, FL encompasses a set of smaller datasets that could differ statistically from one another, and the designer may not be in control of or even aware of these differences. Ideally, a global dataset could be established by aggregating all of these small local datasets, however in reality this is impossible because the data cannot be centralized.
+\subsection{Data Distribution}
+\label{susbsection: Data distribution}
+A dataset is Independent and Identically Distributed (IID) if each example in it has the same probability distribution as the others and all are mutually independent. Models' accuracy, convergence rate, and fairness can all be degraded by training with non-IID datasets. Traditional ML avoids these issues by using a single, massive dataset that the designer is allowed to manipulate.
+
+On the other hand, as shown in figure \ref{fig:Data distribution}, FL encompasses a set of smaller datasets that may statistically differ from one another, and the designer may not be in control of or even aware of that. Ideally, a global dataset could be established by aggregating all of these small local datasets, however in reality this is impossible because the data cannot be centralized.
 
 \begin{figure}[H]
     \centering
         \includegraphics[width=0.6\textwidth]{Images/block_diagrams/data_distribution.png}
         \decoRule
-        \caption[Data distribution]{Centralized Dataset vs. Local Datasets. When distributed unevenly among the clients, the same data can behave as non-iid.}
+        \caption[Data distribution]{Centralized Dataset vs. Local Datasets. An IID dataset may transform to non-IID when distributed between clients.}
         \label{fig:Data distribution}
 \end{figure}
 
-\subsubsection{Non-identical client distributions}
-A global dataset used during FL may not be iid for a variety of reasons. First of all, a client's private dataset may locally violate independence, but this can usually be fixed via local shuffling. The statistical variations between the local datasets are more significant.
+\subsubsection{Non-Identical Client Distributions}
+A global dataset used during FL may not be IID for a variety of reasons. First of all, a client's private dataset may locally violate independence, but this can usually be fixed via local shuffling. The statistical variations between the local datasets are more significant.
 
-The distribution of a local dataset \(P_i(x,y)\) can be rewritten as \(P_i(y|x)P(x)\) and \(P_i(x|y)P(y)\), where \(x\) and \(y\) are the input-output pairs. The distributions of at least two clients, I and j, must differ for the data to be non-iid, that is \(P_i \neq P_j\). There are several causes for this, including:
+The distribution of a local dataset \(P_i(x,y)\) can be rewritten as \(P_i(y|x)P(x)\) and \(P_i(x|y)P(y)\), where \(x\) and \(y\) are the input-output pairs. To classify the overall data as non-IID, the distributions of at least two clients, \(i\) and \(j\), must differ; that is \(P_i \neq P_j\). There are several causes for this, including:
 
 \begin{itemize}
   \item \emph{Feature distribution skew} (covariate shift), \(P_i(x) \neq P_j(x)\):\\
@@ -632,16 +611,41 @@ The distribution of a local dataset \(P_i(x,y)\) can be rewritten as \(P_i(y|x)P
   The FL participants might not be indicative of the end users. For instance, clients with inferior devices may be underrepresented as a result of any eligibility criteria used during client selection.
 \end{itemize}
 
-A real-world FL dataset may have any combination of these effects. Due to the difficulties of generating such datasets and examining algorithms built on them, most research tends to concentrate on one or two of them. Depending on the Fl scenario under training, different distribution skew effects may aplly and different mitigation strategies may be required.
+A real-world FL dataset may have any combination of these effects. Due to the difficulties of generating such datasets and examining algorithms built on them, most research tends to concentrate on one or two of them. Depending on the Fl scenario under training, different distribution skew effects may aplly and different mitigation strategies may be required. The figure \ref{fig:Data distribution} presents label distribution and quantity skew.
 
-\subsubsection{Dealing with non-iid distributions}
+\subsubsection{Dealing with non-IID Distributions}
 Existing algorithms can be modified, either by altering their parameters and hyperparameters or by sophisticating features like client selection. While adjusting other parameters, reducing batch size and increasing local epochs can be increase model accuracy, but excessive use may hurt convergence rate and lengthen training time. Metalearning approaches could be used to discover an ideal equilibrium.
 
 It has been demonstrated that system heterogeneity and data heterogeneity interplay. By discarding straggles, unique and useful data could be wasted, degrading the model's fairness and accuracy. Stragglers can partially work, by personalizing parameters or reparameterizing on the fly, according to their resources. In this way, their local datasets can be exploited without slowing down the overall process.
 
-Another approach is for the server to request data distribution statistics from the clients. With this information, the server can select those that will result in a balanced distribution. In addition, the server may be able to share some relevant publicly available data with the clients in order to rebalance their datasets. If no such data are available, willing clients may, if practical, provide their datasets to aid in the overall training process. These techniques can alleviate non-iid distribution problems, but they require additional communication and bandwidth. Additionally, they have the potential to compromise privacy, which would undermine one of FL's main goals.
+Another approach is for the server to request data distribution statistics from the clients. With this information, the server can select those that will result in a balanced distribution. In addition, the server may be able to share some relevant publicly available data with the clients in order to rebalance their datasets. If no such data are available, willing clients may, if practical, provide their datasets to aid in the overall training process. These techniques can alleviate non-IID distribution problems, but they require additional communication and bandwidth. Additionally, they have the potential to compromise privacy, which would undermine one of FL's main goals.
 
 Similarly, frameworks for multitask learning may be employed. Clients can train their local personalized models concurrently with the global model and share knowledge between them. Such techniques may not always be available as they demand greater processing and memory resources from the clients.
+
+
+\subsection{Communication Cost Reduction}
+To achieve a satisfactory model in FL, multiple rounds of training and communication between the server and the clients are required. Communication can be a big bottleneck if the ANN being trained is massive and has millions of parameters, or if the clients are under slow connections. As a result, a series of techniques for improving communication efficiency have been developed, which can be classified into three groups: increasing computation, decreasing communication size, and decreasing communication frequency.
+
+\subsubsection{Edge and End Computation}
+Increasing parallelism by selecting more clients each GE is an obvious technique to increase computation in edge devices. In general, client-wise parallelism is desirable, but it provides diminishing returns as the number of participating clients increases. Furthermore, if all of the connected clients are participating, this strategy is no longer applicable. Finally, there is the risk of rapidly exhausting the available datasets.
+
+The most typical technique to increase computation is to have clients perform more local model updates per GE. This can be achieved in two ways, more local epochs, i.e. more passes through the local dataset, or smaller batch size, i.e. more updates per pass through the local dataset. In traditional DL, such techniques tends to produce negative effects like overfitting. On the other hand, FL algorithms, due to their model averaging, produce regularization effects equivalent to dropout, ultimately increasing the accuracy of the model under training.
+
+While such techniques are effective, too many local updates between communication rounds can create a negative impact. Local models may diverge too much from each other, especially when under non-IID data distribution, significantly decreasing the convergent rate of the global model. As a result, additional training is required, defeating the aim of these techniques.
+
+Another concern is that the likelihood of stragglers occurring is greatly increased due to client heterogeneity. Clients with fewer resources take disproportionately longer to complete the additional computations, widening the gap between them and the faster ones. Since simulations are most often used when developing FL algorithms, researchers frequently overlook this issue.
+
+\subsubsection{Model Compression}
+These techniques, which are extensively employed in DL, attempt to decrease the amount of the communicated updates. The weights of the model under training make up the majority of the updates; applying transformations like sparification, quantization, and subsambling to them can reduce the size of the updates. In general, they are classified into two types: structured updates, which attempt to select what information is sent, and sketched updates, which attempt to compress the communicated information.
+
+Structured updates require that updates adhere to a set, reduced format. This is possible in multiple ways, like putting a predermined per-client mask on the model after training to sparsify it. Another method is to instruct a client to train and communicate only specific layers or pieces of them. A more complex alternative is for the server to apply dropout to the global model in order to create a submodel, which the clients train, and the server maps back to the global model during aggregation. In general, these methods try to shift the responsibility of compression to the server, with the aim to make it more predictable and correct its error.
+
+Sketched updates refer to techniques that encode the update in one side and decode in the other. One such method is probabilistic quantization \cite{probabilistic_quantization}, in which the update matrices are vectorized and quantized for each scalar. Another option is to use a random mask like in a structure update, with the difference that it is randomly generated by the client and communicated to the server together with the encoded local model.
+
+All these methods can be lossy and introduce error as a result of information loss. This error can be characterized as noise, which in most cases has a mean value of zero due to the nature of the compression algorithms commonly used. As such, the averaging of the FL algorithms can reduce it or even eliminate it from the accumulation of the local updates. For this to be true in practice, a large number of clients must be participating, which that is not always achievable. Moreover, as there is only one global model at any given time, any error in server-to-client communication cannot be reduced.
+
+\subsubsection{Importance-based Updating}
+By sending only what seems important, importance-based updating aims to reduce the volume of communication. Based on the observation that most parameters in an ANN are close to zero or hardly vary \cite{observation_parameters}, this can be done in a fine-grained manner by sending to the server only a small percentage of the model parameters. It can also be applied in a coarse-grained way by asking clients to review their updates and send them only if they think they would help the overall model. These techniques have demonstrated that, when applied properly, they can occasionally reduce communication while also increasing accuracy and convergence rate. In contrast, they may produce the opposite effects if used excessively.
 
 \subsection{Privacy and Security}
 One of FL's key goals is to protect participants' privacy by simply requesting them to share model parameters and not any of their personal information. Additionally, FL wants to improve the model's fairness and accuracy by incorporating personal data. However, if any FL participant is malicious, these goals could be defeated. Model updates obtained from them can be used to reconstruct data, and poisoning attacks can corrupt the model.
@@ -660,7 +664,7 @@ One of FL's key goals is to protect participants' privacy by simply requesting t
   
   Such attack can perpetrated using model extraction algortihms and Generative Adversarial Networks \cite{GAN_attack} (GANs). GANs is a ML technique where two competing ANNs are trained, a generator network and a discriminator network. The generator tries to create fake data while the discriminator tries to discern real data from the fake by analyzing the output of the discriminator. After some training, the generator can create data that closely resembles the real ones using the statistics learned by the classifier.
   
-  A GAN attack seeks to infer as much useful information as possible about elements in a target class that are not under its possession. The GAN tries to mimic samples of that class, mislabels them and feeds them to the ANN under federated training. The rest of the participants must then work harder to discriminate between the target class and the mislabeled class, resulting in additional knowledge about the target class in the global model. This process is repeated until convergence, and the GAN has enough information to reliably reconstruct samples from the target class that approximate the original examples. 
+  A GAN attack, as shown in figure \ref{fig:GAN attack}, seeks to infer as much useful information as possible about elements in a target class that are not under its possession. The GAN tries to mimic samples of that class, mislabels them and feeds them to the ANN under federated training. The rest of the participants must then work harder to discriminate between the target class and the mislabeled class, resulting in additional knowledge about the target class in the global model. This process is repeated until convergence, and the GAN has enough information to reliably reconstruct samples from the target class that approximate the original examples. 
   
   This attack can be generalized to any number of classes and users, as well as any type of collaborative learning. If the server or another entity with access to the victim's communications is the malicious actor,it can be made more efficient by using the victim's local updates rather than the global model.
 \end{itemize}
@@ -669,7 +673,7 @@ One of FL's key goals is to protect participants' privacy by simply requesting t
     \centering
         \includegraphics[width=1\textwidth]{Images/topologies/gan_fl.png}
         \decoRule
-        \caption[GAN attack]{GAN attack. The adversary mimics images of class \emph{a}, labels them as class \emph{c} and uses them to train the collaborative model. To distinguish between these two classes, the model will require more information from the victim. The adversary does not need to have any true samples.: \href{https://arxiv.org/abs/1702.07464}{URL}.}
+        \caption[GAN attack]{GAN attack. The adversary mimics images of class \emph{a}, labels them as class \emph{c} and uses them to train the collaborative model. To distinguish between these two classes, the model will require more information from the victim. The adversary does not need to have any true samples. \cite{GAN_attack}: \href{https://arxiv.org/abs/1702.07464}{URL}.}
         \label{fig:GAN attack}
 \end{figure}
 
@@ -678,7 +682,7 @@ FL algorithms are somewhat resistant to the aforementioned attacks due to the re
 
 Such scale is quite challenging to achieve in an environment closer to the datacenter, making it much more vulnerable. Furthermore, clients might seek stronger privacy guarantees as the server might not always trustworthy. For these reasons, further measures for protecting privacy and security are necessary.
 
-An additional level of security can be provided with minimal adjustments to the FL protocol, by scanning the clients' updates for unusual patterns. Repeated updates with outlandish values could be a sign that a client is attempting to corrupt the model. Furthermore, the updates of clients that try to inject backdoors frequently resemble one another, which is rare, especially in a non-iid dataset. Such methods can improve the security of the model, but require plain-text access to the local updates, which is not always available due to privacy enhancements based on cryptography.
+An additional level of security can be provided with minimal adjustments to the FL protocol, by scanning the clients' updates for unusual patterns. Repeated updates with outlandish values could be a sign that a client is attempting to corrupt the model. Furthermore, the updates of clients that try to inject backdoors frequently resemble one another, which is rare, especially in a non-IID dataset. Such methods can improve the security of the model, but require plain-text access to the local updates, which is not always available due to privacy enhancements based on cryptography.
 
 Clients might request further privacy protections, particularly if they don't trust the server or the connection between them. Secure Multi-Party Computation (MPC) \cite{MPC}, a subfield of cryptography, can be utilized to accomplish that. MPC simulate a trustworthy third party between two or more collaborating parties. Its homomorphic encryption techniques, which allow mathematical operations to be performed directly on cyphertexts and enable the server to aggregate the local models without having access to their plain-text contents, are particularly helpful. As a result, privacy can be ensured, albeit at a high computational cost that comes with cryptographic operations.
 
@@ -689,13 +693,8 @@ The state of the art method to enhance model security and restrict information e
     \centering
         \includegraphics[width=1\textwidth]{Images/topologies/dp_on_gan_attack.png}
         \decoRule
-        \caption[GAN attack under Differential Privacy]{Effect of Differential Privacy on a GAN attack.: \href{https://arxiv.org/abs/1702.07464}{URL}.}
+        \caption[GAN attack under Differential Privacy]{Effect of Differential Privacy on a GAN attack. \cite{GAN_attack}: \href{https://arxiv.org/abs/1702.07464}{URL}.}
         \label{fig:GAN attack under Differential Privacy}
 \end{figure}
 
-Theoretically, under DP transformation, the accuracy of the model and its convergence rate won't be impacted as the noise should vanish during aggregation. In practice, several samples are necessary to generate a distribution with a mean value close to zero, thus FL must be scaled appropriately. Finally, as attacks get more sophisticated, these countermeasures might not be effective and combinations of them or new ones are required.
-
-%types
-% \subsection{Categorization?} % C12:5 +B88
-%     horizontal - vertical - transfer learning?
-%     \subsubsection{Architectures for a federated learning system}
+Theoretically, under DP transformation, the accuracy of the model and its convergence rate won't be impacted as the noise presented in figure \ref{fig:GAN attack under Differential Privacy} should vanish during aggregation. In practice, several samples are necessary to generate a distribution with a mean value close to zero, thus FL must be scaled appropriately. Finally, as attacks get more sophisticated, these countermeasures might not be effective and combinations of them or new ones are required.

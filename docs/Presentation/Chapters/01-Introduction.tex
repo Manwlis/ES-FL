@@ -1,0 +1,35 @@
+\setlength{\parskip}{\baselineskip}
+\section{Introduction}
+
+\begin{frame}{Introduction}
+    \begin{block}{What is Federated Learning (FL)?}
+    	FL is a decentralized \& collaborative training method for AI models
+    	\begin{itemize}
+    		\item training at the data collection point (edge devices)
+    	 	\item edge devices share model weights instead of raw data
+    	 	\item can exploit sensitive data, while ensuring privacy
+    	 	\item compliant with recent legislation like GDPR \& CCPA
+    	 	\item used by Google to train Gboard
+    	 \end{itemize}
+    \end{block}
+\end{frame}
+
+\begin{frame}{Motivation}
+    FL literature mostly disregard the underlying hardware of the edge devices, where the training actually takes place. % mostly works use simulations
+    \begin{itemize}
+        \item[\ding{228}] Few wall-clock time examples.
+        \item[\ding{228}] Interactions between training hardware and FL remain unexplored.
+        \item[\ding{228}] Are FPGAs compatible and efficient with on-edge FL?
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Contributions}
+    In this thesis:
+	\begin{itemize}
+		\item developed FL system, usable with any model, training method \& implementation
+	 	\item conducted in-depth robustness analysis of FL with small client pools 
+	 	\item implemented training of a CNN on a FPGA, optimized for the parameter space where FL is most efficient
+	 	\item produced wall-clock timings by actual runs on real hardware
+	 	\item compared with equivalent CPU \& GPU implementations
+	 \end{itemize}
+\end{frame}

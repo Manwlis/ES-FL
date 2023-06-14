@@ -2,7 +2,9 @@
 \label{Chapter-Results}
 This chapter has three aims. First, to quantify the performance of the FPGA implementation of the ANN and analyze its resource consumption and timing. Second, to compare it will equivalent implementations on other technologies. Final and main goal, to study the interaction and discover any possible synergies or conflicts between the two technologies under focus, namely FL and FPGA. % aims
 
-\subsection{Performance Metrics}
+It should be noted that the following timings were produced through actual runs in a real FPGA. In the following subsections it is explained in detail how they were generated and what they actually mean.
+
+\subsection*{Performance Metrics}
 
 \subsubsection{Latency}
 Latency, is the required time to complete a single task. In this work, latency can be the time taken to process a single image, a batch of images, a dataset of images, etc. % what is latency
@@ -42,7 +44,7 @@ The utilization of the rest of the PL is affected mostly on the desired accuracy
 \subsection{Timing Analysis}
 A thorough analysis of the implementation's timings is required to to assess its performance, identify delays and limitations, as well as enable future improvements. This section provides a breakdown of the relevant latencies. The following formulas and results have been confirmed by experiments on the ZCU102. % why analize timing
 
-\subsubsection{Overall latency}
+\subsubsection{Overall Latency}
 From the point of view of the host program, the overall latency of training can be broken down as follows; writing the variables in global memory, calling the accelerator, waiting for the accelerator to return, and finally read the produced variables from the global memory. % host latency
 \begin{equation}
 	Host_{latency} = GMEM_{write} + Accel_{call} + Accel_{wait} + GMEM_{read}
@@ -72,7 +74,7 @@ Calculating the gradients is done using the long and complex pipeline depicted i
 \begin{equation}
     G(b) = G_{up} + b \cdot E + G_{down}
     \label{eqn: Gradients pipeline, training latency}
-\end{equation}
+\end{equation}%
 Where:
 \begin{conditions}
     G_{up} & latency to wind-up the pipeline\\
@@ -84,26 +86,29 @@ Thus, the latency of the accelerator can better be described as:
     Accel_{latency} = I + S + e \cdot d [ E + \frac{ G_{up} + G_{down} + U }{b} ] % 24613 + 60000 [ 33320 + ( 35310 + 25121 )/b ]
     \label{eqn: Accel, training latency, complete}
 \end{equation}
+$U$, as described in section \ref{sec:Updating_Variables}, is completely elastic and the main target when optimizing for small batches.
+
 Through analyzing the Vitis reports, exact numbers can be assigned on each constant. For a single pass through the whole dataset $( e=1, d=60000 )$ and a clock speed of $4.08 ns (\sim245MHz)$, the equation transforms to: % function with numbers
 \begin{equation}
     Accel_{latency} = 8.157 + \frac{ 14.794 }{b} (sec) % 1999224613 + 3625860000/b 
     \label{eqn: accel, training latency in ms}
 \end{equation}
 \subsubsection{Constrains}
+\label{Constrains}
 According to equation \ref{eqn: Accel, training latency, complete}, the latency introduced by each example (E) is the most important constant. Accountable for that is the dataflow region shown in figure \ref{fig: Gradients Calculation Pipeline Block Diagram}, thus received most of the optimization attention. Better performance is restricted mostly by a single issue caused by the HLS tool, affecting clock speed and the total operating clock cycles. % importance of E and issues
 
 The slowest function of a dataflow region determines its overall latency. In this case, it is the \textit{sum filters} in the back-propagation of the second convolutional layer. Per example, it has 14$\times$14 inputs with 32 input and 16 output channels. The outputs are independent from each other and are calculated in parallel. Thus, 16 accumulators that reset every 32 cycles are needed. % where is problem
 
 Unfortunately, in the latest versions of the Vitis HLS, the tool can not deduce that the \textit{facc} operator is the optimal choice if its accuracy has not been set to low. Instead, when normal accuracy is requested, it implements the slower \textit{fadd} operator, which forces an II of 5 cycles and a clock speed of 245MHz. As a result, the latency of a single example is at least 31360 cycles. % what is the problem and what it affects
 
-The next slowest functions are the \textit{create windows} hardware functions in the convolutional and maxpool layers (layers 0 to 3). While they are simple data transformation, the HLS tool encounters some difficulty in implementing them efficiently, as they are composed mostly of control logic. Furthermore, it is unable to always synthesize them with a free running pipeline, requiring deeper input and output streams to guarantee robustness against random stalls. Still, it is able to synthesize them with a clock of over 300 MHz. % next slowest
+The next slowest functions are the \textit{create windows} hardware functions in the convolutional and maxpool layers (layers 0 to 3). While they are simple data transformation, the HLS tool encounters some difficulty in implementing them efficiently, as they are composed mostly of control logic. Still, it is able to synthesize them with a clock of over 300 MHz.% Furthermore, it is unable to always synthesize them with a free running pipeline, requiring deeper input and output streams to guarantee robustness against random stalls. % next slowest
 
-Both cases are byproducts of using HLS tools. Creating these two function using RTL, would greatly improve the overall performance. If just the \textit{facc} bug is avoided, the clock can be immediately increased by 55MHz. Without trying to improve the II of the function, the latency equation transforms to: % change with facc
+Both cases are byproducts of using HLS tools. If just the \textit{facc} bug is avoided, the clock can be immediately increased by 55MHz. Without trying to improve the II of the function, the latency equation transforms to: % Creating these two function using RTL, would greatly improve the overall performance.  % change with facc
 \begin{equation}
     Accel_{latency} = 6.664 + \frac{ 12.086 }{b} (sec) % 1999224613 + 3625860000/b
     \label{eqn: Accelerator with facc, training latency in ms}
 \end{equation}
-Visualizing the equations \ref{eqn: accel, training latency in ms} \& \ref{eqn: Accelerator with facc, training latency in ms} in the following diagram, shows that their second part is insignificant for batches of over 100 images. In contrast, the first part is unavoidable and sets a base latency regardless of the batch size. % visualize
+Visualizing the equations \ref{eqn: accel, training latency in ms} \& \ref{eqn: Accelerator with facc, training latency in ms} in the diagram \ref{fig: accel latency}, shows that their second part is insignificant for batches of over 100 images. In contrast, the first part is unavoidable and sets a base latency regardless of the batch size. % visualize
 \begin{figure}[H]
     \center
     \begin{tikzpicture}
@@ -123,11 +128,24 @@ Visualizing the equations \ref{eqn: accel, training latency in ms} \& \ref{eqn: 
             \addlegendentry{$Accelerator\:with\:facc$}
         \end{axis}
     \end{tikzpicture}
-    \caption[Accelerator's latency per batch size]{Latency of the accelerator design.}
+    \caption[Accelerator's latency per batch size]{Latency with and without the facc module.}
     \label{fig: accel latency}
 \end{figure}
 
-\section{Comparison with other technologies}
+\subsection{Power Consumption Analysis}
+The average power consumption of the design can be reliably estimated by the Xilinx tools. This report was generated post-implementation and is shown in figure \ref{fig: power}. A breakdown of the consumption per PL element can be seen.
+
+\begin{figure}[H]
+    \centering
+        \includegraphics{Images/power.png}
+        \decoRule
+        \caption[Power Estimation]{Post-implementation power estimation of the accelerator.}
+        \label{fig: power}
+\end{figure}
+
+The average consumption is stated as 9.356 W, with the PL accountable for the majority of it. This is to be expected, as the PS part of the accelerator mostly does nothing while waiting for the PL part to finish. In practice, most of the PS consumption is sourced from the of-chip memory used.
+
+\section{Comparison with Other Technologies}
 To form an opinion on the efficiency of the FPGA implementation, a proper comparison is required. Thus, the ANN is also trained on CPU and GPU using TensorFlow. As metrics, the latency of a training epoch and the overall throughput are used.
 
 \subsection{Specification of Compared Platforms}
@@ -143,13 +161,14 @@ Released in mid 2019, the i7-9750H is a high end CPU for laptops. Based on the C
         Supplied Memory & 16GB DDR4-2666\\
         Max Memory Bandwidth & 41.8 GB/s $\times$ 2 channels\\
         Instruction Set Extensions & SSE4.1, SSE4.2, AVX2\\
+        Average Power Consumption & 45 W\\
     \end{tabular}
     \caption[i7-9750H specifications]{i7-9750H specifications \cite{i7-9750H}.}
     \label{table: i7-9750H}
 \end{table}
 
 \subsubsection{Nvidia GTX 1660 Ti}
-While released in early 2019 as a mid-tier consumer GPU, is more than capable for training ANNs like the one under investigation. Its relevant specifications are shown on the following table. % GPU
+While released in early 2019 as mobile platform (laptops, tablets, etc.) GPU, is more than capable for training ANNs like the one under investigation. Its relevant specifications are shown on the following table. % GPU
 \begin{table}[H]
     \center
     \begin{tabular}
@@ -161,6 +180,7 @@ While released in early 2019 as a mid-tier consumer GPU, is more than capable fo
         Memory Bandwidth & 288 GB/s\\
         Single Precision Compute Power & 5437.44 GFLOPS\\
         Compute Capability & 7.5\\
+        Average Power Consumption & 120 W\\
     \end{tabular}
     \caption[GTX 1660 Ti specifications]{GTX 1660 Ti specifications \cite{GTX1660Ti}.}
     \label{table: GTX1660Ti}
@@ -200,13 +220,13 @@ While released in early 2019 as a mid-tier consumer GPU, is more than capable fo
     \label{fig: FPGA CPU GPU latency}
 \end{figure}
 
-Due to the CPU's fluctuating clock speed and caching architecture, training latency has a slight variance. This effect is considerably more pronounced on the GPU, as during the first epoch it must copy the training dataset and the ANN's variables to its dedicated memory, in addition to having variable clock speed and caching. % variance CPU, GPU
+Due to the CPU's fluctuating clock speed and caching architecture, training latency has a slight variance. This effect is considerably more pronounced on the GPU, as it also copy the training dataset and the ANN's variables to its dedicated memory, during the first epoch. % variance CPU, GPU
 
-On the FPGA, however, training latency is practically deterministic. The only variance that it encounters, is produced by the system calls and is less than 10 ms. Such effects should be noted as this work also considers on-edge devices, where the training algorithm may not have complete control over them and their environment is not always in an ideal state. % variance GPU
+On the FPGA, however, training latency is practically deterministic. The only variance that it encounters, is produced by the system calls and is less than 10 ms. Such effects should be noted as this work also considers on-edge devices, where the training algorithm may not have complete control over them and their environment is not always in an ideal state. % variance GPU
 
-Performance wise, the FPGA implementation outperforms in training with small batches, but is overtaken by the GPU when their size is larger than or equal to 15 examples. Training on CPU is consistently slower than the other technologies.
+Performance wise, according to figure \ref{fig: FPGA CPU GPU latency}, the FPGA implementation outperforms in training with small batches, but is overtaken by the GPU when their size is larger than or equal to 15 examples. Training on CPU is consistently slower than the other technologies.
 
-It should be noted that the GPU is unable to perform non-Stochastic Gradient Descent, where the whole dataset is concatenated in a single batch. TensorFlow can not obtain enough GPU dedicated memory and crashes. Due to the non-deterministic nature of memory management, this can also occur for SGD with batch sizes equal to or more than 15000 samples. In on-edge devices, such effects are expected to become more noticeable, due to the FL algorithm's limited ability to manage them.
+It should be noted that the GPU is unable to perform non-Stochastic Gradient Descent, where the whole dataset is concatenated in a batch. TensorFlow can not obtain enough GPU dedicated memory and crashes. Due to non-determinism in memory management, this can also occur for SGD with batches of more than 15000 samples. In on-edge devices, such effects are expected to become more noticeable, due to the FL algorithm's limited control.
 
 \subsection{Throughput Comparison}
 \begin{figure}[H]
@@ -246,8 +266,25 @@ It should be noted that the GPU is unable to perform non-Stochastic Gradient Des
     \caption[FPGA, GPU, CPU throughput comparison]{Throughput of FPGA, GPU and CPU implementations}
     \label{fig: FPGA CPU GPU throughput}
 \end{figure}
+Similar observations can be made by comparing the throughput of the implementations in figure \ref{fig: FPGA CPU GPU throughput}. Although the FPGA starts from more than 2600 images per second, its performance plateaus at around 7500. In contrast, the GPU can only achieve ~600 images per second with single image batches, but reaches a maximum throughput of 50000 when using huge batches.
 
-Similar observations can be made by comparing the throughput of the implementations. Although the FPGA starts from more than 2600 images per second, its performance plateaus at around 7500. In contrast, the GPU can only achieve ~600 images per second with single image batches, but reaches a maximum throughput of 50000 when using huge batches.
+\subsection{Power Consumption Comparison}
+Table \ref{table: power} presents the power consumption of the three implementation. An actual system with the CPU or GPU implementation, would require other components to operate, e.g. a motherboard. In contrast, the FPGA-based implementation is aimed for the ZCU102, which is an SoC, and requires no other components. This is a gross comparison, and aims to give a general idea of their differences.
+\begin{table}[H]
+    \center
+    \begin{tabular}
+        { | c | c | c | }
+        \hline
+        CPU & GPU & FPGA\\
+        \hline
+        53 W & 120 W & 9.356 W\\ 
+        \hline
+    \end{tabular}
+    \caption[Power Consumption]{Power consumption of the three implementations.}
+    \label{table: power}
+\end{table}
+Although the CPU's average power usage is listed as 45 W, during actual runs it rises to 53 W due to clock frequency boosting. The FPGA consumes \(5.67\times\) less power than the CPU and \(12.83\times\) less power than the GPU.
+
 
 \section{FL \& FPGA Interaction Analysis}
 \subsection{Methodology}
@@ -282,7 +319,7 @@ It should be noted that the results of the previous section can not be used in p
 \subsection{IID} % TODO: replace X and Y with numbers
 In the first experiment, the Fashion-MNIST dataset is split randomly and evenly across 10 clients. This is an IID distribution, in the sense that is used in relevant bibliography. All random factors, such as dataset distribution and client selection, have been seeded to remove their effects from the final results. % data, seeds
 
-The model is trained with the FedAvg algorithm multiple times, once for each batch size that perfectly divides the local datasets. Out of the 10 clients, 5 of them are randomly selected to participate in each GE. The constant parameters of the experiment are listed in the following table. % algorithm & parameters
+The model is trained with the FedAvg algorithm multiple times, once for each batch size that perfectly divides the local datasets. Out of the 10 clients, 5 of them are randomly selected to participate in each GE. The constant parameters of the experiment are listed in table \ref{table: ΙID experiment parameters}. % algorithm & parameters
 \begin{table}[H]
     \center
     \begin{tabular}
@@ -325,7 +362,7 @@ Training with batch sizes of 4 or less, produces overfitted local models and ren
 
 More interesting is the range of batch sizes from 5 to 50, where the target accuracy is reached in 30 to 60 GEs. Larger sizes increase the required number of GEs in a parabolic manner, and regardless how fast is the local training, the increase in communication most likely prohibits their use.
 
-The following figure shows, per batch size, how much time is required to reach the target accuracy. The FPGA design is benchmarked with the best case of the GPU, where the dataset is already cached in its dedicated memory.  % final diagram what it is
+Figure \ref{fig: IID, total time} shows, per batch size, how much time is required to reach the target accuracy. The FPGA design is benchmarked with the best case of the GPU, where the dataset is already cached in its dedicated memory.  % final diagram what it is
 \begin{figure}[H]
     \centering
     \addtolength{\leftskip} {-2cm} % increase (absolute) value if needed
@@ -566,18 +603,43 @@ In a vacuum, the GPU appears to be the superior option, as when operating with l
     \label{fig: GEs per batch size, IID and nonIID}
 \end{figure}
 
-The performance of the FPGA is superior or comparable to that of the GPU in the valleys where the FedAvg algorithm is more effective. The best results of both platforms, for each dataset distributions, are summarized in the table below.
+The performance of the FPGA is superior or comparable to that of the GPU in the valleys where the FedAvg algorithm is more effective. The best results of both platforms, for each dataset distributions, are summarized in the table below.
 \begin{table}[H]
     \center
     \begin{tabular}
-        { l c c }
+        % { l @{\hskip 30pt} c c @{\hskip 30pt} c c }
+        { l @{\hskip 30pt} c c c @{\hskip 30pt} c c c }
         \hline
-                & GPU & FPGA\\\hline
-        IID     & 143 & 132 $(1.08\times)$\\
-        non-IID & 888 & 739 $(1.2\times)$\\\hline
+        \multirow{2}{*}{ \shortstack{Dataset\\Distribution} } &
+            % \multicolumn{2}{c@{\hskip 50pt}}{Training time (s)} & \multicolumn{2}{c@{\hskip 20pt}}{Total time (s)} \\
+            \multicolumn{3}{c@{\hskip 30pt}}{Training time (s)} & \multicolumn{3}{c}{Total time (s)} \\
+        &
+                       GPU         & FPGA & speedup        & GPU       & FPGA & speedup        \\
+        \hline
+        IID          & 39          & 27   & $1.44\times$ & 143       & 132  & $1.08\times$ \\
+        non-IID      & 343         & 269  & $1.27\times$ & 888       & 739  & $1.2\times$  \\
+        \hline
     \end{tabular}
-    \caption[Best Results]{Comparison of both platforms for each setting with relative speedup.}
-    \label{table: Best Results}
+    \caption[Best Results - Timing]{Timing comparison of both platforms, for each setting with relative speedup.}
+    \label{table: Best Results - Timing}
 \end{table}
 
 Last but not least, as these scenarios try to emulate on-edge FL, the computation to communication ratio is quite low. This is typical in such environments, as on-edge devices tend to have small datasets and are used to train small networks.
+
+There is a significant difference in the energy consumption of the two implementations, as indicated in table \ref{table: Best Results - Energy}. It is calculated as the power usage times the amount of training time, which both favor the FPGA-based implementation. Comparing it with the GPU-based one, it requires $(18.18\times)$ and $(16.35\times)$ less energy for the IID and non-IDD datasets respectively.
+\begin{table}[H]
+    \center
+    \small
+    \begin{tabular}
+        { l c c c }
+        \hline
+        \multirow{2}{*}{ \shortstack{Dataset\\Distribution} } & \multicolumn{3}{c}{Total Energy (J)}\\
+                     & GPU       & FPGA   & improvement\\
+        \hline
+        IID          & 4637      & 255    & $18.18\times$\\ % 38.64 * 120 , 27.26122 * 9.356
+        non-IID      & 41.16k     & 2.57k & $16.35\times$\\ % 343 * 120 , 269 * 9.356
+        \hline
+    \end{tabular}
+    \caption[Best Results - Energy]{Energy comparison of both platforms, for each setting with relative improvement.}
+    \label{table: Best Results - Energy}
+\end{table}

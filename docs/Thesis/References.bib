@@ -235,18 +235,17 @@
     volume = 	    {9},
     series = 	    {Proceedings of Machine Learning Research},
     address = 	    {Chia Laguna Resort, Sardinia, Italy},
-    eventdate =     {2010-05-13/2010-05-15},
+    % eventdate =     {2010-05-13/2010-05-15},
     publisher =     {PMLR},
     pdf = 	        {http://proceedings.mlr.press/v9/glorot10a/glorot10a.pdf},
-    url = 	        {https://proceedings.mlr.press/v9/glorot10a.html},
-    abstract = 	    {Whereas before 2006 it appears that deep multi-layer neural networks were not successfully trained, since then several algorithms have been shown to successfully train them, with experimental results showing the superiority of deeper vs less deep architectures. All these experimental results were obtained with new initialization or training mechanisms. Our objective here is to understand better why standard gradient descent from random initialization is doing so poorly with deep neural networks, to better understand these recent relative successes and help design better algorithms in the future.  We first observe the influence of the non-linear activations functions. We find that the logistic sigmoid activation is unsuited for deep networks with random initialization because of its mean value, which can drive especially the top hidden layer into saturation. Surprisingly, we find that saturated units can move out of saturation by themselves, albeit slowly, and explaining the plateaus sometimes seen when training neural networks. We find that a new non-linearity that saturates less can often be beneficial. Finally, we study how activations and gradients vary across layers and during training, with the idea that training may be more difficult when the singular values of the Jacobian associated with each layer are far from 1.  Based on these considerations, we propose a new initialization scheme that brings substantially faster convergence.}
+    url = 	        {https://proceedings.mlr.press/v9/glorot10a.html}
 }
 
 @article{He_Init_paper,
     author =        {Kaiming He and Xiangyu Zhang and Shaoqing Ren and Jian Sun},
     title =         {Delving Deep into Rectifiers: Surpassing Human-Level Performance on ImageNet Classification},
     journal =       {CoRR},
-    volume =        {abs/1502.01852},
+    % volume =        {abs/1502.01852},
     year =          {2015},
     url =           {http://arxiv.org/abs/1502.01852},
     eprinttype =    {arXiv},
@@ -636,9 +635,57 @@
     urldate = {2022-05-25}
 }
 
+@online{edge_detection,
+    title =         {How Image Edge Detection Works},
+    author =        {Aryaman Sharda},
+    year =          {2018},
+    month =         {9},
+    day =           {30},
+    url =           {https://aryamansharda.medium.com/how-image-edge-detection-works-b759baac01e2},
+    urldate =       {2023-05-13}
+}
+
+@online{AI_ven_diagram,
+    title =         {Visually Linking AI, Machine Learning, Deep Learning, Big Data and Data Science},
+    year =          {2016},
+    month =         {10},
+    day =           {17},
+    url =           {whatsthebigdata.com/2016/10/17/visually-linking-ai-machine-learning-deep-learning-big-data-and-data-science/},
+    urldate =       {2022-06-04}
+}
+
+@online{mc_neuron,
+    title =         {McCulloch-Pitts Neuron — Mankind’s First Mathematical Model Of A Biological Neuron},
+    author =        {Akshay L Chandra},
+    year =          {2018},
+    month =         {7},
+    day =           {24},
+    url =           {https://towardsdatascience.com/mcculloch-pitts-model-5fdf65ac5dd1},
+    urldate =       {2023-05-13}
+}
+
+@online{hidden_layers,
+    title =         {Multi Hidden-Layer (Deep) Neural Network},
+    year =          {2023},
+    month =         {4},
+    day =           {06},
+    url =           {http://www.gabormelli.com/RKB/Multi\_Hidden-Layer\_(Deep)\_Neural\_Network},
+    urldate =       {2023-05-13}
+}
+
+@online{comprehensive_cnn,
+    title =         {A Comprehensive Guide to Convolutional Neural Networks — the ELI5 way},
+    author =        {Sumit Saha},
+    year =          {2018},
+    month =         {12},
+    day =           {15},
+    url =           {https://towardsdatascience.com/a-comprehensive-guide-to-convolutional-neural-networks-the-eli5-way-3bd2b1164a53},
+    urldate =       {2023-05-13}
+}
+
 @online{activation_function,
     title =         {How to Choose an Activation Function for Deep Learning},
-    author =         {Jason Brownlee},
+    author =        {Jason Brownlee},
     year =          {2021},
     month =         {1},
     day =           {22},
@@ -664,10 +711,11 @@
     urldate =       {2022-06-04}
 }
 
+
 @online{CS231n_stanford_cnn,
     institution =   {Stanford University},
-    title =         {Convolutional Neural Networks for Visual Recognition},
-    year =          {2022},
+    title =         "{Convolutional Neural Networks for Visual Recognition}",
+    % year =          {2022},
     url =           {https://cs231n.github.io/convolutional-networks/},
     urldate =       {2022-06-05}
 }
@@ -811,7 +859,6 @@
     urldate =       {2022-06-27}
 }
 
-
 @online{MPC,
     title =         {What is Secure Multiparty Computation?},
     organization =  {Inpher},
@@ -827,6 +874,43 @@
     url =           {http://yann.lecun.com/exdb/mnist/},
     year =          {2010}
 }
+
+@online{examples_fashion_MNIST,
+    author =        {Mark West},
+    title =         {Convolutional Neural Networks : An Implementation},
+    url =           {https://www.bouvet.no/bouvet-deler/understanding-convolutional-neural-networks-part-2},
+    urldate =       {2023-05-13}
+}
+
+@online{AlexNet_wiki,
+    title =         {AlexNet},
+    organization =  {Wikipedia},
+    
+    url =           {https://en.wikipedia.org/wiki/AlexNet?useskin=vector#},
+    urldate =       {2022-07-01}
+}
+
+@online{resnet_image,
+    author =        {Sik-Ho Tsang},
+    title =         {Review: ResNet — Winner of ILSVRC 2015 (Image Classification, Localization, Detection)},
+    year =          {2018},
+    month =         {09},
+    day =           {15},
+    
+    url =           {https://towardsdatascience.com/review-resnet-winner-of-ilsvrc-2015-image-classification-localization-detection-e39402bfa5d8},
+    urldate =       {2023-05-13}
+}
+@online{dogs_image,
+    author =        {Bharath Raj},
+    title =         {A Simple Guide to the Versions of the Inception Network},
+    year =          {2018},
+    month =         {05},
+    day =           {29},
+    
+    url =           {https://towardsdatascience.com/a-simple-guide-to-the-versions-of-the-inception-network-7fc52b863202},
+    urldate =       {2023-05-13}
+}
+
 
 @online{tff,
     title =         {TensorFlow Federated: Machine Learning on Decentralized Data},
@@ -959,6 +1043,13 @@
     urldate =       {2022-11-14}
 }
 
+@online{ZCU_102,
+    title =         {Zynq UltraScale+ MPSoC ZCU102 Evaluation Kit},
+    organization =  {Xilinx Inc.},
+    url =           {https://www.xilinx.com/products/boards-and-kits/ek-u1-zcu102-g.html#information},
+    urldate =       {2023-05-13}
+}
+
 @online{XRT_Native_APIs,
     title =         {XRT Native APIs},
     organization =  {Xilinx Inc.},
@@ -967,6 +1058,14 @@
     day =           {7},
     
     url =           {https://xilinx.github.io/XRT/master/html/xrt_native_apis.html},
+    urldate =       {2023-02-13}
+}
+
+@online{vitis_tutorials,
+    title =         {Vitis-Tutorials},
+    organization =  {Xilinx Inc.},
+    
+    url =           {https://github.com/Xilinx/Vitis-Tutorials/tree/2022.1},
     urldate =       {2023-02-13}
 }
 

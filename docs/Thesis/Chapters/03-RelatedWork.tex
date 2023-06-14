@@ -2,29 +2,29 @@
 \label{Chapter-Related-Work}
 % tf and tff?
 \section{Training Dataset}
+\label{sec:training_dataset}
 The training dataset is the most important element of the training process, as ML models directly extract knowledge from it. Regardless of the training algorithm, using inadequate data can only result in underperforming models. A well-known adage still holds brutally true when it comes to training data for ML: garbage in, garbage out.
 
-In the context of this work, the Fashion-MNIST \cite{fashion_mnist} dataset is utilized. It consists of 28 \(\times\) 28 grayscale images of 70,000 fashion items from 10 equally sized categories, split into a training set of 60,000 images and a testing set of 10,000 images. It is designed as a direct drop-in replacement of the original MNIST dataset \cite{digits_mnist} that provides a more challenging classification problem.
+In the context of this work, the Fashion-MNIST \cite{fashion_mnist} dataset is utilized. It consists of 28 \(\times\) 28 grayscale images of 70,000 fashion items from 10 equally sized categories, split into a training set of 60,000 images and a testing set of 10,000 images. It is designed as a direct drop-in replacement of the original MNIST dataset \cite{digits_mnist} that provides a more challenging classification problem. Some of its images are shown in figure \ref{fig:Fashion_MNIST_dataset}.
 
 The major factor of its popularity is its small size which enables DL researchers to swiftly prototype and test their algorithms. Furthermore, it is highly accessible due to its strait-forward encoding and its permissive license. Finally, DL frameworks (e.g TensorFlow) provide auxiliary functions and convenient examples that use it right out of the box, makes it highly compelling.
-
 \begin{figure}[H]
     \centering
-        \includegraphics[width=0.9\textwidth]{Images/Examples_Fashion_MNIST.png}
+        \includegraphics[width=0.75\textwidth]{Images/Examples_Fashion_MNIST.png}
         \decoRule
-        \caption[Examples of Fashion MNIST Dataset]{Examples of Fashion MNIST Dataset: \href{https://www.bouvet.no/bouvet-deler/understanding-convolutional-neural-networks-part-2}{URL}.}
+        \caption[Examples of Fashion MNIST Dataset]{Examples of Fashion MNIST Dataset \cite{examples_fashion_MNIST}: \href{https://www.bouvet.no/bouvet-deler/understanding-convolutional-neural-networks-part-2}{URL}.}
         \label{fig:Fashion_MNIST_dataset}
 \end{figure}
 
 
-\section{ANN architectures}
+\section{ANN Architectures}
 Any DL model that can be trained locally should be possible to be trained in FL, since FL is essentially another DL training method. To demonstate that the FL impementation in this work is accurate, multiple models of different architectures have been implemented and incorporated into the FL training loop. 
 
 \subsection{LeNet-5}
 LeNet-5 \cite{LeNet}, one of the first CNNs to describe its fundamental form, was proposed in 1989. Its original use was for handwritten digit recognition, a task in which it performed greatly and piqued academics' interest in the development and use of ANNs. It possesses the fundamental building blocks of CNNs, interconnected convolutional and pooling layers, followed by fully connected layers. Across all these layers it uses the tanh activation function, and to make the computation less difficult maintains sparse connections between them.
 
 \subsection{AlexNet}
-AlexNet \cite{Alexnet} is a CNN architecture designed to compete in the ImageNet Large Scale Visual Recognition Challenge of 2012. The depth of the network's model, five convolutional layers, some of which were followed by max-pooling layers, and then three fully connected layers, allowed it to outperform its competition in terms of accuracy. Furthermore, it used the non-saturating ReLU activation function, which shows better performance than prior activation functions like tanh.
+AlexNet \cite{Alexnet} is a CNN architecture designed to compete in the ImageNet Large Scale Visual Recognition Challenge of 2012. The depth of the network's model, five convolutional layers, some of which were followed by max-pooling layers, and then three fully connected layers, allowed it to outperform its competition in terms of accuracy. Furthermore, it used the non-saturating ReLU activation function, which shows better performance than prior activation functions like tanh. A visual comparison with LeNet-5 is done in diagram \ref{fig:Lenet_Alexnet_Comparison}.
 
 Training such a large network on a CPU, which was the standard at that time, is computationally prohibitive, but was made possible by training it on graphics processing units (GPUs). That novelty spurred huge interest in CNNs and training them with accelerators, making it one of the most influential ANN architectures.
 
@@ -32,39 +32,38 @@ Training such a large network on a CPU, which was the standard at that time, is 
     \centering
         \includegraphics[width=0.8\textwidth]{Images/ANNArchitectures/lenet_vs_alexnet.png}
         \decoRule
-        \caption[Comparing LeNet-5 and AlexNet]{Comparing the LeNet and AlexNet architectures: \href{https://en.wikipedia.org/wiki/AlexNet\#/media/File:Comparison_image_neural_networks.svg}{URL}.}
+        \caption[Comparing LeNet-5 and AlexNet]{Comparing the LeNet and AlexNet architectures \cite{AlexNet_wiki}: \href{https://en.wikipedia.org/wiki/AlexNet\#/media/File:Comparison_image_neural_networks.svg}{URL}.}
         \label{fig:Lenet_Alexnet_Comparison}
 \end{figure}
 
 \subsection{ResNet}
-An ANN known as a residual neural network is distinguished by its shortcut connections that skip several layers. In this manner, it is possible to build ANNs that have hundreds of layers and are very deep without experiencing the vanishing gradients phenomenon. Additionally, it reduces the accuracy saturation issue, in which adding additional layers to a complex model causes the training error to increase.
+An ANN known as a residual neural network is distinguished by its shortcut connections that skip several layers, as shown in diagram \ref{fig:ResNet_Plain_Comparison}. In this manner, it is possible to build ANNs that have hundreds of layers and are very deep without experiencing the vanishing gradients phenomenon. Additionally, it reduces the accuracy saturation issue, in which adding additional layers to a complex model causes the training error to increase.
 \begin{figure}[H]
     \centering
         \includegraphics[width=1\textwidth]{Images/ANNArchitectures/resnet_vs_plain.png}
         \decoRule
-        \caption[Comparing ResNet and plain architectures]{Comparing a ResNet and a plain model: \href{https://towardsdatascience.com/review-resnet-winner-of-ilsvrc-2015-image-classification-localization-detection-e39402bfa5d8}{URL}.}
+        \caption[Comparing ResNet and plain architectures]{Comparing a ResNet and a plain model \cite{resnet_image}: \href{https://towardsdatascience.com/review-resnet-winner-of-ilsvrc-2015-image-classification-localization-detection-e39402bfa5d8}{URL}.}
         \label{fig:ResNet_Plain_Comparison}
 \end{figure}
 
 \subsection{Inception Module}\label{Inception Module}
-In CNNs, the appropriate size of the filters depends on how the important information is located in the training data. Filters with small kernels are better in detecting information with a local distribution, while large kernels are preferred when dealing with a global distribution. Each sample may have a different distribution, making it challenging to select an ideal filter.
+In CNNs, the size of the filters depends on how the important information is located in the inputs. Filters with small kernels are better in detecting information with a local distribution, while large kernels are preferred when dealing with a global distribution. Each sample may have a different distribution, as in diagram \ref{fig:dogs_inception}, making it challenging to select an ideal filter.
 \begin{figure}[H]
     \centering
-        \includegraphics[width=0.8\textwidth]{Images/dogs_inception.jpg}
+        \includegraphics[width=0.7\textwidth]{Images/dogs_inception.jpg}
         \decoRule
-        \caption[Variety of distribution of information.]{The dog, which is the important information, can occupy differently sized portions of the picture: \href{https://towardsdatascience.com/a-simple-guide-to-the-versions-of-the-inception-network-7fc52b863202}{URL}.}
+        \caption[Variety of distribution of information.]{The dog, which is the important information, can occupy differently sized portions of the picture \cite{dogs_image}: \href{https://towardsdatascience.com/a-simple-guide-to-the-versions-of-the-inception-network-7fc52b863202}{URL}.}
         \label{fig:dogs_inception}
 \end{figure}
 
-The inception module \cite{inception_module} addresses this issue by providing multiple filters of various sizes that operate in parallel. These filters seek after the same information but in differently sized parts of the input. Consolidating their outputs is sufficient to determine whether one of them found the sought-after information because the one who identified it will overshadow the rest.
+The inception module \cite{inception_module}, diagram \ref{fig:inception}, addresses this issue by providing multiple filters of various sizes that operate in parallel. These filters seek after the same information but in differently sized parts of the input. Consolidating their outputs is sufficient to determine whether the sought-after information is found, the filter that identified it overshadows the rest.
 
 In its original form, it consists of three convolutional layers, with sizes of \(1\times1\), \(3\times3\), \(5\times5\), as well as one \(1\times1\) max pooling layer. To reduce computation, prior to the \(3\times3\), \(5\times5\) convolutions, and after the max pooling, additional \(1\times1\) convolutionals are added. These layers are dual-purposed, as they apply dimension reduction and an extra layer of ReLU activations.
-
 \begin{figure}[H]
     \centering
         \includegraphics[width=0.8\textwidth]{Images/ANNArchitectures/inception_module.png}
         \decoRule
-        \caption[Inception Module]{Architecture of the Inception module with dimension reductions.: \href{https://arxiv.org/abs/1409.4842}{URL}.}
+        \caption[Inception Module]{Architecture of the Inception module with dimension reductions. \cite{inception_module}: \href{https://arxiv.org/abs/1409.4842}{URL}.}
         \label{fig:inception}
 \end{figure}
 
@@ -143,16 +142,8 @@ While FederatedSGD improves the computation-to-communication ratio, a number of 
 
 
 \section{The FPGA Perspective}
-Recent works have attempted to merge FL and FPGAs. Most notably, Zixiao Wang et al. have a developed PipeFL \cite{PipeFL}, an architecture to accelerate ANN training in FL with FPGAs. This work is fully focused to the datacenter settings and completely ignores problems specific with on-edge FL. Furthermore, FPGAs are able to efficiently implement complementary systems for FL, such as homomorphic encryption \cite{FPGA_encryption_for_FL}.
-
-Recent works have attempted to merge FL and FPGAs. PipeFL, created by Zixiao Wang et al. \cite{PipeFL}, accelerates ANN training in FL using FPGAs. This study is entirely focused on the datacenter setting and completely disregards issues unique to on-edge FL. Moreover, FPGAs can effectively implement FL-related systems like homomorphic encryption.
+Centralized training has been implemented with FPGAs multiple times in the past. The training part of the FL shouldn't be substantially different from it, in terms of design and implementation. In contrast, the driver of the re-programmable hardware will differ, as it must facilitate the FL procedure. The FL algorithm itself is not computationally demanding and may be conveniently offloaded to a CPU. 
 
 Modern system-on-chip (SoC) FPGAs contain all the tools required to implement FL, including running on an operating system and having an Ethernet adaptor. With those, connecting the two technologies is feasible, for both the datacenter and the on-edge settings.
 
-The training part of the FL shouldn't be substantially different from centralized training on a FPGA, in terms of design and implementation. In contrast, the driver of the re-programmable hardware will differ, as it must facilitate the FL procedure. Furthermore, The FL algorithm itself is not computationally demanding and may be conveniently offloaded to the SoC's CPU.
-
-\section{Thesis Approach}
-As the thesis moves forward, conflicts in terms of design and implementation are anticipated to arise between the two technologies. Furthermore, this is an mostly unexplored field. As such, a conservative and steady approach is expected to work best. 
-
-Initially, a FL implementation that is agnostic and independent of the underlying training implementation, will be developed. Its robustness will be thoroughly validated, using TensorFlow to facilitate the local training. Subsequently, an FPGA-based CNN training implementation will be created. Finally, by combining the networking code of the FL clients with the FPGA driver,
-an intermediate layer will connect the previous two implementations.
+Recent works have attempted to merge FL and FPGAs. Most notably, Zixiao Wang et al. have a developed PipeFL \cite{PipeFL}, a generic architecture to accelerate ANN training in FL with FPGAs. This work is fully focused to the datacenter settings and completely ignores problems specific with on-edge FL. Furthermore, the system is not compared with an equivalent GPU implementation. Other works have shown that FPGAs are able to efficiently implement complementary systems for FL, such as homomorphic encryption \cite{FPGA_encryption_for_FL}.

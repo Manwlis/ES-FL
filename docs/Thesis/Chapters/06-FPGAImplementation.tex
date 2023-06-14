@@ -1,15 +1,30 @@
 \chapter{FPGA Design \& Implementation} 
-% architecutr &design & impementation
 \label{Chapter-FPGA-Implementation}
+This chapter presents the architecture and design of the FPGA-based CNN accelerator developed in this thesis, as well as the important parts of its implementation and integration into the overall FL system.
+
+In more detail, sections \ref{sec:fpga_tools_used} and \ref{sec:fpga_platform} contain the relevant parts of the tools and platforms used, respectively. Section \ref{sec:C++_CNN_implementation} describes a CPU-based CNN implementation developed in this thesis, which served as the starting point of the ensuing FPGA-based implementation.
+
+\begin{figure}[H]
+    \centering
+        \includegraphics[width=\textwidth]{Images/block_diagrams/zcu_FL_client.png}
+        \decoRule
+        \caption[ZCU102 FL client]{Top-down view of the FL client on the ZCU102.}
+        \label{fig: ZCU102 FL client}
+\end{figure}
+
+Although the accelerator was developed and is explained in a bottom-up manner, showing here the top-down view of figure \ref{fig: ZCU102 FL client} makes the rest of the chapter easier to navigate. Section \ref{sec:FPGA_architecture} covers in depth the design and implementation of the accelerator in the PL, starting with the individual layers of the CNN, continuing with the developed pipelines and ending with the top function that interfaces with the Processing System (PS).
+
+The final section \ref{sec:host_program} presents the remaining developed design elements. These include the PL driver in the PS, the management of the global memory used to transfer data from the PS to PL and vice versa, and how the driver is incorporated in the FL client described in chapter \ref{Chapter-FL-architecture-design}.
 
 \section{Tools Used}
+\label{sec:fpga_tools_used}
 \subsection{Vitis Unified Software Platform}
 The Vitis unified software platform\cite{Vitis_unified_software_platform} is a collection of tools, libraries and environments designed to ease the development of accelerated applications tailored for AMD Xilinx FPGA and Versal® ACAP hardware platforms. It includes graphical and command-line compilers, analyzers, and debuggers to build applications, analyze performance bottlenecks, and debug accelerated algorithms, developed in C, C++, or OpenCL APIs. Furthermore, it offers numerous advantages such as effortless application portability, complete simulation of hardware systems, and an open source runtime that handles host-device communication.
 \begin{figure}[H]
     \centering
         \includegraphics[width=1\textwidth]{Images/Platform/vitis.jpg}
         \decoRule
-        \caption[Vitis]{Vitis overview: \href{https://www.xilinx.com/products/design-tools/vitis/vitis-platform.html\#overview}{URL}.}
+        \caption[Vitis]{Vitis overview \cite{Vitis_unified_software_platform}: \href{https://www.xilinx.com/products/design-tools/vitis/vitis-platform.html\#overview}{URL}.}
         \label{fig:Vitis_overview}
 \end{figure}
 
@@ -18,7 +33,7 @@ Vitis supports hardware acceleration kernels controlled by PS or x86 kernels. Th
     \centering
         \includegraphics[width=1\textwidth]{Images/Platform/vitis_kernel.png}
         \decoRule
-        \caption[Vitis]{Vitis kernel architecture: \href{https://www.xilinx.com/products/design-tools/vitis/vitis-platform.html\#development}{URL}.}
+        \caption[Vitis]{Vitis kernel architecture \cite{Vitis_unified_software_platform}: \href{https://www.xilinx.com/products/design-tools/vitis/vitis-platform.html\#development}{URL}.}
         \label{fig:Vitis_kernel_overview}
 \end{figure}
 
@@ -31,7 +46,7 @@ A widely used alternative are the OpenCL libraries. TBy abstracting the underlyi
     \centering
         \includegraphics[width=1\textwidth]{Images/Platform/xrt.png}
         \decoRule
-        \caption[Xilinx Runtime Library]{Xilinx Runtime Library overview: \href{https://www.xilinx.com/products/design-tools/vitis/xrt.html}{URL}.}
+        \caption[Xilinx Runtime Library]{Xilinx Runtime Library overview \cite{Xilinx_Runtime_Library}: \href{https://www.xilinx.com/products/design-tools/vitis/xrt.html}{URL}.}
         \label{fig:XRT_overview}
 \end{figure}
 
@@ -74,6 +89,7 @@ HLS is an automated design process that takes an abstract behavioral specificati
 \end{table}
 
 \section{FPGA Platform}
+\label{sec:fpga_platform}
 \subsection{Xilinx Zynq UltraScale+ MPSoC}
 The Zynq\textsuperscript{\textregistered} UltraScale+\texttrademark{} MPSoC is a family of Xilinx products that integrates a feature-rich 64-bit quad-core or dual-core Arm® Cortex®-A53 and dual-core Arm Cortex-R5F based processing system (PS) and Xilinx programmable logic (PL) UltraScale architecture in a single device. In addition, on-chip memory, multiport external memory interfaces, and a rich set of peripheral connectivity interfaces are included. \cite{Zynq_UltraScale_overview}
 
@@ -84,13 +100,14 @@ The ZCU102 Evaluation Board features a Zynq\textsuperscript{\textregistered} Ult
     \centering
         \includegraphics[width=1\textwidth]{Images/Hardware/zcu102.jpg}
         \decoRule
-        \caption[ZCU102]{ZCU102 Features: \href{https://www.xilinx.com/products/boards-and-kits/ek-u1-zcu102-g.html\#information}{URL}.}
+        \caption[ZCU102]{ZCU102 Features \cite{ZCU_102}: \href{https://www.xilinx.com/products/boards-and-kits/ek-u1-zcu102-g.html\#information}{URL}.}
         \label{fig:ZCU102}
 \end{figure}
 
 Given that the thesis is based on an edge application, this platform seems to be an ideal fit for it. During the hardware design phase, the constrains and resource limitation were placed according to the specifications of this board. Nevertheless, transferring the final design to devices of similar families should require minimal effort.
 
-\section{Preparing the CNN for Hardware}
+\section{CPU-based C++ CNN implementation}
+\label{sec:C++_CNN_implementation}
 In the preceding phase, TF with Python was utilized to implement all ANNs and training. As the Vitis Kernel Toolchain is aimed to C/C++ code, these implementations can not be synthesized to hardware by the aforementioned tools. As such, a simplified version of the most used CNN, the third in the model library, has been re-implemented with C++.
 
 Migrating from TF to a hardware synthesizable CNN is a fairly challenging task riddled with pitfalls. This implementation is not optimized for hardware, but rather serves as a stepping stone between TF and synthesizable code. Certain practices are adopted to facilitate future transition to hardware targeted code:
@@ -98,20 +115,21 @@ Migrating from TF to a hardware synthesizable CNN is a fairly challenging task r
 \begin{itemize}[leftmargin=*]
     \item Implementation is modular and re-configurable. The code is build around template functions, each of which performs a specified task. Layers can effortlessly added, removed, or altered in size, shape and parameters.
     \item All data, whether input, output or internal, are produced and consumed serially and only once. This behavior is similar to the stream data format, which is widely utilized in hardware design.
-    \item All feature maps, input gradients, variable gradients, and updated variables are logged and compared with those generated by the existing TF implementation. This approach not only evaluates functionality, but also produces test benches for future hardware implementation.
+    \item All feature maps, input gradients, variable gradients, and updated variables are logged and compared with those generated by the existing TF implementation. This approach not only evaluates functionality, but also produces test benches for future hardware implementation.
 \end{itemize}
 
 \begin{figure}[H]
     \centering
         \includegraphics[width=1\textwidth]{Images/block_diagrams/dataflow_cnn_model.png}
         \decoRule
-        \caption[CNN dataflow]{Dataflow diagram of the utilized CNN model.}
+        \caption[CNN dataflow]{Dataflow diagram of the implemented CNN model.}
         \label{fig: CNN dataflow}
 \end{figure}
 
 Figure \ref{fig: CNN dataflow} depicts the basic structure of the implementation. Tasks are represented by cycles, whereas data are represented by squares. Inputs, labels, weights and any other data that must to be saved in memory have greyed-out squares. The majority of internal data are consumed immediately after being produced. Some of them, marked by red arrows, skip parts of the chain and must be temporally stored.
 
-\section{Vitis HLS Hardware Implementation}
+\section{FPGA-based CNN architecture}
+\label{sec:FPGA_architecture}
 Even with the aforementioned techniques, adapting the code to be compatible with FPGAs is not a trivial task. To build an efficient implementation, resource usage, data access patterns, and other factors must be taken into account. All parts of the CNN are modified accordingly.
 
 \subsection{2D Convolutional Layers}
@@ -121,7 +139,7 @@ Due to their non-serial data access patterns, multi-dimensional filter algorithm
     \centering
         \includegraphics[width=1\textwidth]{Images/diagrams/convolution_access_pattern.jpg}
         \decoRule
-        \caption[convolution access pattern]{Convolution access pattern: Input (Blue) pixels are accessed in a non-serial pattern.\href{https://github.com/Xilinx/Vitis-Tutorials/blob/2022.1/Hardware_Acceleration/Design_Tutorials/01-convolution-tutorial/lab1_app_introduction_performance_estimation.md}{URL} }
+        \caption[convolution access pattern]{Convolution access pattern: Input (Blue) pixels are accessed in a non-serial pattern \cite{vitis_tutorials}: \href{https://github.com/Xilinx/Vitis-Tutorials/blob/2022.1/Hardware_Acceleration/Design_Tutorials/01-convolution-tutorial/lab1_app_introduction_performance_estimation.md}{URL} }
         \label{fig: convolution access pattern}
 \end{figure}
 
@@ -133,7 +151,7 @@ A unique data mover, specifically designed for the given algorithm, has been dev
     \centering
         \includegraphics[width=1\textwidth]{Images/diagrams/line_buf_conv.jpg}
         \decoRule
-        \caption[Line Buffers, Convolution]{Line Buffers: Sifting a 3x3 window. \href{https://github.com/Xilinx/Vitis-Tutorials/blob/2022.1/Hardware_Acceleration/Design_Tutorials/01-convolution-tutorial/lab2_conv_filter_kernel_design.md}{URL} }
+        \caption[Line Buffers, Convolution]{Line Buffers: Shifting a 3x3 window \cite{vitis_tutorials}: \href{https://github.com/Xilinx/Vitis-Tutorials/blob/2022.1/Hardware_Acceleration/Design_Tutorials/01-convolution-tutorial/lab2_conv_filter_kernel_design.md}{URL} }
         \label{fig: Line Buffers Convolution}
 \end{figure}
 
@@ -151,7 +169,7 @@ Two output streams are produced, one float and one bool. The first one consists 
         \label{fig: Conv2D order of calculations}
 \end{figure}
 
-Figures \ref{fig: Conv2D order of calculations} and \ref{fig: Conv2D forward propagation block diagram} illustrate the same operation, from a different point of view. The first focus on the flow of the algorithm, while the second focus on the structure of the hardware functions. The additions and multiplications tree corresponds to the dot product function, the accumulator represent the sum channels function, and the ReLU is the activation function. In figure \ref{fig: Conv2D order of calculations}, the input is already windowed and padded.
+Figures \ref{fig: Conv2D order of calculations} and \ref{fig: Conv2D forward propagation block diagram} illustrate the same operation, from a different point of view. The first focus on the flow of the algorithm, while the second considers the structure of the hardware functions. The additions and multiplications tree corresponds to the dot product function, the accumulator represent the sum channels function, and the ReLU is the activation function. In figure \ref{fig: Conv2D order of calculations}, the input is already windowed and padded.
 
 \begin{figure}[H]
     \centering
@@ -277,6 +295,8 @@ In back propagation, the input is the activated output gradients. To activate th
 
 The processing element of the gradient calculation differs more. Instead of using the weights to calculate the outputs, the outputs are used to calculate the weight gradients. Furthermore, finding the bias gradients is trivial, as they are equal with the sum of all output gradients of their filter.
 
+Figure \ref{fig: Conv2D back propagation block diagram} shows the structure of the backpropagation and gradient calculation elements. Common hardware functions are shared by duplicating their output streams.
+
 \begin{figure}[H]
     \centering
         \includegraphics[width=1\textwidth]{Images/block_diagrams/conv2d_bp_cg_mc.png}
@@ -305,7 +325,7 @@ The implementations of the dense and Softmax layers are simple and fairly simi
 
 The most crucial aspect of their design is ensuring that the hardware functions are constantly operating. To accomplish this, a streaming architecture, that reads and writes inputs and outputs serially and only once, is used. Important to note is that the Softmax activation requires all the inputs to be received before calculating any output, meaning that for an example back-propagation can not start until forward propagation is fully completed.
 
-\subsection{Gradients Calculation Pipeline} % TODO: find better title
+\subsection{Gradients Calculation Pipeline}
 A major advantage of FPGA accelerators is that multiple hardware functions operate simultaneously, if the implemented algorithm allows. This holds true for most of the design. As an example, The first maxpool layer requires four inputs to generate the first output. These inputs have being generated by the first convolutional layer before a training data-point is fully loaded and processed. Thus the first two layers can operate simultaneously. % hardware function can operate simutanusly
 
 On the other hand, the Softmax layer, which is the last step of the forward propagation, operates like a barrier. Due to the nature of the algorithm, to produce its feature map, all inputs must first be collected. As a result, for a single training data-point, the forward propagation must be completed before the back propagation begins. % softmax is a barrier
@@ -315,9 +335,6 @@ As such, the sequential semantics must be preserved, and the pipeline is impleme
 In this paradigm, the task with the highest latency typically determines the overall latency. Due to the existence of the Softmax barrier, for a single data input, forward propagation tasks can not operate simultaneously with tasks after it. As a result, the minimum overall latency equals the highest task latency before the barrier plus the highest task latency after it. % implementation barrier clash, overall latency
 
 Figure \ref{fig: Gradients Calculation Pipeline Block Diagram} shows in detail the developed dataflow region that generates the weight and bias gradients. The heavy use of auxiliary data transformation functions, such as create windows and stream, is evident. These functions consume almost no hardware when synthesized, and add near zero latency. % auxiliary functions
-
-Furthermore, several data streams skip hardware functions and layers. This could introduce stalls and ultimately deadlocks. To address this issue, hardware functions are implemented as free running pipelines $($FRPs$)$, when possible. Such implementations significantly reduce the possibility of a stall, by continuing to operate even when no input data are available or the output streams are full. % using frp and what they are
-
 \begin{figure}[H]
     \centering
         \includegraphics[height=0.95\textheight]{Images/block_diagrams/process_batch.png}
@@ -325,6 +342,9 @@ Furthermore, several data streams skip hardware functions and layers. This could
         \caption[Gradients Calculation Pipeline Block Diagram]{Block diagram of the pipeline that generates the gradients. Inputs/Outpouts are not shown. Arrows represent data streams.}
         \label{fig: Gradients Calculation Pipeline Block Diagram}
 \end{figure}
+
+Several data streams skip hardware functions and layers. This could introduce stalls and ultimately deadlocks. To address this issue, hardware functions are implemented as free running pipelines $($FRPs$)$, when possible. Such implementations significantly reduce the possibility of a stall, by continuing to operate even when no input data are available or the output streams are full. % using frp and what they are
+
 Using FRPs comes with multiple restrictions, a strict coding style is required, and MAXI ports are not supported. For hardware functions that read or write data from MAXI ports or can not adhere to other restrictions, flushable pipelines (FLPs) are used instead. They achieve the same goal as FRPs, but by instantiating multiple copies of the pipeline and executing them independently. As a result, the design is robust against any unpredictable stalls that MAXI ports may introduce. % FLPs and result
 
 \subsection{Hardware Streams}
@@ -334,10 +354,10 @@ In most cases, this is trivial as they link sequential functions in a dataflow r
 
 More consideration is required about the streams that skip parts of the function chain. Due to the Softmax barrier, forward propagation of a sample is completed before its back propagation begins, thus all their data are produced before any of them is consumed. As such, their minimum depth is equal with the data produced by a single input sample.
 
-To determine the ideal depths, an iterative optimization approach has typically been used. The Vitis HLS environment offers a variety of simulation tools that generate a number of useful statistics, such as the amount of clock cycles that each function stalls and whether or not a stream becomes full. Monitoring these when testing, enables calibrating the depths to ensure the stable flow of the pipeline, while not wasting hardware space in unnecessarily large streams.
+To determine the ideal depths, an iterative optimization approach has typically been used. The Vitis HLS environment offers a variety of simulation tools that generate a number of useful statistics, such as the amount of clock cycles that each function stalls and whether or not a stream becomes full. Monitoring these when testing, enables calibrating the depths to ensure the stable flow of the pipeline, while not wasting hardware space in unnecessarily large streams.
 
 \subsection{Batching Inputs}
-As already explained, not all hardware functions can run concurrently for a single input sample. This issue is mitigated through batching input samples, where while an input runs through back-propagation, the next one is used in forward propagation. % description
+As already explained, not all hardware functions can run concurrently for a single input sample. This issue is mitigated through batching input samples, where while an input runs through back-propagation, the next one is used in forward propagation, as shown in figure \ref{fig: Batching Pipeline latency}. % description
 
 \begin{figure}[H]
     \centering
@@ -368,6 +388,7 @@ With Vitis HLS, implementing batching on each individual hardware function is qu
 Further though must be given to the size of the streams connecting functions of the forward propagation with functions after the barrier. The producer functions will block until the consumer functions clear some space in the stream if the minimal depth is used as mentioned in the preceding section. Depending on the minimal latency between the producer and the consumer, this can be avoided by increasing the depth by 0.5 to 1 times.
 
 \subsection{Updating Variables}
+\label{sec:Updating_Variables}
 Based on the produced gradients, the variables of the ANN are updated in a second dataflow region. Due to the independence of all weights and gradients, this process is relatively straightforward. The classic SGD with momentum optimization algorithm is used and the learning rate is supplied by the driver program. Thus, latency and hardware usage are the only criteria for the applied parallelism in this specific region.
 
 \subsection{Data Movement \& Storage}
@@ -381,25 +402,21 @@ For the weights of the second convolutional layer, this is insufficient. They ar
 
 To generate the gradients, the ANN's inputs, data and labels, are sent from global memory to the PL via AXI Master Adapter ports. In a dataflow region, each channel must have a single consumer, thus two ports are needed to propagate the input data to the two hardware functions that consume it. All ports are independent from one another by having their own dedicated bundles, thus enabling the simultaneous reading of all inputs. % dataflow inputs
 
-The gradients are produced in the first dataflow region and consumed in the second, thus persistent saving in on-chip memory is necessary. The related memory is not shared since their producers and consumers are in different regions, and can be implemented as streams or arrays, whichever is more convenient. The same applies for the momenta of the gradients, as they may be produced and consumed in same dataflow region, but in different iterations of it. % persistent memory
+The gradients are produced in the first dataflow region and consumed in the second, thus persistent saving in on-chip memory is necessary. This memory is not shared, as its producers and consumers are in different regions, and is implemented as streams or arrays, whichever is more convenient. The same applies for the momenta of the gradients, as they may be produced and consumed in same dataflow region, but in different iterations of it. % persistent memory
 
-% \subsection{Minimizing Global Memory Accesses}
-% bursting / port widening
-% Rejected
+\subsection{Top Function}
+To hold everything together, the top level function of figure \ref{fig: top function} has been developed. Its signature operates as the API between PL and PS. Furthermore, it contains all the definitions of the memory structures, as well as the instantiations of the data movers \& initializers and dataflow regions. Finally, to train on multiple batches, the dataflow regions are enclosed in a loop.
 
-\subsection{Top function}
-To hold everything together, a top level function has been developed, whose signature operates as the API between PL and PS. Furthermore, it contains all the definitions of the memory structures, as well as the instantiations of the data movers \& initializers and dataflow regions. Finally, to train on multiple batches, the dataflow regions are enclosed in a loop.
-
-\begin{figure}[H] % TODO: remove the batch fetching
+\begin{figure}[H]
     \centering
-        \includegraphics[height=0.45\textheight]{Images/block_diagrams/accel_top.png}
+        \includegraphics[height=0.4\textheight]{Images/block_diagrams/accel_top.png}
         \decoRule
         \caption[Top function]{Block diagram of the accelerator's top function.}
         \label{fig: top function}
 \end{figure}
 
 \section{Host Program}
-
+\label{sec:host_program}
 \subsection{Driver Architecture}
 The overall application uses Linux system calls, such as socket read and write. Thus a bare metal implementation is inadequate and a host program in the PS is required to drive the developed hardware design in the PL. This is achieved with the use of the XRT native C++ APIs \cite{XRT_Native_APIs}.
 
@@ -423,15 +440,7 @@ The previous solution is acceptable when the server and client processes operate
 
 Diagram \ref{fig: Gradients Calculation Pipeline Block Diagram} demonstrates how the image inputs are needed twice. They are stored twice in global memory, in two distinct memory banks, to prevent any bus or AXI conflicts. As a result, both hardware functions can read them concurrently without experiencing any additional latency. % two buffers for images
 
-\subsection{Incorporating the driver in the FL client}
+\subsection{Incorporating the Driver in the FL Client}
 Uniting the Federated Learning and the driver codebases is trivial. First off, the server is, by design, agnostic to the implementation of the training. As it does not interface with any hardware kernel, there is no need for any code changes when compiled for another device, such as the ZCU102.
 
-In the case of the client with the write API, all that is required is swapping the calls to the integrated Python interpreter with those to the aforementioned driver. The following diagram shows the architecture of the FL client on the ZCU102, with an emphasis on data transfers. For the client using the map API, a tighter integration of the driver is required. The received and send messages buffers are allocated in the global memory and the socket output is written directly there. 
-
-\begin{figure}[H]
-    \centering
-        \includegraphics[width=\textwidth]{Images/block_diagrams/zcu_FL_client.png}
-        \decoRule
-        \caption[ZCU102 FL client]{Architecture of the FL client with the write API on the ZCU102. In case of the map API, the received \& send message buffers are not required.}
-        \label{fig: ZCU102 FL client}
-\end{figure}
+In the case of the client with the write API, all that is required is swapping the calls to the integrated Python interpreter with those to the aforementioned driver. Figure \ref{fig: ZCU102 FL client} shows the architecture of that FL client on the ZCU102, with an emphasis on data transfers. For the client using the map API, a tighter integration of the driver is required. The received and send messages buffers are allocated in the global memory and the socket output is written directly there. 

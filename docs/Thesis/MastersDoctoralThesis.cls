@@ -353,6 +353,7 @@ KOMA-script documentation for details.}]{fancyhdr}
 \DeclareDocumentCommand{\abstracttitlefont}{}{}
 \newcommand{\byname}{by}
 \newcommand{\abstractname}{Abstract}
+\newcommand{\abstractgreekname}{\selectlanguage{greek}Περίληψη}
 \providecaptionname{german,ngerman,austrian,naustrian}{\byname}{von}
 \providecaptionname{american,australian,british,canadian,english,newzealand,UKenglish,USenglish}{\byname}{by}
 \ifbool{consistentlayout}{
@@ -373,16 +374,43 @@ KOMA-script documentation for details.}]{fancyhdr}
 		\begin{center}
 			{\normalsize \MakeUppercase{\univname} \par}% University name in capitals
 			\bigskip
-			{\huge\textit{\abstractname} \par}
-			\bigskip
 			{\normalsize \facname \par}% Faculty name
 			{\normalsize \deptname \par}% Department name
 			\bigskip
-			{\normalsize \degreename\par}% Degree name
+			{\huge\textit{\abstractname} \par}
+			% \bigskip
+			% {\normalsize \degreename\par}% Degree name
 			\bigskip
 			{\normalsize\bfseries \@title \par}% Thesis title
 			\medskip
 			{\normalsize \byname{} \authorname \par}% Author name
+			\bigskip
+		\end{center}
+	}
+	{
+		\vfill\null
+	}
+
+ 	\DeclareDocumentEnvironment{abstractgreek}{ O{\null\vfill} }{
+		\checktoopen
+		\tttypeout{\abstractgreekname}
+		#1%added to be able to have abstract more than one page long
+		\thispagestyle{plain}
+		\begin{center}
+			{\normalsize \href{https://www.tuc.gr/}{\selectlanguage{greek}ΠΟΛΥΤΕΧΝΕΙΟ ΚΡΗΤΗΣ} \par}% University name in capitals
+			\bigskip
+			{\normalsize \href{https://www.ece.tuc.gr/}{\selectlanguage{greek}Σχολή Ηλεκτρολόγων Μηχανικών και Μηχανικών Υπολογιστών} \par}% Faculty name
+			% {\normalsize \deptname \par}% Department name
+			\bigskip
+			{\huge\textit{\selectlanguage{greek}Περίληψη} \par}
+			% \bigskip
+			% {\normalsize \degreename\par}% Degree name
+			\bigskip
+			{\normalsize \textgreek{Αρχιτεκτονική Συστημάτων βασισμένων σε Αναδιατασσόμενη Λογική}
+                    (FPGA)
+                    \textgreek{για Επιτάχυνση Συνεργατικής Μάθησης} \par}% Thesis title
+			\medskip
+			{\normalsize \selectlanguage{greek}από τον Εμμανουήλ Πετράκο \par}% Author name
 			\bigskip
 		\end{center}
 	}

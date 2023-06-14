@@ -49,6 +49,7 @@
 \usepackage[noend]{algpseudocode}
 \algrenewcommand\algorithmicfunction{}
 \algrenewcommand\textproc{}
+% \PassOptionsToPackage{hyphens}{url}
 \usepackage{hyperref}
 \usepackage{graphicx}
 \usepackage{mathtools} %!!!!!!!!! changed !!!!!!!!!
@@ -62,6 +63,7 @@
 \usepackage{makecell}
 
 \usepackage{textcomp}
+\usepackage{multirow}
 
 \usepgfplotslibrary{fillbetween}
 
@@ -73,6 +75,9 @@
 %----------------------------------------------------------------------------------------
 %	BIBLIOGRAPHY FILES
 %----------------------------------------------------------------------------------------
+
+\setcounter{biburllcpenalty}{7000}
+\setcounter{biburlucpenalty}{8000}
 
 \addbibresource{References.bib} % The filename of the bibliography
 
@@ -94,7 +99,7 @@
 %	THESIS INFORMATION
 %----------------------------------------------------------------------------------------
 
-\thesistitle{Embedded System Architecture for the Acceleration of Collaborative Learning in Neural Networks} % Your thesis title, this is used in the title and abstract, print it elsewhere with \ttitle
+\thesistitle{Reconfigurable Logic (FPGA)-based System Architecture for the Acceleration of Federated Learning in Neural Networks} % Your thesis title, this is used in the title and abstract, print it elsewhere with \ttitle
 \author{Emmanouil \textsc{Petrakos}} % Your name, this is used in the title page and abstract, print it elsewhere with \authorname
 \supervisor{Prof. Apostolos \textsc{Dollas}} % Your supervisor's name, this is used in the title page, print it elsewhere with \supname
 \degree{Electrical and Computer Engineer} % Your degree name, this is used in the title page and abstract, print it elsewhere with \degreename
@@ -126,12 +131,12 @@
 \begin{titlepage}
 	\begin{center}
 		{\scshape\LARGE \univname\par}
-		\vspace{0.5cm} % University name
-		\textsc{\Large Diploma Thesis}\\[0.5cm] % Thesis type
+		\vspace{0.4cm} % University name
+		\textsc{\Large Diploma Thesis}\\[0.4cm] % Thesis type
 
-		\HRule \\[0.4cm] % Horizontal line
-		{\huge \bfseries \ttitle\par}\vspace{0.4cm} % Thesis title
-		\HRule \\[0.4cm] % Horizontal line
+		\HRule \\[0.35cm] % Horizontal line
+		{\huge \bfseries \ttitle\par}\vspace{0.35cm} % Thesis title
+		\HRule \\[0.35cm] % Horizontal line
 
 		\begin{minipage}[t]{0.4\textwidth}
 			\begin{flushleft} \large
@@ -145,22 +150,22 @@
 				\href{https://www.ece.tuc.gr/index.php?id=4531&tx_tuclabspersonnel_list\%5Bperson\%5D=289&tx_tuclabspersonnel_list\%5Baction\%5D=person&tx_tuclabspersonnel_list\%5Bcontroller\%5D=List}{\supname}\\ % Supervisor name
 				\href{https://www.ece.tuc.gr/index.php?id=4531&tx_tuclabspersonnel_list\%5Bperson\%5D=313&tx_tuclabspersonnel_list\%5Baction\%5D=person&tx_tuclabspersonnel_list\%5Bcontroller\%5D=List}{Prof. Michail G. \textsc{Lagoudakis}}\\
 				%{\supname}\\ % Supervisor name
-				\href{https://www.ece.tuc.gr/index.php?id=4531&tx_tuclabspersonnel_list\%5Bperson\%5D=313&tx_tuclabspersonnel_list\%5Baction\%5D=person&tx_tuclabspersonnel_list\%5Bcontroller\%5D=List}{Asst. Prof. Vassilios \textsc{Papaefstathiou} (CS Dept., U. of Crete)}
+				\href{https://users.ics.forth.gr/~greg/}{Asst. Prof. Grigorios \textsc{Tsagkatakis} (University of Crete)}
 			\end{flushright}
-		\end{minipage}\\[0.2cm]
+		\end{minipage}\\[0.1cm]
 
-		\includegraphics[scale=0.21]{Images/logos/TUC.png} % University/department logo - uncomment to place it
+		\includegraphics[scale=0.2]{Images/logos/TUC.png} % University/department logo - uncomment to place it
 		\\
 		
 		\vfill
 
-		\large \textit{A thesis submitted in fulfillment of the requirements\\ for the diploma of \degreename}\\[0.3cm] % University requirement text
-		\textit{in the}\\[0.4cm]
-		\deptname\\\groupname\\[2cm] % Research group name and department name
+		\large \textit{A thesis submitted in fulfillment of the requirements\\ for the diploma of \degreename}\\[0.25cm] % University requirement text
+		\textit{in the}\\[0.25cm]
+		\deptname\\\groupname\\[0.2cm] % Research group name and department name
 
 		\vfill
 
-		{\large \today}\\ % Date
+		{\large June 13, 2023}\\ % Date
 		\vfill
 	\end{center}
 \end{titlepage}
@@ -170,22 +175,56 @@
 %----------------------------------------------------------------------------------------
 
 \begin{abstract}
-	\addchaptertocentry{\abstractname} % Add the abstract to the table of contents
-	% Todo: Add English Abstract
-	The Thesis Abstract is written here (and usually kept to just this page). The page is kept centered vertically so can expand into the blank space above the title too\ldots
+    \addchaptertocentry{\abstractname} % Add the abstract to the table of contents
+    
+    Federated Learning (FL) is a decentralized training method for Machine Learning applications which can exploit data that are inaccessible to conventional centralized approaches, due to privacy and security concerns. FL literature has refined and evaluated most of its aspects, but generally few works have taken into consideration the underlying hardware, where the training actually takes place. % what is FL and problem
+
+    This thesis demonstrates that, in the on-edge FL setting, the clients can effectively utilize FPGAs to accelerate their local training and the overall FL process. First, an FL system, agnostic of the underlying training method and its implementation, is developed. With that, an in-depth analysis of the effects of each FL parameter is conducted. According to its findings, an FPGA-based implementation of a Convolutional Neural Network (CNN), optimized for the parameter space where the FL is most efficient, is developed and incorporated into the FL system.  % aim and what was created
+    % that can use CPU, GPU and FPGA based implementations / anti tou agnostic...
+
+    Through actual runs on real hardware, the FPGA-based solution presents a modest speedup of the local training (1.27$\times$-1.44$\times$) and the overall FL process (1.08$\times$-1.20$\times$) in comparison to a GPU-based one, depending on data distribution. More impressively, it consumes (16.35$\times$-18.18$\times$) less energy. Thus, this thesis provides more than a feasibility study of combining FL and FPGAs, and it can be used as a starting point for future works or as a benchmarking reference. % results
 \end{abstract}
 
 %----------------------------------------------------------------------------------------
 %	ABSTRACT PAGE Greek
 %----------------------------------------------------------------------------------------
 
-\begin{abstract}
-	\addchaptertocentry{\abstractname} % Add the abstract to the table of contents
-	% Todo: Add Greek Abstract
-    \selectlanguage{greek}
-	Η περίληψη της διπλωματικής γράφεται εδώ (και συνήθως αποτελεί αυτή την μία μόνο σελίδα). Η σελίδα αυτή κρατάται στοιχισμένη στην μέση οριζόντια και κάθετα, ώστε να μπορεί να επεκτείνεται στον κενό χώρο και πάνω από τον τίτλο\ldots
-	
-\end{abstract}
+\begin{abstractgreek}
+    \addchaptertocentry{\selectlanguage{greek}Περίληψη} % Add the abstract to the table of contents
+    
+    \selectlanguage{greek}Το
+    \selectlanguage{english}Federated Learning (FL)
+    \selectlanguage{greek}είναι μια αποκεντρωμένη μέθοδος εκπαίδευσης για εφαρμογές Μηχανικής Μάθησης, που μπορεί να εκμεταλλευτεί δεδομένα τα οποία είναι μη προσβάσιμα από συμβατικές κεντρικοποιημένες μεθόδους, λόγω ανησυχιών περί προσωπικού απορρήτου και κυβερνοασφάλειας. Σχετικές έρευνες έχουν βελτιώσει και αξιολογήσει τις περισσότερες πτυχές του, αλλά γενικά λίγες από αυτές λαμβάνουν υπόψη το υποκείμενο υλικό, όπου λαμβάνει χώρα η εκπαίδευση.
+
+    Αυτή η εργασία αποδεικνύει ότι, στο
+    \selectlanguage{english}on-edge FL,
+    \selectlanguage{greek}οι πελάτες μπορούν να χρησιμοποιήσουν αποτελεσματικά
+    \selectlanguage{english}FPGAs
+    \selectlanguage{greek}για να επιταχύνουν την τοπική εκπαίδευση και τη συνολική
+    \selectlanguage{english}FL
+    \selectlanguage{greek}διαδικασία. Καταρχάς, υλοποιήθηκε ένα
+    \selectlanguage{english}FL
+    \selectlanguage{greek}σύστημα, ανεξάρτητο της υποκείμενης μεθόδου εκπαίδευσης και της υλοποίησής της. Μέσω αυτού, έγινε εις βάθος ανάλυση των επιδράσεων κάθε παραμέτρου του
+    \selectlanguage{english}FL.
+    \selectlanguage{greek}Σύμφωνα με τα ευρήματα της, υλοποιήθηκε ένα Συνελυκτικό Νευρωνικό Δίκτυο σε
+    \selectlanguage{english}FPGA,
+    \selectlanguage{greek}βελτιστοποιημένο για τον χώρο παραμέτρων όπου το
+    \selectlanguage{english}FL
+    \selectlanguage{greek}είναι πιο αποτελεσματικό, και συνδέθηκε στο
+    \selectlanguage{english}FL
+    \selectlanguage{greek}σύστημα.
+
+    Μέσω μετρήσεων σε πραγματικό υλικό, η υλοποίηση βασισμένη σε
+    \selectlanguage{english}FPGA
+    \selectlanguage{greek}εμφανίζει μια μέτρια επιτάχυνση στην τοπική εκπαίδευση (1,27$\times$-1,44$\times$) και στην συνολική
+    \selectlanguage{english}FL
+    \selectlanguage{greek}διαδικασία (1,08$\times$-1,20$\times$), σε σύγκριση με αντίστοιχη υλοποίηση βασισμένη σε
+    \selectlanguage{english}GPU,
+    \selectlanguage{greek}συναρτήσει της διασποράς των δεδομένων. Πιο εντυπωσιακά, καταναλώνει (16,35$\times$-18,18$\times$) λιγότερη ενέργεια. Τοιουτοτρόπως, η παρούσα εργασία παρέχει παραπάνω από μια μελέτη σκοπιμότητας συνδυασμού
+    \selectlanguage{english}FL \& FPGAs,
+    \selectlanguage{greek}και μπορεί να χρησιμοποιηθεί ως αφετηρία για μελλοντικές εργασίες ή ως μέτρο σύγκρισης.
+    
+\end{abstractgreek}
 
 %----------------------------------------------------------------------------------------
 %	ACKNOWLEDGEMENTS
@@ -193,12 +232,11 @@
 
 \begin{acknowledgements}
 	\addchaptertocentry{\acknowledgementname} % Add the acknowledgements to the table of contents
-	% Todo: Add Acknowledgements
     First and foremost, I want to express my gratitude to Prof. Apostolos Dollas, my supervisor, for enabling me to work on this intriguing thesis and for his insightful advice and support throughout the entire process. This work allowed me to dabble in multiple fields of computer engineering, helping me to grow as a professional and as a person.
-    
-    Furthermore, I would like to thank my supervisor again, in addition to the rest of the committee's members, Prof. Michail G. Lagoudakis, and Asst. Prof. Vassilios Papaefstathiou, for evaluating the work of this thesis.
 
-    Moreover, I would like to thank all the members of the Microprocessors and Hardware Lab (MHL) and colleagues that offered me crucial advice when requested. In addition, I would like to specially mention my colleague Manolis Perakis for assisting me with remotely operating the hardware required to complete this work.
+    Also, I want to especially acknowledge Asst. Prof. Grigorios Tsagkatakis for suggesting the subject of this thesis, as well as providing instructive guidance during its implementation. Furthermore, I would like to thank them again, in addition with the final member of the thesis committee, Prof. Michail G. Lagoudakis, for evaluating my work.
+
+    Moreover, I would like to thank all the members of the Microprocessor and Hardware Lab (MHL) and colleagues that offered me crucial advice when requested. In addition, I would like to specially mention my colleague Manolis Perakis for assisting me with remotely operating the hardware required to complete this work.
 
     Last but not least, I would like to thank my family from the bottom of my heart for their unwavering understanding and support.
     \\
@@ -225,36 +263,36 @@ Chania 2023
 % Todo: edit to your requirements
 % spell-checker: disable
 \begin{abbreviations}{ll} % Include a list of abbreviations (a table of two columns)]
-	\textbf{AI}	    & \textbf{A}rtificial \textbf{I}ntelligence\\
-	\textbf{ANN}	& \textbf{A}rtificial \textbf{N}eural \textbf{N}etwork\\
-	\textbf{API}    & \textbf{A}pplication \textbf{P}rogramming \textbf{I}nterface\\
-	\textbf{CCPA}   & \textbf{C}alifornia \textbf{C}onsumer \textbf{P}rivacy \textbf{A}ct\\
-	\textbf{CNN}	& \textbf{C}onvolutional \textbf{N}eural \textbf{N}etwork\\
-	\textbf{CPU}	& \textbf{C}entral \textbf{P}rocessor \textbf{U}nit\\
-	\textbf{DNN}    & \textbf{D}eep \textbf{N}eural \textbf{N}etwork\\ 
-	\textbf{DL}     & \textbf{D}istributed \textbf{L}earning\\
-	\textbf{DP}     & \textbf{D}ifferential \textbf{P}rivacy\\
-	\textbf{FedAvg} & \textbf{Fed}erated\textbf{Av}era\textbf{g}ing\\
-	\textbf{FL}	    & \textbf{F}ederated \textbf{L}earning\\
-        \textbf{FLP}    & \textbf{Fl}ushable \textbf{P}ipeline\\ 
-        \textbf{FRP}    & \textbf{F}ree \textbf{R}unning \textbf{P}ipeline\\
-	\textbf{FPGA}   & \textbf{F}ield \textbf{P}rogrammable \textbf{G}ate \textbf{A}rray\\
-	\textbf{GAN}    & \textbf{G}enerative \textbf{A}dversarial \textbf{N}etwork\\
-	\textbf{GDPR}   & \textbf{G}eneral \textbf{D}ata \textbf{P}rotection \textbf{R}egulation\\
-	\textbf{GPU}	& \textbf{G}raphics \textbf{P}rocessing \textbf{U}nit\\
-        \textbf{GE}	    & \textbf{G}lobal \textbf{E}poch\\
-        \textbf{HLS}    & \textbf{H}igh \textbf{L}evel \textbf{S}ynthesis\\
-        \textbf{II}     & \textbf{I}teration \textbf{I}nterval\\
-        \textbf{IID}    & \textbf{I}ndependent and \textbf{I}dentically \textbf{D}istributed\\
-        \textbf{LR}	    & \textbf{L}earning \textbf{R}ate\\
-	\textbf{MEC}    & \textbf{M}ulti-access \textbf{E}dge \textbf{C}omputing\\
-	\textbf{ML}	    & \textbf{M}achine \textbf{L}earning\\
-	\textbf{MSE}    & \textbf{M}ean \textbf{S}quare \textbf{E}rror\\
-	\textbf{MPC}    & \textbf{M}ulti-\textbf{P}arty \textbf{C}omputation\\
-        \textbf{PL}     & \textbf{P}rogrammable \textbf{L}ogic\\
-	\textbf{RNN}    & \textbf{R}ecurrent \textbf{N}eural \textbf{N}etwork\\
-	\textbf{SoC}    & \textbf{S}ystem \textbf{O}n \textbf{C}hip\\
-        \textbf{XRT}    & \textbf{X}ilinx \textbf{R}untime \textbf{L}ibrary\\
+    \textbf{AI}	    & \textbf{A}rtificial \textbf{I}ntelligence\\
+    \textbf{ANN}	& \textbf{A}rtificial \textbf{N}eural \textbf{N}etwork\\
+    \textbf{API}    & \textbf{A}pplication \textbf{P}rogramming \textbf{I}nterface\\
+    \textbf{CCPA}   & \textbf{C}alifornia \textbf{C}onsumer \textbf{P}rivacy \textbf{A}ct\\
+    \textbf{CNN}	& \textbf{C}onvolutional \textbf{N}eural \textbf{N}etwork\\
+    \textbf{CPU}	& \textbf{C}entral \textbf{P}rocessor \textbf{U}nit\\
+    \textbf{DNN}    & \textbf{D}eep \textbf{N}eural \textbf{N}etwork\\ 
+    \textbf{DL}     & \textbf{D}istributed \textbf{L}earning\\
+    \textbf{DP}     & \textbf{D}ifferential \textbf{P}rivacy\\
+    \textbf{FedAvg} & \textbf{Fed}erated\textbf{Av}era\textbf{g}ing\\
+    \textbf{FL}	    & \textbf{F}ederated \textbf{L}earning\\
+    \textbf{FLP}    & \textbf{Fl}ushable \textbf{P}ipeline\\ 
+    \textbf{FRP}    & \textbf{F}ree \textbf{R}unning \textbf{P}ipeline\\
+    \textbf{FPGA}   & \textbf{F}ield \textbf{P}rogrammable \textbf{G}ate \textbf{A}rray\\
+    \textbf{GAN}    & \textbf{G}enerative \textbf{A}dversarial \textbf{N}etwork\\
+    \textbf{GDPR}   & \textbf{G}eneral \textbf{D}ata \textbf{P}rotection \textbf{R}egulation\\
+    \textbf{GPU}	& \textbf{G}raphics \textbf{P}rocessing \textbf{U}nit\\
+    \textbf{GE}	    & \textbf{G}lobal \textbf{E}poch\\
+    \textbf{HLS}    & \textbf{H}igh \textbf{L}evel \textbf{S}ynthesis\\
+    \textbf{II}     & \textbf{I}teration \textbf{I}nterval\\
+    \textbf{IID}    & \textbf{I}ndependent and \textbf{I}dentically \textbf{D}istributed\\
+    \textbf{LR}	    & \textbf{L}earning \textbf{R}ate\\
+    \textbf{MEC}    & \textbf{M}ulti-access \textbf{E}dge \textbf{C}omputing\\
+    \textbf{ML}	    & \textbf{M}achine \textbf{L}earning\\
+    \textbf{MSE}    & \textbf{M}ean \textbf{S}quare \textbf{E}rror\\
+    \textbf{MPC}    & \textbf{M}ulti-\textbf{P}arty \textbf{C}omputation\\
+    \textbf{PL}     & \textbf{P}rogrammable \textbf{L}ogic\\
+    \textbf{RNN}    & \textbf{R}ecurrent \textbf{N}eural \textbf{N}etwork\\
+    \textbf{SoC}    & \textbf{S}ystem \textbf{O}n \textbf{C}hip\\
+    \textbf{XRT}    & \textbf{X}ilinx \textbf{R}untime \textbf{L}ibrary\\
 \end{abbreviations}
 % spell-checker: enable
 
@@ -273,12 +311,11 @@ Chania 2023
 \pagestyle{thesis} % Return the page headers back to the "thesis" style
 \mainmatter % Begin numeric (1,2,3...) page numbering
 
-\include{Chapters/00-ExampleChapter}
 \include{Chapters/01-Introduction}
 \include{Chapters/02-TheoreticalBackground}
 \include{Chapters/03-RelatedWork}
 \include{Chapters/04-FL_architecture_design}
-\include{Chapters/05-RobustnessAnalysis} % TODO: break in two parts
+\include{Chapters/05-RobustnessAnalysis}
 \include{Chapters/06-FPGAImplementation}
 \include{Chapters/07-Results}
 \include{Chapters/08-ConclusionsAndFutureWork}

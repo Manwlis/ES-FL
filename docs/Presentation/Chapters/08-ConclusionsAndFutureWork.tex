@@ -1,0 +1,27 @@
+\setlength{\parskip}{\baselineskip}
+\section{Conclusion}
+
+\begin{frame}
+	\huge Conclusions \& Future Work
+\end{frame}
+
+% Todo: Edit to your liking
+\begin{frame}{Conclusions}
+	\begin{itemize}
+		\item In any FL application, the parameter space should be explored to discover its optimum point. %Generally, the data distribution and the batch size are the most important parameters.
+		\item The re-configurability of FPGAs can be exploited to develop an accelerator that is optimized for that point.
+		\item Time and power wise, FPGA-based implementations of FL clients can be superior to equivalent CPU \& GPU based implementations.
+		
+	\end{itemize}
+\end{frame}
+
+% Todo: Edit to your liking
+\begin{frame}{Future Work}
+	\begin{itemize}
+		\item \textbf{Quantization}: In on-edge FL, to improve the communication-to-computation ratio, it has been proposed to quantize the communication. Furthermore, quantization is also used to speed-up training on ANNs. FPGAs are a fitting platform to implement that. % Thus, it can improve both time-consuming parts of FL.
+	
+		\item \textbf{Scale}: This work experiments with 2 to 20 clients with a few thousand samples each. In other settings, the optimal point of the parameter space may be different, thus making FPGAs less or more fitting. 
+	
+		\item \textbf{Models}: Larger models could be locally trained more before overfitting, thus having a better communication-to-computation ratio. It should be explored if FPGAs are less or more fitting to such a setting.
+	\end{itemize}
+\end{frame}
