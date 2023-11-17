@@ -1,7 +1,7 @@
 # ES-FL
- Embedded System Architecture for the Acceleration of Collaborative Learning in Neural Networks
-
- This repository contains all files produced during my thesis. The code is organized between standalone CNN implementations and FL systems.
+ FPGA-accelerated Federated Learning on a small CNN that recognises Fashion-MNIST images. This repository contains all files produced during my thesis under the title "Reconfigurable Logic (FPGA)-based System Architecture for the Acceleration of Federated Learning in Neural Networks".
+ 
+ The code is organized between standalone CNN implementations and FL systems.
 
  There are 4 CNN implementations:
  * A Python/TF one that was used for theoriticla experimentation and to produce the folden results.
