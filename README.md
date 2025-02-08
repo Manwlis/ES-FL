@@ -4,7 +4,7 @@
  The code is organized between standalone CNN implementations and FL systems.
 
  There are 4 CNN implementations:
- * A Python/TF one that was used for theoriticla experimentation and to produce the folden results.
+ * A Python/TF one that was used for theoritical experimentation and to produce the folden results.
  * A CPU-based C++ one, intended as a stepping stone between the first one and FPGA-based ones.
  * An FPGA-based HLS one.
  * A complete FPGA-based one ( HLS + XRT ). It has been run and evaluated on a ZCU102.
